@@ -165,6 +165,80 @@ Falta dominio para subir la página
 El logo de la organización debería estar en la página principal
 Desde ahí se puede acceder a los distintos torneos
 
+### Nuevo requierimietos
+
+Nosotros manejamos formatos dependiendo el número de equipos 
+Puede ser todos contra todos, o grupos. Pero siempre con ronda final es decir eliminatorias directas hasta llegar al juego final 
+
+El tema en el baloncesto siempre se maneja así 
+Ganador 2 puntos
+Perdedor 1 punto 
+En el baloncesto no hay empate 
+
+Luego hay diferencia de goles o canastas y también aparte se saca un overage que es el promedio de los puntos por juego eso se puede consultar 
+
+Claro nosotros manejamos categorías 
+- juvenil o senior 
+- +30 años 
+- +40 años 
+- +50 años 
+Hombres y mujeres 
+
+El tema de nombre de canchas puedes ubicarle como cancha central o mejor como coliseo Pablo Delgado Álava, que es donde siempre jugamos
+
+En el tema estadísticas 
+- nosotros tenemos un programa en base al que lleva el marcador que saca estadísticas de cada jugador por la planilla, nos dan un documentos PDF que se podria subir y el mismo contabilice lo que uno desea, es decir puntos. Triples. Rebotes y así. 
+- el tema de ingresar resultados se podría manejar con el mismo documentos PDF que te mencioné 
+- Claro nosotros normalmente premiamos al mejor jugador pero eso lo manejamos en nuestra página de instagram y Facebook 
+- lo de los árbitros ese tema no
+Del primer punto está bien, así debería ser. 
+Documentos puede ser PDF obviamente documentos de certificados o cedula, imagen solo fotos 
+
+Claro son categorizadas
+- Juvenil es abierto ahí no hay problema 
+- +30 años. Es decir nacidos en el año 96 para arriba... 97-98-99... y así 
+- +40 años, igual del 86 para arriba 
+
+Pago de inscripción deben hacerlo por medio del registro de equipo 
+Por decir 
+Al ingresar los datos del equipo como 
+1. Nombre de equipo
+2. Logo de equipo 
+3. Categoría 
+4. Pago de inscripción 
+
+Y luego de eso accede a registrar a los jugadores
+Un super admin que sería yo 
+Mesa de control no
+Delegado si, que realiza las gestiones de ingreso de jugadores 
+Público así mismo 
+Claro recuperan contraseña al correo los delegados
+
+Los colores al menos de la página principal debe ir con los logos, y dentro de cada torneo se maneje igual la linea gráfica con los logos de cada torneo o algo semejante en colores que se vea bien 
+
+Equipos al menos en el Intercolegial Exalumnos son un máximo de 35 con más de 400 jugadores 
+
+Y con los otros torneos más o menos un 30% menos en equipos y jugadores
+
+La web solo tiene que mostrar información (como una landing?, la campara como con la página de la liga PRO)
+Ellos usan FIBA stadistics, quiere que el programa identifique los equipos la categoría y el resultado del pdf restante
+
+El solía gestionar las inscripciones con google forms entonces considera que podríamos extraer la info de esos formularios para insertarlos en la nueva base de datos y no tener que inscribir a jugadores que ya habían participado
+
+Quiere que haya una galería de fotos (No lo tomaremos en cuenta de momento pero lo dejaremos para el futuro o para el momento de afinar detalles)
+
+Respecto al almacenamiento no se quiere hacer demasiados problemas, lo que si quiere es que se almacenan las fotos de cada jugador
+
+El me envió un ejemplo del documento, es este de aquí [[Planilla estadística FIBA 5DJ vs JLP 05 octubre.pdf]], quiere que se le detecte del pdf la información para obtener las estadísticas ya que, tiene porque detectar todo si no solo un par de celdas, el ha intentado trasnformarlo en excel para poder pasar los datos asi que al final solo lo compartió las estadísticas mediante el pdf
+
+Respecto al formulario de inscripción sería:
+-Delegado del equipo
+-Foto del equipo
+-Nombre del equipo
+-Que haya un botón para añadir jugadores e ir añadiendo uno a uno (si ya están registrados podríamos ir añadiendolos por nombre, es decir buscarlos dentro de la base de datos)
+-Datos básicos de jugador: nombre, foto, y el número de camiseta
+
+
 # Preguntas para realizar
 
 Buenas noches, gracias por la espera a mi respuesta, estuve revisando los requisitos que me pidió y me parecen muy detallados, está perfecto, tengo muchas preguntas, puede ir respondiéndolas por partes, mas que nada porque me faltan mas especificaciones del sistema para 
@@ -254,3 +328,13 @@ Estas preguntas te ayudarán a definir la infraestructura y los costos del despl
 - Esto es mas como una anotación, para almacenar los documentos y las fotos necesitaremos un almacenamiento S3 y este suele tener un costo por uso, hay algunas opciones y dependiendo de que tanta información se almacenará podemos elegir una e ir revisándolas
 
 - **¿Debe haber un límite en el tamaño de los archivos que se suban y si lo ha cual será?** Para cuando se suban fotos y documentos ya que hay que tenerlo en cuenta para el almacenamiento y sabiendo que tiene un costo mientras mas pesados sean los archivos mas podría costar
+
+## Próximas preguntas a realizar
+
+- Sobre el registro de equipos: Cuando el delegado inscribe al equipo y sube el pago, ¿puede empezar a añadir a sus jugadores inmediatamente, o el sistema debe bloquearlo hasta que tú revises y apruebes ese comprobante de pago?
+
+- Sobre las estadísticas: Leer datos desde un PDF automáticamente suele dar errores porque los formatos varían. ¿Crees que puedas pedirle a la persona de la mesa de control que nos exporte las estadísticas desde el FIBA LiveStats en formato **Excel o CSV** en lugar de PDF? Si tenemos ese archivo, el sistema lo leerá a la perfección y automáticamente.
+
+- Sobre los datos antiguos: ¿Me podrías compartir un ejemplo (aunque sea con 5 filas) del Excel de Google Forms que usaban antes? Así voy preparando la base de datos para que encaje con esa información.
+
+- El tema del comprobante de pago y el registro de los equipos como debe funcionar?, es decir, la persona paga y por ejemplo te envía el comprobante a ti y ahí se autoriza el registro del equipo o deben subir el comprobante a la página web y tu lo revisas y apruebas desde allí?
