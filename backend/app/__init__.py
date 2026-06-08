@@ -37,12 +37,11 @@ def create_app() -> Flask:
 
     # ── Modelos (importar para que Alembic los detecte) ────────────
     with app.app_context():
-        import app.models  # noqa: F401
+        from app import models  # noqa: F401
 
     # ── Blueprints ─────────────────────────────────────────────────
-    # Los blueprints se registrarán a medida que se creen las rutas.
-    # from app.routes import ...
-    # app.register_blueprint(...)
+    from app.routes.health_bp import health_bp
+    app.register_blueprint(health_bp)
 
     # ── Manejadores de errores ─────────────────────────────────────
     from app.utils.error_handlers import register_error_handlers
