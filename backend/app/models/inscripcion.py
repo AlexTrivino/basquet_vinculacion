@@ -38,6 +38,10 @@ class Inscripcion(db.Model):
             "estado_inscripcion IN ('pendiente', 'aprobado', 'rechazado')",
             name='ck_inscripciones_estado',
         ),
+        db.UniqueConstraint(
+            'id_torneo', 'id_equipo', 'id_categoria',
+            name='uq_inscripcion_torneo_equipo_categoria',
+        ),
     )
 
     def to_dict(self) -> dict:

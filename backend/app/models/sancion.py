@@ -27,6 +27,11 @@ class Sancion(db.Model):
     jugador = db.relationship('Jugador', back_populates='sanciones', lazy='select')
     partido = db.relationship('Partido', back_populates='sanciones', lazy='select')
 
+    @classmethod
+    def activos(cls):
+        """Retorna query filtrada por sanciones vigentes (soft delete)."""
+        return cls.query.filter_by(estado='activa')
+
     def to_dict(self) -> dict:
         """Serializa la instancia a un diccionario JSON-compatible."""
         return {

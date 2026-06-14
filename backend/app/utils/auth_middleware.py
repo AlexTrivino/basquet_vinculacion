@@ -9,7 +9,8 @@ Seguridad aplicada:
     - Algoritmo forzado a HS256 (previene ataques de degradación).
     - Claims ``sub`` y ``exp`` requeridos explícitamente.
     - Inyección de identidad en ``flask.g`` para trazabilidad.
-    - Verificación de rol (RBAC) opcional contra la tabla ``Usuarios``.
+    - Verificación de roles (RBAC) con lista ``allowed_roles`` contra
+      la tabla ``Usuarios`` para soportar múltiples roles por ruta.
 """
 import os
 from functools import wraps
@@ -20,7 +21,7 @@ from flask import g, jsonify, request
 from app import db
 
 
-def token_required(fn=None, *, required_role=None):
+def token_required(fn=None, *, allowed_roles=None):
     """Decorador de autenticación y control de acceso basado en roles (RBAC).
 
     Soporta dos formas de invocación:
@@ -32,20 +33,24 @@ def token_required(fn=None, *, required_role=None):
             usuario_id = g.usuario_id   # UUID inyectado desde el claim 'sub'
             ...
 
-    **Con restricción de rol**::
+    **Con restricción de uno o más roles**::
 
-        @token_required(required_role='super_admin')
+        @token_required(allowed_roles=['super_admin'])
         def ruta_admin():
-            rol = g.usuario_rol   # 'super_admin' confirmado
+            ...
+
+        @token_required(allowed_roles=['super_admin', 'delegado'])
+        def ruta_compartida():
+            rol = g.usuario_rol   # rol verificado contra la BD
             ...
 
     Args:
         fn: Función decorada (se recibe automáticamente cuando se usa
             ``@token_required`` sin paréntesis).
-        required_role: Rol mínimo requerido (``'super_admin'`` o ``'delegado'``).
-            Cuando se especifica, el middleware consulta la tabla ``usuarios``
-            para verificar que el rol del usuario coincida y que su cuenta
-            esté activa.
+        allowed_roles: Lista de roles permitidos para acceder al endpoint
+            (ej. ``['super_admin', 'delegado']``). Cuando se especifica,
+            el middleware consulta la tabla ``usuarios`` para verificar que
+            el rol del usuario esté incluido y que su cuenta esté activa.
 
     Inyecta en ``flask.g``:
         - ``g.usuario_id`` (str): UUID del usuario autenticado (claim ``sub``).
@@ -116,8 +121,8 @@ def token_required(fn=None, *, required_role=None):
             g.usuario_id = payload['sub']
             g.usuario_rol = None
 
-            # ── 5. Verificación de rol (RBAC) si se requiere ─────
-            if required_role is not None:
+            # ── 5. Verificación de roles (RBAC) si se requiere ───
+            if allowed_roles is not None:
                 from app.models.usuario import Usuario
 
                 usuario = db.session.get(Usuario, g.usuario_id)
@@ -141,13 +146,14 @@ def token_required(fn=None, *, required_role=None):
 
                 g.usuario_rol = usuario.rol
 
-                if usuario.rol != required_role:
+                if usuario.rol not in allowed_roles:
                     return jsonify({
                         'success': False,
                         'error_code': 'FORBIDDEN',
                         'message': (
-                            f'Acceso denegado. Se requiere el rol '
-                            f'\'{required_role}\' para esta operación.'
+                            f'Acceso denegado. Se requiere uno de los siguientes '
+                            f'roles para esta operación: '
+                            f'{", ".join(f"{chr(39)}{r}{chr(39)}" for r in allowed_roles)}.'
                         ),
                     }), 403
 
@@ -156,7 +162,7 @@ def token_required(fn=None, *, required_role=None):
         return wrapper
 
     # Soporte para @token_required (sin paréntesis)
-    # y @token_required(required_role='...') (con paréntesis).
+    # y @token_required(allowed_roles=[...]) (con paréntesis).
     if fn is not None:
         return decorator(fn)
     return decorator

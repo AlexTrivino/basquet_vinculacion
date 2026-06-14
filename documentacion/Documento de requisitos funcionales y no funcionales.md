@@ -142,3 +142,7 @@ Las siguientes decisiones fueron validadas tras la revisión arquitectónica ini
 7. **Inscripción Sin Bloqueo:** El delegado registra equipo y jugadores inmediatamente. Todo ingresa con estado `'pendiente'`. El Admin aprueba/rechaza el conjunto.
 8. **Campos de Edad en `Categorias`:** `edad_minima` (Integer, Default=0) y `edad_maxima` (Integer, Nullable) eliminan Magic Numbers en validaciones.
 9. **Frontend con TailwindCSS:** Última versión estable compatible con Vite.
+10. **Patrón Controlador-Servicio (Rutas Delgadas):** Las rutas en `routes/` son delegadores puros (máximo ~15 líneas): reciben la petición, validan con schema y delegan a `services/`. Toda lógica de negocio, cálculos y consultas complejas residen exclusivamente en la capa de servicios.
+11. **Helper `api_response` centralizado (RNF-MAN-02):** Todas las respuestas JSON (éxito y error) se construyen mediante un único helper en `utils/response.py`. Queda prohibido construir `jsonify({...})` ad-hoc en las rutas.
+12. **Paginación obligatoria desde el primer endpoint GET:** Todo endpoint de listado usa el helper `paginate_query()` con formato estandarizado (`data` + `pagination: {page, per_page, total, pages}`). No se crean endpoints de listado sin paginación para evitar refactorizaciones futuras (RNF-REN-03).
+13. **Schemas diferenciados — Patrón DTO:** Cada entidad expone schemas de Marshmallow separados (`PublicSchema`, `AdminSchema`, `CreateSchema`) para controlar qué campos se serializan según el rol del consumidor. Los IDs internos y FKs sensibles no se exponen en vistas públicas.

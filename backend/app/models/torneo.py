@@ -33,6 +33,15 @@ class Torneo(db.Model):
         ),
     )
 
+    @classmethod
+    def activos(cls):
+        """Retorna query filtrada excluyendo torneos eliminados (soft delete).
+
+        Incluye torneos programados, en curso y finalizados.
+        Solo excluye los marcados como 'inactivo'.
+        """
+        return cls.query.filter(cls.estado != 'inactivo')
+
     def to_dict(self) -> dict:
         """Serializa la instancia a un diccionario JSON-compatible."""
         return {

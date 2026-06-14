@@ -35,6 +35,11 @@ class Plantilla(db.Model):
         db.CheckConstraint("estado IN ('activo', 'inactivo')", name='ck_plantillas_estado'),
     )
 
+    @classmethod
+    def activos(cls):
+        """Retorna query filtrada excluyendo registros inactivos (soft delete)."""
+        return cls.query.filter_by(estado='activo')
+
     def to_dict(self) -> dict:
         """Serializa la instancia a un diccionario JSON-compatible."""
         return {

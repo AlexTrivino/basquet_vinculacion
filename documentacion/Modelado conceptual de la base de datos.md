@@ -168,6 +168,10 @@
 * `updated_at`: DateTime, Default=now(), onupdate=now()
 **Relaciones:**
 * Desde `Torneos`, `Equipos`, `Categorias`: **Mandatorio Uno (||)**. Toda inscripción exige obligatoriamente las tres referencias.
+**Restricciones:**
+* `UNIQUE(id_torneo, id_equipo, id_categoria)`: Un equipo solo puede inscribirse una vez por categoría en cada torneo. Previene duplicados a nivel de base de datos.
+
+> **Nota general — Soft Delete Scope:** Todas las entidades con campo `estado` (Usuarios, Torneos, Equipos, Jugadores, Plantillas, Sanciones) implementan un classmethod `.activos()` que retorna una query pre-filtrada excluyendo registros inactivos. Las consultas deben usar `Entidad.activos()` en lugar de `Entidad.query` para evitar la filtración accidental de datos eliminados lógicamente.
 
 ## Plantillas
 * `id_plantilla`: Integer (Primary Key, Auto-increment)
