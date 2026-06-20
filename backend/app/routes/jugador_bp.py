@@ -105,3 +105,63 @@ def eliminar_jugador(id_jugador):
     if jugador is None:
         return api_error('NOT_FOUND', 'Jugador no encontrado.', 404)
     return api_response(message='Jugador eliminado exitosamente.')
+
+
+# ── POST /api/jugadores/<id>/foto ─────────────────────────────────
+
+@jugador_bp.route('/<int:id_jugador>/foto', methods=['POST'])
+@token_required(allowed_roles=['super_admin', 'delegado'])
+def subir_foto_jugador(id_jugador):
+    """Sube la foto de perfil de un jugador a Supabase Storage.
+
+    Acepta: JPEG, PNG, WebP. Máximo 2 MB.
+    El tipo MIME se verifica por **magic bytes** (no por extensión del archivo).
+    No acepta PDFs (solo imágenes de perfil).
+    """
+    from app.utils.storage import TIPOS_IMAGEN, subir_archivo, validar_archivo
+
+    jugador = jugador_service.obtener_jugador_por_id(id_jugador)
+    if jugador is None:
+        return api_error('NOT_FOUND', 'Jugador no encontrado.', 404)
+
+    if 'archivo' not in request.files:
+        return api_error(
+            'BAD_REQUEST',
+            "No se encontró el campo 'archivo'. Usa multipart/form-data.",
+            400,
+        )
+
+    archivo = request.files['archivo']
+    if archivo.filename == '':
+        return api_error('BAD_REQUEST', 'No se seleccionó ningún archivo.', 400)
+
+    # ── Validar: solo imágenes, máximo 2 MB ──────────────────────
+    try:
+        mime = validar_archivo(
+            archivo.stream,
+            tipos_aceptados=TIPOS_IMAGEN,
+            max_bytes=2 * 1024 * 1024,  # 2 MB
+        )
+    except ValueError as e:
+        return api_error('UNSUPPORTED_MEDIA_TYPE', str(e), 415)
+
+    # ── Subir en memoria a Supabase Storage ──────────────────────
+    try:
+        url = subir_archivo(
+            file_stream=archivo.stream,
+            nombre_original=archivo.filename,
+            carpeta=f'jugadores/{id_jugador}/fotos',
+            mime_type=mime,
+        )
+    except RuntimeError as e:
+        return api_error('STORAGE_ERROR', str(e), 502)
+
+    # ── Persistir la URL en la BD ─────────────────────────────────
+    jugador = jugador_service.actualizar_jugador(jugador, {'url_foto': url})
+
+    return api_response(
+        data=_admin_schema.dump(jugador),
+        message='Foto de jugador actualizada exitosamente.',
+        status=201,
+    )
+

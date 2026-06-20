@@ -149,3 +149,92 @@ def cambiar_estado(id_inscripcion):
         data=_admin_schema.dump(inscripcion),
         message=f"Estado actualizado a '{data['estado_inscripcion']}' exitosamente.",
     )
+
+
+# ── POST /api/inscripciones/<id>/comprobante ──────────────────────
+
+@inscripcion_bp.route('/<int:id_inscripcion>/comprobante', methods=['POST'])
+@token_required(allowed_roles=['super_admin', 'delegado'])
+def subir_comprobante(id_inscripcion):
+    """Sube el comprobante de pago de una inscripción a Supabase Storage.
+
+    Acepta: PDF, JPEG, PNG, WebP. Máximo 5 MB.
+    El tipo MIME se verifica por **magic bytes** (contenido real del archivo),
+    no por la extensión declarada por el cliente.
+
+    Para delegados: solo pueden subir comprobante de inscripciones
+    de equipos propios.
+    """
+    from app.utils.storage import (
+        TIPOS_DOCUMENTO,
+        TIPOS_IMAGEN,
+        subir_archivo,
+        validar_archivo,
+    )
+
+    # ── Verificar existencia de la inscripción ────────────────────
+    inscripcion = inscripcion_service.obtener_inscripcion_por_id(id_inscripcion)
+    if inscripcion is None:
+        return api_error('NOT_FOUND', 'Inscripción no encontrada.', 404)
+
+    # ── Verificar propiedad del delegado ──────────────────────────
+    if g.usuario_rol == 'delegado':
+        from app import db
+        from app.models.equipo import Equipo
+        equipo = db.session.get(Equipo, inscripcion.id_equipo)
+        if equipo is None or equipo.id_usuario != g.usuario_id:
+            return api_error(
+                'FORBIDDEN',
+                'No tienes permiso para subir documentos de esta inscripción.',
+                403,
+            )
+
+    # ── Verificar que se envió un archivo ─────────────────────────
+    if 'archivo' not in request.files:
+        return api_error(
+            'BAD_REQUEST',
+            "No se encontró el campo 'archivo' en la solicitud. "
+            "Usa multipart/form-data con el campo 'archivo'.",
+            400,
+        )
+
+    archivo = request.files['archivo']
+    if archivo.filename == '':
+        return api_error('BAD_REQUEST', 'No se seleccionó ningún archivo.', 400)
+
+    # ── Validar por magic bytes (PDF o imagen) ────────────────────
+    try:
+        mime = validar_archivo(
+            archivo.stream,
+            tipos_aceptados=TIPOS_DOCUMENTO | TIPOS_IMAGEN,
+            max_bytes=5 * 1024 * 1024,  # 5 MB
+        )
+    except ValueError as e:
+        return api_error('UNSUPPORTED_MEDIA_TYPE', str(e), 415)
+
+    # ── Subir en memoria a Supabase Storage ───────────────────────
+    try:
+        url = subir_archivo(
+            file_stream=archivo.stream,
+            nombre_original=archivo.filename,
+            carpeta=f'inscripciones/{id_inscripcion}',
+            mime_type=mime,
+        )
+    except RuntimeError as e:
+        return api_error('STORAGE_ERROR', str(e), 502)
+
+    # ── Persistir la URL en la BD ─────────────────────────────────
+    from app import db
+    inscripcion_obj = inscripcion_service.obtener_inscripcion_por_id(id_inscripcion)
+    # Acceso directo al objeto base para actualizar sin recargar relaciones
+    from app.models.inscripcion import Inscripcion as InscripcionModel
+    registro = db.session.get(InscripcionModel, id_inscripcion)
+    registro.url_comprobante_pago = url
+    db.session.commit()
+
+    return api_response(
+        data={'url_comprobante_pago': url},
+        message='Comprobante subido exitosamente.',
+        status=201,
+    )
+
