@@ -137,3 +137,29 @@ def eliminar_torneo(id_torneo):
     if torneo is None:
         return api_error('NOT_FOUND', 'Torneo no encontrado.', 404)
     return api_response(message='Torneo eliminado exitosamente.')
+
+
+# ── GET /api/torneos/<id>/posiciones ──────────────────────────────
+
+@torneo_bp.route('/<int:id_torneo>/posiciones', methods=['GET'])
+def tabla_de_posiciones(id_torneo):
+    """Retorna la tabla de posiciones del torneo. Acceso público.
+
+    Ejecuta el motor estadístico completo:
+        1. Una query a ``partidos`` para traer encuentros finalizados.
+        2. Procesamiento en memoria (defaultdict, cero queries adicionales).
+        3. Una query con ``in_`` para enriquecer con nombres y logos de equipos.
+
+    Retorna la lista ordenada por: Puntos DESC → DIF DESC → PF DESC.
+    """
+    torneo = torneo_service.obtener_torneo_por_id(id_torneo)
+    if torneo is None:
+        return api_error('NOT_FOUND', 'Torneo no encontrado.', 404)
+
+    from app.services.standings import recalcular_tabla
+    posiciones = recalcular_tabla(id_torneo)
+
+    return api_response(
+        data=posiciones,
+        message=f'Tabla de posiciones del torneo "{torneo.nombre}".',
+    )

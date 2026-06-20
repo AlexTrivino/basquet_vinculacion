@@ -51,7 +51,7 @@ class Partido(db.Model):
     # ── Restricciones ──────────────────────────────────────────────
     __table_args__ = (
         db.CheckConstraint(
-            "estado IN ('programado', 'en_curso', 'finalizado', 'suspendido')",
+            "estado IN ('programado', 'en_curso', 'finalizado', 'finalizado_wo', 'suspendido')",
             name='ck_partidos_estado',
         ),
     )

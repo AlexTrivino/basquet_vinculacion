@@ -255,13 +255,63 @@ npm run dev
 
 | Fase | Descripción | Estado |
 |------|-------------|--------|
-| **1** | Entorno, linters, modelos SQLAlchemy, primera migración | 🟡 En progreso |
-| **2** | Seguridad: CORS, JWT middleware, schemas de validación | ⬜ Pendiente |
-| **3** | Backend core: CRUD, motor estadístico, seeders, tests | ⬜ Pendiente |
-| **4** | Integración S3: carga de archivos, filtros, nomenclatura | ⬜ Pendiente |
-| **5** | Frontend base: React + Vite + TailwindCSS + Auth | ⬜ Pendiente |
-| **6** | Paneles de control: delegado, admin, vistas públicas | ⬜ Pendiente |
-| **7** | Pruebas E2E y despliegue: Vercel + Render | ⬜ Pendiente |
+| **1** | Entorno, linters, 14 modelos SQLAlchemy, primera migración (Alembic) | ✅ Completada |
+| **2** | Seguridad: CORS, JWT middleware (RBAC + `flask.g`), health check | ✅ Completada |
+| **3** | CRUDs base: Torneos, Categorías, Equipos (helpers `api_response`, `paginate_query`, schemas DTO) | ✅ Completada |
+| **4** | CRUDs avanzados: Inscripciones (joinedload, IntegrityError), Jugadores (validación cédula/edad), Plantillas (3 validaciones FIBA) | ✅ Completada |
+| **5** | Partidos y Motor Estadístico: CRUD de partidos, motor de posiciones FIBA (2 queries, defaultdict) | ✅ Completada |
+| **6** | Integración S3: carga de archivos (logos, fotos, comprobantes, documentos) | ⬜ Pendiente |
+| **7** | Frontend: React + Vite + TailwindCSS + Auth + paneles de control | ⬜ Pendiente |
+| **8** | Pruebas E2E y despliegue: Vercel + Render | ⬜ Pendiente |
+
+---
+
+## 🎯 Endpoints Destacados
+
+### Tabla de Posiciones (Pública)
+
+```bash
+GET /api/torneos/{id_torneo}/posiciones
+```
+
+Retorna la clasificación calculada en tiempo real con **2 queries SQL** (cero N+1):
+
+```json
+{
+  "success": true,
+  "message": "Tabla de posiciones del torneo \"Copa Salesiana 2025\".",
+  "data": [
+    {
+      "posicion": 1,
+      "id_equipo": 3,
+      "nombre_equipo": "Salesianos FC",
+      "url_logo": "https://storage.supabase.co/...",
+      "PJ": 5, "PG": 4, "PP": 1,
+      "PF": 410, "PC": 330,
+      "DIF": 80,
+      "puntos": 9
+    },
+    { "posicion": 2, "..." : "..." }
+  ]
+}
+```
+
+**Reglas de desempate aplicadas (FIBA):** Puntos → Diferencia de Canastas (DIF) → Puntos a Favor (PF)
+
+### Otros Endpoints Clave
+
+| Método | Ruta | Auth | Descripción |
+|--------|------|------|-------------|
+| `GET` | `/api/health` | Público | Estado del servidor y BD |
+| `GET` | `/api/torneos` | Público | Lista torneos activos (paginado) |
+| `GET` | `/api/torneos/{id}/posiciones` | Público | Tabla de posiciones FIBA |
+| `GET` | `/api/partidos?id_torneo={id}` | Público | Calendario de partidos (paginado) |
+| `GET` | `/api/equipos` | Público | Lista de equipos activos (paginado) |
+| `GET` | `/api/categorias` | Público | Categorías disponibles |
+| `POST` | `/api/inscripciones` | `delegado` / `super_admin` | Inscribir equipo en torneo |
+| `PATCH` | `/api/inscripciones/{id}/estado` | `super_admin` | Aprobar/rechazar inscripción |
+| `POST` | `/api/plantillas` | `delegado` / `super_admin` | Agregar jugador a nómina |
+| `PUT` | `/api/partidos/{id}` | `super_admin` | Actualizar marcadores (activa standings) |
 
 ---
 
