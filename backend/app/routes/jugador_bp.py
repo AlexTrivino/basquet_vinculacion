@@ -135,12 +135,11 @@ def subir_foto_jugador(id_jugador):
     if archivo.filename == '':
         return api_error('BAD_REQUEST', 'No se seleccionó ningún archivo.', 400)
 
-    # ── Validar: solo imágenes, máximo 2 MB ──────────────────────
+    # ── Validar: solo imágenes, sin doble consumo de memoria ─────
     try:
         mime = validar_archivo(
             archivo.stream,
             tipos_aceptados=TIPOS_IMAGEN,
-            max_bytes=2 * 1024 * 1024,  # 2 MB
         )
     except ValueError as e:
         return api_error('UNSUPPORTED_MEDIA_TYPE', str(e), 415)

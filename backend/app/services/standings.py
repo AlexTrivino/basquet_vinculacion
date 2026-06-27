@@ -72,6 +72,7 @@ def recalcular_tabla(id_torneo: int) -> list[dict]:
     # El defaultdict elimina la necesidad de verificar si el equipo
     # ya existe antes de acumular.
     def _equipo_inicial():
+        """Retorna dict con estadísticas inicializadas en cero para un equipo."""
         return {'PJ': 0, 'PG': 0, 'PP': 0, 'PF': 0, 'PC': 0, 'puntos': 0}
 
     tabla = defaultdict(_equipo_inicial)

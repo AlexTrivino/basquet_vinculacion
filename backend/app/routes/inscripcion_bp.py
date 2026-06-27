@@ -158,30 +158,27 @@ def cambiar_estado(id_inscripcion):
 def subir_comprobante(id_inscripcion):
     """Sube el comprobante de pago de una inscripción a Supabase Storage.
 
-    Acepta: PDF, JPEG, PNG, WebP. Máximo 5 MB.
-    El tipo MIME se verifica por **magic bytes** (contenido real del archivo),
-    no por la extensión declarada por el cliente.
+    Acepta: PDF, JPEG, PNG, WebP. Límite de tamaño gestionado por
+    ``MAX_CONTENT_LENGTH`` de Flask (sin doble lectura del stream).
 
     Para delegados: solo pueden subir comprobante de inscripciones
     de equipos propios.
     """
-    from app.utils.storage import (
-        TIPOS_DOCUMENTO,
-        TIPOS_IMAGEN,
-        subir_archivo,
-        validar_archivo,
-    )
+    from app import db
+    from app.models.equipo import Equipo
+    from app.models.inscripcion import Inscripcion as InscripcionModel
+    from app.utils.storage import TIPOS_DOCUMENTO, TIPOS_IMAGEN, subir_archivo, validar_archivo
 
-    # ── Verificar existencia de la inscripción ────────────────────
-    inscripcion = inscripcion_service.obtener_inscripcion_por_id(id_inscripcion)
-    if inscripcion is None:
+    # ── SELECT único: verificar existencia y cargar objeto ────────
+    # Este mismo objeto se muta en memoria más adelante (patrón
+    # SELECT → validar → mutar → commit).
+    registro = db.session.get(InscripcionModel, id_inscripcion)
+    if registro is None:
         return api_error('NOT_FOUND', 'Inscripción no encontrada.', 404)
 
     # ── Verificar propiedad del delegado ──────────────────────────
     if g.usuario_rol == 'delegado':
-        from app import db
-        from app.models.equipo import Equipo
-        equipo = db.session.get(Equipo, inscripcion.id_equipo)
+        equipo = db.session.get(Equipo, registro.id_equipo)
         if equipo is None or equipo.id_usuario != g.usuario_id:
             return api_error(
                 'FORBIDDEN',
@@ -202,12 +199,11 @@ def subir_comprobante(id_inscripcion):
     if archivo.filename == '':
         return api_error('BAD_REQUEST', 'No se seleccionó ningún archivo.', 400)
 
-    # ── Validar por magic bytes (PDF o imagen) ────────────────────
+    # ── Validar por magic bytes (sin consumo doble de memoria) ────
     try:
         mime = validar_archivo(
             archivo.stream,
             tipos_aceptados=TIPOS_DOCUMENTO | TIPOS_IMAGEN,
-            max_bytes=5 * 1024 * 1024,  # 5 MB
         )
     except ValueError as e:
         return api_error('UNSUPPORTED_MEDIA_TYPE', str(e), 415)
@@ -223,12 +219,8 @@ def subir_comprobante(id_inscripcion):
     except RuntimeError as e:
         return api_error('STORAGE_ERROR', str(e), 502)
 
-    # ── Persistir la URL en la BD ─────────────────────────────────
-    from app import db
-    inscripcion_obj = inscripcion_service.obtener_inscripcion_por_id(id_inscripcion)
-    # Acceso directo al objeto base para actualizar sin recargar relaciones
-    from app.models.inscripcion import Inscripcion as InscripcionModel
-    registro = db.session.get(InscripcionModel, id_inscripcion)
+    # ── Mutar objeto en memoria y commit único ────────────────────
+    # Sin segundo SELECT: reutilizamos ``registro`` del SELECT inicial.
     registro.url_comprobante_pago = url
     db.session.commit()
 

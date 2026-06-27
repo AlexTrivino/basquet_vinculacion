@@ -90,19 +90,22 @@ def detectar_mime(file_stream: IO) -> str | None:
     return None  # Tipo no reconocido → rechazar
 
 
-def validar_archivo(file_stream: IO, tipos_aceptados: frozenset, max_bytes: int) -> str:
-    """Valida un archivo por contenido real y tamaño.
+def validar_archivo(file_stream: IO, tipos_aceptados: frozenset) -> str:
+    """Valida el tipo real de un archivo por sus magic bytes.
+
+    El límite de tamaño se aplica globalmente vía ``MAX_CONTENT_LENGTH`` en
+    la configuración de Flask, evitando así una segunda lectura completa del
+    stream (doble consumo de memoria) en esta función.
 
     Args:
         file_stream: Stream del archivo.
         tipos_aceptados: Conjunto de MIME types permitidos (ej. ``TIPOS_IMAGEN``).
-        max_bytes: Tamaño máximo permitido en bytes.
 
     Returns:
         MIME type detectado (string).
 
     Raises:
-        ValueError: Si el tipo no es válido o supera el tamaño máximo.
+        ValueError: Si el tipo real del archivo no coincide con los permitidos.
     """
     mime = detectar_mime(file_stream)
 
@@ -112,18 +115,6 @@ def validar_archivo(file_stream: IO, tipos_aceptados: frozenset, max_bytes: int)
             f'Tipo de archivo no permitido. '
             f'Se aceptan: {tipos_legibles}. '
             f'El archivo fue analizado por su contenido real, no por su extensión.'
-        )
-
-    # Verificar tamaño leyendo el stream completo en memoria
-    file_stream.seek(0, 2)     # Seek al final
-    tamano = file_stream.tell()
-    file_stream.seek(0)        # Restaurar al inicio
-
-    if tamano > max_bytes:
-        mb = max_bytes / (1024 * 1024)
-        raise ValueError(
-            f'El archivo supera el límite de {mb:.0f} MB '
-            f'({tamano / (1024 * 1024):.2f} MB recibidos).'
         )
 
     return mime

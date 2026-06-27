@@ -6,7 +6,14 @@ matemáticamente los tokens JWT emitidos por Supabase Auth antes
 de permitir el acceso a endpoints protegidos.
 
 Seguridad aplicada:
-    - Algoritmo forzado a HS256 (previene ataques de degradación).
+    - **JWKS dinámico:** Obtiene las claves públicas desde el endpoint
+      JWKS de Supabase para validar tokens firmados con ECC P-256 (ES256).
+      Usa ``PyJWKClient(cache_keys=True)`` para cachear las claves y
+      evitar una petición HTTP en cada request.
+    - **Fallback HS256:** Si el JWKS no contiene la clave del token
+      (ej. API Keys legacy de Supabase que usan HS256 con secreto
+      simétrico), se intenta la verificación con ``SUPABASE_JWT_SECRET``.
+    - Algoritmos permitidos: ``['ES256', 'RS256', 'HS256']``.
     - Claims ``sub`` y ``exp`` requeridos explícitamente.
     - Inyección de identidad en ``flask.g`` para trazabilidad.
     - Verificación de roles (RBAC) con lista ``allowed_roles`` contra
@@ -16,9 +23,38 @@ import os
 from functools import wraps
 
 import jwt
+from jwt import PyJWKClient, PyJWKClientError
 from flask import g, jsonify, request
 
 from app import db
+
+# ── Algoritmos aceptados (orden de preferencia) ──────────────────
+_ALGORITHMS = ['ES256', 'RS256', 'HS256']
+
+# ── Cliente JWKS (singleton lazy con caché) ──────────────────────
+# Se inicializa en el primer request y reutiliza la caché de claves
+# para todos los requests subsiguientes (sin HTTP extra).
+_jwks_client = None
+
+
+def _get_jwks_client():
+    """Retorna (o crea) el PyJWKClient apuntando al JWKS de Supabase.
+
+    La URL tiene la forma:
+        ``https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json``
+
+    ``cache_keys=True`` habilita la caché interna de PyJWKClient:
+    las claves descargadas se almacenan en memoria y solo se refrescan
+    cuando un ``kid`` desconocido aparece en un token nuevo.
+    """
+    global _jwks_client
+
+    if _jwks_client is None:
+        supabase_url = os.getenv('SUPABASE_URL', '').rstrip('/')
+        jwks_url = f'{supabase_url}/auth/v1/.well-known/jwks.json'
+        _jwks_client = PyJWKClient(jwks_url, cache_keys=True)
+
+    return _jwks_client
 
 
 def token_required(fn=None, *, allowed_roles=None):
@@ -76,28 +112,32 @@ def token_required(fn=None, *, allowed_roles=None):
 
             token = auth_header.split(' ', 1)[1]
 
-            # ── 2. Verificar configuración del servidor ───────────
-            supabase_secret = os.getenv('SUPABASE_JWT_SECRET')
+            # ── 2. Decodificar JWT con JWKS (asimétrico) o fallback HS256
+            #
+            #    Estrategia de doble intento:
+            #      a) JWKS: extrae la clave pública del endpoint JWKS de
+            #         Supabase usando el 'kid' del header del token.
+            #         Soporta ES256 (ECC P-256) y RS256 (RSA).
+            #      b) HS256 fallback: si el JWKS no tiene la clave (API Keys
+            #         legacy sin 'kid'), intenta con el secreto simétrico
+            #         SUPABASE_JWT_SECRET.
+            #
+            payload = None
 
-            if not supabase_secret:
-                return jsonify({
-                    'success': False,
-                    'error_code': 'SERVER_CONFIG_ERROR',
-                    'message': 'El servidor no tiene configurada la clave JWT.',
-                }), 500
-
-            # ── 3. Decodificar y validar la firma del JWT ─────────
-            #    - algorithms=["HS256"]: previene ataques de degradación
-            #      (ej. "alg":"none" o cambio a RS256 con clave pública).
-            #    - require=["sub", "exp"]: rechaza tokens sin identidad
-            #      o sin fecha de expiración.
+            # ── Intento A: Verificación asimétrica via JWKS ───────
             try:
+                jwks_client = _get_jwks_client()
+                signing_key = jwks_client.get_signing_key_from_jwt(token)
                 payload = jwt.decode(
                     token,
-                    supabase_secret,
-                    algorithms=['HS256'],
+                    signing_key.key,
+                    algorithms=_ALGORITHMS,
+                    audience='authenticated',
                     options={'require': ['sub', 'exp']},
                 )
+            except (PyJWKClientError, jwt.exceptions.PyJWKClientConnectionError):
+                # JWKS no disponible o token sin 'kid' → intentar HS256
+                pass
             except jwt.ExpiredSignatureError:
                 return jsonify({
                     'success': False,
@@ -105,6 +145,8 @@ def token_required(fn=None, *, allowed_roles=None):
                     'message': 'El token ha expirado. Inicia sesión nuevamente.',
                 }), 401
             except jwt.InvalidTokenError:
+                # Firma inválida con clave JWKS → no intentar fallback,
+                # el token fue rechazado criptográficamente.
                 return jsonify({
                     'success': False,
                     'error_code': 'INVALID_TOKEN',
@@ -112,6 +154,44 @@ def token_required(fn=None, *, allowed_roles=None):
                         'El token es inválido o su firma no pudo ser verificada.'
                     ),
                 }), 401
+
+            # ── Intento B: Fallback HS256 con secreto simétrico ───
+            if payload is None:
+                supabase_secret = os.getenv('SUPABASE_JWT_SECRET')
+
+                if not supabase_secret:
+                    return jsonify({
+                        'success': False,
+                        'error_code': 'SERVER_CONFIG_ERROR',
+                        'message': (
+                            'El servidor no tiene configuradas las credenciales '
+                            'JWT (ni JWKS ni secreto simétrico).'
+                        ),
+                    }), 500
+
+                try:
+                    payload = jwt.decode(
+                        token,
+                        supabase_secret,
+                        algorithms=['HS256'],
+                        audience='authenticated',
+                        options={'require': ['sub', 'exp']},
+                    )
+                except jwt.ExpiredSignatureError:
+                    return jsonify({
+                        'success': False,
+                        'error_code': 'TOKEN_EXPIRED',
+                        'message': 'El token ha expirado. Inicia sesión nuevamente.',
+                    }), 401
+                except jwt.InvalidTokenError:
+                    return jsonify({
+                        'success': False,
+                        'error_code': 'INVALID_TOKEN',
+                        'message': (
+                            'El token es inválido o su firma no pudo ser '
+                            'verificada con ningún método (JWKS ni HS256).'
+                        ),
+                    }), 401
 
             # ── 4. Inyectar identidad en el contexto de Flask ─────
             #    flask.g es un objeto por-request: cada petición HTTP
