@@ -1,13 +1,15 @@
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
+
 import { ProtectedRoute } from './ProtectedRoute';
+import { MainLayout } from '../components/MainLayout';
 import NotFound from '../pages/errors/NotFound';
 import Unauthorized from '../pages/errors/Unauthorized';
 
 // --- Lazy loaded pages (Code Splitting) ---
 // Público
-const Home = lazy(() => import('../pages/Home'));
-const TorneoDetail = lazy(() => import('../pages/TorneoDetail'));
+const Home = lazy(() => import('../pages/public/Home'));
+const TorneoDetail = lazy(() => import('../pages/public/TorneoDetail'));
 
 // Auth
 const Login = lazy(() => import('../pages/auth/Login'));
@@ -25,23 +27,54 @@ const AdminPartidos = lazy(() => import('../pages/admin/Partidos'));
 const AdminEstadisticas = lazy(() => import('../pages/admin/Estadisticas'));
 
 // --- Suspense Wrapper ---
-// Muestra un indicador de carga temporal mientras se descarga el chunk de la ruta.
-// Sin diseño por ahora, se reemplazará con un Skeleton en la Fase 3.
+// Placeholder temporal de carga mientras se bajan los chunks.
 const withSuspense = (Component: React.LazyExoticComponent<any>) => (
-  <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Cargando...</div>}>
+  <Suspense
+    fallback={
+      <div className="flex min-h-[50vh] items-center justify-center p-8">
+        <div className="text-gray-500">Cargando contenido...</div>
+      </div>
+    }
+  >
     <Component />
   </Suspense>
 );
 
 export const router = createBrowserRouter([
   {
-    path: '/',
-    element: withSuspense(Home),
+    // MainLayout envuelve a todas las rutas de negocio para proveer el Navbar
+    element: <MainLayout />,
+    children: [
+      {
+        path: '/',
+        element: withSuspense(Home),
+      },
+      {
+        path: '/torneos/:id',
+        element: withSuspense(TorneoDetail),
+      },
+      {
+        path: '/delegado',
+        element: <ProtectedRoute allowedRoles={['delegado']} />,
+        children: [
+          { path: 'dashboard', element: withSuspense(DelegadoDashboard) },
+          { path: 'inscripcion', element: withSuspense(DelegadoInscripcion) },
+          { path: 'plantilla', element: withSuspense(DelegadoPlantilla) },
+        ],
+      },
+      {
+        path: '/admin',
+        element: <ProtectedRoute allowedRoles={['super_admin']} />,
+        children: [
+          { path: 'dashboard', element: withSuspense(AdminDashboard) },
+          { path: 'auditoria', element: withSuspense(AdminAuditoria) },
+          { path: 'partidos', element: withSuspense(AdminPartidos) },
+          { path: 'estadisticas', element: withSuspense(AdminEstadisticas) },
+        ],
+      },
+    ],
   },
-  {
-    path: '/torneos/:id',
-    element: withSuspense(TorneoDetail),
-  },
+  // Auth Layout (se excluye MainLayout para no mostrar el Navbar en Login)
   {
     path: '/auth/login',
     element: withSuspense(Login),
@@ -49,25 +82,6 @@ export const router = createBrowserRouter([
   {
     path: '/auth/recuperar',
     element: withSuspense(Recuperar),
-  },
-  {
-    path: '/delegado',
-    element: <ProtectedRoute allowedRoles={['delegado']} />,
-    children: [
-      { path: 'dashboard', element: withSuspense(DelegadoDashboard) },
-      { path: 'inscripcion', element: withSuspense(DelegadoInscripcion) },
-      { path: 'plantilla', element: withSuspense(DelegadoPlantilla) },
-    ],
-  },
-  {
-    path: '/admin',
-    element: <ProtectedRoute allowedRoles={['super_admin']} />,
-    children: [
-      { path: 'dashboard', element: withSuspense(AdminDashboard) },
-      { path: 'auditoria', element: withSuspense(AdminAuditoria) },
-      { path: 'partidos', element: withSuspense(AdminPartidos) },
-      { path: 'estadisticas', element: withSuspense(AdminEstadisticas) },
-    ],
   },
   {
     path: '/unauthorized',
