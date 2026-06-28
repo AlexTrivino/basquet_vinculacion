@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+/*
+ * ─── Design Tokens del Proyecto ──────────────────────────────────
+ *
+ * Paleta neutra institucional para el shell de la app.
+ * Los colores dinámicos por torneo se inyectan via CSS custom
+ * properties en runtime (--torneo-primary, --torneo-accent).
+ *
+ * Tipografía: Inter (Google Fonts) — importada en index.html.
+ */
+
+@theme {
+  /* ── Tipografía ──────────────────────────────────────────────── */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* ── Paleta neutra institucional (Shell) ─────────────────────── */
+  --color-primary-50: #EFF6FF;
+  --color-primary-100: #DBEAFE;
+  --color-primary-200: #BFDBFE;
+  --color-primary-300: #93C5FD;
+  --color-primary-400: #60A5FA;
+  --color-primary-500: #3B82F6;
+  --color-primary-600: #2563EB;
+  --color-primary-700: #1D4ED8;
+  --color-primary-800: #1E3A5F;
+  --color-primary-900: #0F172A;
+
+  --color-accent-500: #F59E0B;
+  --color-accent-600: #D97706;
+
+  --color-success-500: #22C55E;
+  --color-danger-500: #EF4444;
+  --color-warning-500: #F59E0B;
+
+  /* ── Bordes ──────────────────────────────────────────────────── */
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+}
+
+/*
+ * ─── Colores Dinámicos por Torneo ────────────────────────────────
+ *
+ * Estas variables se inyectan en runtime desde React al cargar un
+ * torneo. Se consumen via: bg-[var(--torneo-primary)]
+ *
+ * Defaults: heredan de la paleta institucional para evitar
+ * flashes de contenido sin estilo.
+ */
+:root {
+  --torneo-primary: #1D4ED8;
+  --torneo-accent: #F59E0B;
+  --torneo-bg: #EFF6FF;
+}
+
+/*
+ * ─── Base Styles ─────────────────────────────────────────────────
+ */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #F8FAFC;
+  color: #0F172A;
+  min-height: 100dvh;
+}
+
+/* Focus visible accesible para navegación por teclado */
+*:focus-visible {
+  outline: 2px solid var(--color-primary-500);
+  outline-offset: 2px;
+}
