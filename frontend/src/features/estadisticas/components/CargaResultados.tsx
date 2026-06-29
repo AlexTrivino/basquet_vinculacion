@@ -7,8 +7,8 @@ import { AsyncButton } from '../../../components/AsyncButton';
 // Esquema para validar los resultados antes de tocar el backend
 const cargaSchema = z.object({
   partidoId: z.string().min(1, 'Debes seleccionar un partido finalizado'),
-  puntosLocal: z.coerce.number().min(0, 'No puede ser negativo').max(300, 'Puntaje irreal'),
-  puntosVisitante: z.coerce.number().min(0, 'No puede ser negativo').max(300, 'Puntaje irreal'),
+  puntosLocal: z.number().min(0, 'No puede ser negativo').max(300, 'Puntaje irreal'),
+  puntosVisitante: z.number().min(0, 'No puede ser negativo').max(1000, 'Puntaje irreal'),
   observaciones: z.string().optional(),
 });
 
@@ -62,7 +62,7 @@ export function CargaResultados() {
             <input
               id="puntosLocal"
               type="number"
-              {...register('puntosLocal')}
+              {...register('puntosLocal', { valueAsNumber: true })}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
             {errors.puntosLocal && <p className="mt-1 text-xs text-red-600">{errors.puntosLocal.message}</p>}
@@ -74,7 +74,7 @@ export function CargaResultados() {
             <input
               id="puntosVisitante"
               type="number"
-              {...register('puntosVisitante')}
+              {...register('puntosVisitante', { valueAsNumber: true })}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             />
             {errors.puntosVisitante && <p className="mt-1 text-xs text-red-600">{errors.puntosVisitante.message}</p>}
