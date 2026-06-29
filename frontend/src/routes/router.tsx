@@ -13,6 +13,7 @@ const TorneoDetail = lazy(() => import('../pages/public/TorneoDetail'));
 
 // Auth
 const Login = lazy(() => import('../pages/auth/Login'));
+const Registro = lazy(() => import('../pages/auth/Registro'));
 const Recuperar = lazy(() => import('../pages/auth/Recuperar'));
 
 // Delegado
@@ -78,6 +79,10 @@ export const router = createBrowserRouter([
   {
     path: '/auth/login',
     element: withSuspense(Login),
+  },
+  {
+    path: '/auth/registro',
+    element: withSuspense(Registro),
   },
   {
     path: '/auth/recuperar',

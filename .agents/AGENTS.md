@@ -239,22 +239,36 @@ Desktop (≥1024px)              Mobile (<1024px)
 
 ---
 
-## Plan de Ejecución (Secuencial — no saltarse fases)
+## Plan de Ejecución (Fases Completadas)
 
-El agente **no debe construir toda la aplicación en un solo paso**.
-Esperar instrucción del usuario para avanzar fase a fase:
+✅ **Fase 1: Andamiaje:** Vite + Tailwind + estructura (Completada).
+✅ **Fase 2: Infraestructura:** Axios, AuthContext, ProtectedRoute, Router base (Completada).
+✅ **Fase 3: UI Kit base:** Navbar, Sidebar, DataGridTable, AsyncButton, etc. (Completada).
+✅ **Fase 4: Dominio Auth:** Login (Completada).
+✅ **Fase 5: Dominio Público:** Home + Tabla de Posiciones (Completada).
+✅ **Fase 6: Dominio Delegado:** Dashboard + Inscripción + Gestor (Completada).
+✅ **Fase 7: Dominio Admin:** Auditoría + Partidos + Estadísticas (Completada).
+✅ **Fase 8: Testing:** Vitest + React Testing Library (Completada).
 
-1. **Andamiaje:** Vite + Tailwind + estructura de carpetas + dependencias +
-   `tailwind.config.ts` con design tokens + Google Fonts (Inter) + config de Vitest.
-2. **Infraestructura:** Axios config, AuthContext, ProtectedRoute, Router base
-   con `React.lazy` + `Suspense` en todas las rutas, `ErrorBoundary` global,
-   páginas 404 y `/unauthorized`.
-3. **UI Kit base:** Componentes reutilizables: Navbar responsiva con hamburger,
-   Sidebar deslizante por rol, DataGridTable, AsyncButton, StatusBadge,
-   EmptyState, Skeleton, Toast system (Sonner).
-4. **Dominio Auth:** Login conectado a Supabase Auth.
-5. **Dominio Público:** Home + Tabla de Posiciones.
-6. **Dominio Delegado:** Dashboard + Wizard inscripción + Gestor plantilla.
-7. **Dominio Admin:** Auditoría + Partidos + Estadísticas bulk.
-8. **Testing:** Vitest + React Testing Library para hooks, utils, UI Kit y
-   schemas Zod.
+---
+
+## Siguiente Etapa: Integración Frontend-Backend
+
+La etapa de UI/Maquetado ha finalizado. El proyecto entra en la **Etapa de Integración**.
+Consulta `Docs/PLAN_INTEGRACION.md` para el roadmap exacto. El enfoque actual será:
+
+1. Setup de tipados e interfaces (mapeo con Marshmallow).
+2. Conexión de endpoints (Supabase + Flask REST API) vía Axios.
+3. Sustitución de datos falsos (mock data) por carga dinámica desde el backend.
+4. Implementación de feedback real de API en UI (errores, validaciones).
+
+---
+
+## Reglas de Integración (Prevención de Desajustes Frontend-Backend)
+
+**IMPORTANTE: Prevención de errores de Mapeo (422 Unprocessable Entity & Errores Visuales)**
+Durante cualquier proceso de conexión entre el Frontend (React) y el Backend (Flask), se **prohíbe** asumir los nombres de las columnas o las propiedades. Antes de escribir una interfaz de TypeScript, de crear el payload para Axios o de leer un dato devuelto por la API, se **deben** revisar obligatoriamente:
+1. El Schema de Marshmallow correspondiente (`backend/app/schemas/`).
+2. El Modelo de SQLAlchemy (`backend/app/models/`).
+
+*Ejemplo de contexto:* Nombres como `estado` o `id` podrían ser en realidad `estado_inscripcion` o `id_equipo` dependiendo del Schema. Los objetos anidados devueltos por `fields.Nested` en Flask no desempaquetan sus IDs en la raíz, sino dentro de objetos hijos (ej. `equipo.id_equipo`). El agente **debe** verificar esto antes de escribir el código frontend que lee dichas variables para evitar que las variables devuelvan `undefined`.

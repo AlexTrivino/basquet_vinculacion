@@ -1,15 +1,41 @@
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../context/AuthContext';
 import { Users, Calendar, Trophy, FileWarning } from 'lucide-react';
+import { getDashboardStats } from '../../features/estadisticas/api/estadisticas.api';
+import { Skeleton } from '../../components/Skeleton';
 
 export default function Dashboard() {
   useAuth(); // Consumo obligatorio de contexto
 
+  const { data: response, isLoading, isError } = useQuery({
+    queryKey: ['dashboard_stats'],
+    queryFn: getDashboardStats,
+  });
+
+  const stats = response?.data;
+
   const cards = [
-    { name: 'Inscripciones Pendientes', value: '12', icon: FileWarning, to: '/admin/auditoria', color: 'text-yellow-600', bg: 'bg-yellow-50' },
-    { name: 'Partidos Hoy', value: '4', icon: Calendar, to: '/admin/partidos', color: 'text-blue-600', bg: 'bg-blue-50' },
-    { name: 'Equipos Activos', value: '24', icon: Users, to: '#', color: 'text-green-600', bg: 'bg-green-50' },
-    { name: 'Torneos Finalizados', value: '3', icon: Trophy, to: '#', color: 'text-purple-600', bg: 'bg-purple-50' },
+    { 
+      name: 'Inscripciones Pendientes', 
+      value: stats?.inscripciones_pendientes ?? '0', 
+      icon: FileWarning, to: '/admin/auditoria', color: 'text-yellow-600', bg: 'bg-yellow-50' 
+    },
+    { 
+      name: 'Partidos Activos', 
+      value: stats?.partidos_hoy ?? '0', 
+      icon: Calendar, to: '/admin/partidos', color: 'text-blue-600', bg: 'bg-blue-50' 
+    },
+    { 
+      name: 'Equipos Inscritos', 
+      value: stats?.equipos_totales ?? '0', 
+      icon: Users, to: '#', color: 'text-green-600', bg: 'bg-green-50' 
+    },
+    { 
+      name: 'Torneos Activos', 
+      value: '1', 
+      icon: Trophy, to: '#', color: 'text-purple-600', bg: 'bg-purple-50' 
+    },
   ];
 
   return (
@@ -18,6 +44,12 @@ export default function Dashboard() {
         <h1 className="text-3xl font-bold text-gray-900">Dashboard de Administración</h1>
         <p className="mt-2 text-gray-600">Resumen global de la plataforma Torneos Salesianos.</p>
       </div>
+
+      {isError && (
+        <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-lg">
+          No se pudieron cargar las estadísticas. Revisa tu conexión.
+        </div>
+      )}
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
@@ -28,7 +60,11 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">{card.name}</p>
-                <p className="text-2xl font-bold text-gray-900">{card.value}</p>
+                {isLoading ? (
+                  <Skeleton className="h-8 w-12 mt-1" />
+                ) : (
+                  <p className="text-2xl font-bold text-gray-900">{card.value}</p>
+                )}
               </div>
             </div>
             {card.to !== '#' && (

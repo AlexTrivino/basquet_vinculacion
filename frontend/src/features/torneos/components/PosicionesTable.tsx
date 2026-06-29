@@ -1,43 +1,61 @@
+import { useQuery } from '@tanstack/react-query';
 import { DataGridTable, type Column } from '../../../components/DataGridTable';
+import { getPosicionesByTorneo } from '../api/torneos.api';
+import type { PosicionFIBA } from '../../../types/api.types';
+import { EmptyState } from '../../../components/EmptyState';
+import { Trophy } from 'lucide-react';
 
-interface PosicionMock {
-  id: string;
-  equipo: string;
-  pj: number;
-  pg: number;
-  pp: number;
-  puntos: number;
+const columns: Column<PosicionFIBA>[] = [
+  { 
+    key: 'nombre_equipo', 
+    header: 'Equipo', 
+    render: (row) => <span className="font-semibold text-primary-900">{row.nombre_equipo}</span> 
+  },
+  { key: 'partidos_jugados', header: 'PJ' },
+  { key: 'partidos_ganados', header: 'PG' },
+  { key: 'partidos_perdidos', header: 'PP' },
+  { key: 'puntos_a_favor', header: 'PF' },
+  { key: 'puntos_en_contra', header: 'PC' },
+  { key: 'diferencia_puntos', header: 'DIF' },
+  { 
+    key: 'puntos_fiba', 
+    header: 'Pts', 
+    render: (row) => <span className="font-bold text-gray-900">{row.puntos_fiba}</span> 
+  },
+];
+
+interface PosicionesTableProps {
+  torneoId: string;
 }
 
-const mockData: PosicionMock[] = [
-  { id: '1', equipo: 'Los Lakers', pj: 10, pg: 8, pp: 2, puntos: 18 },
-  { id: '2', equipo: 'Chicago Bulls', pj: 10, pg: 7, pp: 3, puntos: 17 },
-  { id: '3', equipo: 'Miami Heat', pj: 10, pg: 5, pp: 5, puntos: 15 },
-  { id: '4', equipo: 'Golden State', pj: 10, pg: 4, pp: 6, puntos: 14 },
-];
+export function PosicionesTable({ torneoId }: PosicionesTableProps) {
+  const { data: response, isLoading, isError } = useQuery({
+    queryKey: ['torneos', torneoId, 'posiciones'],
+    queryFn: () => getPosicionesByTorneo(torneoId),
+  });
 
-const columns: Column<PosicionMock>[] = [
-  { 
-    key: 'equipo', 
-    header: 'Equipo', 
-    render: (row) => <span className="font-semibold text-primary-900">{row.equipo}</span> 
-  },
-  { key: 'pj', header: 'PJ' },
-  { key: 'pg', header: 'PG' },
-  { key: 'pp', header: 'PP' },
-  { 
-    key: 'puntos', 
-    header: 'Pts', 
-    render: (row) => <span className="font-bold text-gray-900">{row.puntos}</span> 
-  },
-];
+  const posiciones = response?.data || [];
 
-export function PosicionesTable() {
+  if (isError) {
+    return <div className="text-center text-red-500 py-8">Error al cargar la tabla de posiciones.</div>;
+  }
+
+  if (!isLoading && posiciones.length === 0) {
+    return (
+      <EmptyState
+        title="Sin estadísticas"
+        description="Aún no hay posiciones calculadas para este torneo."
+        icon={<Trophy className="mx-auto h-12 w-12 text-gray-400" />}
+      />
+    );
+  }
+
   return (
     <div className="mt-6">
       <DataGridTable
         columns={columns}
-        data={mockData}
+        data={posiciones}
+        isLoading={isLoading}
         ariaLabel="Tabla de Posiciones FIBA"
       />
     </div>

@@ -16,3 +16,19 @@ export async function loginWithSupabase(email: string, password: string) {
   });
   return response.data;
 }
+
+export async function registerWithSupabase(email: string, password: string, nombre: string) {
+  const response = await supabaseAuthClient.post('/signup', {
+    email,
+    password,
+    data: { nombre }, // Supabase inserta esto en raw_user_meta_data
+  });
+  return response.data;
+}
+
+export async function resetPasswordWithSupabase(email: string) {
+  const response = await supabaseAuthClient.post('/recover', {
+    email,
+  });
+  return response.data;
+}

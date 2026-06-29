@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { useAuth, type UserRole } from '../../../context/AuthContext';
@@ -98,6 +98,18 @@ export function LoginForm() {
       >
         Ingresar
       </AsyncButton>
+
+      <div className="mt-4 flex flex-col items-center gap-2 text-sm text-gray-600">
+        <Link to="/auth/recuperar" className="font-medium text-primary-600 hover:text-primary-500">
+          ¿Olvidaste tu contraseña?
+        </Link>
+        <div>
+          ¿No tienes una cuenta?{' '}
+          <Link to="/auth/registro" className="font-semibold text-primary-600 hover:text-primary-500">
+            Regístrate aquí
+          </Link>
+        </div>
+      </div>
     </form>
   );
 }

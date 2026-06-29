@@ -19,6 +19,29 @@ stats_bp = Blueprint('estadisticas', __name__, url_prefix='/api/estadisticas')
 
 _bulk_schema = EstadisticasBulkSchema()
 
+@stats_bp.route('/dashboard', methods=['GET'])
+@token_required(allowed_roles=['super_admin'])
+def dashboard_stats():
+    """Retorna los contadores para el Dashboard del Admin (Fase 13)."""
+    from app.models import Inscripcion, Partido, Equipo
+    from sqlalchemy import func
+    
+    # 1. Inscripciones pendientes
+    inscripciones_pendientes = Inscripcion.query.filter_by(estado_inscripcion='pendiente').count()
+    
+    # 2. Partidos activos/hoy
+    partidos_hoy = Partido.query.filter_by(estado='programado').count()
+    
+    # 3. Equipos inscritos
+    equipos_totales = Equipo.query.count()
+    
+    return api_response({
+        'inscripciones_pendientes': inscripciones_pendientes,
+        'partidos_hoy': partidos_hoy,
+        'equipos_totales': equipos_totales
+    })
+
+
 
 @stats_bp.route('/bulk', methods=['POST'])
 @token_required(allowed_roles=['super_admin', 'delegado'])

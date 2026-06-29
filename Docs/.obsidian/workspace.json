@@ -210,6 +210,8 @@
   },
   "active": "904823b4ff4ec745",
   "lastOpenFiles": [
+    "supabase_trigger.sql",
+    "PLAN_INTEGRACION.md",
     "Frontend Docs/Planificación del Frontend.md",
     "Frontend Docs/FRONTEND_ARCHITECTURE.md",
     "Documento de requisitos funcionales y no funcionales.md",

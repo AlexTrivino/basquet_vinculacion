@@ -2,9 +2,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AsyncButton } from '../../../components/AsyncButton';
+import { createEquipo, createInscripcion } from '../api/equipos.api';
 
-// Esquema Zod (DRY, centralizando validación)
+// Esquema Zod
 const inscripcionSchema = z.object({
   nombreEquipo: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
   categoria: z.string().min(1, 'Debes seleccionar una categoría'),
@@ -14,6 +17,9 @@ const inscripcionSchema = z.object({
 type InscripcionValues = z.infer<typeof inscripcionSchema>;
 
 export function InscripcionWizard() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   const {
     register,
     handleSubmit,
@@ -28,10 +34,35 @@ export function InscripcionWizard() {
   });
 
   const onSubmit = async (data: InscripcionValues) => {
-    // Simula el POST al backend (1.5s)
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log('Payload Inscripción:', data);
-    toast.success('Inscripción registrada correctamente');
+    try {
+      // 1. Crear el equipo
+      const equipoRes = await createEquipo({
+        nombre: data.nombreEquipo,
+        entrenador: data.entrenador,
+      });
+      
+      const nuevoEquipo = equipoRes.data;
+      if (!nuevoEquipo) throw new Error('No se pudo crear el equipo');
+
+      // 2. Crear la inscripción (usando torneo 1 por defecto para MVP)
+      await createInscripcion({
+        id_torneo: 1, // TODO: Seleccionar torneo dinámicamente si hay múltiples
+        id_equipo: nuevoEquipo.id_equipo || nuevoEquipo.id,
+        id_categoria: Number(data.categoria),
+      });
+
+      // 3. Invalidar caché para refrescar el Dashboard
+      queryClient.invalidateQueries({ queryKey: ['inscripciones', 'delegado'] });
+
+      toast.success('Inscripción registrada correctamente');
+      navigate('/delegado/dashboard');
+    } catch (error: any) {
+      console.error(error);
+      const message =
+        error.response?.data?.message ||
+        'Ocurrió un error al procesar la inscripción.';
+      toast.error(message);
+    }
   };
 
   return (
@@ -66,9 +97,9 @@ export function InscripcionWizard() {
             className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
           >
             <option value="">-- Selecciona una categoría --</option>
-            <option value="masculino_senior">Masculino Senior</option>
-            <option value="femenino_senior">Femenino Senior</option>
-            <option value="mixto">Mixto Libre</option>
+            <option value="1">Masculino Senior</option>
+            <option value="2">Femenino Senior</option>
+            <option value="3">Mixto Libre</option>
           </select>
           {errors.categoria && <p className="mt-1 text-xs text-red-600">{errors.categoria.message}</p>}
         </div>
@@ -88,7 +119,6 @@ export function InscripcionWizard() {
         </div>
 
         <div className="mt-4 border-t border-gray-100 pt-5">
-          {/* AsyncButton previene spam de clicks y muestra spinner por nosotros */}
           <AsyncButton
             type="button"
             onClickAction={handleSubmit(onSubmit)}
