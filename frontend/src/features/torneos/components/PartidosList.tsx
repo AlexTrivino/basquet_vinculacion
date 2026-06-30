@@ -47,7 +47,7 @@ export function PartidosList({ torneoId }: PartidosListProps) {
       {partidos.map((partido) => (
         <div key={partido.id} className="flex flex-col sm:flex-row items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
           <div className="flex-1 flex justify-end text-right">
-            <span className="font-semibold text-gray-900 text-lg sm:text-base">{partido.equipo_local?.nombre || `Equipo ${partido.id_equipo_local}`}</span>
+            <span className="font-semibold text-gray-900 text-lg sm:text-base">{partido.equipo_local?.nombre || partido.equipo_local?.nombre_equipo || `Equipo Local`}</span>
           </div>
           
           <div className="px-6 flex flex-col items-center justify-center py-4 sm:py-0">
@@ -56,16 +56,16 @@ export function PartidosList({ torneoId }: PartidosListProps) {
               {partido.estado.includes('finalizado') ? (
                 <span className="text-2xl font-bold text-gray-900 tracking-widest">{partido.marcador_local} - {partido.marcador_visitante}</span>
               ) : (
-                <span className="text-sm font-medium text-gray-600">{new Date(partido.fecha_hora).toLocaleDateString()}</span>
+                <span className="text-sm font-medium text-gray-600">{partido.fecha_hora ? new Date(partido.fecha_hora).toLocaleDateString() : partido.fecha}</span>
               )}
             </div>
             {partido.estado === 'programado' && (
-              <span className="text-xs text-gray-400 mt-1">{new Date(partido.fecha_hora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              <span className="text-xs text-gray-400 mt-1">{partido.fecha_hora ? new Date(partido.fecha_hora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : partido.hora}</span>
             )}
           </div>
           
           <div className="flex-1 flex justify-start text-left">
-            <span className="font-semibold text-gray-900 text-lg sm:text-base">{partido.equipo_visitante?.nombre || `Equipo ${partido.id_equipo_visitante}`}</span>
+            <span className="font-semibold text-gray-900 text-lg sm:text-base">{partido.equipo_visitante?.nombre || partido.equipo_visitante?.nombre_equipo || `Equipo Visitante`}</span>
           </div>
         </div>
       ))}

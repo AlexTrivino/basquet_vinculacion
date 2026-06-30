@@ -69,6 +69,7 @@ export interface Inscripcion {
 
 export interface Jugador {
   id: number;
+  id_jugador?: number;
   nombres: string;
   apellidos: string;
   documento_identificacion: string;
@@ -110,6 +111,7 @@ export interface Partido {
 }
 
 export interface PosicionFIBA {
+  id?: number;
   id_equipo: number;
   nombre_equipo: string;
   partidos_jugados: number;

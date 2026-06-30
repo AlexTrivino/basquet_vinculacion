@@ -44,7 +44,7 @@ api.interceptors.response.use(
   (error) => {
     const status = error.response?.status;
 
-    if (status === 401 || status === 403) {
+    if (status === 401) {
       localStorage.removeItem('access_token');
       localStorage.removeItem('user_role');
       window.location.href = '/auth/login';
