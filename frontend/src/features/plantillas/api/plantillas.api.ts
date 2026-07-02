@@ -9,8 +9,13 @@ export async function getJugadores(page = 1, perPage = 20): Promise<ApiResponse<
   return response.data;
 }
 
-export async function createJugador(data: { nombres: string; apellidos: string; documento_identificacion: string; fecha_nacimiento: string; genero: string }): Promise<ApiResponse<any>> {
+export async function createJugador(data: { nombres: string; apellidos: string; documento_identificacion: string; fecha_nacimiento: string; genero: string; telefono: string; correo?: string }): Promise<ApiResponse<any>> {
   const response = await axiosInstance.post('/jugadores', data);
+  return response.data;
+}
+
+export async function deleteJugador(idJugador: number): Promise<ApiResponse<any>> {
+  const response = await axiosInstance.delete(`/jugadores/${idJugador}`);
   return response.data;
 }
 
@@ -24,5 +29,22 @@ export async function getPlantillas(idEquipo?: number, page = 1, perPage = 50): 
 
 export async function createPlantilla(data: { id_jugador: number; id_equipo: number; id_torneo: number; numero_camiseta: number }): Promise<ApiResponse<Plantilla>> {
   const response = await axiosInstance.post('/plantillas', data);
+  return response.data;
+}
+
+export async function deletePlantilla(idPlantilla: number): Promise<ApiResponse<any>> {
+  const response = await axiosInstance.delete(`/plantillas/${idPlantilla}`);
+  return response.data;
+}
+
+export async function uploadFotoJugador(idJugador: number, file: File): Promise<ApiResponse<any>> {
+  const formData = new FormData();
+  formData.append('archivo', file);
+  
+  const response = await axiosInstance.post(`/jugadores/${idJugador}/foto`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return response.data;
 }

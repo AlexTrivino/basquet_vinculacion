@@ -23,9 +23,14 @@ export interface ApiResponse<T = any> {
 // ── Modelos de Dominio ──────────────────────────────────────────
 
 export interface Categoria {
-  id: number;
-  nombre: string;
+  id?: number;
+  id_categoria?: number;
+  nombre?: string;
+  nombre_categoria?: string;
   descripcion?: string;
+  genero_categoria?: string;
+  edad_minima?: number;
+  edad_maxima?: number;
 }
 
 export interface Torneo {
@@ -58,7 +63,7 @@ export interface Inscripcion {
   id_categoria: number;
   estado?: 'pendiente' | 'aprobado' | 'rechazado';
   estado_inscripcion?: 'pendiente' | 'aprobado' | 'rechazado';
-  comprobante_pago_url?: string;
+  url_comprobante_pago?: string;
   fecha_inscripcion: string;
   
   // Relaciones
@@ -74,11 +79,14 @@ export interface Jugador {
   apellidos: string;
   documento_identificacion: string;
   fecha_nacimiento: string;
-  foto_url?: string;
+  url_foto?: string;
+  telefono?: string;
+  correo?: string;
 }
 
 export interface Plantilla {
   id: number;
+  id_plantilla?: number;
   id_jugador: number;
   id_equipo: number;
   id_torneo: number;

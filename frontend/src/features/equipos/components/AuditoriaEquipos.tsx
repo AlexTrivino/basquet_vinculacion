@@ -6,7 +6,7 @@ import { AsyncButton } from '../../../components/AsyncButton';
 import { getInscripciones, updateInscripcionEstado } from '../api/equipos.api';
 import type { Inscripcion } from '../../../types/api.types';
 import { EmptyState } from '../../../components/EmptyState';
-import { FileWarning } from 'lucide-react';
+import { FileWarning, Eye } from 'lucide-react';
 
 export function AuditoriaEquipos() {
   const queryClient = useQueryClient();
@@ -15,6 +15,8 @@ export function AuditoriaEquipos() {
     queryKey: ['inscripciones', 'admin'],
     queryFn: () => getInscripciones(1, 100), // En MVP traemos bastantes
   });
+
+  const inscripciones = response?.data || [];
 
   const updateEstadoMutation = useMutation({
     mutationFn: ({ id, estado }: { id: number; estado: 'aprobado' | 'rechazado' }) =>
@@ -26,6 +28,14 @@ export function AuditoriaEquipos() {
   });
 
   const handleAprobar = async (id: number, equipo: string) => {
+    const inscripcion = inscripciones.find(i => (i.id_inscripcion || i.id) === id);
+    if (inscripcion && !inscripcion.url_comprobante_pago) {
+      const confirm = window.confirm("Esta inscripción no tiene comprobante asignado. ¿Estás seguro de que deseas aprobarla?");
+      if (!confirm) {
+        return;
+      }
+    }
+
     try {
       await updateEstadoMutation.mutateAsync({ id, estado: 'aprobado' });
       toast.success(`Equipo ${equipo} aprobado exitosamente.`);
@@ -46,7 +56,26 @@ export function AuditoriaEquipos() {
   const columns: Column<Inscripcion>[] = [
     { key: 'equipo', header: 'Equipo', render: (row) => <span className="font-semibold text-gray-900">{row.equipo?.nombre_equipo || row.equipo?.nombre}</span> },
     { key: 'categoria', header: 'Categoría', render: (row) => <span>{row.categoria?.nombre || 'General'}</span> },
-    { key: 'entrenador', header: 'Entrenador', render: (row) => <span>{row.equipo?.entrenador || 'N/A'}</span> },
+    { 
+      key: 'comprobante', 
+      header: 'Comprobante', 
+      render: (row) => {
+        if (row.url_comprobante_pago) {
+          return (
+            <a 
+              href={row.url_comprobante_pago} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary-600 hover:text-primary-800 hover:underline"
+            >
+              <Eye className="h-4 w-4" />
+              Ver Recibo
+            </a>
+          );
+        }
+        return <span className="text-sm text-gray-400 italic">Sin archivo</span>;
+      }
+    },
     { key: 'estado', header: 'Estado', render: (row) => {
       const estado = row.estado_inscripcion || row.estado;
       return <StatusBadge status={estado === 'pendiente' ? 'Pendiente' : estado === 'aprobado' ? 'Aprobado' : 'Rechazado'} />;
@@ -79,8 +108,6 @@ export function AuditoriaEquipos() {
       },
     },
   ];
-
-  const inscripciones = response?.data || [];
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">

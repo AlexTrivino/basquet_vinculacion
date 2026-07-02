@@ -230,3 +230,87 @@ def subir_comprobante(id_inscripcion):
         status=201,
     )
 
+# ── POST /api/inscripciones/completa ──────────────────────────────
+
+@inscripcion_bp.route('/completa', methods=['POST'])
+@token_required(allowed_roles=['super_admin', 'delegado'])
+def crear_inscripcion_completa():
+    """Registra un equipo, la inscripción y sube el comprobante atómicamente.
+    """
+    from app import db
+    from app.models.equipo import Equipo
+    from app.models.inscripcion import Inscripcion as InscripcionModel
+    from app.utils.storage import TIPOS_DOCUMENTO, TIPOS_IMAGEN, subir_archivo, validar_archivo, borrar_archivo
+
+    nombre_equipo = request.form.get('nombre_equipo')
+    id_torneo = request.form.get('id_torneo')
+    id_categoria = request.form.get('id_categoria')
+
+    if not all([nombre_equipo, id_torneo, id_categoria]):
+        return api_error('BAD_REQUEST', 'Faltan datos obligatorios (nombre_equipo, id_torneo, id_categoria).', 400)
+
+    if 'archivo' not in request.files:
+        return api_error('BAD_REQUEST', 'No se encontró el campo archivo.', 400)
+
+    archivo = request.files['archivo']
+    if archivo.filename == '':
+        return api_error('BAD_REQUEST', 'No se seleccionó ningún archivo.', 400)
+
+    try:
+        mime = validar_archivo(
+            archivo.stream,
+            tipos_aceptados=TIPOS_DOCUMENTO | TIPOS_IMAGEN,
+        )
+    except ValueError as e:
+        return api_error('UNSUPPORTED_MEDIA_TYPE', str(e), 415)
+
+    url_archivo = None
+    try:
+        # Transacción de base de datos
+        nuevo_equipo = Equipo(
+            nombre_equipo=nombre_equipo,
+            id_usuario=g.usuario_id
+        )
+        db.session.add(nuevo_equipo)
+        db.session.flush()
+
+        nueva_inscripcion = InscripcionModel(
+            id_torneo=int(id_torneo),
+            id_equipo=nuevo_equipo.id_equipo,
+            id_categoria=int(id_categoria),
+            estado_inscripcion='pendiente'
+        )
+        db.session.add(nueva_inscripcion)
+        db.session.flush()
+
+        # Subir archivo
+        url_archivo = subir_archivo(
+            file_stream=archivo.stream,
+            nombre_original=archivo.filename,
+            carpeta=f'inscripciones/{nueva_inscripcion.id_inscripcion}',
+            mime_type=mime,
+        )
+
+        nueva_inscripcion.url_comprobante_pago = url_archivo
+        
+        # Commit de la transacción
+        db.session.commit()
+
+        return api_response(
+            data=_admin_schema.dump(nueva_inscripcion),
+            message='Inscripción y comprobante procesados exitosamente.',
+            status=201
+        )
+
+    except Exception as e:
+        db.session.rollback()
+        # Si falló después de subir el archivo, lo borramos de S3
+        if url_archivo:
+            try:
+                borrar_archivo(url_archivo)
+            except Exception:
+                pass
+
+        return api_error('SERVER_ERROR', f'Ocurrió un error en la inscripción: {str(e)}', 500)
+
+

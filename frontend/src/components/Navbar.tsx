@@ -16,6 +16,7 @@ const NAV_LINKS = {
   ],
   super_admin: [
     { name: 'Inicio', path: '/' },
+    { name: 'Torneos', path: '/admin/torneos' },
     { name: 'Dashboard', path: '/admin/dashboard' },
     { name: 'Auditoría', path: '/admin/auditoria' },
     { name: 'Partidos', path: '/admin/partidos' },

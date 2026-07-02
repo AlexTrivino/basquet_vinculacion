@@ -204,6 +204,9 @@ def crear_plantilla(data):
 
 def eliminar_de_plantilla(id_plantilla):
     """Soft delete: marca la entrada de plantilla como inactiva.
+    Ejecuta un borrado híbrido: si el jugador sale del torneo,
+    su foto física se borra de S3 para no acumular basura, y
+    su url_foto se limpia, pero el perfil maestro persiste.
 
     Args:
         id_plantilla: PK de la entrada a desactivar.
@@ -211,10 +214,18 @@ def eliminar_de_plantilla(id_plantilla):
     Returns:
         Instancia de ``Plantilla`` desactivada, o ``None`` si no existe.
     """
+    import threading
+    from app.utils.storage import borrar_archivo
+
     plantilla = db.session.get(Plantilla, id_plantilla)
 
     if plantilla is None or plantilla.estado == 'inactivo':
         return None
+
+    jugador = plantilla.jugador
+    if jugador and jugador.url_foto:
+        threading.Thread(target=borrar_archivo, args=(jugador.url_foto,)).start()
+        jugador.url_foto = None
 
     plantilla.estado = 'inactivo'
     db.session.commit()

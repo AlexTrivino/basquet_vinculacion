@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import { ProtectedRoute } from './ProtectedRoute';
 import { MainLayout } from '../components/MainLayout';
@@ -22,6 +22,7 @@ const DelegadoInscripcion = lazy(() => import('../pages/delegado/Inscripcion'));
 const DelegadoPlantilla = lazy(() => import('../pages/delegado/Plantilla'));
 
 // Admin
+const AdminTorneos = lazy(() => import('../pages/admin/TorneosAdmin'));
 const AdminDashboard = lazy(() => import('../pages/admin/Dashboard'));
 const AdminAuditoria = lazy(() => import('../pages/admin/Auditoria'));
 const AdminPartidos = lazy(() => import('../pages/admin/Partidos'));
@@ -67,6 +68,8 @@ export const router = createBrowserRouter([
         path: '/admin',
         element: <ProtectedRoute allowedRoles={['super_admin']} />,
         children: [
+          { index: true, element: <Navigate to="torneos" replace /> },
+          { path: 'torneos', element: withSuspense(AdminTorneos) },
           { path: 'dashboard', element: withSuspense(AdminDashboard) },
           { path: 'auditoria', element: withSuspense(AdminAuditoria) },
           { path: 'partidos', element: withSuspense(AdminPartidos) },

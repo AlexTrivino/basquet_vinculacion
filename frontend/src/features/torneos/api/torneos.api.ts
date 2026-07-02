@@ -26,3 +26,18 @@ export async function getPartidosByTorneo(idTorneo: string | number, page = 1, p
   });
   return response.data;
 }
+
+export async function createTorneo(payload: Partial<Torneo>): Promise<ApiResponse<Torneo>> {
+  const response = await axiosInstance.post('/torneos', payload);
+  return response.data;
+}
+
+export async function updateTorneo(id: string | number, payload: Partial<Torneo>): Promise<ApiResponse<Torneo>> {
+  const response = await axiosInstance.put(`/torneos/${id}`, payload);
+  return response.data;
+}
+
+export async function deleteTorneo(id: string | number): Promise<ApiResponse<void>> {
+  const response = await axiosInstance.delete(`/torneos/${id}`);
+  return response.data;
+}

@@ -217,3 +217,24 @@ def subir_archivo(
         f'{supabase_url}/storage/v1/object/public/{bucket}/{ruta_objeto}'
     )
     return url_publica
+
+def borrar_archivo(ruta_objeto: str):
+    """Elimina un objeto de Supabase Storage.
+    
+    Permite eliminar archivos huérfanos si una transacción en base de datos falla.
+    Si la ruta_objeto incluye la URL base de Supabase, la recorta a la llave real.
+    """
+    bucket = os.getenv('SUPABASE_STORAGE_BUCKET', 'archivos')
+    
+    prefijo_url = f"/storage/v1/object/public/{bucket}/"
+    if prefijo_url in ruta_objeto:
+        ruta_objeto = ruta_objeto.split(prefijo_url)[-1]
+        
+    try:
+        s3 = _get_s3_client()
+        s3.delete_object(
+            Bucket=bucket,
+            Key=ruta_objeto
+        )
+    except (BotoCoreError, ClientError) as e:
+        raise RuntimeError(f'Error al borrar el archivo en Storage: {str(e)}')

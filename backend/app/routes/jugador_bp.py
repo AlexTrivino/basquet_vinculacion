@@ -6,6 +6,7 @@ Rutas de escritura: protegidas con allowed_roles=['super_admin', 'delegado'].
 """
 from flask import Blueprint, request
 from marshmallow import ValidationError
+import threading
 
 from app.schemas.jugador_schema import (
     JugadorAdminSchema,
@@ -101,9 +102,21 @@ def actualizar_jugador(id_jugador):
 @token_required(allowed_roles=['super_admin', 'delegado'])
 def eliminar_jugador(id_jugador):
     """Soft delete de un jugador."""
-    jugador = jugador_service.eliminar_jugador(id_jugador)
-    if jugador is None:
+    from app.utils.storage import borrar_archivo
+    
+    jugador = jugador_service.obtener_jugador_por_id(id_jugador)
+    if not jugador:
         return api_error('NOT_FOUND', 'Jugador no encontrado.', 404)
+        
+    foto_vieja = jugador.url_foto
+    
+    # Efectuar Soft Delete
+    jugador = jugador_service.eliminar_jugador(id_jugador)
+    
+    if foto_vieja:
+        jugador = jugador_service.actualizar_jugador(jugador, {'url_foto': None})
+        threading.Thread(target=borrar_archivo, args=(foto_vieja,)).start()
+        
     return api_response(message='Jugador eliminado exitosamente.')
 
 
@@ -118,7 +131,7 @@ def subir_foto_jugador(id_jugador):
     El tipo MIME se verifica por **magic bytes** (no por extensión del archivo).
     No acepta PDFs (solo imágenes de perfil).
     """
-    from app.utils.storage import TIPOS_IMAGEN, subir_archivo, validar_archivo
+    from app.utils.storage import TIPOS_IMAGEN, subir_archivo, validar_archivo, borrar_archivo
 
     jugador = jugador_service.obtener_jugador_por_id(id_jugador)
     if jugador is None:
@@ -155,8 +168,13 @@ def subir_foto_jugador(id_jugador):
     except RuntimeError as e:
         return api_error('STORAGE_ERROR', str(e), 502)
 
+    foto_vieja = jugador.url_foto
+
     # ── Persistir la URL en la BD ─────────────────────────────────
     jugador = jugador_service.actualizar_jugador(jugador, {'url_foto': url})
+
+    if foto_vieja:
+        threading.Thread(target=borrar_archivo, args=(foto_vieja,)).start()
 
     return api_response(
         data=_admin_schema.dump(jugador),

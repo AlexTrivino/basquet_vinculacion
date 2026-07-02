@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { UserPlus, X } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { UserPlus, X, Trash2, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -8,29 +8,11 @@ import { z } from 'zod';
 
 import { DataGridTable, type Column } from '../../../components/DataGridTable';
 import { AsyncButton } from '../../../components/AsyncButton';
-import { getPlantillas, createJugador, createPlantilla } from '../api/plantillas.api';
+import { getPlantillas, createJugador, createPlantilla, uploadFotoJugador, deletePlantilla } from '../api/plantillas.api';
 import { getInscripciones } from '../../equipos/api/equipos.api';
 import type { Plantilla } from '../../../types/api.types';
 import { Skeleton } from '../../../components/Skeleton';
 import { EmptyState } from '../../../components/EmptyState';
-
-const columns: Column<Plantilla>[] = [
-  { 
-    key: 'jugador', 
-    header: 'Nombre', 
-    render: (row) => <span className="font-medium text-gray-900">{row.jugador?.nombres} {row.jugador?.apellidos}</span> 
-  },
-  { 
-    key: 'numero_camiseta', 
-    header: 'Camiseta', 
-    render: (row) => <span className="rounded bg-gray-100 px-2 py-1 text-xs font-bold text-gray-700">#{row.numero_camiseta}</span> 
-  },
-  { 
-    key: 'identificacion', 
-    header: 'Cédula / ID', 
-    render: (row) => <span className="text-gray-500">{row.jugador?.documento_identificacion}</span> 
-  },
-];
 
 const jugadorSchema = z.object({
   nombres: z.string().min(2, 'Nombres requeridos'),
@@ -39,22 +21,29 @@ const jugadorSchema = z.object({
   genero: z.string().min(1, 'Género requerido'),
   fecha_nacimiento: z.string().min(1, 'Fecha requerida'),
   numero_camiseta: z.number().min(0, 'Número inválido'),
+  telefono: z.string().min(5, 'Requerido'),
+  correo: z.string().email('Inválido').optional().or(z.literal('')),
 });
 type JugadorFormValues = z.infer<typeof jugadorSchema>;
 
 export function GestorPlantilla() {
   const [showForm, setShowForm] = useState(false);
+  const [fotoFile, setFotoFile] = useState<File | null>(null);
+  const hiddenFileInput = useRef<HTMLInputElement>(null);
+  const [selectedJugadorId, setSelectedJugadorId] = useState<number | null>(null);
+  
   const queryClient = useQueryClient();
 
-  // 1. Obtener el equipo del delegado
   const { data: inscripcionesRes, isLoading: isLoadingInscripciones } = useQuery({
     queryKey: ['inscripciones', 'delegado'],
     queryFn: () => getInscripciones(1, 1),
   });
-  const idEquipo = inscripcionesRes?.data?.[0]?.equipo?.id_equipo || inscripcionesRes?.data?.[0]?.id_equipo;
-  const idTorneo = inscripcionesRes?.data?.[0]?.torneo?.id_torneo || inscripcionesRes?.data?.[0]?.id_torneo;
+  
+  const inscripcion = inscripcionesRes?.data?.[0];
+  const idEquipo = inscripcion?.equipo?.id_equipo || inscripcion?.id_equipo;
+  const idTorneo = inscripcion?.torneo?.id_torneo || inscripcion?.id_torneo;
+  const generoCategoria = inscripcion?.categoria?.genero_categoria;
 
-  // 2. Obtener la plantilla de ese equipo
   const { data: plantillasRes, isLoading: isLoadingPlantilla, isError } = useQuery({
     queryKey: ['plantillas', idEquipo],
     queryFn: () => getPlantillas(idEquipo),
@@ -72,21 +61,36 @@ export function GestorPlantilla() {
       return;
     }
 
+    if (generoCategoria && generoCategoria !== 'mixto' && data.genero !== generoCategoria) {
+      toast.error(`El género del jugador no coincide con la categoría (${generoCategoria}).`);
+      return;
+    }
+
     try {
-      // 1. Crear el jugador
       const jugadorRes = await createJugador({
         nombres: data.nombres,
         apellidos: data.apellidos,
         genero: data.genero,
         documento_identificacion: data.documento_identificacion,
         fecha_nacimiento: data.fecha_nacimiento,
+        telefono: data.telefono,
+        correo: data.correo,
       });
 
       if (!jugadorRes.data) throw new Error('Error al crear jugador');
+      const idJugador = jugadorRes.data.id_jugador || jugadorRes.data.id;
 
-      // 2. Añadirlo a la plantilla
+      if (fotoFile) {
+        try {
+          await uploadFotoJugador(idJugador, fotoFile);
+        } catch (fotoErr: any) {
+          console.error(fotoErr);
+          toast.warning('Jugador creado, pero hubo un error al subir la foto.');
+        }
+      }
+
       await createPlantilla({
-        id_jugador: jugadorRes.data.id_jugador || jugadorRes.data.id,
+        id_jugador: idJugador,
         id_equipo: idEquipo,
         id_torneo: idTorneo,
         numero_camiseta: data.numero_camiseta,
@@ -95,6 +99,7 @@ export function GestorPlantilla() {
       queryClient.invalidateQueries({ queryKey: ['plantillas', idEquipo] });
       toast.success('Jugador añadido a la plantilla exitosamente');
       reset();
+      setFotoFile(null);
       setShowForm(false);
     } catch (error: any) {
       const message = error.response?.data?.message || 'Ocurrió un error al registrar el jugador.';
@@ -102,10 +107,112 @@ export function GestorPlantilla() {
     }
   };
 
+  const handleEliminarPlantilla = async (idPlantilla: number) => {
+    if (!window.confirm("¿Estás seguro de que quieres eliminar su perfil del roster?")) return;
+    
+    try {
+      await deletePlantilla(idPlantilla);
+      toast.success('Jugador eliminado de la plantilla.');
+      queryClient.invalidateQueries({ queryKey: ['plantillas', idEquipo] });
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Error al eliminar jugador.');
+    }
+  };
+
+  const handleUploadFotoDirecta = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !selectedJugadorId) return;
+
+    try {
+      await uploadFotoJugador(selectedJugadorId, file);
+      toast.success('Foto actualizada exitosamente.');
+      queryClient.invalidateQueries({ queryKey: ['plantillas', idEquipo] });
+    } catch (error: any) {
+      toast.error('Error al actualizar la foto.');
+    } finally {
+      if (hiddenFileInput.current) {
+        hiddenFileInput.current.value = '';
+      }
+      setSelectedJugadorId(null);
+    }
+  };
+
+  const handleClickActualizarFoto = (idJugador: number) => {
+    setSelectedJugadorId(idJugador);
+    hiddenFileInput.current?.click();
+  };
+
+  const columns: Column<Plantilla>[] = [
+    { 
+      key: 'jugador', 
+      header: 'Nombre', 
+      render: (row) => {
+        const fotoUrl = row.jugador?.url_foto;
+        const inicial = row.jugador?.nombres?.charAt(0) || '?';
+        return (
+          <div className="flex items-center gap-3">
+            {fotoUrl ? (
+              <img src={fotoUrl} alt="avatar" className="w-8 h-8 rounded-full object-cover bg-gray-200" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold text-xs uppercase">
+                {inicial}
+              </div>
+            )}
+            <span className="font-medium text-gray-900">{row.jugador?.nombres} {row.jugador?.apellidos}</span>
+          </div>
+        );
+      }
+    },
+    { 
+      key: 'numero_camiseta', 
+      header: 'Camiseta', 
+      render: (row) => <span className="rounded bg-gray-100 px-2 py-1 text-xs font-bold text-gray-700">#{row.numero_camiseta}</span> 
+    },
+    { 
+      key: 'identificacion', 
+      header: 'Cédula / ID', 
+      render: (row) => <span className="text-gray-500">{row.jugador?.documento_identificacion}</span> 
+    },
+    {
+      key: 'acciones',
+      header: 'Acciones',
+      render: (row) => {
+        const idPlantilla = row.id_plantilla || row.id || 0;
+        const idJugador = row.jugador?.id_jugador || row.jugador?.id || row.id_jugador;
+        return (
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleClickActualizarFoto(idJugador)}
+              className="text-gray-500 hover:text-primary-600 transition-colors p-1"
+              title="Actualizar Foto"
+            >
+              <ImageIcon className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => handleEliminarPlantilla(idPlantilla)}
+              className="text-gray-500 hover:text-red-600 transition-colors p-1"
+              title="Quitar del Roster"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        );
+      }
+    }
+  ];
+
   const isLoading = isLoadingInscripciones || isLoadingPlantilla;
 
   return (
     <div className="flex flex-col gap-6">
+      <input 
+        type="file" 
+        ref={hiddenFileInput} 
+        onChange={handleUploadFotoDirecta} 
+        style={{ display: 'none' }} 
+        accept="image/jpeg, image/png, image/webp" 
+      />
+
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Roster del Equipo</h2>
@@ -125,7 +232,7 @@ export function GestorPlantilla() {
 
       {showForm && (
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 relative">
-          <button onClick={() => setShowForm(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+          <button onClick={() => { setShowForm(false); setFotoFile(null); reset(); }} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Registrar Nuevo Jugador</h3>
@@ -163,6 +270,25 @@ export function GestorPlantilla() {
               <label className="mb-1 block text-sm font-medium text-gray-700">Número de Camiseta</label>
               <input type="number" {...register('numero_camiseta', { valueAsNumber: true })} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
               {errors.numero_camiseta && <p className="mt-1 text-xs text-red-600">{errors.numero_camiseta.message}</p>}
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Teléfono</label>
+              <input type="text" {...register('telefono')} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
+              {errors.telefono && <p className="mt-1 text-xs text-red-600">{errors.telefono.message}</p>}
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Correo Electrónico (Opcional)</label>
+              <input type="email" {...register('correo')} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
+              {errors.correo && <p className="mt-1 text-xs text-red-600">{errors.correo.message}</p>}
+            </div>
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-sm font-medium text-gray-700">Foto de Perfil (Opcional)</label>
+              <input 
+                type="file" 
+                accept="image/jpeg, image/png, image/webp"
+                onChange={(e) => setFotoFile(e.target.files?.[0] || null)}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100" 
+              />
             </div>
             
             <div className="sm:col-span-2 mt-2">
