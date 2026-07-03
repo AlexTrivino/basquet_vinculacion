@@ -103,6 +103,7 @@ export interface Partido {
   id_torneo?: number;
   id_categoria?: number;
   fecha_hora?: string;
+  url_planilla_fiba?: string;
   fecha?: string;
   hora?: string;
   fase?: string;
@@ -122,11 +123,11 @@ export interface PosicionFIBA {
   id?: number;
   id_equipo: number;
   nombre_equipo: string;
-  partidos_jugados: number;
-  partidos_ganados: number;
-  partidos_perdidos: number;
-  puntos_fiba: number;
-  puntos_a_favor: number;
-  puntos_en_contra: number;
-  diferencia_puntos: number;
+  PJ: number;
+  PG: number;
+  PP: number;
+  puntos: number;
+  PF: number;
+  PC: number;
+  DIF: number;
 }

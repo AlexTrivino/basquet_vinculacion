@@ -14,7 +14,9 @@ const TorneoDetail = lazy(() => import('../pages/public/TorneoDetail'));
 // Auth
 const Login = lazy(() => import('../pages/auth/Login'));
 const Registro = lazy(() => import('../pages/auth/Registro'));
-const Recuperar = lazy(() => import('../pages/auth/Recuperar'));
+const RecuperarPassword = lazy(() => import('../pages/auth/RecuperarPassword'));
+const ResetPassword = lazy(() => import('../pages/auth/ResetPassword'));
+const MiPerfil = lazy(() => import('../pages/auth/MiPerfil'));
 
 // Delegado
 const DelegadoDashboard = lazy(() => import('../pages/delegado/Dashboard'));
@@ -56,6 +58,13 @@ export const router = createBrowserRouter([
         element: withSuspense(TorneoDetail),
       },
       {
+        path: '/perfil',
+        element: <ProtectedRoute allowedRoles={['super_admin', 'delegado']} />,
+        children: [
+          { index: true, element: withSuspense(MiPerfil) },
+        ],
+      },
+      {
         path: '/delegado',
         element: <ProtectedRoute allowedRoles={['delegado']} />,
         children: [
@@ -89,7 +98,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/auth/recuperar',
-    element: withSuspense(Recuperar),
+    element: withSuspense(RecuperarPassword),
+  },
+  {
+    path: '/auth/reset-password',
+    element: withSuspense(ResetPassword),
   },
   {
     path: '/unauthorized',

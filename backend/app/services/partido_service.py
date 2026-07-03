@@ -169,3 +169,49 @@ def actualizar_partido(partido, data):
         recalcular_tabla(partido.id_torneo)
 
     return obtener_partido_por_id(partido.id_partido)
+
+
+def obtener_box_score(partido):
+    """Genera el box score del partido con todos los jugadores activos."""
+    from app.models.plantilla import Plantilla
+    from app.models.estadistica import Estadistica
+    from sqlalchemy.orm import joinedload
+    
+    # 1. Obtener todas las plantillas para los equipos del partido
+    plantillas_local = Plantilla.query.filter_by(
+        id_torneo=partido.id_torneo, id_equipo=partido.id_equipo_local, estado='activo'
+    ).options(joinedload(Plantilla.jugador)).all()
+    
+    plantillas_visitante = Plantilla.query.filter_by(
+        id_torneo=partido.id_torneo, id_equipo=partido.id_equipo_visitante, estado='activo'
+    ).options(joinedload(Plantilla.jugador)).all()
+    
+    # 2. Obtener las estadísticas registradas
+    estadisticas = Estadistica.query.filter_by(id_partido=partido.id_partido).all()
+    stats_by_jugador = {e.id_jugador: e for e in estadisticas}
+    
+    # 3. Formatear la data
+    def build_jugador_stats(plantillas):
+        res = []
+        for p in plantillas:
+            jug = p.jugador
+            stat = stats_by_jugador.get(jug.id_jugador)
+            res.append({
+                'id_jugador': jug.id_jugador,
+                'nombre_jugador': jug.nombres,
+                'apellido_jugador': jug.apellidos,
+                'dorsal': p.numero_camiseta,
+                'puntos_anotados': stat.puntos_anotados if stat else 0,
+                'triples_anotados': stat.triples_anotados if stat else 0,
+                'faltas_cometidas': stat.faltas_cometidas if stat else 0,
+                'rebotes': stat.rebotes if stat else 0,
+                'asistencias': stat.asistencias if stat else 0
+            })
+        # Order by points descending
+        res.sort(key=lambda x: x['puntos_anotados'], reverse=True)
+        return res
+        
+    return {
+        'local': build_jugador_stats(plantillas_local),
+        'visitante': build_jugador_stats(plantillas_visitante)
+    }

@@ -106,3 +106,17 @@ class EstadisticaPublicSchema(Schema):
     rebotes = fields.Integer()
     asistencias = fields.Integer()
     created_at = fields.DateTime()
+
+
+class BoxScoreItemSchema(Schema):
+    """Serialización de una estadística individual para el Box Score público."""
+
+    id_jugador = fields.Integer()
+    nombre_jugador = fields.String(attribute='jugador.nombre')
+    apellido_jugador = fields.String(attribute='jugador.apellido')
+    dorsal = fields.String(attribute='jugador.dorsal')
+    puntos_anotados = fields.Integer()
+    triples_anotados = fields.Integer()
+    faltas_cometidas = fields.Integer()
+    rebotes = fields.Integer()
+    asistencias = fields.Integer()

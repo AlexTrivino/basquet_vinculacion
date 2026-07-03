@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user_role');
-    setState({ isAuthenticated: false, userRole: null });
+    window.location.href = '/auth/login';
   }, []);
 
   const value = useMemo<AuthContextValue>(

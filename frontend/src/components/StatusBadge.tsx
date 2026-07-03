@@ -11,17 +11,25 @@ export function StatusBadge({ status }: StatusBadgeProps) {
   switch (status.toLowerCase()) {
     case 'aprobado':
     case 'activo':
+    case 'finalizado':
+    case 'finalizado w.o.':
       bgColor = 'bg-green-100';
       textColor = 'text-green-800';
       break;
     case 'rechazado':
     case 'inactivo':
+    case 'suspendido':
       bgColor = 'bg-red-100';
       textColor = 'text-red-800';
       break;
     case 'pendiente':
+    case 'en curso':
       bgColor = 'bg-yellow-100';
       textColor = 'text-yellow-800';
+      break;
+    case 'programado':
+      bgColor = 'bg-blue-100';
+      textColor = 'text-blue-800';
       break;
   }
 

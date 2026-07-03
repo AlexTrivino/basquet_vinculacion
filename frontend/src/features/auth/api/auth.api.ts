@@ -32,3 +32,10 @@ export async function resetPasswordWithSupabase(email: string) {
   });
   return response.data;
 }
+
+export async function updatePasswordWithSupabase(password: string, accessToken: string) {
+  const response = await supabaseAuthClient.put('/user', { password }, {
+    headers: { Authorization: `Bearer ${accessToken}` }
+  });
+  return response.data;
+}

@@ -14,10 +14,12 @@ export async function createEquipo(data: { nombre: string }): Promise<ApiRespons
   return response.data;
 }
 
-export async function getInscripciones(page = 1, perPage = 50): Promise<ApiResponse<Inscripcion[]>> {
-  const response = await axiosInstance.get('/inscripciones', {
-    params: { page, per_page: perPage },
-  });
+export async function getInscripciones(page = 1, perPage = 50, idTorneo?: number, estado?: string): Promise<ApiResponse<Inscripcion[]>> {
+  const params: any = { page, per_page: perPage };
+  if (idTorneo) params.id_torneo = idTorneo;
+  if (estado) params.estado_inscripcion = estado;
+  
+  const response = await axiosInstance.get('/inscripciones', { params });
   return response.data;
 }
 

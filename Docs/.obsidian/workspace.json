@@ -39,10 +39,14 @@
             "id": "904823b4ff4ec745",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "02_estado_actual.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "Nueva pestaña"
+              "title": "02_estado_actual"
             }
           }
         ],
@@ -210,15 +214,21 @@
   },
   "active": "904823b4ff4ec745",
   "lastOpenFiles": [
-    "supabase_trigger.sql",
+    "03_plan_integracion.md",
+    "04_tareas_agy.md",
+    "Arquitectura y entornos.md",
+    "Documento de requisitos funcionales y no funcionales.md",
+    "Estructura de carpetas.md",
+    "Modelado conceptual de la base de datos.md",
+    "Etapas del desarrollo.md",
     "PLAN_INTEGRACION.md",
+    "Planilla estadística FIBA 5DJ vs JLP 05 octubre.pdf",
+    "Registro de Inscripción Campeonato Intercolegial Exalumnos Manta 2025.pdf",
+    "Requisitos Borrador.md",
+    "supabase_trigger.sql",
     "Frontend Docs/Planificación del Frontend.md",
     "Frontend Docs/FRONTEND_ARCHITECTURE.md",
-    "Documento de requisitos funcionales y no funcionales.md",
-    "Etapas del desarrollo.md",
     "Frontend Docs",
-    "Arquitectura y entornos.md",
-    "~ Indice basquet vinculación.md",
-    "Requisitos Borrador.md"
+    "~ Indice basquet vinculación.md"
   ]
 }

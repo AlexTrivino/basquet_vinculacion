@@ -16,3 +16,4 @@ export async function postEstadisticasBulk(data: any): Promise<ApiResponse<any>>
   const response = await axiosInstance.post('/estadisticas/bulk', data);
   return response.data;
 }
+

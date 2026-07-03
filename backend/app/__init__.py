@@ -53,6 +53,7 @@ def create_app() -> Flask:
     from app.routes.partido_bp import partido_bp
     from app.routes.stats_bp import stats_bp
     from app.routes.reportes_bp import reportes_bp
+    from app.routes.usuario_bp import usuario_bp
     app.register_blueprint(health_bp)
     app.register_blueprint(torneo_bp)
     app.register_blueprint(categoria_bp)
@@ -63,6 +64,7 @@ def create_app() -> Flask:
     app.register_blueprint(partido_bp)
     app.register_blueprint(stats_bp)
     app.register_blueprint(reportes_bp)
+    app.register_blueprint(usuario_bp)
 
     # ── Manejadores de errores ─────────────────────────────────────
     from app.utils.error_handlers import register_error_handlers
