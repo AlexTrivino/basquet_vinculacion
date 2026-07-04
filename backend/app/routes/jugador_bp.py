@@ -15,6 +15,7 @@ from app.schemas.jugador_schema import (
     JugadorUpdateSchema,
 )
 from app.services import jugador_service
+from app.services import jugador_profile_service
 from app.utils.auth_middleware import token_required
 from app.utils.pagination import paginate_query
 from app.utils.response import api_error, api_response
@@ -181,4 +182,15 @@ def subir_foto_jugador(id_jugador):
         message='Foto de jugador actualizada exitosamente.',
         status=201,
     )
+
+
+# ── GET /api/jugadores/<id>/perfil ────────────────────────────────
+
+@jugador_bp.route('/<int:id_jugador>/perfil', methods=['GET'])
+def obtener_perfil_jugador(id_jugador):
+    """Obtiene el perfil consolidado (datos, equipo, estadísticas promediadas)."""
+    perfil = jugador_profile_service.obtener_perfil_publico(id_jugador)
+    if not perfil:
+        return api_error('NOT_FOUND', 'Jugador no encontrado.', 404)
+    return api_response(data=perfil)
 

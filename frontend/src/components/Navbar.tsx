@@ -17,13 +17,16 @@ const NAV_LINKS = {
     { name: 'Plantilla', path: '/delegado/plantilla' },
   ],
   super_admin: [
-    { name: 'Inicio', path: '/' },
-    { name: 'Equipos', path: '/equipos' },
-    { name: 'Torneos', path: '/admin/torneos' },
     { name: 'Dashboard', path: '/admin/dashboard' },
-    { name: 'Auditoría', path: '/admin/auditoria' },
+    { name: 'Torneos', path: '/admin/torneos' },
+    { name: 'Equipos', path: '/admin/equipos' },
     { name: 'Partidos', path: '/admin/partidos' },
+    { name: 'Inscripciones', path: '/admin/auditoria' },
     { name: 'Estadísticas', path: '/admin/estadisticas' },
+  ],
+  public_admin: [
+    { name: 'Inicio', path: '/' },
+    { name: 'Directorio', path: '/equipos' },
   ],
 };
 
@@ -43,7 +46,7 @@ export function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-0 z-40 w-full border-b border-gray-200 bg-white shadow-sm">
+      <nav className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4">
             {/* Botón hamburguesa (Mobile) */}
@@ -73,6 +76,16 @@ export function Navbar() {
                 {link.name}
               </NavLink>
             ))}
+            {userRole === 'super_admin' && (
+              <div className="flex items-center gap-4 ml-4 pl-4 border-l-2 border-gray-200">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Vistas de Usuario</span>
+                {NAV_LINKS.public_admin.map(link => (
+                  <NavLink key={link.path} to={link.path} className={({ isActive }) => `text-sm font-medium ${isActive ? 'text-primary-600' : 'text-gray-500 hover:text-primary-600'}`}>
+                    {link.name}
+                  </NavLink>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Acciones de usuario */}

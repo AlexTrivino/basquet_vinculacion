@@ -12,6 +12,7 @@ const Home = lazy(() => import('../pages/public/Home'));
 const TorneoDetail = lazy(() => import('../pages/public/TorneoDetail'));
 const EquipoProfile = lazy(() => import('../pages/public/EquipoProfile'));
 const DirectorioEquipos = lazy(() => import('../pages/public/DirectorioEquipos'));
+const JugadorProfile = lazy(() => import('../pages/public/JugadorProfile'));
 
 // Auth
 const Login = lazy(() => import('../pages/auth/Login'));
@@ -29,6 +30,7 @@ const DelegadoPlantilla = lazy(() => import('../pages/delegado/Plantilla'));
 const AdminTorneos = lazy(() => import('../pages/admin/TorneosAdmin'));
 const AdminDashboard = lazy(() => import('../pages/admin/Dashboard'));
 const AdminAuditoria = lazy(() => import('../pages/admin/Auditoria'));
+const AdminEquipos = lazy(() => import('../pages/admin/AdminEquipos'));
 const AdminPartidos = lazy(() => import('../pages/admin/Partidos'));
 const AdminEstadisticas = lazy(() => import('../pages/admin/Estadisticas'));
 
@@ -68,6 +70,10 @@ export const router = createBrowserRouter([
         element: withSuspense(EquipoProfile),
       },
       {
+        path: '/jugadores/:id',
+        element: withSuspense(JugadorProfile),
+      },
+      {
         path: '/perfil',
         element: <ProtectedRoute allowedRoles={['super_admin', 'delegado']} />,
         children: [
@@ -91,6 +97,7 @@ export const router = createBrowserRouter([
           { path: 'torneos', element: withSuspense(AdminTorneos) },
           { path: 'dashboard', element: withSuspense(AdminDashboard) },
           { path: 'auditoria', element: withSuspense(AdminAuditoria) },
+          { path: 'equipos', element: withSuspense(AdminEquipos) },
           { path: 'partidos', element: withSuspense(AdminPartidos) },
           { path: 'estadisticas', element: withSuspense(AdminEstadisticas) },
         ],

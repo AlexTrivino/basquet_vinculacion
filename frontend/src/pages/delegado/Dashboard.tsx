@@ -95,7 +95,7 @@ export default function Dashboard() {
       <EquipoProfile teamId={inscripcionActual.equipo?.id_equipo || inscripcionActual.equipo?.id} />
 
       {/* 3. TARJETA FLOTANTE DE ESCRITORIO (Glassmorphism) */}
-      <div className="hidden lg:block fixed top-24 right-8 z-40 bg-white/80 backdrop-blur-xl shadow-2xl rounded-2xl p-6 border border-white/40 w-80">
+      <div className={`hidden lg:block fixed ${inscripcionActual.equipo?.estado === 'inactivo' ? 'top-40' : 'top-24'} right-8 z-40 bg-white/80 backdrop-blur-xl shadow-2xl rounded-2xl p-6 border border-white/40 w-80 transition-all duration-300`}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-bold text-gray-900 text-lg flex items-center gap-2">
             <Trophy className="w-5 h-5 text-primary-600" /> Administración

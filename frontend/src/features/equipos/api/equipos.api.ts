@@ -94,3 +94,15 @@ export async function getInscripcionesPublicas(idTorneo?: number, idEquipo?: num
   const response = await axiosInstance.get('/inscripciones/publicas', { params });
   return response.data;
 }
+
+export const getEquiposAdmin = async (page = 1, perPage = 20, idTorneo?: number, idCategoria?: number, search?: string) => {
+  return (await axiosInstance.get('/equipos/admin/list', { params: { page, per_page: perPage, id_torneo: idTorneo, id_categoria: idCategoria, search } })).data;
+};
+
+export const reactivarEquipo = async (idEquipo: number) => {
+  return (await axiosInstance.put(`/equipos/${idEquipo}/reactivar`)).data;
+};
+
+export const desactivarEquipo = async (idEquipo: number) => {
+  return (await axiosInstance.delete(`/equipos/${idEquipo}`)).data;
+};

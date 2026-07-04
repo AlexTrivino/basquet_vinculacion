@@ -56,7 +56,7 @@ def listar_equipos():
 @equipo_bp.route('/<int:id_equipo>', methods=['GET'])
 def obtener_equipo(id_equipo):
     """Obtiene los detalles públicos de un equipo por su ID."""
-    equipo = equipo_service.obtener_equipo_por_id(id_equipo)
+    equipo = equipo_service.obtener_equipo_por_id(id_equipo, incluir_inactivos=True)
     if equipo is None:
         return api_error('NOT_FOUND', 'Equipo no encontrado.', 404)
     return api_response(data=_public_schema.dump(equipo))
@@ -169,6 +169,29 @@ def eliminar_equipo(id_equipo):
         return api_error('NOT_FOUND', 'Equipo no encontrado.', 404)
 
     return api_response(message='Equipo eliminado exitosamente.')
+
+
+# ── PUT /api/equipos/<id>/reactivar ───────────────────────────────
+
+@equipo_bp.route('/<int:id_equipo>/reactivar', methods=['PUT'])
+@token_required(allowed_roles=['super_admin'])
+def reactivar_equipo_route(id_equipo):
+    equipo = equipo_service.reactivar_equipo(id_equipo)
+    if not equipo: return api_error('NOT_FOUND', 'Equipo no encontrado o ya activo.', 404)
+    return api_response(message='Equipo reactivado exitosamente.')
+
+
+# ── GET /api/equipos/admin/list ───────────────────────────────────
+
+@equipo_bp.route('/admin/list', methods=['GET'])
+@token_required(allowed_roles=['super_admin'])
+def listar_equipos_admin_route():
+    id_torneo = request.args.get('id_torneo', type=int)
+    id_categoria = request.args.get('id_categoria', type=int)
+    search_query = request.args.get('search', type=str)
+    query = equipo_service.listar_equipos_admin(id_torneo, id_categoria, search_query)
+    items, pagination = paginate_query(query)
+    return api_response(data=_public_many.dump(items), pagination=pagination)
 
 
 # ── Multimedia ────────────────────────────────────────────────────

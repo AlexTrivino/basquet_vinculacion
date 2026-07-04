@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { DataGridTable, type Column } from '../../../components/DataGridTable';
 import { getPosicionesByTorneo } from '../api/torneos.api';
@@ -24,7 +25,20 @@ export function PosicionesTable({ torneoId }: PosicionesTableProps) {
     {
       key: 'nombre_equipo',
       header: 'Equipo',
-      render: (row) => <span className="font-semibold text-primary-900">{row.nombre_equipo}</span>
+      render: (row) => (
+        <Link to={`/equipos/${row.id_equipo}`} className="group flex items-center gap-3 p-1.5 pr-4 -ml-1.5 rounded-full transition-all duration-200 hover:bg-primary-50 w-max">
+          <div className="w-8 h-8 rounded-full shadow-sm bg-white border border-gray-100 overflow-hidden flex items-center justify-center flex-shrink-0">
+            {row.url_logo ? (
+              <img src={row.url_logo} alt={row.nombre_equipo} className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-xs font-bold text-gray-400">{row.nombre_equipo.substring(0, 2).toUpperCase()}</span>
+            )}
+          </div>
+          <span className="font-bold text-gray-900 group-hover:text-primary-700 transition-colors">
+            {row.nombre_equipo}
+          </span>
+        </Link>
+      )
     },
     { key: 'PJ', header: 'PJ' },
     { key: 'PG', header: 'PG' },

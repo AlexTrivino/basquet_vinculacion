@@ -128,3 +128,23 @@ def eliminar_equipo(id_equipo, verificar_propietario=True):
     equipo.estado = 'inactivo'
     db.session.commit()
     return equipo
+
+def reactivar_equipo(id_equipo):
+    equipo = db.session.get(Equipo, id_equipo)
+    if not equipo or equipo.estado == 'activo': return None
+    equipo.estado = 'activo'
+    db.session.commit()
+    return equipo
+
+def listar_equipos_admin(id_torneo=None, id_categoria=None, search_query=None):
+    from app.models.inscripcion import Inscripcion
+    query = Equipo.query.order_by(Equipo.nombre_equipo)
+    
+    if search_query:
+        query = query.filter(Equipo.nombre_equipo.ilike(f'%{search_query}%'))
+        
+    if id_torneo or id_categoria:
+        query = query.join(Inscripcion, Equipo.id_equipo == Inscripcion.id_equipo)
+        if id_torneo: query = query.filter(Inscripcion.id_torneo == id_torneo)
+        if id_categoria: query = query.filter(Inscripcion.id_categoria == id_categoria)
+    return query

@@ -54,6 +54,7 @@ export interface Equipo {
   url_foto_equipo?: string;
   id_usuario?: string;
   entrenador?: string;
+  estado?: string;
 }
 
 export interface Inscripcion {
@@ -126,6 +127,7 @@ export interface PosicionFIBA {
   id?: number;
   id_equipo: number;
   nombre_equipo: string;
+  url_logo?: string;
   PJ: number;
   PG: number;
   PP: number;
@@ -133,4 +135,22 @@ export interface PosicionFIBA {
   PF: number;
   PC: number;
   DIF: number;
+}
+
+export interface JugadorPerfilResponse {
+  id_jugador: number;
+  nombres: string;
+  apellidos: string;
+  url_foto?: string;
+  equipo_actual?: string;
+  torneo_actual?: string;
+  id_equipo_actual?: number;
+  id_torneo_actual?: number;
+  estadisticas: {
+    partidos_jugados: number;
+    promedio_puntos: number;
+    promedio_rebotes: number;
+    promedio_asistencias: number;
+    promedio_triples: number;
+  };
 }

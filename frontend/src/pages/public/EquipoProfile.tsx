@@ -163,6 +163,12 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
         )}
       </div>
 
+      {equipo.estado === 'inactivo' && (
+        <div className="fixed top-16 left-0 w-full z-40 bg-red-600 text-white text-center py-2 text-sm font-bold shadow-md tracking-wide">
+          ⚠️ Este equipo se encuentra actualmente inactivo en la liga.
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row gap-6 relative">
@@ -282,16 +288,18 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
               {loadingPlantilla ? <Skeleton className="h-64" /> : plantillas.length > 0 ? (
                 <ul className="divide-y divide-gray-100">
                   {plantillas.map(jugador => (
-                    <li key={jugador.id_plantilla} className="p-4 flex items-center gap-4 hover:bg-gray-50">
-                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 flex-shrink-0">
-                        {jugador.numero_camiseta}
-                      </div>
-                      <div className="flex flex-col truncate">
-                        <span className="text-sm font-bold text-gray-900 truncate">
-                          {jugador.jugador?.nombres} {jugador.jugador?.apellidos}
-                        </span>
-                        <span className="text-xs text-gray-500">Jugador</span>
-                      </div>
+                    <li key={jugador.id_plantilla} className="px-2 py-1">
+                      <Link to={`/jugadores/${jugador.jugador?.id_jugador}`} className="group flex items-center gap-3 p-2 hover:bg-primary-50 rounded-lg transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-700 flex-shrink-0 group-hover:bg-primary-100 group-hover:text-primary-700 transition-colors">
+                          {jugador.numero_camiseta}
+                        </div>
+                        <div className="flex flex-col truncate">
+                          <span className="text-sm font-bold text-gray-900 truncate group-hover:text-primary-700 transition-colors">
+                            {jugador.jugador?.nombres} {jugador.jugador?.apellidos}
+                          </span>
+                          <span className="text-xs text-gray-500">Jugador</span>
+                        </div>
+                      </Link>
                     </li>
                   ))}
                 </ul>
