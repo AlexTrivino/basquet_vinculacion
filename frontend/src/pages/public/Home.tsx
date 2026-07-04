@@ -5,6 +5,7 @@ import { getTorneos } from '../../features/torneos/api/torneos.api';
 import { Skeleton } from '../../components/Skeleton';
 import { EmptyState } from '../../components/EmptyState';
 import { Trophy } from 'lucide-react';
+import { SponsorsCarousel } from '../../components/SponsorsCarousel';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -35,6 +36,9 @@ export default function Home() {
           La mejor plataforma para gestionar y seguir de cerca los torneos de baloncesto de nuestra comunidad.
         </p>
       </section>
+
+      {/* Carrusel de Auspiciantes */}
+      <SponsorsCarousel />
 
       {/* Grid de Torneos */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">

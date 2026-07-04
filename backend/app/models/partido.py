@@ -16,6 +16,8 @@ class Partido(db.Model):
     fase = db.Column(db.String(50), nullable=False)
     ubicacion = db.Column(db.String(150), nullable=False, default='Coliseo Pablo Delgado Álava')
     url_planilla_fiba = db.Column(db.Text, nullable=True)
+    stats_local_procesadas = db.Column(db.Boolean, nullable=False, default=False, server_default='false')
+    stats_visitante_procesadas = db.Column(db.Boolean, nullable=False, default=False, server_default='false')
     id_torneo = db.Column(
         db.Integer, db.ForeignKey('torneos.id_torneo'), nullable=False
     )
@@ -68,6 +70,8 @@ class Partido(db.Model):
             'fase': self.fase,
             'ubicacion': self.ubicacion,
             'url_planilla_fiba': self.url_planilla_fiba,
+            'stats_local_procesadas': self.stats_local_procesadas,
+            'stats_visitante_procesadas': self.stats_visitante_procesadas,
             'id_torneo': self.id_torneo,
             'id_equipo_local': self.id_equipo_local,
             'id_equipo_visitante': self.id_equipo_visitante,

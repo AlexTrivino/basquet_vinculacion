@@ -7,15 +7,18 @@ import { Sidebar } from './Sidebar';
 const NAV_LINKS = {
   public: [
     { name: 'Inicio', path: '/' },
+    { name: 'Equipos', path: '/equipos' },
   ],
   delegado: [
     { name: 'Inicio', path: '/' },
+    { name: 'Equipos', path: '/equipos' },
     { name: 'Mi Equipo', path: '/delegado/dashboard' },
     { name: 'Inscripción', path: '/delegado/inscripcion' },
     { name: 'Plantilla', path: '/delegado/plantilla' },
   ],
   super_admin: [
     { name: 'Inicio', path: '/' },
+    { name: 'Equipos', path: '/equipos' },
     { name: 'Torneos', path: '/admin/torneos' },
     { name: 'Dashboard', path: '/admin/dashboard' },
     { name: 'Auditoría', path: '/admin/auditoria' },

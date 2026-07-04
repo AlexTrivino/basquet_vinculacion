@@ -53,6 +53,12 @@ def procesar_estadisticas_bulk(data: dict, usuario_id: str, usuario_rol: str) ->
     id_equipo = data['id_equipo']
     jugadores_payload = data['estadisticas_jugadores']
 
+    # ── Validación 0: Solo super_admin puede ingresar estadísticas ─
+    if usuario_rol != 'super_admin':
+        raise ValueError(
+            'Solo los administradores del sistema pueden registrar estadísticas de partidos.'
+        )
+
     # ── Validación 1: Partido existe y está en curso ───────────────
     partido = db.session.get(Partido, id_partido)
     if partido is None:
@@ -71,13 +77,25 @@ def procesar_estadisticas_bulk(data: dict, usuario_id: str, usuario_rol: str) ->
         )
 
     # ── Validación 3: Propiedad del delegado ──────────────────────
+    # (Ahora bloqueada para delegados; solo super_admin llega aquí)
+    # Se mantiene como código de defensa en profundidad.
     if usuario_rol == 'delegado':
-        from app.models.equipo import Equipo
-        equipo = db.session.get(Equipo, id_equipo)
-        if equipo is None or equipo.id_usuario != usuario_id:
-            raise ValueError(
-                'No tienes permiso para registrar estadísticas de este equipo.'
-            )
+        raise ValueError(
+            'No tienes permiso para registrar estadísticas. Contacta al administrador.'
+        )
+
+    # ── Validación 4: Verificación matemática del marcador ────────
+    total_puntos_payload = sum(entry['puntos'] for entry in jugadores_payload)
+    if id_equipo == partido.id_equipo_local:
+        marcador_oficial = partido.marcador_local
+    else:
+        marcador_oficial = partido.marcador_visitante
+
+    if marcador_oficial is not None and total_puntos_payload != marcador_oficial:
+        raise ValueError(
+            f'La suma de puntos individuales ({total_puntos_payload}) no coincide con '
+            f'el marcador oficial del equipo en el partido ({marcador_oficial}).'
+        )
 
     # ── Validación 4: Anti-spoofing con set difference en O(1) ────
     # Extraer todos los IDs del payload en un set (O(n) en longitud del array)
@@ -146,6 +164,11 @@ def procesar_estadisticas_bulk(data: dict, usuario_id: str, usuario_rol: str) ->
 
     if sanciones_a_insertar:
         db.session.execute(insert(Sancion), sanciones_a_insertar)
+
+    if id_equipo == partido.id_equipo_local:
+        partido.stats_local_procesadas = True
+    else:
+        partido.stats_visitante_procesadas = True
 
     # ── flush() + commit() atómico ────────────────────────────────
     # flush() envía todo al motor de BD sin cerrar la transacción.

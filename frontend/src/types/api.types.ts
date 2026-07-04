@@ -50,7 +50,8 @@ export interface Equipo {
   id_equipo?: number;
   nombre?: string;
   nombre_equipo?: string;
-  logo_url?: string;
+  url_logo?: string;
+  url_foto_equipo?: string;
   id_usuario?: string;
   entrenador?: string;
 }
@@ -111,6 +112,8 @@ export interface Partido {
   estado: 'programado' | 'en_curso' | 'finalizado' | 'finalizado_wo' | 'suspendido';
   marcador_local: number;
   marcador_visitante: number;
+  stats_local_procesadas?: boolean;
+  stats_visitante_procesadas?: boolean;
   
   // Relaciones anidadas (Marshmallow _EquipoEnPartidoSchema, etc)
   equipo_local?: Equipo;

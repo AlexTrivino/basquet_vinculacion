@@ -10,6 +10,8 @@ import Unauthorized from '../pages/errors/Unauthorized';
 // Público
 const Home = lazy(() => import('../pages/public/Home'));
 const TorneoDetail = lazy(() => import('../pages/public/TorneoDetail'));
+const EquipoProfile = lazy(() => import('../pages/public/EquipoProfile'));
+const DirectorioEquipos = lazy(() => import('../pages/public/DirectorioEquipos'));
 
 // Auth
 const Login = lazy(() => import('../pages/auth/Login'));
@@ -56,6 +58,14 @@ export const router = createBrowserRouter([
       {
         path: '/torneos/:id',
         element: withSuspense(TorneoDetail),
+      },
+      {
+        path: '/equipos',
+        element: withSuspense(DirectorioEquipos),
+      },
+      {
+        path: '/equipos/:id',
+        element: withSuspense(EquipoProfile),
       },
       {
         path: '/perfil',

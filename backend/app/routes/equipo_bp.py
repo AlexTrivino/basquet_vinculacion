@@ -22,6 +22,8 @@ from app.services import equipo_service
 from app.utils.auth_middleware import token_required
 from app.utils.pagination import paginate_query
 from app.utils.response import api_error, api_response
+from app.utils.storage import subir_archivo, borrar_archivo, validar_archivo, TIPOS_IMAGEN
+from app import db
 
 equipo_bp = Blueprint('equipos', __name__, url_prefix='/api/equipos')
 
@@ -167,3 +169,125 @@ def eliminar_equipo(id_equipo):
         return api_error('NOT_FOUND', 'Equipo no encontrado.', 404)
 
     return api_response(message='Equipo eliminado exitosamente.')
+
+
+# ── Multimedia ────────────────────────────────────────────────────
+
+@equipo_bp.route('/<int:id_equipo>/logo', methods=['POST'])
+@token_required(allowed_roles=['super_admin', 'delegado'])
+def subir_logo_equipo(id_equipo):
+    equipo = equipo_service.obtener_equipo_por_id(id_equipo)
+    if not equipo:
+        return api_error('NOT_FOUND', 'Equipo no encontrado.', 404)
+        
+    if g.usuario_rol != 'super_admin' and equipo.id_usuario != g.usuario_id:
+        return api_error('FORBIDDEN', 'No tienes permiso para modificar este equipo.', 403)
+        
+    file = request.files.get('file') or request.files.get('logo')
+    if not file:
+        return api_error('BAD_REQUEST', 'No se proporcionó un archivo.', 400)
+        
+    try:
+        if equipo.url_logo:
+            try:
+                borrar_archivo(equipo.url_logo)
+            except Exception:
+                pass
+                
+        mime_type = validar_archivo(file.stream, TIPOS_IMAGEN)
+        url = subir_archivo(file.stream, file.filename, f'equipos/{id_equipo}/logo', mime_type)
+        equipo.url_logo = url
+        db.session.commit()
+        return api_response({'url': url}, message='Logo subido exitosamente.')
+    except ValueError as e:
+        return api_error('VALIDATION_ERROR', str(e), 422)
+    except RuntimeError as e:
+        return api_error('SERVER_ERROR', str(e), 500)
+    except Exception as e:
+        db.session.rollback()
+        return api_error('SERVER_ERROR', 'Error interno al subir el logo.', 500)
+
+
+@equipo_bp.route('/<int:id_equipo>/logo', methods=['DELETE'])
+@token_required(allowed_roles=['super_admin', 'delegado'])
+def eliminar_logo_equipo(id_equipo):
+    equipo = equipo_service.obtener_equipo_por_id(id_equipo)
+    if not equipo:
+        return api_error('NOT_FOUND', 'Equipo no encontrado.', 404)
+        
+    if g.usuario_rol != 'super_admin' and equipo.id_usuario != g.usuario_id:
+        return api_error('FORBIDDEN', 'No tienes permiso para modificar este equipo.', 403)
+        
+    if not equipo.url_logo:
+        return api_error('BAD_REQUEST', 'El equipo no tiene logo.', 400)
+        
+    try:
+        borrar_archivo(equipo.url_logo)
+        equipo.url_logo = None
+        db.session.commit()
+        return api_response(message='Logo eliminado exitosamente.')
+    except RuntimeError as e:
+        return api_error('SERVER_ERROR', str(e), 500)
+    except Exception as e:
+        db.session.rollback()
+        return api_error('SERVER_ERROR', 'Error interno al borrar el logo.', 500)
+
+
+@equipo_bp.route('/<int:id_equipo>/banner', methods=['POST'])
+@token_required(allowed_roles=['super_admin', 'delegado'])
+def subir_banner_equipo(id_equipo):
+    equipo = equipo_service.obtener_equipo_por_id(id_equipo)
+    if not equipo:
+        return api_error('NOT_FOUND', 'Equipo no encontrado.', 404)
+        
+    if g.usuario_rol != 'super_admin' and equipo.id_usuario != g.usuario_id:
+        return api_error('FORBIDDEN', 'No tienes permiso para modificar este equipo.', 403)
+        
+    file = request.files.get('file') or request.files.get('banner')
+    if not file:
+        return api_error('BAD_REQUEST', 'No se proporcionó un archivo.', 400)
+        
+    try:
+        if equipo.url_foto_equipo:
+            try:
+                borrar_archivo(equipo.url_foto_equipo)
+            except Exception:
+                pass
+                
+        mime_type = validar_archivo(file.stream, TIPOS_IMAGEN)
+        url = subir_archivo(file.stream, file.filename, f'equipos/{id_equipo}/banner', mime_type)
+        equipo.url_foto_equipo = url
+        db.session.commit()
+        return api_response({'url': url}, message='Banner subido exitosamente.')
+    except ValueError as e:
+        return api_error('VALIDATION_ERROR', str(e), 422)
+    except RuntimeError as e:
+        return api_error('SERVER_ERROR', str(e), 500)
+    except Exception as e:
+        db.session.rollback()
+        return api_error('SERVER_ERROR', 'Error interno al subir el banner.', 500)
+
+
+@equipo_bp.route('/<int:id_equipo>/banner', methods=['DELETE'])
+@token_required(allowed_roles=['super_admin', 'delegado'])
+def eliminar_banner_equipo(id_equipo):
+    equipo = equipo_service.obtener_equipo_por_id(id_equipo)
+    if not equipo:
+        return api_error('NOT_FOUND', 'Equipo no encontrado.', 404)
+        
+    if g.usuario_rol != 'super_admin' and equipo.id_usuario != g.usuario_id:
+        return api_error('FORBIDDEN', 'No tienes permiso para modificar este equipo.', 403)
+        
+    if not equipo.url_foto_equipo:
+        return api_error('BAD_REQUEST', 'El equipo no tiene banner.', 400)
+        
+    try:
+        borrar_archivo(equipo.url_foto_equipo)
+        equipo.url_foto_equipo = None
+        db.session.commit()
+        return api_response(message='Banner eliminado exitosamente.')
+    except RuntimeError as e:
+        return api_error('SERVER_ERROR', str(e), 500)
+    except Exception as e:
+        db.session.rollback()
+        return api_error('SERVER_ERROR', 'Error interno al borrar el banner.', 500)

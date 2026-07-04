@@ -14,6 +14,11 @@ export async function createEquipo(data: { nombre: string }): Promise<ApiRespons
   return response.data;
 }
 
+export async function getEquipoById(id: number | string): Promise<ApiResponse<Equipo>> {
+  const response = await axiosInstance.get(`/equipos/${id}`);
+  return response.data;
+}
+
 export async function getInscripciones(page = 1, perPage = 50, idTorneo?: number, estado?: string): Promise<ApiResponse<Inscripcion[]>> {
   const params: any = { page, per_page: perPage };
   if (idTorneo) params.id_torneo = idTorneo;
@@ -51,5 +56,41 @@ export async function inscribirEquipoCompleto(formData: FormData): Promise<ApiRe
       'Content-Type': 'multipart/form-data',
     },
   });
+  return response.data;
+}
+
+export async function uploadLogoEquipo(id: number, file: File): Promise<ApiResponse<{ url: string }>> {
+  const formData = new FormData();
+  formData.append('logo', file);
+  const response = await axiosInstance.post(`/equipos/${id}/logo`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+}
+
+export async function deleteLogoEquipo(id: number): Promise<ApiResponse<null>> {
+  const response = await axiosInstance.delete(`/equipos/${id}/logo`);
+  return response.data;
+}
+
+export async function uploadBannerEquipo(id: number, file: File): Promise<ApiResponse<{ url: string }>> {
+  const formData = new FormData();
+  formData.append('banner', file);
+  const response = await axiosInstance.post(`/equipos/${id}/banner`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return response.data;
+}
+
+export async function deleteBannerEquipo(id: number): Promise<ApiResponse<null>> {
+  const response = await axiosInstance.delete(`/equipos/${id}/banner`);
+  return response.data;
+}
+
+export async function getInscripcionesPublicas(idTorneo?: number, idEquipo?: number): Promise<ApiResponse<Inscripcion[]>> {
+  const params: any = {};
+  if (idTorneo) params.id_torneo = idTorneo;
+  if (idEquipo) params.id_equipo = idEquipo;
+  const response = await axiosInstance.get('/inscripciones/publicas', { params });
   return response.data;
 }

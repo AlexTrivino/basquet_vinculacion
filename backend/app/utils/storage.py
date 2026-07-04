@@ -32,6 +32,7 @@ import boto3
 from botocore.config import Config
 from botocore.exceptions import BotoCoreError, ClientError
 from werkzeug.utils import secure_filename
+from flask import current_app
 
 # ── Firmas de magic bytes soportadas ──────────────────────────────
 # Formato: {magic_bytes_prefix: mime_type}
@@ -208,8 +209,9 @@ def subir_archivo(
             },
         )
     except (BotoCoreError, ClientError) as e:
+        current_app.logger.exception('Error de Storage de S3:')
         raise RuntimeError(
-            f'Error al subir el archivo a Storage: {str(e)}'
+            'No se pudo establecer conexión con el servidor de almacenamiento. Intente de nuevo más tarde.'
         )
 
     # URL pública de Supabase Storage
@@ -237,4 +239,5 @@ def borrar_archivo(ruta_objeto: str):
             Key=ruta_objeto
         )
     except (BotoCoreError, ClientError) as e:
-        raise RuntimeError(f'Error al borrar el archivo en Storage: {str(e)}')
+        current_app.logger.exception('Error de Storage de S3:')
+        raise RuntimeError('No se pudo establecer conexión con el servidor de almacenamiento. Intente de nuevo más tarde.')

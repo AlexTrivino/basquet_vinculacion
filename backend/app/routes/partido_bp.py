@@ -4,7 +4,7 @@ Blueprint de rutas para la gestión de Partidos.
 Rutas de lectura: públicas (sin autenticación).
 Rutas de escritura: exclusivas de ``super_admin``.
 """
-from flask import Blueprint, request
+from flask import Blueprint, request, current_app
 from marshmallow import ValidationError
 
 from app.schemas.partido_schema import (
@@ -33,11 +33,12 @@ _update_schema = PartidoUpdateSchema()
 def listar_partidos():
     """Lista partidos con paginación y filtros opcionales.
 
-    Query params: ``id_torneo``, ``estado``.
+    Query params: ``id_torneo``, ``estado``, ``id_equipo``.
     """
     id_torneo = request.args.get('id_torneo', type=int)
     estado = request.args.get('estado')
-    query = partido_service.listar_partidos(id_torneo=id_torneo, estado=estado)
+    id_equipo = request.args.get('id_equipo', type=int)
+    query = partido_service.listar_partidos(id_torneo=id_torneo, estado=estado, id_equipo=id_equipo)
     items, pagination = paginate_query(query)
     return api_response(data=_public_many.dump(items), pagination=pagination)
 
@@ -93,7 +94,8 @@ def subir_acta_partido(id_partido):
         return api_error('VALIDATION_ERROR', str(e), 422)
     except Exception as e:
         db.session.rollback()
-        return api_error('SERVER_ERROR', f'Error al procesar el archivo: {str(e)}', 500)
+        current_app.logger.exception(f'Error en partido: {e}')
+        return api_error('SERVER_ERROR', 'Error interno al procesar la operación.', 500)
 
 
 @partido_bp.route('/<int:id_partido>/acta', methods=['DELETE'])
@@ -114,7 +116,8 @@ def eliminar_acta_partido(id_partido):
         return api_response(None, message='Acta eliminada exitosamente.')
     except Exception as e:
         db.session.rollback()
-        return api_error('SERVER_ERROR', f'Error al eliminar el archivo: {str(e)}', 500)
+        current_app.logger.exception(f'Error en partido: {e}')
+        return api_error('SERVER_ERROR', 'Error interno al procesar la operación.', 500)
 
 
 @partido_bp.route('', methods=['POST'])
@@ -171,3 +174,20 @@ def actualizar_partido(id_partido):
         data=_admin_schema.dump(partido),
         message='Partido actualizado exitosamente.',
     )
+
+
+@partido_bp.route('/<int:id_partido>', methods=['DELETE'])
+@token_required(allowed_roles=['super_admin'])
+def eliminar_partido(id_partido):
+    """Elimina un partido permanentemente si no contiene datos históricos."""
+    try:
+        partido_service.eliminar_partido(id_partido)
+        return api_response(None, message='Partido eliminado exitosamente.')
+    except ValueError as e:
+        if "Este partido contiene información histórica" in str(e):
+            return api_error('CONFLICT', str(e), 409)
+        return api_error('NOT_FOUND' if 'no existe' in str(e) else 'VALIDATION_ERROR', str(e), 404 if 'no existe' in str(e) else 422)
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception(f'Error en partido: {e}')
+        return api_error('SERVER_ERROR', 'Error interno al procesar la operación.', 500)

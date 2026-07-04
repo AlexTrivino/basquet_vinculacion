@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar as CalendarIcon, Edit, Plus, X, FileText } from 'lucide-react';
+import { Calendar as CalendarIcon, Edit, Plus, X, FileText, BarChart2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -11,11 +11,13 @@ import { AsyncButton } from '../../../components/AsyncButton';
 import { DataGridTable, type Column } from '../../../components/DataGridTable';
 import { StatusBadge } from '../../../components/StatusBadge';
 import { Skeleton } from '../../../components/Skeleton';
+import { ConfirmationModal } from '../../../components/ConfirmationModal';
 
 import { getTorneos, getPartidosByTorneo } from '../../torneos/api/torneos.api';
 import { getInscripciones } from '../../equipos/api/equipos.api';
-import { crearPartido, actualizarPartido } from '../api/partidos.api';
+import { crearPartido, actualizarPartido, eliminarPartido } from '../api/partidos.api';
 import { GestionActaModal } from './GestionActaModal';
+import { GenerarEstadisticasModal } from './GenerarEstadisticasModal';
 import type { Partido } from '../../../types/api.types';
 
 const partidoSchema = z.object({
@@ -44,6 +46,13 @@ export function GestorPartidos() {
   const [showProgramar, setShowProgramar] = useState(false);
   const [editingPartido, setEditingPartido] = useState<Partido | null>(null);
   const [selectedPartidoActa, setSelectedPartidoActa] = useState<Partido | null>(null);
+  const [estadisticasTarget, setEstadisticasTarget] = useState<{
+    idPartido: number;
+    idEquipo: number;
+    nombreEquipo: string;
+    marcadorOficial: number;
+  } | null>(null);
+  const [partidoAEliminar, setPartidoAEliminar] = useState<Partido | null>(null);
 
   const { data: torneosRes, isLoading: loadingTorneos } = useQuery({
     queryKey: ['torneos', 1],
@@ -115,6 +124,22 @@ export function GestorPartidos() {
     }
   };
 
+  const handleConfirmDelete = async () => {
+    if (!partidoAEliminar) return;
+    const id = partidoAEliminar.id_partido || partidoAEliminar.id;
+    if (!id) return;
+    
+    try {
+      await eliminarPartido(id);
+      toast.success('Partido eliminado exitosamente');
+      queryClient.invalidateQueries({ queryKey: ['partidos', selectedTorneo] });
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Error al eliminar el partido');
+    } finally {
+      setPartidoAEliminar(null);
+    }
+  };
+
 
   const columns: Column<Partido>[] = [
     { 
@@ -167,23 +192,79 @@ export function GestorPartidos() {
       render: (row) => {
         const id = row.id_partido || row.id;
         const canUpload = row.estado === 'finalizado' || row.estado === 'finalizado_wo';
+        
         return (
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-2 items-center flex-wrap">
             {canUpload && id && (
-              <button
-                onClick={() => setSelectedPartidoActa(row)}
-                className="text-gray-500 hover:text-green-600 transition-colors p-1"
-                title="Gestionar Acta"
-              >
-                <FileText className="w-4 h-4" />
-              </button>
+              <>
+                {/* Acta */}
+                <button
+                  onClick={() => setSelectedPartidoActa(row)}
+                  className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                    row.url_planilla_fiba ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                  title="Gestionar Acta"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  {row.url_planilla_fiba ? 'Acta ✓' : 'Acta'}
+                </button>
+                
+                {/* Stats Local */}
+                {row.equipo_local?.id_equipo && (
+                  <button
+                    onClick={() => setEstadisticasTarget({
+                      idPartido: id as number,
+                      idEquipo: row.equipo_local!.id_equipo!,
+                      nombreEquipo: row.equipo_local?.nombre_equipo || 'Local',
+                      marcadorOficial: row.marcador_local || 0,
+                    })}
+                    className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                      row.stats_local_procesadas ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                    }`}
+                    title="Stats Local"
+                  >
+                    <BarChart2 className="w-3.5 h-3.5" />
+                    {row.stats_local_procesadas ? 'L ✓' : 'L'}
+                  </button>
+                )}
+                
+                {/* Stats Visitante */}
+                {row.equipo_visitante?.id_equipo && (
+                  <button
+                    onClick={() => setEstadisticasTarget({
+                      idPartido: id as number,
+                      idEquipo: row.equipo_visitante!.id_equipo!,
+                      nombreEquipo: row.equipo_visitante?.nombre_equipo || 'Visitante',
+                      marcadorOficial: row.marcador_visitante || 0,
+                    })}
+                    className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                      row.stats_visitante_procesadas ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
+                    }`}
+                    title="Stats Visitante"
+                  >
+                    <BarChart2 className="w-3.5 h-3.5" />
+                    {row.stats_visitante_procesadas ? 'V ✓' : 'V'}
+                  </button>
+                )}
+              </>
             )}
+            
+            {/* Editar */}
             <button 
               onClick={() => handleEditClick(row)}
               className="text-gray-500 hover:text-primary-600 transition-colors p-1"
               title="Editar Partido"
             >
               <Edit className="w-4 h-4" />
+            </button>
+            
+            {/* Eliminar */}
+            <button 
+              onClick={() => setPartidoAEliminar(row)}
+              className="text-gray-500 hover:text-red-600 transition-colors p-1"
+              title="Eliminar Partido"
+            >
+              <Trash2 className="w-4 h-4" />
             </button>
           </div>
         );
@@ -374,6 +455,27 @@ export function GestorPartidos() {
           partido={selectedPartidoActa}
           onClose={() => setSelectedPartidoActa(null)}
           onSuccess={() => queryClient.invalidateQueries({ queryKey: ['partidos', selectedTorneo] })}
+        />
+      )}
+
+      {estadisticasTarget && (
+        <GenerarEstadisticasModal
+          idPartido={estadisticasTarget.idPartido}
+          idEquipo={estadisticasTarget.idEquipo}
+          nombreEquipo={estadisticasTarget.nombreEquipo}
+          marcadorOficial={estadisticasTarget.marcadorOficial}
+          onClose={() => setEstadisticasTarget(null)}
+          onSuccess={() => queryClient.invalidateQueries({ queryKey: ['partidos', selectedTorneo] })}
+        />
+      )}
+
+      {partidoAEliminar && (
+        <ConfirmationModal
+          title="Eliminar Partido"
+          description={`¿Estás seguro de que deseas eliminar el partido entre ${partidoAEliminar.equipo_local?.nombre_equipo} y ${partidoAEliminar.equipo_visitante?.nombre_equipo}? Esta acción no se puede deshacer.`}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setPartidoAEliminar(null)}
+          isDangerous={true}
         />
       )}
     </div>

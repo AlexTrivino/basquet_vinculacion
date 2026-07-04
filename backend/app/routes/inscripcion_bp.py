@@ -7,7 +7,7 @@ Rutas de escritura:
     - ``POST /api/inscripciones``: super_admin y delegado.
     - ``PATCH /api/inscripciones/<id>/estado``: exclusivo super_admin.
 """
-from flask import Blueprint, g, request
+from flask import Blueprint, g, request, current_app
 from marshmallow import ValidationError
 
 from app.schemas.inscripcion_schema import (
@@ -20,6 +20,7 @@ from app.services import inscripcion_service
 from app.utils.auth_middleware import token_required
 from app.utils.pagination import paginate_query
 from app.utils.response import api_error, api_response
+from app.models.inscripcion import Inscripcion as InscripcionModel
 
 inscripcion_bp = Blueprint(
     'inscripciones', __name__, url_prefix='/api/inscripciones'
@@ -32,6 +33,21 @@ _admin_schema = InscripcionAdminSchema()
 _admin_many = InscripcionAdminSchema(many=True)
 _create_schema = InscripcionCreateSchema()
 _estado_schema = InscripcionEstadoSchema()
+
+
+# ── GET /api/inscripciones/publicas ───────────────────────────────
+
+@inscripcion_bp.route('/publicas', methods=['GET'])
+def listar_inscripciones_publicas():
+    id_torneo = request.args.get('id_torneo', type=int)
+    id_equipo = request.args.get('id_equipo', type=int)
+
+    query = inscripcion_service.listar_inscripciones(id_torneo=id_torneo, estado='aprobado')
+    if id_equipo:
+        query = query.filter(InscripcionModel.id_equipo == id_equipo)
+
+    items, pagination = paginate_query(query)
+    return api_response(data=_public_many.dump(items), pagination=pagination)
 
 
 # ── GET /api/inscripciones ────────────────────────────────────────
@@ -304,6 +320,7 @@ def crear_inscripcion_completa():
 
     except Exception as e:
         db.session.rollback()
+        current_app.logger.exception(f'Error en inscripción: {e}')
         # Si falló después de subir el archivo, lo borramos de S3
         if url_archivo:
             try:
@@ -311,6 +328,6 @@ def crear_inscripcion_completa():
             except Exception:
                 pass
 
-        return api_error('SERVER_ERROR', f'Ocurrió un error en la inscripción: {str(e)}', 500)
+        return api_error('SERVER_ERROR', 'Ocurrió un error inesperado al procesar la inscripción.', 500)
 
 

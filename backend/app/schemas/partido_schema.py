@@ -92,6 +92,8 @@ class PartidoPublicSchema(Schema):
     fase = fields.String()
     ubicacion = fields.String()
     url_planilla_fiba = fields.String(allow_none=True)
+    stats_local_procesadas = fields.Boolean()
+    stats_visitante_procesadas = fields.Boolean()
     # Relaciones anidadas — requieren joinedload en el servicio
     torneo = fields.Nested(_TorneoEnPartidoSchema)
     equipo_local = fields.Nested(_EquipoEnPartidoSchema)
@@ -110,6 +112,8 @@ class PartidoAdminSchema(Schema):
     fase = fields.String()
     ubicacion = fields.String()
     url_planilla_fiba = fields.String(allow_none=True)
+    stats_local_procesadas = fields.Boolean()
+    stats_visitante_procesadas = fields.Boolean()
     # FKs para referencia interna
     id_torneo = fields.Integer()
     id_equipo_local = fields.Integer()

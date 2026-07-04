@@ -26,6 +26,13 @@ export async function getBoxScore(idPartido: number): Promise<ApiResponse<any>> 
   return response.data;
 }
 
+export async function getPartidosByEquipo(idEquipo: number | string): Promise<ApiResponse<Partido[]>> {
+  const response = await axiosInstance.get('/partidos', {
+    params: { id_equipo: idEquipo, per_page: 50 },
+  });
+  return response.data;
+}
+
 export const subirActaPartido = async (idPartido: number, file: File): Promise<ApiResponse<{ url: string }>> => { 
   const formData = new FormData(); 
   formData.append('acta', file); 
@@ -37,5 +44,10 @@ export const subirActaPartido = async (idPartido: number, file: File): Promise<A
 
 export const eliminarActaPartido = async (idPartido: number): Promise<ApiResponse<null>> => {
   const response = await axiosInstance.delete(`/partidos/${idPartido}/acta`);
+  return response.data;
+};
+
+export const eliminarPartido = async (idPartido: number): Promise<ApiResponse<null>> => {
+  const response = await axiosInstance.delete(`/partidos/${idPartido}`);
   return response.data;
 };

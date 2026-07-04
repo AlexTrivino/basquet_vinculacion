@@ -59,6 +59,7 @@ class EquipoPublicSchema(Schema):
     estado = fields.String()
     url_logo = fields.String(allow_none=True)
     url_foto_equipo = fields.String(allow_none=True)
+    id_usuario = fields.String()
 
 
 class EquipoAdminSchema(Schema):

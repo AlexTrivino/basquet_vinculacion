@@ -16,6 +16,7 @@ Nota técnica sobre joinedload con dos FKs al mismo modelo:
 """
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
+from sqlalchemy import or_
 
 from app import db
 from app.models.inscripcion import Inscripcion
@@ -50,12 +51,13 @@ def _base_query_con_relaciones():
 
 # ── Funciones de servicio ─────────────────────────────────────────
 
-def listar_partidos(id_torneo=None, estado=None):
+def listar_partidos(id_torneo=None, estado=None, id_equipo=None):
     """Retorna la query de partidos con filtros opcionales para paginación.
 
     Args:
         id_torneo: Filtra por torneo.
         estado: Filtra por estado del partido.
+        id_equipo: Filtra partidos donde el equipo sea local o visitante.
 
     Returns:
         Query de SQLAlchemy lista para ``paginate_query()``.
@@ -69,6 +71,9 @@ def listar_partidos(id_torneo=None, estado=None):
 
     if estado in ('programado', 'en_curso', 'finalizado', 'suspendido'):
         query = query.filter(Partido.estado == estado)
+
+    if id_equipo is not None:
+        query = query.filter(or_(Partido.id_equipo_local == id_equipo, Partido.id_equipo_visitante == id_equipo))
 
     return query
 
@@ -215,3 +220,16 @@ def obtener_box_score(partido):
         'local': build_jugador_stats(plantillas_local),
         'visitante': build_jugador_stats(plantillas_visitante)
     }
+
+def eliminar_partido(id_partido):
+    """Elimina un partido si no tiene actas ni estadísticas."""
+    partido = db.session.get(Partido, id_partido)
+    if not partido:
+        raise ValueError("El partido no existe.")
+        
+    if partido.url_planilla_fiba or partido.stats_local_procesadas or partido.stats_visitante_procesadas:
+        raise ValueError("Este partido contiene información histórica (estadísticas o actas). Por seguridad, cámbiale el estado a 'Suspendido' en lugar de eliminarlo físicamente.")
+        
+    db.session.delete(partido)
+    db.session.commit()
+    return True

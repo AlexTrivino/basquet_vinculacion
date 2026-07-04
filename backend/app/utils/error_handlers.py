@@ -4,7 +4,9 @@ Manejadores de errores HTTP centralizados.
 Registra handlers para los códigos de estado más comunes,
 devolviendo respuestas JSON con formato estandarizado (RNF-MAN-02).
 """
-from flask import Flask, jsonify
+from flask import Flask, jsonify, current_app
+from sqlalchemy.exc import SQLAlchemyError
+from app import db
 
 
 def register_error_handlers(app_instance: Flask) -> None:
@@ -59,11 +61,24 @@ def register_error_handlers(app_instance: Flask) -> None:
             'message': 'El método HTTP utilizado no está permitido para esta ruta.',
         }), 405
 
-    @app_instance.errorhandler(500)
+    @app_instance.errorhandler(Exception)
     def internal_server_error(error):
-        """Error interno del servidor."""
+        """Error interno del servidor (captura cualquier excepción no manejada)."""
+        db.session.rollback()
+        current_app.logger.exception('Error no manejado:')
         return jsonify({
             'success': False,
             'error_code': 'INTERNAL_SERVER_ERROR',
-            'message': 'Ocurrió un error interno en el servidor.',
+            'message': 'Ocurrió un error inesperado en el servidor.',
+        }), 500
+
+    @app_instance.errorhandler(SQLAlchemyError)
+    def sqlalchemy_error(error):
+        """Error de base de datos o de integridad."""
+        db.session.rollback()
+        current_app.logger.exception('Error de Base de Datos:')
+        return jsonify({
+            'success': False,
+            'error_code': 'DATABASE_ERROR',
+            'message': 'Ocurrió un error de integridad de datos. Verifique que la acción no rompa relaciones existentes.',
         }), 500
