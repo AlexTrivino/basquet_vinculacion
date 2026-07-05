@@ -1,20 +1,12 @@
 import { useState, useMemo, useEffect } from 'react';
-import { X, BarChart2 } from 'lucide-react';
+import { X, BarChart2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
 import axiosInstance from '../../../api/axios.config';
 import { postEstadisticasBulk } from '../../estadisticas/api/estadisticas.api';
+import { createSancion } from '../../sanciones/api/sanciones.api';
 
 // ── Tipos ─────────────────────────────────────────────────────────
-interface JugadorPlantilla {
-  id_jugador: number;
-  id_plantilla?: number;
-  jugador?: { id_jugador?: number; nombres: string; apellidos: string };
-  nombres?: string;
-  apellidos?: string;
-  numero_camiseta?: number;
-}
-
 interface StatRow {
   id_jugador: number;
   nombre: string;
@@ -24,6 +16,7 @@ interface StatRow {
   faltas: number;
   rebotes: number;
   asistencias: number;
+  sancion_activa?: boolean;
 }
 
 interface Props {
@@ -31,6 +24,7 @@ interface Props {
   idEquipo: number;
   nombreEquipo: string;
   marcadorOficial: number;
+  tipoEquipo: 'local' | 'visitante';
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -40,43 +34,43 @@ export function GenerarEstadisticasModal({
   idEquipo,
   nombreEquipo,
   marcadorOficial,
+  tipoEquipo,
   onClose,
   onSuccess,
 }: Props) {
   const [rows, setRows] = useState<StatRow[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [jugadorAmonestar, setJugadorAmonestar] = useState<number | null>(null);
+  const [motivoAmonestacion, setMotivoAmonestacion] = useState('');
+  const [isAmonestando, setIsAmonestando] = useState(false);
 
   // Carga jugadores de la plantilla del equipo en este contexto de partido
   const { data: queryData, isLoading } = useQuery({
-    queryKey: ['plantilla-stats', idEquipo, idPartido],
+    queryKey: ['partido-stats', idPartido, tipoEquipo],
     queryFn: async () => {
-      const res = await axiosInstance.get('/plantillas', {
-        params: { id_equipo: idEquipo, estado: 'activo', per_page: 100 }
-      });
+      const res = await axiosInstance.get('/partidos/' + idPartido + '/estadisticas');
       return res.data;
     }
   });
 
   useEffect(() => {
     if (queryData?.data) {
-      const plantilla: JugadorPlantilla[] = queryData.data;
-      const initialRows: StatRow[] = plantilla.map((p) => ({
-        // Fix de mapeo: el ID viaja dentro del objeto anidado en el PublicSchema
-        id_jugador: p.jugador?.id_jugador || p.id_jugador,
-        nombre: p.jugador
-          ? `${p.jugador.nombres} ${p.jugador.apellidos}`
-          : `${p.nombres || ''} ${p.apellidos || ''}`.trim(),
+      const statsEquipo = queryData.data[tipoEquipo] || [];
+      const initialRows: StatRow[] = statsEquipo.map((p: any) => ({
+        id_jugador: p.id_jugador,
+        nombre: `${p.nombre_jugador} ${p.apellido_jugador}`.trim(),
         dorsal: p.numero_camiseta || 0,
-        puntos: 0,
-        triples: 0,
-        faltas: 0,
-        rebotes: 0,
-        asistencias: 0,
+        puntos: p.puntos_anotados || 0,
+        triples: p.triples_anotados || 0,
+        faltas: p.faltas_cometidas || 0,
+        rebotes: p.rebotes || 0,
+        asistencias: p.asistencias || 0,
+        sancion_activa: p.sancion_activa || false,
       }));
       // Solo inicializa si la tabla está vacía para no borrar lo que el Admin esté tipeando
       setRows((prev) => (prev.length === 0 ? initialRows : prev));
     }
-  }, [queryData]);
+  }, [queryData, tipoEquipo]);
 
   // Suma reactiva de puntos en tiempo real
   const totalPuntos = useMemo(() => rows.reduce((sum, r) => sum + (r.puntos || 0), 0), [rows]);
@@ -88,6 +82,27 @@ export function GenerarEstadisticasModal({
       next[idx] = { ...next[idx], [field]: value };
       return next;
     });
+  };
+
+  const handleAmonestar = async () => {
+    if (!jugadorAmonestar || !motivoAmonestacion.trim()) return toast.warning('Escribe el motivo');
+    setIsAmonestando(true);
+    try {
+      await createSancion({ id_partido: idPartido, id_jugador: jugadorAmonestar, motivo: motivoAmonestacion, fecha: new Date().toISOString().split('T')[0] });
+      toast.success('Amonestación registrada con éxito');
+      setJugadorAmonestar(null);
+      setMotivoAmonestacion('');
+    } catch (error) { 
+      toast.error('Error al amonestar jugador'); 
+    } finally {
+      setIsAmonestando(false);
+    }
+  };
+
+  const handleLimpiar = () => {
+    if (window.confirm("¿Seguro que deseas reiniciar todas las estadísticas a cero?")) {
+      setRows((prev) => prev.map(r => ({ ...r, puntos: 0, triples: 0, faltas: 0, rebotes: 0, asistencias: 0 })));
+    }
   };
 
   const handleSave = async () => {
@@ -153,6 +168,7 @@ export function GenerarEstadisticasModal({
                           {col}
                         </th>
                       ))}
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -171,11 +187,32 @@ export function GenerarEstadisticasModal({
                             />
                           </td>
                         ))}
+                        <td className="px-3 py-2 text-center">
+                          <button 
+                            onClick={() => setJugadorAmonestar(row.id_jugador)} 
+                            disabled={row.sancion_activa}
+                            title={row.sancion_activa ? "Jugador ya sancionado en este partido" : "Amonestar Jugador"} 
+                            className={`transition-colors ${row.sancion_activa ? 'text-red-500 fill-red-100 disabled:opacity-100' : 'text-gray-400 hover:text-yellow-500 disabled:opacity-50'}`}
+                          >
+                            <AlertTriangle className="w-5 h-5" />
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
+
+              {jugadorAmonestar && (
+                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex flex-col sm:flex-row gap-3 items-center">
+                  <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0" />
+                  <input type="text" placeholder="Motivo de la amonestación disciplinaria..." value={motivoAmonestacion} onChange={(e) => setMotivoAmonestacion(e.target.value)} className="flex-1 rounded-md border-gray-300 px-3 py-1.5 text-sm" disabled={isAmonestando} />
+                  <button onClick={handleAmonestar} disabled={isAmonestando} className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-1.5 rounded-md text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    {isAmonestando ? 'Aplicando...' : 'Aplicar Tarjeta'}
+                  </button>
+                  <button onClick={() => { setJugadorAmonestar(null); setMotivoAmonestacion(''); }} className="text-gray-500 hover:text-gray-700 px-2 py-1.5 text-sm font-semibold">Cancelar</button>
+                </div>
+              )}
 
               {/* Panel de control / Feedback predictivo */}
               <div className={`mt-6 rounded-lg border-2 p-4 flex items-center justify-between ${
@@ -194,17 +231,26 @@ export function GenerarEstadisticasModal({
                     </p>
                   )}
                 </div>
-                <button
-                  onClick={handleSave}
-                  disabled={!isBalanced || isSaving}
-                  className={`px-6 py-2 rounded-md text-sm font-semibold text-white transition-all ${
-                    isBalanced && !isSaving
-                      ? 'bg-primary-600 hover:bg-primary-700 shadow-sm'
-                      : 'bg-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  {isSaving ? 'Guardando...' : 'Guardar Estadísticas'}
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleLimpiar}
+                    disabled={isSaving}
+                    className="px-4 py-2 rounded-md text-sm font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Limpiar Todo
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    disabled={!isBalanced || isSaving}
+                    className={`px-6 py-2 rounded-md text-sm font-semibold text-white transition-all ${
+                      isBalanced && !isSaving
+                        ? 'bg-primary-600 hover:bg-primary-700 shadow-sm'
+                        : 'bg-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    {isSaving ? 'Guardando...' : 'Guardar Estadísticas'}
+                  </button>
+                </div>
               </div>
             </>
           )}

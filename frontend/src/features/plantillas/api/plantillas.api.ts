@@ -9,7 +9,7 @@ export async function getJugadores(page = 1, perPage = 20): Promise<ApiResponse<
   return response.data;
 }
 
-export async function createJugador(data: { nombres: string; apellidos: string; documento_identificacion: string; fecha_nacimiento: string; genero: string; telefono: string; correo?: string }): Promise<ApiResponse<any>> {
+export async function createJugador(data: { nombres: string; apellidos: string; documento_identificacion: string; fecha_nacimiento: string; genero: string; telefono?: string; correo?: string }): Promise<ApiResponse<any>> {
   const response = await axiosInstance.post('/jugadores', data);
   return response.data;
 }

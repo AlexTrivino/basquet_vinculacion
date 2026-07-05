@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, User } from 'lucide-react';
+import { Menu, User, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Sidebar } from './Sidebar';
+import { useQuery } from '@tanstack/react-query';
+import { getInscripciones } from '../features/equipos/api/equipos.api';
 
 const NAV_LINKS = {
   public: [
@@ -22,7 +24,7 @@ const NAV_LINKS = {
     { name: 'Equipos', path: '/admin/equipos' },
     { name: 'Partidos', path: '/admin/partidos' },
     { name: 'Inscripciones', path: '/admin/auditoria' },
-    { name: 'Estadísticas', path: '/admin/estadisticas' },
+    { name: 'Sanciones', path: '/admin/sanciones' },
   ],
   public_admin: [
     { name: 'Inicio', path: '/' },
@@ -31,10 +33,39 @@ const NAV_LINKS = {
 };
 
 export function Navbar() {
-  const { userRole, isAuthenticated, logout } = useAuth();
+  const { userRole, isAuthenticated, logout, activeTeamId, setActiveTeamId } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
+
+  const { data: response } = useQuery({
+    queryKey: ['inscripciones', 'delegado'],
+    queryFn: () => getInscripciones(1, 50),
+    enabled: userRole === 'delegado',
+  });
+  const inscripciones = response?.data || [];
+
+  const renderTeamSwitcher = () => {
+    if (userRole !== 'delegado' || inscripciones.length <= 1) return null;
+    return (
+      <div className="flex items-center gap-2">
+        <Shield className="w-4 h-4 text-gray-400 hidden lg:block" />
+        <select
+          value={activeTeamId || ''}
+          onChange={(e) => setActiveTeamId(Number(e.target.value))}
+          className="bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 cursor-pointer outline-none hover:bg-gray-100 transition-colors"
+        >
+          <option value="" disabled>Seleccionar equipo...</option>
+          {inscripciones.map(ins => {
+            const eq = ins.equipo;
+            if (!eq) return null;
+            const id = eq.id_equipo || eq.id;
+            return <option key={id} value={id}>{eq.nombre_equipo}</option>;
+          })}
+        </select>
+      </div>
+    );
+  };
 
   const links = userRole === 'super_admin' ? NAV_LINKS.super_admin :
                 userRole === 'delegado' ? NAV_LINKS.delegado : NAV_LINKS.public;
@@ -84,6 +115,13 @@ export function Navbar() {
                     {link.name}
                   </NavLink>
                 ))}
+              </div>
+            )}
+            
+            {/* Team Switcher Desktop */}
+            {userRole === 'delegado' && inscripciones.length > 1 && (
+              <div className="ml-4 pl-4 border-l border-gray-200">
+                {renderTeamSwitcher()}
               </div>
             )}
           </div>
@@ -139,6 +177,7 @@ export function Navbar() {
         links={links}
         isAuthenticated={isAuthenticated}
         onLogout={handleLogout}
+        topContent={renderTeamSwitcher()}
       />
     </>
   );

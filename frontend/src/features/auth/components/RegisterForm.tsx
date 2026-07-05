@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { Mail } from 'lucide-react';
 
 import { registerWithSupabase } from '../api/auth.api';
 import { AsyncButton } from '../../../components/AsyncButton';
@@ -20,6 +22,7 @@ const registerSchema = z.object({
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function RegisterForm() {
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const {
     register,
     handleSubmit,
@@ -32,10 +35,16 @@ export function RegisterForm() {
 
   const onSubmit = async (data: RegisterFormValues) => {
     try {
-      await registerWithSupabase(data.email, data.password, data.nombre);
+      const res = await registerWithSupabase(data.email, data.password, data.nombre);
       
-      toast.success('Registro exitoso. Revisa tu correo para confirmar la cuenta.');
-      navigate('/auth/login');
+      // Validación contra falso éxito (Email Enumeration Protection de Supabase)
+      const identities = res.identities || res.user?.identities;
+      if (identities && identities.length === 0) {
+        toast.error('Este correo ya se encuentra registrado en nuestro sistema.');
+        return;
+      }
+      
+      setShowSuccessModal(true);
     } catch (error: any) {
       const message =
         error.response?.data?.error_description ||
@@ -46,6 +55,7 @@ export function RegisterForm() {
   };
 
   return (
+    <>
     <form className="flex w-full flex-col gap-4">
       <div>
         <label htmlFor="nombre" className="mb-1 block text-sm font-medium text-gray-700">
@@ -126,5 +136,27 @@ export function RegisterForm() {
         </Link>
       </div>
     </form>
+
+    {showSuccessModal && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 text-center animate-in fade-in zoom-in duration-200">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary-100 mb-6">
+            <Mail className="h-8 w-8 text-primary-600" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">¡Revisa tu correo!</h3>
+          <p className="text-gray-600 mb-8 text-sm">
+            Hemos enviado un enlace de confirmación a tu correo electrónico. Por favor, haz clic en él para activar tu cuenta.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate('/auth/login')}
+            className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors"
+          >
+            Entendido, ir al Login
+          </button>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

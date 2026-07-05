@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { UserPlus, X, Trash2, Image as ImageIcon } from 'lucide-react';
+import { UserPlus, X, Trash2, Image as ImageIcon, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -8,8 +8,10 @@ import { z } from 'zod';
 
 import { DataGridTable, type Column } from '../../../components/DataGridTable';
 import { AsyncButton } from '../../../components/AsyncButton';
+import { useAuth } from '../../../context/AuthContext';
 import { getPlantillas, createJugador, createPlantilla, uploadFotoJugador, deletePlantilla } from '../api/plantillas.api';
 import { getInscripciones } from '../../equipos/api/equipos.api';
+import { getSanciones } from '../../sanciones/api/sanciones.api';
 import type { Plantilla } from '../../../types/api.types';
 import { Skeleton } from '../../../components/Skeleton';
 import { EmptyState } from '../../../components/EmptyState';
@@ -17,11 +19,11 @@ import { EmptyState } from '../../../components/EmptyState';
 const jugadorSchema = z.object({
   nombres: z.string().min(2, 'Nombres requeridos'),
   apellidos: z.string().min(2, 'Apellidos requeridos'),
-  documento_identificacion: z.string().min(5, 'Documento inválido'),
+  documento_identificacion: z.string().length(10, 'La cédula debe tener exactamente 10 dígitos'),
   genero: z.string().min(1, 'Género requerido'),
   fecha_nacimiento: z.string().min(1, 'Fecha requerida'),
   numero_camiseta: z.number().min(0, 'Número inválido'),
-  telefono: z.string().min(5, 'Requerido'),
+  telefono: z.string().optional().or(z.literal('')),
   correo: z.string().email('Inválido').optional().or(z.literal('')),
 });
 type JugadorFormValues = z.infer<typeof jugadorSchema>;
@@ -34,12 +36,17 @@ export function GestorPlantilla() {
   
   const queryClient = useQueryClient();
 
+  const { activeTeamId } = useAuth();
+
   const { data: inscripcionesRes, isLoading: isLoadingInscripciones } = useQuery({
     queryKey: ['inscripciones', 'delegado'],
-    queryFn: () => getInscripciones(1, 1),
+    queryFn: () => getInscripciones(1, 50),
   });
   
-  const inscripcion = inscripcionesRes?.data?.[0];
+  const inscripciones = inscripcionesRes?.data || [];
+  const inscripcion = activeTeamId 
+    ? inscripciones.find(i => (i.equipo?.id_equipo || i.equipo?.id) === activeTeamId)
+    : inscripciones[0];
   const idEquipo = inscripcion?.equipo?.id_equipo || inscripcion?.id_equipo;
   const idTorneo = inscripcion?.torneo?.id_torneo || inscripcion?.id_torneo;
   const generoCategoria = inscripcion?.categoria?.genero_categoria;
@@ -50,6 +57,12 @@ export function GestorPlantilla() {
     enabled: !!idEquipo,
   });
   const plantilla = plantillasRes?.data || [];
+
+  const { data: sancionesRes } = useQuery({
+    queryKey: ['sanciones-activas-liga'],
+    queryFn: () => getSanciones(undefined, 'activa'),
+  });
+  const amonestacionesActivas = sancionesRes?.data || [];
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<JugadorFormValues>({
     resolver: zodResolver(jugadorSchema),
@@ -67,15 +80,17 @@ export function GestorPlantilla() {
     }
 
     try {
-      const jugadorRes = await createJugador({
+      const payload = {
         nombres: data.nombres,
         apellidos: data.apellidos,
         genero: data.genero,
         documento_identificacion: data.documento_identificacion,
         fecha_nacimiento: data.fecha_nacimiento,
-        telefono: data.telefono,
-        correo: data.correo,
-      });
+        telefono: data.telefono === "" ? undefined : data.telefono,
+        correo: data.correo === "" ? undefined : data.correo,
+      };
+
+      const jugadorRes = await createJugador(payload);
 
       if (!jugadorRes.data) throw new Error('Error al crear jugador');
       const idJugador = jugadorRes.data.id_jugador || jugadorRes.data.id;
@@ -102,8 +117,17 @@ export function GestorPlantilla() {
       setFotoFile(null);
       setShowForm(false);
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Ocurrió un error al registrar el jugador.';
-      toast.error(message);
+      let message = error.response?.data?.message || error.response?.data?.errors || error.message || 'Ocurrió un error al registrar el jugador.';
+      if (typeof message === 'object' && message !== null) {
+        try {
+          message = Object.entries(message)
+            .map(([key, val]) => `${key}: ${Array.isArray(val) ? val.join(', ') : val}`)
+            .join(' | ');
+        } catch (e) {
+          message = JSON.stringify(message);
+        }
+      }
+      toast.error(String(message));
     }
   };
 
@@ -149,6 +173,8 @@ export function GestorPlantilla() {
       render: (row) => {
         const fotoUrl = row.jugador?.url_foto;
         const inicial = row.jugador?.nombres?.charAt(0) || '?';
+        const idJugador = row.jugador?.id_jugador || row.jugador?.id || row.id_jugador;
+        const amonestado = amonestacionesActivas.some(s => s.id_jugador === idJugador);
         return (
           <div className="flex items-center gap-3">
             {fotoUrl ? (
@@ -158,7 +184,10 @@ export function GestorPlantilla() {
                 {inicial}
               </div>
             )}
-            <span className="font-medium text-gray-900">{row.jugador?.nombres} {row.jugador?.apellidos}</span>
+            <span className="font-medium text-gray-900 flex items-center gap-2">
+              {row.jugador?.nombres} {row.jugador?.apellidos}
+              {amonestado && <span title="Jugador Amonestado (Faltas Activas)"><AlertTriangle className="w-4 h-4 text-yellow-500" /></span>}
+            </span>
           </div>
         );
       }

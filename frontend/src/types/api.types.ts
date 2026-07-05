@@ -123,6 +123,19 @@ export interface Partido {
   categoria?: Categoria;
 }
 
+export interface Sancion {
+  id?: number;
+  id_sancion: number;
+  motivo: string;
+  fecha: string;
+  estado: string;
+  id_jugador: number;
+  id_partido: number;
+  created_at: string;
+  jugador?: { id_jugador: number; nombres: string; apellidos: string };
+  partido?: { id_partido: number; fecha_programada: string; estado: string };
+}
+
 export interface PosicionFIBA {
   id?: number;
   id_equipo: number;

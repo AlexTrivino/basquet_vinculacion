@@ -16,6 +16,7 @@ import {
   useContext,
   useMemo,
   useState,
+  useEffect,
   type ReactNode,
 } from 'react';
 
@@ -26,11 +27,13 @@ export type UserRole = 'super_admin' | 'delegado' | null;
 interface AuthState {
   isAuthenticated: boolean;
   userRole: UserRole;
+  activeTeamId: number | null;
 }
 
 interface AuthContextValue extends AuthState {
   login: (token: string, role: UserRole) => void;
   logout: () => void;
+  setActiveTeamId: (id: number | null) => void;
 }
 
 // ── Contexto ─────────────────────────────────────────────────────
@@ -42,10 +45,12 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 function loadInitialState(): AuthState {
   const token = localStorage.getItem('access_token');
   const role = localStorage.getItem('user_role') as UserRole;
+  const teamId = localStorage.getItem('ag_active_team_id');
 
   return {
     isAuthenticated: token !== null,
     userRole: token ? role : null,
+    activeTeamId: teamId ? Number(teamId) : null,
   };
 }
 
@@ -61,18 +66,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('user_role', role);
     }
 
-    setState({ isAuthenticated: true, userRole: role });
+    setState(prev => ({ ...prev, isAuthenticated: true, userRole: role }));
   }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user_role');
+    localStorage.removeItem('ag_active_team_id');
     window.location.href = '/auth/login';
   }, []);
 
+  const setActiveTeamId = useCallback((id: number | null) => {
+    setState(prev => ({ ...prev, activeTeamId: id }));
+  }, []);
+
+  useEffect(() => {
+    if (state.activeTeamId !== null) {
+      localStorage.setItem('ag_active_team_id', state.activeTeamId.toString());
+    } else {
+      localStorage.removeItem('ag_active_team_id');
+    }
+  }, [state.activeTeamId]);
+
   const value = useMemo<AuthContextValue>(
-    () => ({ ...state, login, logout }),
-    [state, login, logout],
+    () => ({ ...state, login, logout, setActiveTeamId }),
+    [state, login, logout, setActiveTeamId],
   );
 
   return (

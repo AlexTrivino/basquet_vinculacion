@@ -51,6 +51,7 @@ export function GestorPartidos() {
     idEquipo: number;
     nombreEquipo: string;
     marcadorOficial: number;
+    tipoEquipo: 'local' | 'visitante';
   } | null>(null);
   const [partidoAEliminar, setPartidoAEliminar] = useState<Partido | null>(null);
 
@@ -208,44 +209,6 @@ export function GestorPartidos() {
                   <FileText className="w-3.5 h-3.5" />
                   {row.url_planilla_fiba ? 'Acta ✓' : 'Acta'}
                 </button>
-                
-                {/* Stats Local */}
-                {row.equipo_local?.id_equipo && (
-                  <button
-                    onClick={() => setEstadisticasTarget({
-                      idPartido: id as number,
-                      idEquipo: row.equipo_local!.id_equipo!,
-                      nombreEquipo: row.equipo_local?.nombre_equipo || 'Local',
-                      marcadorOficial: row.marcador_local || 0,
-                    })}
-                    className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                      row.stats_local_procesadas ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
-                    }`}
-                    title="Stats Local"
-                  >
-                    <BarChart2 className="w-3.5 h-3.5" />
-                    {row.stats_local_procesadas ? 'L ✓' : 'L'}
-                  </button>
-                )}
-                
-                {/* Stats Visitante */}
-                {row.equipo_visitante?.id_equipo && (
-                  <button
-                    onClick={() => setEstadisticasTarget({
-                      idPartido: id as number,
-                      idEquipo: row.equipo_visitante!.id_equipo!,
-                      nombreEquipo: row.equipo_visitante?.nombre_equipo || 'Visitante',
-                      marcadorOficial: row.marcador_visitante || 0,
-                    })}
-                    className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                      row.stats_visitante_procesadas ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100'
-                    }`}
-                    title="Stats Visitante"
-                  >
-                    <BarChart2 className="w-3.5 h-3.5" />
-                    {row.stats_visitante_procesadas ? 'V ✓' : 'V'}
-                  </button>
-                )}
               </>
             )}
             
@@ -417,6 +380,63 @@ export function GestorPartidos() {
               </AsyncButton>
             </div>
           </form>
+
+          {/* New sub-section for Rendimiento Individual (Estadísticas) */}
+          <div className="border-t border-gray-200 mt-6 pt-6">
+            <h4 className="text-md font-bold text-gray-900 mb-3">Rendimiento Individual (Estadísticas)</h4>
+            
+            {editingPartido.estado === 'finalizado' || editingPartido.estado === 'finalizado_wo' ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {editingPartido.equipo_local?.id_equipo && (
+                  <button
+                    onClick={() => setEstadisticasTarget({
+                      idPartido: editingPartido.id_partido || editingPartido.id as number,
+                      idEquipo: editingPartido.equipo_local!.id_equipo!,
+                      nombreEquipo: editingPartido.equipo_local?.nombre_equipo || 'Local',
+                      marcadorOficial: editingPartido.marcador_local || 0,
+                      tipoEquipo: 'local',
+                    })}
+                    className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-colors ${
+                      editingPartido.stats_local_procesadas 
+                        ? 'border-green-200 bg-green-50 text-green-700 hover:bg-green-100' 
+                        : 'border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100'
+                    }`}
+                  >
+                    <BarChart2 className="w-6 h-6 mb-2" />
+                    <span className="font-bold text-center">Stats Local</span>
+                    <span className="text-xs mt-1 text-center font-medium opacity-80">{editingPartido.equipo_local?.nombre_equipo}</span>
+                    {editingPartido.stats_local_procesadas && <span className="mt-2 bg-green-200 text-green-800 text-xs font-bold px-2 py-1 rounded-full">✓ Procesadas</span>}
+                  </button>
+                )}
+                
+                {editingPartido.equipo_visitante?.id_equipo && (
+                  <button
+                    onClick={() => setEstadisticasTarget({
+                      idPartido: editingPartido.id_partido || editingPartido.id as number,
+                      idEquipo: editingPartido.equipo_visitante!.id_equipo!,
+                      nombreEquipo: editingPartido.equipo_visitante?.nombre_equipo || 'Visitante',
+                      marcadorOficial: editingPartido.marcador_visitante || 0,
+                      tipoEquipo: 'visitante',
+                    })}
+                    className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-colors ${
+                      editingPartido.stats_visitante_procesadas 
+                        ? 'border-green-200 bg-green-50 text-green-700 hover:bg-green-100' 
+                        : 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
+                    }`}
+                  >
+                    <BarChart2 className="w-6 h-6 mb-2" />
+                    <span className="font-bold text-center">Stats Visitante</span>
+                    <span className="text-xs mt-1 text-center font-medium opacity-80">{editingPartido.equipo_visitante?.nombre_equipo}</span>
+                    {editingPartido.stats_visitante_procesadas && <span className="mt-2 bg-green-200 text-green-800 text-xs font-bold px-2 py-1 rounded-full">✓ Procesadas</span>}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 italic bg-gray-50 p-4 rounded-lg border border-gray-100 text-center">
+                Guarde el partido como 'Finalizado' para habilitar la carga de estadísticas.
+              </p>
+            )}
+          </div>
         </div>
       )}
 
@@ -464,6 +484,7 @@ export function GestorPartidos() {
           idEquipo={estadisticasTarget.idEquipo}
           nombreEquipo={estadisticasTarget.nombreEquipo}
           marcadorOficial={estadisticasTarget.marcadorOficial}
+          tipoEquipo={estadisticasTarget.tipoEquipo}
           onClose={() => setEstadisticasTarget(null)}
           onSuccess={() => queryClient.invalidateQueries({ queryKey: ['partidos', selectedTorneo] })}
         />

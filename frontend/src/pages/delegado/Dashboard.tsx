@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { StatusBadge } from '../../components/StatusBadge';
 import { useAuth } from '../../context/AuthContext';
 import { getInscripciones } from '../../features/equipos/api/equipos.api';
@@ -8,16 +9,74 @@ import { ShieldAlert, Trophy } from 'lucide-react';
 import EquipoProfile from '../public/EquipoProfile';
 
 export default function Dashboard() {
-  useAuth();
+  const { activeTeamId, setActiveTeamId } = useAuth();
 
   const { data: response, isLoading, isError } = useQuery({
     queryKey: ['inscripciones', 'delegado'],
-    queryFn: () => getInscripciones(1, 10),
+    queryFn: () => getInscripciones(1, 50),
   });
 
   const inscripciones = response?.data || [];
-  // Para el MVP, asumimos que el delegado está gestionando principalmente su inscripción más reciente.
-  const inscripcionActual = inscripciones.length > 0 ? inscripciones[0] : null;
+  
+  useEffect(() => {
+    if (inscripciones.length === 1 && activeTeamId === null) {
+      const id = inscripciones[0].equipo?.id_equipo || inscripciones[0].equipo?.id;
+      if (id !== undefined) setActiveTeamId(id);
+    }
+  }, [inscripciones, activeTeamId, setActiveTeamId]);
+
+  if (inscripciones.length > 1 && activeTeamId === null) {
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-extrabold text-gray-900">Bienvenido, Entrenador</h1>
+          <p className="mt-2 text-gray-600">Selecciona el equipo que deseas administrar.</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {inscripciones.map(ins => {
+            const eq = ins.equipo;
+            if (!eq) return null;
+            const idEq = eq.id_equipo || eq.id;
+            const logo = eq.url_logo;
+            const inicial = eq.nombre_equipo?.charAt(0) || '?';
+            return (
+              <div key={idEq} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col items-center p-6 hover:shadow-md transition-shadow">
+                <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4 overflow-hidden border-4 border-gray-50 shadow-inner">
+                  {logo ? <img src={logo} alt={eq.nombre_equipo} className="w-full h-full object-cover" /> : <span className="text-2xl font-bold text-gray-400">{inicial}</span>}
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-6">{eq.nombre_equipo}</h3>
+                
+                <button 
+                  onClick={() => {
+                    if (idEq !== undefined) setActiveTeamId(idEq);
+                  }}
+                  className="w-full bg-primary-600 text-white font-semibold py-2.5 rounded-xl hover:bg-primary-700 transition-colors shadow-sm"
+                >
+                  Administrar Equipo
+                </button>
+              </div>
+            );
+          })}
+          <div className="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300 overflow-hidden flex flex-col items-center justify-center p-6 text-center hover:bg-gray-100 transition-colors">
+            <ShieldAlert className="w-12 h-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-bold text-gray-600 mb-2">Inscribir Otro Equipo</h3>
+            <p className="text-sm text-gray-500 mb-4">Registra una nueva categoría bajo tu misma cuenta.</p>
+            <Link to="/delegado/inscripcion" className="inline-flex w-full items-center justify-center rounded-xl bg-gray-800 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-900">
+              Registrar Equipo
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  let inscripcionActual = null;
+  if (activeTeamId) {
+    inscripcionActual = inscripciones.find(i => (i.equipo?.id_equipo || i.equipo?.id) === activeTeamId);
+  } else if (inscripciones.length > 0) {
+    inscripcionActual = inscripciones[0];
+  }
+  
   const estadoActual = inscripcionActual?.estado_inscripcion || inscripcionActual?.estado;
 
   if (!inscripcionActual) {
@@ -31,7 +90,7 @@ export default function Dashboard() {
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <div className="flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <h3 className="text-lg font-bold text-gray-900">Estado de Inscripción</h3>
-            
+
             {isLoading ? (
               <div className="mt-4 flex flex-col gap-2">
                 <Skeleton className="h-6 w-1/2" />
@@ -77,11 +136,11 @@ export default function Dashboard() {
           <StatusBadge status={estadoActual === 'pendiente' ? 'Pendiente' : estadoActual === 'aprobado' ? 'Aprobado' : 'Rechazado'} />
         </div>
         <p className="text-sm text-gray-500 mb-4 leading-relaxed">
-          {estadoActual === 'pendiente' 
-            ? 'Perfil en revisión administrativa.' 
+          {estadoActual === 'pendiente'
+            ? 'Perfil en revisión administrativa.'
             : estadoActual === 'aprobado'
-            ? 'Equipo aprobado. Todo en orden.'
-            : 'Inscripción rechazada.'}
+              ? 'Equipo aprobado. Todo en orden.'
+              : 'Inscripción rechazada.'}
         </p>
         <Link
           to="/delegado/plantilla"
@@ -95,26 +154,26 @@ export default function Dashboard() {
       <EquipoProfile teamId={inscripcionActual.equipo?.id_equipo || inscripcionActual.equipo?.id} />
 
       {/* 3. TARJETA FLOTANTE DE ESCRITORIO (Glassmorphism) */}
-      <div className={`hidden lg:block fixed ${inscripcionActual.equipo?.estado === 'inactivo' ? 'top-40' : 'top-24'} right-8 z-40 bg-white/80 backdrop-blur-xl shadow-2xl rounded-2xl p-6 border border-white/40 w-80 transition-all duration-300`}>
+      <div className={`mt-8 hidden lg:block fixed ${inscripcionActual.equipo?.estado === 'inactivo' ? 'top-40' : 'top-24'} right-8 z-40 bg-white/80 backdrop-blur-xl shadow-2xl rounded-2xl p-6 border border-white/40 w-80 transition-all duration-300`}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-bold text-gray-900 text-lg flex items-center gap-2">
             <Trophy className="w-5 h-5 text-primary-600" /> Administración
           </h2>
         </div>
-        
+
         <div className="mb-4">
           <span className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1 block">Estatus del Equipo</span>
           <StatusBadge status={estadoActual === 'pendiente' ? 'Pendiente' : estadoActual === 'aprobado' ? 'Aprobado' : 'Rechazado'} />
         </div>
-        
+
         <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-          {estadoActual === 'pendiente' 
-            ? 'El perfil de tu equipo está bajo revisión administrativa. Te notificaremos pronto.' 
+          {estadoActual === 'pendiente'
+            ? 'El perfil de tu equipo está bajo revisión administrativa. Te notificaremos pronto.'
             : estadoActual === 'aprobado'
-            ? 'Tu equipo ha sido aprobado exitosamente. ¡Mantén tu plantilla al día!'
-            : 'Tu inscripción ha sido rechazada. Revisa las observaciones.'}
+              ? 'Tu equipo ha sido aprobado exitosamente. ¡Mantén tu plantilla al día!'
+              : 'Tu inscripción ha sido rechazada. Revisa las observaciones.'}
         </p>
-        
+
         <Link
           to="/delegado/plantilla"
           className="inline-flex w-full items-center justify-center rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-700 shadow-md hover:shadow-lg hover:-translate-y-0.5"

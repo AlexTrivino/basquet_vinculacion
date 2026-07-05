@@ -2,7 +2,9 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getJugadorPerfil } from '../../features/jugadores/api/jugadores.api';
 import { Skeleton } from '../../components/Skeleton';
-import { Shield, Trophy, Activity, Target, ArrowUp, Hand, Goal, ArrowLeft } from 'lucide-react';
+import { Shield, Trophy, Activity, Target, ArrowUp, Hand, Goal, ArrowLeft, AlertTriangle } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { getSanciones } from '../../features/sanciones/api/sanciones.api';
 
 export default function JugadorProfile() {
   const { id } = useParams<{ id: string }>();
@@ -12,6 +14,15 @@ export default function JugadorProfile() {
     queryFn: () => getJugadorPerfil(id!),
     enabled: !!id,
   });
+
+  const { userRole } = useAuth();
+  const { data: sancionesRes } = useQuery({
+    queryKey: ['sanciones-jugador', id],
+    queryFn: () => getSanciones(Number(id)),
+    enabled: !!id,
+  });
+  const sanciones = sancionesRes?.data || [];
+  const tieneAmonestacionActiva = sanciones.some(s => s.estado === 'activa');
 
   if (isLoading) {
     return (
@@ -75,6 +86,12 @@ export default function JugadorProfile() {
             <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight capitalize">
               {jugador.nombres.toLowerCase()} {jugador.apellidos.toLowerCase()}
             </h1>
+            
+            {tieneAmonestacionActiva && (
+              <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-sm font-bold text-yellow-800">
+                <AlertTriangle className="w-4 h-4"/> Amonestado
+              </span>
+            )}
             
             <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
               {(jugador.equipo_actual || jugador.torneo_actual) && (
@@ -187,6 +204,32 @@ export default function JugadorProfile() {
 
           </div>
         </div>
+
+        {/* Historial Disciplinario (Privado) */}
+        {(userRole === 'super_admin' || userRole === 'delegado') && sanciones.length > 0 && (
+          <div className="mt-12">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="bg-gray-50 border-b border-gray-100 px-6 py-4 flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                <h3 className="font-bold text-gray-900">Historial Disciplinario</h3>
+              </div>
+              <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {sanciones.map(s => (
+                  <div key={s.id_sancion || s.id} className="p-4 bg-gray-50 rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="text-sm font-semibold text-gray-900">{s.fecha}</span>
+                      {s.estado === 'activa' 
+                        ? <span className="inline-flex items-center rounded bg-yellow-100 px-2 py-0.5 text-xs font-semibold text-yellow-800">Activa</span>
+                        : <span className="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-semibold text-gray-600">Revocada</span>}
+                    </div>
+                    <p className="text-sm italic text-gray-700 mb-2">"{s.motivo}"</p>
+                    <p className="text-xs text-gray-500">Partido ID: {s.id_partido}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

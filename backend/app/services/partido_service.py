@@ -180,6 +180,7 @@ def obtener_box_score(partido):
     """Genera el box score del partido con todos los jugadores activos."""
     from app.models.plantilla import Plantilla
     from app.models.estadistica import Estadistica
+    from app.models.sancion import Sancion
     from sqlalchemy.orm import joinedload
     
     # 1. Obtener todas las plantillas para los equipos del partido
@@ -191,9 +192,12 @@ def obtener_box_score(partido):
         id_torneo=partido.id_torneo, id_equipo=partido.id_equipo_visitante, estado='activo'
     ).options(joinedload(Plantilla.jugador)).all()
     
-    # 2. Obtener las estadísticas registradas
+    # 2. Obtener las estadísticas registradas y sanciones activas
     estadisticas = Estadistica.query.filter_by(id_partido=partido.id_partido).all()
     stats_by_jugador = {e.id_jugador: e for e in estadisticas}
+    
+    sanciones = Sancion.query.filter_by(id_partido=partido.id_partido, estado='activa').all()
+    sanciones_by_jugador = {s.id_jugador: s for s in sanciones}
     
     # 3. Formatear la data
     def build_jugador_stats(plantillas):
@@ -210,7 +214,8 @@ def obtener_box_score(partido):
                 'triples_anotados': stat.triples_anotados if stat else 0,
                 'faltas_cometidas': stat.faltas_cometidas if stat else 0,
                 'rebotes': stat.rebotes if stat else 0,
-                'asistencias': stat.asistencias if stat else 0
+                'asistencias': stat.asistencias if stat else 0,
+                'sancion_activa': True if jug.id_jugador in sanciones_by_jugador else False
             })
         # Order by points descending
         res.sort(key=lambda x: x['puntos_anotados'], reverse=True)

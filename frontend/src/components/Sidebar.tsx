@@ -12,9 +12,10 @@ interface SidebarProps {
   links: SidebarLink[];
   isAuthenticated: boolean;
   onLogout: () => void;
+  topContent?: React.ReactNode;
 }
 
-export function Sidebar({ isOpen, onClose, links, isAuthenticated, onLogout }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, links, isAuthenticated, onLogout, topContent }: SidebarProps) {
   return (
     <>
       {/* Overlay oscuro */}
@@ -45,6 +46,11 @@ export function Sidebar({ isOpen, onClose, links, isAuthenticated, onLogout }: S
         </div>
 
         <nav className="flex flex-col gap-2 p-4">
+          {topContent && (
+            <div className="mb-4 pb-4 border-b border-gray-100">
+              {topContent}
+            </div>
+          )}
           {links.map((link) => (
             <NavLink
               key={link.path}

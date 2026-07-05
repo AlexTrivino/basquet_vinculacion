@@ -32,7 +32,7 @@ const AdminDashboard = lazy(() => import('../pages/admin/Dashboard'));
 const AdminAuditoria = lazy(() => import('../pages/admin/Auditoria'));
 const AdminEquipos = lazy(() => import('../pages/admin/AdminEquipos'));
 const AdminPartidos = lazy(() => import('../pages/admin/Partidos'));
-const AdminEstadisticas = lazy(() => import('../pages/admin/Estadisticas'));
+const AdminSanciones = lazy(() => import('../pages/admin/AdminSanciones'));
 
 // --- Suspense Wrapper ---
 // Placeholder temporal de carga mientras se bajan los chunks.
@@ -99,7 +99,7 @@ export const router = createBrowserRouter([
           { path: 'auditoria', element: withSuspense(AdminAuditoria) },
           { path: 'equipos', element: withSuspense(AdminEquipos) },
           { path: 'partidos', element: withSuspense(AdminPartidos) },
-          { path: 'estadisticas', element: withSuspense(AdminEstadisticas) },
+          { path: 'sanciones', element: withSuspense(AdminSanciones) },
         ],
       },
     ],
