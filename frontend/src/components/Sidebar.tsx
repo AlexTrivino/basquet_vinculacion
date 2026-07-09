@@ -34,7 +34,10 @@ export function Sidebar({ isOpen, onClose, links, isAuthenticated, onLogout, top
         }`}
       >
         <div className="flex h-16 items-center justify-between border-b px-4">
-          <span className="text-xl font-bold text-primary-600">Menú</span>
+          <div className="flex items-center gap-2">
+            <img src="/logo.png" alt="BaloncestoManta Logo" className="h-6 w-6 object-contain" />
+            <span className="text-lg font-bold text-primary-600">BaloncestoManta</span>
+          </div>
           <button
             type="button"
             className="rounded-md p-2 text-gray-500 hover:bg-gray-100"

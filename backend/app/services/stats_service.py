@@ -13,7 +13,7 @@ Garantías de este módulo:
 """
 from datetime import date
 
-from sqlalchemy import insert
+from sqlalchemy import insert, delete
 from sqlalchemy.exc import IntegrityError
 
 from app import db
@@ -85,7 +85,7 @@ def procesar_estadisticas_bulk(data: dict, usuario_id: str, usuario_rol: str) ->
         )
 
     # ── Validación 4: Verificación matemática del marcador ────────
-    total_puntos_payload = sum(entry['puntos'] for entry in jugadores_payload)
+    total_puntos_payload = sum(entry['puntos'] + (entry.get('triples', 0) * 3) for entry in jugadores_payload)
     if id_equipo == partido.id_equipo_local:
         marcador_oficial = partido.marcador_local
     else:
@@ -124,6 +124,16 @@ def procesar_estadisticas_bulk(data: dict, usuario_id: str, usuario_rol: str) ->
             f'o no están activos en la plantilla: {sorted(ids_invalidos)}. '
             f'Posible intento de asignación de estadísticas a jugadores rivales.'
         )
+
+    # ── Limpiar estadísticas previas (Upsert atómico) ───────────────
+    # Borramos las stats previas de los jugadores del payload para este
+    # partido específico. Esto permite editar sin duplicar registros.
+    db.session.execute(
+        delete(Estadistica).where(
+            Estadistica.id_partido == id_partido,
+            Estadistica.id_jugador.in_(ids_enviados)
+        )
+    )
 
     # ── Bulk INSERT de estadísticas (SQLAlchemy 2.x) ──────────────
     # ``db.session.execute(insert(Model), lista)`` emite UN SOLO INSERT

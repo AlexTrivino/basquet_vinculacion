@@ -89,8 +89,9 @@ export function Navbar() {
             >
               <Menu className="h-6 w-6" />
             </button>
-            <Link to="/" className="text-xl font-bold text-primary-600">
-              Torneos
+            <Link to="/" className="flex items-center gap-2">
+              <img src="/logo.png" alt="BaloncestoManta Logo" className="h-8 w-8 object-contain" />
+              <span className="text-xl font-bold text-primary-600 hidden sm:block">BaloncestoManta</span>
             </Link>
           </div>
 

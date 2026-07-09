@@ -28,12 +28,13 @@ export default function Home() {
   return (
     <main>
       {/* Hero Section */}
-      <section className="bg-primary-900 px-4 py-20 text-center sm:px-6 lg:px-8">
+      <section className="bg-primary-900 px-4 py-20 text-center sm:px-6 lg:px-8 flex flex-col items-center">
+        <img src="/logo.png" alt="BaloncestoManta Logo" className="h-32 w-32 object-contain mb-6 drop-shadow-xl" />
         <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-          Torneos Salesianos de Baloncesto
+          BaloncestoManta
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-xl text-primary-100">
-          La mejor plataforma para gestionar y seguir de cerca los torneos de baloncesto de nuestra comunidad.
+          Plataforma para gestionar y seguir de cerca los torneos de baloncesto de nuestra comunidad.
         </p>
       </section>
 

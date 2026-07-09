@@ -58,6 +58,21 @@ class _EstadisticaJugadorSchema(Schema):
         load_default=0,
         validate=validate.Range(min=0, error='Las asistencias no pueden ser negativas.'),
     )
+    tiros_libres = fields.Integer(
+        load_default=0,
+        validate=validate.Range(min=0, error='Los tiros libres no pueden ser negativos.'),
+    )
+    valoracion = fields.Integer(
+        load_default=0,
+    )
+    tapones = fields.Integer(
+        load_default=0,
+        validate=validate.Range(min=0, error='Los tapones no pueden ser negativos.'),
+    )
+    robos = fields.Integer(
+        load_default=0,
+        validate=validate.Range(min=0, error='Los robos no pueden ser negativos.'),
+    )
 
     # Sanción opcional: si está presente, se crea un registro en la tabla Sanciones
     # dentro del mismo bloque transaccional del bulk insert.
@@ -105,6 +120,10 @@ class EstadisticaPublicSchema(Schema):
     faltas_cometidas = fields.Integer()
     rebotes = fields.Integer()
     asistencias = fields.Integer()
+    tiros_libres_anotados = fields.Integer()
+    valoracion = fields.Integer()
+    tapones = fields.Integer()
+    robos = fields.Integer()
     created_at = fields.DateTime()
 
 
@@ -120,3 +139,7 @@ class BoxScoreItemSchema(Schema):
     faltas_cometidas = fields.Integer()
     rebotes = fields.Integer()
     asistencias = fields.Integer()
+    tiros_libres_anotados = fields.Integer()
+    valoracion = fields.Integer()
+    tapones = fields.Integer()
+    robos = fields.Integer()

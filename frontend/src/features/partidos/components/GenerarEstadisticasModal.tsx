@@ -45,7 +45,7 @@ export function GenerarEstadisticasModal({
   const [isAmonestando, setIsAmonestando] = useState(false);
 
   // Carga jugadores de la plantilla del equipo en este contexto de partido
-  const { data: queryData, isLoading } = useQuery({
+  const { data: queryData, isLoading, isFetching } = useQuery({
     queryKey: ['partido-stats', idPartido, tipoEquipo],
     queryFn: async () => {
       const res = await axiosInstance.get('/partidos/' + idPartido + '/estadisticas');
@@ -67,13 +67,13 @@ export function GenerarEstadisticasModal({
         asistencias: p.asistencias || 0,
         sancion_activa: p.sancion_activa || false,
       }));
-      // Solo inicializa si la tabla está vacía para no borrar lo que el Admin esté tipeando
-      setRows((prev) => (prev.length === 0 ? initialRows : prev));
+      // Siempre sobrescribir con datos frescos del backend al abrir
+      setRows(initialRows);
     }
   }, [queryData, tipoEquipo]);
 
-  // Suma reactiva de puntos en tiempo real
-  const totalPuntos = useMemo(() => rows.reduce((sum, r) => sum + (r.puntos || 0), 0), [rows]);
+  // Suma reactiva de puntos en tiempo real (Puntos de 2/1 + Triples * 3)
+  const totalPuntos = useMemo(() => rows.reduce((sum, r) => sum + (r.puntos || 0) + ((r.triples || 0) * 3), 0), [rows]);
   const isBalanced = totalPuntos === marcadorOficial;
 
   const updateRow = (idx: number, field: keyof StatRow, value: number) => {
@@ -116,7 +116,7 @@ export function GenerarEstadisticasModal({
           id_jugador: r.id_jugador,
           puntos: r.puntos,
           triples: r.triples,
-          faltas: r.faltas,
+          faltas: 0,
           rebotes: r.rebotes,
           asistencias: r.asistencias,
         })),
@@ -131,7 +131,7 @@ export function GenerarEstadisticasModal({
     }
   };
 
-  const STAT_COLS = ['puntos', 'triples', 'faltas', 'rebotes', 'asistencias'] as const;
+  const STAT_COLS = ['puntos', 'triples', 'rebotes', 'asistencias'] as const;
   type StatKey = typeof STAT_COLS[number];
 
   return (
@@ -149,7 +149,7 @@ export function GenerarEstadisticasModal({
         </div>
 
         <div className="p-6">
-          {isLoading ? (
+          {isLoading || isFetching ? (
             <div className="flex justify-center py-12">
               <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
             </div>

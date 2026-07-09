@@ -161,9 +161,10 @@ export interface JugadorPerfilResponse {
   id_torneo_actual?: number;
   estadisticas: {
     partidos_jugados: number;
+    puntos_totales: number;
     promedio_puntos: number;
-    promedio_rebotes: number;
-    promedio_asistencias: number;
-    promedio_triples: number;
+    rebotes_totales: number;
+    asistencias_totales: number;
+    triples_totales: number;
   };
 }

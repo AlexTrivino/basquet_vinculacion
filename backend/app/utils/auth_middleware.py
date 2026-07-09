@@ -134,6 +134,7 @@ def token_required(fn=None, *, allowed_roles=None):
                     algorithms=_ALGORITHMS,
                     audience='authenticated',
                     options={'require': ['sub', 'exp']},
+                    leeway=10,
                 )
             except (PyJWKClientError, jwt.exceptions.PyJWKClientConnectionError):
                 # JWKS no disponible o token sin 'kid' → intentar HS256
@@ -144,14 +145,14 @@ def token_required(fn=None, *, allowed_roles=None):
                     'error_code': 'TOKEN_EXPIRED',
                     'message': 'El token ha expirado. Inicia sesión nuevamente.',
                 }), 401
-            except jwt.InvalidTokenError:
+            except jwt.InvalidTokenError as e:
                 # Firma inválida con clave JWKS → no intentar fallback,
                 # el token fue rechazado criptográficamente.
                 return jsonify({
                     'success': False,
                     'error_code': 'INVALID_TOKEN',
                     'message': (
-                        'El token es inválido o su firma no pudo ser verificada.'
+                        f'El token es inválido o su firma no pudo ser verificada. Detalle: {str(e)}'
                     ),
                 }), 401
 
@@ -176,6 +177,7 @@ def token_required(fn=None, *, allowed_roles=None):
                         algorithms=['HS256'],
                         audience='authenticated',
                         options={'require': ['sub', 'exp']},
+                        leeway=10,
                     )
                 except jwt.ExpiredSignatureError:
                     return jsonify({
@@ -183,13 +185,13 @@ def token_required(fn=None, *, allowed_roles=None):
                         'error_code': 'TOKEN_EXPIRED',
                         'message': 'El token ha expirado. Inicia sesión nuevamente.',
                     }), 401
-                except jwt.InvalidTokenError:
+                except jwt.InvalidTokenError as e:
                     return jsonify({
                         'success': False,
                         'error_code': 'INVALID_TOKEN',
                         'message': (
-                            'El token es inválido o su firma no pudo ser '
-                            'verificada con ningún método (JWKS ni HS256).'
+                            f'El token es inválido o su firma no pudo ser '
+                            f'verificada con ningún método (JWKS ni HS256). Detalle: {str(e)}'
                         ),
                     }), 401
 

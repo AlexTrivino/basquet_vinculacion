@@ -155,53 +155,61 @@ export default function JugadorProfile() {
             <Activity className="w-5 h-5 text-primary-600" /> Rendimiento Promedio
           </h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             
             {/* Partidos Jugados */}
-            <div className="col-span-2 md:col-span-1 lg:col-span-1 bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
               <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 mb-3">
                 <Target className="w-5 h-5" />
               </div>
-              <p className="text-sm font-medium text-gray-500 mb-1">Partidos Jugados</p>
+              <p className="text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Partidos</p>
               <p className="text-3xl font-black text-gray-900">{jugador.estadisticas.partidos_jugados}</p>
             </div>
 
-            {/* Promedio Puntos */}
+            {/* Puntos Totales */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
               <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-600 mb-3">
                 <Goal className="w-5 h-5" />
               </div>
-              <p className="text-sm font-medium text-gray-500 mb-1">PTS / Partido</p>
+              <p className="text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Puntos</p>
+              <p className="text-3xl font-black text-gray-900">{jugador.estadisticas.puntos_totales}</p>
+            </div>
+
+            {/* Promedio Puntos */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
+              <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-600 mb-3">
+                <Activity className="w-5 h-5" />
+              </div>
+              <p className="text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">PTS/Partido</p>
               <p className="text-3xl font-black text-gray-900">{jugador.estadisticas.promedio_puntos}</p>
             </div>
 
-            {/* Promedio Rebotes */}
+            {/* Rebotes Totales */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
               <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 mb-3">
                 <ArrowUp className="w-5 h-5" />
               </div>
-              <p className="text-sm font-medium text-gray-500 mb-1">REB / Partido</p>
-              <p className="text-3xl font-black text-gray-900">{jugador.estadisticas.promedio_rebotes}</p>
+              <p className="text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Rebotes</p>
+              <p className="text-3xl font-black text-gray-900">{jugador.estadisticas.rebotes_totales}</p>
             </div>
 
-            {/* Promedio Asistencias */}
+            {/* Asistencias Totales */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
               <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600 mb-3">
                 <Hand className="w-5 h-5" />
               </div>
-              <p className="text-sm font-medium text-gray-500 mb-1">AST / Partido</p>
-              <p className="text-3xl font-black text-gray-900">{jugador.estadisticas.promedio_asistencias}</p>
+              <p className="text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Asistencias</p>
+              <p className="text-3xl font-black text-gray-900">{jugador.estadisticas.asistencias_totales}</p>
             </div>
 
-            {/* Promedio Triples */}
+            {/* Triples Totales */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center justify-center text-center">
               <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-purple-600 mb-3">
                 <span className="font-bold">3PT</span>
               </div>
-              <p className="text-sm font-medium text-gray-500 mb-1">3P / Partido</p>
-              <p className="text-3xl font-black text-gray-900">{jugador.estadisticas.promedio_triples}</p>
+              <p className="text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Triples</p>
+              <p className="text-3xl font-black text-gray-900">{jugador.estadisticas.triples_totales}</p>
             </div>
-
           </div>
         </div>
 

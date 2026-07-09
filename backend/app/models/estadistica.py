@@ -13,6 +13,12 @@ class Estadistica(db.Model):
     triples_anotados = db.Column(db.Integer, nullable=False, default=0)
     rebotes = db.Column(db.Integer, nullable=False, default=0)
     asistencias = db.Column(db.Integer, nullable=False, default=0)
+    
+    # Campos futuros (Phase 8+)
+    tiros_libres_anotados = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    valoracion = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    tapones = db.Column(db.Integer, nullable=False, default=0, server_default='0')
+    robos = db.Column(db.Integer, nullable=False, default=0, server_default='0')
     id_partido = db.Column(
         db.Integer, db.ForeignKey('partidos.id_partido'), nullable=False
     )
@@ -29,6 +35,11 @@ class Estadistica(db.Model):
     partido = db.relationship('Partido', back_populates='estadisticas', lazy='select')
     jugador = db.relationship('Jugador', back_populates='estadisticas', lazy='select')
 
+    # ── Restricciones ──────────────────────────────────────────────
+    __table_args__ = (
+        db.UniqueConstraint('id_partido', 'id_jugador', name='uq_estadistica_partido_jugador'),
+    )
+
     def to_dict(self) -> dict:
         """Serializa la instancia a un diccionario JSON-compatible."""
         return {
@@ -38,6 +49,10 @@ class Estadistica(db.Model):
             'triples_anotados': self.triples_anotados,
             'rebotes': self.rebotes,
             'asistencias': self.asistencias,
+            'tiros_libres_anotados': self.tiros_libres_anotados,
+            'valoracion': self.valoracion,
+            'tapones': self.tapones,
+            'robos': self.robos,
             'id_partido': self.id_partido,
             'id_jugador': self.id_jugador,
             'created_at': self.created_at.isoformat() if self.created_at else None,

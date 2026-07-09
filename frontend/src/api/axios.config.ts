@@ -47,7 +47,9 @@ api.interceptors.response.use(
     if (status === 401) {
       localStorage.removeItem('access_token');
       localStorage.removeItem('user_role');
-      window.location.href = '/auth/login';
+      
+      const errorMessage = error.response?.data?.message || 'Tu sesión ha expirado o es inválida.';
+      window.location.href = `/auth/login?error_msg=${encodeURIComponent(errorMessage)}`;
     }
 
     return Promise.reject(error);
