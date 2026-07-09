@@ -19,8 +19,8 @@ export default function Home() {
   }, [navigate]);
 
   const { data: response, isLoading, isError } = useQuery({
-    queryKey: ['torneos', 'public'],
-    queryFn: () => getTorneos(1, 10), // Limitamos a 10 torneos en Home
+    queryKey: ['torneos', 'public', 2026],
+    queryFn: () => getTorneos(1, 10, 2026), // Limitamos a 10 torneos del año 2026
   });
 
   const torneos = response?.data || [];
@@ -43,7 +43,7 @@ export default function Home() {
 
       {/* Grid de Torneos */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <h2 className="mb-8 text-2xl font-bold text-gray-900">Torneos Destacados</h2>
+        <h2 className="mb-8 text-2xl font-bold text-gray-900">Torneos 2026</h2>
 
         {isLoading ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

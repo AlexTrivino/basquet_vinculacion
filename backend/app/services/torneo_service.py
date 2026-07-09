@@ -23,17 +23,23 @@ def crear_torneo(data):
     return torneo
 
 
-def listar_torneos_activos():
+def listar_torneos_activos(anio=None):
     """Retorna la query base de torneos activos para paginación.
 
     Usa el scope ``Torneo.activos()`` para excluir registros
     eliminados lógicamente. Ordena por fecha de inicio descendente
     (torneos más recientes primero).
+    
+    Args:
+        anio (int, optional): Año para filtrar los torneos por su fecha de inicio.
 
     Returns:
         Query de SQLAlchemy sin ejecutar, lista para ``paginate_query()``.
     """
-    return Torneo.activos().order_by(Torneo.fecha_inicio.desc())
+    query = Torneo.activos()
+    if anio is not None:
+        query = query.filter(db.extract('year', Torneo.fecha_inicio) == anio)
+    return query.order_by(Torneo.fecha_inicio.desc())
 
 
 def obtener_torneo_por_id(id_torneo, incluir_inactivos=False):

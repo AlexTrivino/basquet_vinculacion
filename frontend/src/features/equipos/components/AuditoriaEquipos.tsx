@@ -45,9 +45,14 @@ export function AuditoriaEquipos() {
   };
 
   const handleRechazar = async (id: number, equipo: string) => {
+    const confirm = window.confirm(`Estás a punto de rechazar la inscripción del equipo ${equipo}. Esto eliminará permanentemente la inscripción y el equipo de la base de datos. ¿Deseas continuar?`);
+    if (!confirm) {
+      return;
+    }
+    
     try {
       await updateEstadoMutation.mutateAsync({ id, estado: 'rechazado' });
-      toast.success(`Equipo ${equipo} rechazado.`);
+      toast.success(`Equipo ${equipo} rechazado y eliminado permanentemente.`);
     } catch (error) {
       toast.error(`Error al rechazar equipo ${equipo}.`);
     }
@@ -55,7 +60,21 @@ export function AuditoriaEquipos() {
 
   const columns: Column<Inscripcion>[] = [
     { key: 'equipo', header: 'Equipo', render: (row) => <span className="font-semibold text-gray-900">{row.equipo?.nombre_equipo || row.equipo?.nombre}</span> },
-    { key: 'categoria', header: 'Categoría', render: (row) => <span>{row.categoria?.nombre || 'General'}</span> },
+    { key: 'torneo', header: 'Torneo', render: (row) => <span className="text-sm">{row.torneo?.nombre || 'General'}</span> },
+    { key: 'categoria', header: 'Categoría', render: (row) => <span className="text-sm">{row.categoria?.nombre_categoria || row.categoria?.nombre || 'General'}</span> },
+    { 
+      key: 'delegado', 
+      header: 'Delegado', 
+      render: (row) => {
+        const u = row.equipo?.usuario;
+        return (
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-gray-900">{u?.nombre || 'Desconocido'}</span>
+            <span className="text-xs text-gray-500">{u?.correo || 'Sin correo'}</span>
+          </div>
+        );
+      }
+    },
     { 
       key: 'comprobante', 
       header: 'Comprobante', 

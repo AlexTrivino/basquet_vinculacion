@@ -65,7 +65,7 @@ export function InscripcionWizard() {
       await inscribirEquipoCompleto(formData);
       
       queryClient.invalidateQueries({ queryKey: ['inscripciones', 'delegado'] });
-      toast.success('¡Inscripción completada exitosamente!');
+      toast.success('COMUNIQUESE CON EL REPRESENTANTE DE LA ORGANIZACION');
       navigate('/delegado/dashboard');
     } catch (error: any) {
       console.error(error);

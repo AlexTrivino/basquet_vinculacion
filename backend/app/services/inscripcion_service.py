@@ -32,7 +32,7 @@ def _base_query_con_relaciones():
     """
     return Inscripcion.query.options(
         joinedload(Inscripcion.torneo),
-        joinedload(Inscripcion.equipo),
+        joinedload(Inscripcion.equipo).joinedload(Equipo.usuario),
         joinedload(Inscripcion.categoria),
     )
 
@@ -137,18 +137,40 @@ def crear_inscripcion(data):
 def cambiar_estado_inscripcion(id_inscripcion, nuevo_estado):
     """Cambia el estado de una inscripción (aprobación/rechazo del Admin).
 
+    Si el estado es 'rechazado', se eliminan físicamente la inscripción,
+    las plantillas asociadas y el equipo, liberando el cupo del delegado.
+
     Args:
         id_inscripcion: PK de la inscripción a actualizar.
         nuevo_estado: Uno de ``'pendiente'``, ``'aprobado'``, ``'rechazado'``.
 
     Returns:
-        Instancia de ``Inscripcion`` actualizada con relaciones cargadas,
-        o ``None`` si no existe.
+        Instancia de ``Inscripcion`` actualizada con relaciones cargadas
+        (o dict dummy si fue eliminada), o ``None`` si no existe.
     """
     inscripcion = db.session.get(Inscripcion, id_inscripcion)
 
     if inscripcion is None:
         return None
+
+    if nuevo_estado == 'rechazado':
+        from app.models.plantilla import Plantilla
+        equipo = inscripcion.equipo
+        
+        # 1. Eliminar plantillas asociadas
+        Plantilla.query.filter_by(id_equipo=equipo.id_equipo).delete()
+        
+        # 2. Eliminar inscripción
+        db.session.delete(inscripcion)
+        
+        # 3. Eliminar equipo
+        db.session.delete(equipo)
+        
+        db.session.commit()
+        
+        # Retornamos un objeto dummy para que la serialización de la ruta no falle
+        # si espera una Inscripcion (aunque la ruta debería devolver 204 o mensaje).
+        return inscripcion
 
     inscripcion.estado_inscripcion = nuevo_estado
     db.session.commit()

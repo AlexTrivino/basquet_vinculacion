@@ -57,14 +57,33 @@ export default function Dashboard() {
               </div>
             );
           })}
-          <div className="bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300 overflow-hidden flex flex-col items-center justify-center p-6 text-center hover:bg-gray-100 transition-colors">
-            <ShieldAlert className="w-12 h-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-bold text-gray-600 mb-2">Inscribir Otro Equipo</h3>
-            <p className="text-sm text-gray-500 mb-4">Registra una nueva categoría bajo tu misma cuenta.</p>
-            <Link to="/delegado/inscripcion" className="inline-flex w-full items-center justify-center rounded-xl bg-gray-800 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-900">
-              Registrar Equipo
-            </Link>
-          </div>
+          {(() => {
+            const cuposOcupados = inscripciones.filter(
+              (ins) => ins.equipo?.estado === 'activo' && ins.estado_inscripcion !== 'rechazado'
+            ).length;
+            const hasReachedLimit = cuposOcupados >= 3;
+
+            return (
+              <div className={`bg-gray-50 rounded-2xl border-2 border-dashed border-gray-300 overflow-hidden flex flex-col items-center justify-center p-6 text-center transition-colors ${hasReachedLimit ? 'opacity-50' : 'hover:bg-gray-100'}`}>
+                <ShieldAlert className="w-12 h-12 text-gray-400 mb-4" />
+                <h3 className="text-lg font-bold text-gray-600 mb-2">Inscribir Otro Equipo</h3>
+                {hasReachedLimit ? (
+                  <p className="text-sm text-red-500 font-medium mb-4 uppercase">LÍMITE DE 3 EQUIPOS ALCANZADO</p>
+                ) : (
+                  <p className="text-sm text-gray-500 mb-4">Registra una nueva categoría bajo tu misma cuenta.</p>
+                )}
+                {hasReachedLimit ? (
+                  <button disabled className="inline-flex w-full items-center justify-center rounded-xl bg-gray-400 px-4 py-2.5 text-sm font-semibold text-white cursor-not-allowed">
+                    Límite Alcanzado
+                  </button>
+                ) : (
+                  <Link to="/delegado/inscripcion" className="inline-flex w-full items-center justify-center rounded-xl bg-gray-800 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-900">
+                    Registrar Equipo
+                  </Link>
+                )}
+              </div>
+            );
+          })()}
         </div>
       </main>
     );
@@ -137,7 +156,7 @@ export default function Dashboard() {
         </div>
         <p className="text-sm text-gray-500 mb-4 leading-relaxed">
           {estadoActual === 'pendiente'
-            ? 'Perfil en revisión administrativa.'
+            ? 'TU EQUIPO ESTÁ PENDIENTE DE APROBACIÓN POR PARTE DEL ADMINISTRADOR.'
             : estadoActual === 'aprobado'
               ? 'Equipo aprobado. Todo en orden.'
               : 'Inscripción rechazada.'}
@@ -168,7 +187,7 @@ export default function Dashboard() {
 
         <p className="text-sm text-gray-600 mb-6 leading-relaxed">
           {estadoActual === 'pendiente'
-            ? 'El perfil de tu equipo está bajo revisión administrativa. Te notificaremos pronto.'
+            ? 'TU EQUIPO ESTÁ PENDIENTE DE APROBACIÓN POR PARTE DEL ADMINISTRADOR.'
             : estadoActual === 'aprobado'
               ? 'Tu equipo ha sido aprobado exitosamente. ¡Mantén tu plantilla al día!'
               : 'Tu inscripción ha sido rechazada. Revisa las observaciones.'}

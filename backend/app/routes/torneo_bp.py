@@ -38,9 +38,12 @@ _update_schema = TorneoUpdateSchema()
 def listar_torneos():
     """Lista todos los torneos activos con paginación.
 
-    Query params opcionales: ``page`` (default 1), ``per_page`` (default 20).
+    Query params opcionales: ``page`` (default 1), ``per_page`` (default 20), ``anio`` (opcional).
     """
-    query = torneo_service.listar_torneos_activos()
+    anio_param = request.args.get('anio')
+    anio = int(anio_param) if anio_param and anio_param.isdigit() else None
+    
+    query = torneo_service.listar_torneos_activos(anio=anio)
     items, pagination = paginate_query(query)
     return api_response(
         data=_public_many.dump(items),

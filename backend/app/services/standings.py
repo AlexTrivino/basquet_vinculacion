@@ -76,6 +76,10 @@ def recalcular_tabla(id_torneo: int) -> list[dict]:
         return {'PJ': 0, 'PG': 0, 'PP': 0, 'PF': 0, 'PC': 0, 'puntos': 0}
 
     tabla = defaultdict(_equipo_inicial)
+    
+    # ── Para el desempate: Enfrentamientos directos ───────────────
+    # Registramos cuántas veces el equipo A le ganó al equipo B
+    head_to_head_wins = defaultdict(int)
 
     for p in partidos:
         es_wo = p.estado == 'finalizado_wo'
@@ -114,11 +118,13 @@ def recalcular_tabla(id_torneo: int) -> list[dict]:
             tabla[p.id_equipo_local]['puntos'] += pts_ganador
             tabla[p.id_equipo_visitante]['PP'] += 1
             tabla[p.id_equipo_visitante]['puntos'] += pts_perdedor
+            head_to_head_wins[(p.id_equipo_local, p.id_equipo_visitante)] += 1
         else:
             tabla[p.id_equipo_visitante]['PG'] += 1
             tabla[p.id_equipo_visitante]['puntos'] += pts_ganador
             tabla[p.id_equipo_local]['PP'] += 1
             tabla[p.id_equipo_local]['puntos'] += pts_perdedor
+            head_to_head_wins[(p.id_equipo_visitante, p.id_equipo_local)] += 1
 
     # ── PASO 3: Enriquecimiento con una sola query in_ ────────────
     # Traer nombre y logo de todos los equipos participantes de una vez,
@@ -151,10 +157,32 @@ def recalcular_tabla(id_torneo: int) -> list[dict]:
         })
 
     # ── PASO 5: Ordenar por reglas de desempate FIBA ──────────────
-    # Criterio 1: Puntos (mayor a menor)
-    # Criterio 2: Diferencia de canastas — DIF (mayor a menor)
-    # Criterio 3: Puntos a Favor — PF (mayor a menor)
-    lista.sort(key=lambda e: (-e['puntos'], -e['DIF'], -e['PF']))
+    from functools import cmp_to_key
+
+    def compare_teams(a, b):
+        # Criterio 1: Puntos (mayor a menor)
+        if a['puntos'] != b['puntos']:
+            return b['puntos'] - a['puntos']
+            
+        # Criterio 2: Supremacía (Enfrentamiento directo)
+        id_a = a['id_equipo']
+        id_b = b['id_equipo']
+        victorias_a = head_to_head_wins.get((id_a, id_b), 0)
+        victorias_b = head_to_head_wins.get((id_b, id_a), 0)
+        
+        if victorias_a > victorias_b:
+            return -1  # A va arriba
+        elif victorias_b > victorias_a:
+            return 1   # B va arriba
+            
+        # Criterio 3: Diferencia de canastas global — DIF (mayor a menor)
+        if a['DIF'] != b['DIF']:
+            return b['DIF'] - a['DIF']
+            
+        # Criterio 4: Puntos a Favor globales — PF (mayor a menor)
+        return b['PF'] - a['PF']
+
+    lista.sort(key=cmp_to_key(compare_teams))
 
     # ── PASO 6: Agregar número de posición ────────────────────────
     for i, entrada in enumerate(lista, start=1):

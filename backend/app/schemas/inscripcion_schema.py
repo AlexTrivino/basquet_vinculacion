@@ -18,10 +18,16 @@ class _TorneoResumenSchema(Schema):
     estado = fields.String()
 
 
+class _UsuarioResumenSchema(Schema):
+    nombre = fields.String()
+    correo = fields.String()
+
+
 class _EquipoResumenSchema(Schema):
     id_equipo = fields.Integer()
     nombre_equipo = fields.String()
     url_logo = fields.String(allow_none=True)
+    usuario = fields.Nested(_UsuarioResumenSchema)
 
 
 class _CategoriaResumenSchema(Schema):

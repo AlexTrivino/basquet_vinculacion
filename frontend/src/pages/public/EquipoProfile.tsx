@@ -1,7 +1,7 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Camera, Calendar, Trophy, Users, Trash2 } from 'lucide-react';
+import { Camera, Calendar, Trophy, Users, Trash2, ShieldAlert } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useAuth } from '../../context/AuthContext';
@@ -12,6 +12,7 @@ import axiosInstance from '../../api/axios.config';
 
 import { Skeleton } from '../../components/Skeleton';
 import { StatusBadge } from '../../components/StatusBadge';
+import { DesactivarEquipoModal } from '../../features/equipos/components/DesactivarEquipoModal';
 
 export default function EquipoProfile({ teamId }: { teamId?: number }) {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +22,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
 
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
+  const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
 
   // Queries
   const { data: equipoRes, isLoading: loadingEquipo } = useQuery({
@@ -162,6 +164,22 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
           </div>
         )}
       </div>
+
+      {isOwner && equipo.estado === 'activo' && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 flex justify-end">
+          <button 
+            onClick={() => setIsDeactivateModalOpen(true)}
+            className="flex items-center gap-2 bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-xl text-sm font-bold transition-colors border border-red-200"
+          >
+            <ShieldAlert className="w-4 h-4" /> Desactivar Equipo
+          </button>
+        </div>
+      )}
+      <DesactivarEquipoModal 
+        isOpen={isDeactivateModalOpen} 
+        onClose={() => setIsDeactivateModalOpen(false)} 
+        idEquipo={idEquipo} 
+      />
 
       {equipo.estado === 'inactivo' && (
         <div className="fixed top-16 left-0 w-full z-40 bg-red-600 text-white text-center py-2 text-sm font-bold shadow-md tracking-wide">
