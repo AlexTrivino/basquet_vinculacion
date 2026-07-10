@@ -9,6 +9,11 @@ from sqlalchemy.exc import IntegrityError
 from app import db
 from app.models.jugador import Jugador
 
+class JugadorDuplicadoError(Exception):
+    def __init__(self, mensaje, jugador):
+        super().__init__(mensaje)
+        self.jugador = jugador
+
 
 def listar_jugadores_activos(genero=None):
     """Retorna la query base de jugadores activos para paginación.
@@ -73,9 +78,14 @@ def crear_jugador(data):
         return jugador
     except IntegrityError:
         db.session.rollback()
-        raise ValueError(
-            'Ya existe un jugador registrado con ese número de documento. '
-            'Verifique la cédula ingresada.'
+        # Buscar el jugador existente
+        jugador_existente = Jugador.query.filter_by(
+            documento_identificacion=data['documento_identificacion']
+        ).first()
+        
+        raise JugadorDuplicadoError(
+            'Ya existe un jugador registrado con ese número de documento.',
+            jugador_existente
         )
 
 

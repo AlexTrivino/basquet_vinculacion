@@ -62,6 +62,13 @@ def crear_jugador():
 
     try:
         jugador = jugador_service.crear_jugador(data)
+    except jugador_service.JugadorDuplicadoError as e:
+        return api_error(
+            'CONFLICT', 
+            str(e), 
+            409, 
+            data=_admin_schema.dump(e.jugador) if e.jugador else None
+        )
     except ValueError as e:
         return api_error('CONFLICT', str(e), 409)
 

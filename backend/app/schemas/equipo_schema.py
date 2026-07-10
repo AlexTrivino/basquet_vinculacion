@@ -10,6 +10,28 @@ Define schemas diferenciados según el consumidor:
 from marshmallow import Schema, fields, validate
 
 
+# ── Schemas auxiliares anidados ───────────────────────────────────
+
+class _UsuarioResumenSchema(Schema):
+    id_usuario = fields.String()
+    nombre = fields.String()
+    correo = fields.String()
+
+class _TorneoResumenSchema(Schema):
+    id_torneo = fields.Integer()
+    nombre = fields.String()
+
+class _CategoriaResumenSchema(Schema):
+    id_categoria = fields.Integer()
+    nombre_categoria = fields.String()
+
+class _InscripcionResumenSchema(Schema):
+    id_inscripcion = fields.Integer()
+    estado_inscripcion = fields.String()
+    torneo = fields.Nested(_TorneoResumenSchema)
+    categoria = fields.Nested(_CategoriaResumenSchema)
+
+
 # ── Schemas de entrada ────────────────────────────────────────────
 
 class EquipoCreateSchema(Schema):
@@ -75,5 +97,13 @@ class EquipoAdminSchema(Schema):
     url_logo = fields.String(allow_none=True)
     url_foto_equipo = fields.String(allow_none=True)
     id_usuario = fields.String()
+    usuario = fields.Nested(
+        _UsuarioResumenSchema,
+        dump_only=True
+    )
+    inscripciones = fields.List(
+        fields.Nested(_InscripcionResumenSchema),
+        dump_only=True
+    )
     created_at = fields.DateTime()
     updated_at = fields.DateTime()

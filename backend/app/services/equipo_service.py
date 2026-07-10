@@ -146,13 +146,28 @@ def eliminar_equipo(id_equipo, verificar_propietario=True):
 def reactivar_equipo(id_equipo):
     equipo = db.session.get(Equipo, id_equipo)
     if not equipo or equipo.estado == 'activo': return None
+
+    # Validar límite de 3 equipos activos para el delegado
+    equipos_activos = Equipo.query.filter_by(
+        id_usuario=equipo.id_usuario, estado='activo'
+    ).count()
+
+    if equipos_activos >= 3:
+        raise ValueError('Este delegado ya tiene 3 equipos activos.')
+
     equipo.estado = 'activo'
     db.session.commit()
     return equipo
 
 def listar_equipos_admin(id_torneo=None, id_categoria=None, search_query=None):
+    from sqlalchemy.orm import joinedload
     from app.models.inscripcion import Inscripcion
-    query = Equipo.query.order_by(Equipo.nombre_equipo)
+    
+    query = Equipo.query.options(
+        joinedload(Equipo.usuario),
+        joinedload(Equipo.inscripciones).joinedload(Inscripcion.torneo),
+        joinedload(Equipo.inscripciones).joinedload(Inscripcion.categoria)
+    ).order_by(Equipo.nombre_equipo)
     
     if search_query:
         query = query.filter(Equipo.nombre_equipo.ilike(f'%{search_query}%'))

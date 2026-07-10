@@ -81,7 +81,8 @@ def listar_inscripciones():
         from app.models.equipo import Equipo
         from app.models.inscripcion import Inscripcion
         query = query.join(Equipo, Inscripcion.id_equipo == Equipo.id_equipo).filter(
-            Equipo.id_usuario == g.usuario_id
+            Equipo.id_usuario == g.usuario_id,
+            Equipo.estado == 'activo'
         )
 
     items, pagination = paginate_query(query)
@@ -160,6 +161,12 @@ def cambiar_estado(id_inscripcion):
 
     if inscripcion is None:
         return api_error('NOT_FOUND', 'Inscripción no encontrada.', 404)
+
+    # Caso rechazo: el equipo e inscripción fueron eliminados físicamente
+    if inscripcion == 'DELETED':
+        return api_response(
+            message='Inscripción rechazada. El equipo y sus datos asociados fueron eliminados permanentemente.',
+        )
 
     return api_response(
         data=_admin_schema.dump(inscripcion),
@@ -283,15 +290,11 @@ def crear_inscripcion_completa():
     url_archivo = None
     try:
         # ── Validación de Límite de 3 Equipos ──────────────────────────
-        equipos_usuario = Equipo.query.filter_by(id_usuario=g.usuario_id, estado='activo').all()
-        equipos_ocupados = 0
-        for eq in equipos_usuario:
-            inscripciones = InscripcionModel.query.filter_by(id_equipo=eq.id_equipo).all()
-            # Ocupa cupo si no tiene inscripciones, o si al menos una no está rechazada
-            if not inscripciones or any(i.estado_inscripcion != 'rechazado' for i in inscripciones):
-                equipos_ocupados += 1
-                
-        if equipos_ocupados >= 3:
+        equipos_activos = Equipo.query.filter_by(
+            id_usuario=g.usuario_id, estado='activo'
+        ).count()
+
+        if equipos_activos >= 3:
             return api_error('CONFLICT', 'No puedes administrar más de 3 equipos simultáneamente. Límite alcanzado.', 409)
 
         # Transacción de base de datos

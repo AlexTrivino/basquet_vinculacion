@@ -49,19 +49,24 @@ def api_response(data=None, message='', status=200, pagination=None):
     return jsonify(body), status
 
 
-def api_error(error_code, message, status=400):
+def api_error(error_code, message, status=400, data=None):
     """Construye una respuesta JSON de error estandarizada.
 
     Args:
         error_code: Código legible por máquina (ej. ``'VALIDATION_ERROR'``).
         message: Mensaje legible por humanos.
         status: Código HTTP de error (default 400).
+        data: Datos adicionales del error (opcional).
 
     Returns:
         Tuple ``(Response, status_code)``.
     """
-    return jsonify({
+    body = {
         'success': False,
         'error_code': error_code,
         'message': message,
-    }), status
+    }
+    if data is not None:
+        body['data'] = data
+
+    return jsonify(body), status

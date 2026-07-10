@@ -176,7 +176,11 @@ def eliminar_equipo(id_equipo):
 @equipo_bp.route('/<int:id_equipo>/reactivar', methods=['PUT'])
 @token_required(allowed_roles=['super_admin'])
 def reactivar_equipo_route(id_equipo):
-    equipo = equipo_service.reactivar_equipo(id_equipo)
+    try:
+        equipo = equipo_service.reactivar_equipo(id_equipo)
+    except ValueError as e:
+        return api_error('CONFLICT', str(e), 409)
+
     if not equipo: return api_error('NOT_FOUND', 'Equipo no encontrado o ya activo.', 404)
     return api_response(message='Equipo reactivado exitosamente.')
 
@@ -191,7 +195,9 @@ def listar_equipos_admin_route():
     search_query = request.args.get('search', type=str)
     query = equipo_service.listar_equipos_admin(id_torneo, id_categoria, search_query)
     items, pagination = paginate_query(query)
-    return api_response(data=_public_many.dump(items), pagination=pagination)
+    
+    _admin_many = EquipoAdminSchema(many=True)
+    return api_response(data=_admin_many.dump(items), pagination=pagination)
 
 
 # ── Multimedia ────────────────────────────────────────────────────

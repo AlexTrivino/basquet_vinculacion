@@ -168,9 +168,8 @@ def cambiar_estado_inscripcion(id_inscripcion, nuevo_estado):
         
         db.session.commit()
         
-        # Retornamos un objeto dummy para que la serialización de la ruta no falle
-        # si espera una Inscripcion (aunque la ruta debería devolver 204 o mensaje).
-        return inscripcion
+        # Retornamos un string sentinel para que la ruta sepa que fue eliminado
+        return 'DELETED'
 
     inscripcion.estado_inscripcion = nuevo_estado
     db.session.commit()
