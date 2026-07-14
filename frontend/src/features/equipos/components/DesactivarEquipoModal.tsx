@@ -21,7 +21,7 @@ export function DesactivarEquipoModal({ isOpen, onClose, idEquipo, isAdmin = fal
 
   useEffect(() => {
     if (isOpen) {
-      setCountdown(15);
+      setCountdown(5);
     }
   }, [isOpen]);
 
@@ -79,8 +79,8 @@ export function DesactivarEquipoModal({ isOpen, onClose, idEquipo, isAdmin = fal
           
           <p className="text-sm text-gray-600 mb-6 font-medium leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-200">
             {isAdmin 
-              ? "LA DESACTIVACIÓN DE UN EQUIPO PUEDE SER REVOCADA DESDE EL PANEL DE GESTIÓN DE EQUIPOS." 
-              : "LA DESACTIVACIÓN DE UN EQUIPO SOLO PUEDE SER REVOCADA POR EL ADMINISTRADOR DE LA ORGANIZACIÓN. ESTA ACCIÓN LE PERMITIRÁ REGISTRAR UN NUEVO EQUIPO EN CASO DE TENER CUPOS DISPONIBLES."}
+              ? "La desactivación de un equipo puede ser revocada desde el panel de gestión de equipos." 
+              : "La desactivación de un equipo solo puede ser revocada por el administrador de la organización. esta acción le permitirá registrar un nuevo equipo en caso de tener cupos disponibles."}
           </p>
           
           <div className="w-full flex gap-3">

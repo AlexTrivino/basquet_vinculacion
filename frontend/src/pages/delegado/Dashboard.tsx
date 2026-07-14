@@ -17,7 +17,7 @@ export default function Dashboard() {
   });
 
   const inscripciones = response?.data || [];
-  
+
   useEffect(() => {
     if (inscripciones.length === 1 && activeTeamId === null) {
       const id = inscripciones[0].equipo?.id_equipo || inscripciones[0].equipo?.id;
@@ -45,8 +45,8 @@ export default function Dashboard() {
                   {logo ? <img src={logo} alt={eq.nombre_equipo} className="w-full h-full object-cover" /> : <span className="text-2xl font-bold text-gray-400">{inicial}</span>}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-6">{eq.nombre_equipo}</h3>
-                
-                <button 
+
+                <button
                   onClick={() => {
                     if (idEq !== undefined) setActiveTeamId(idEq);
                   }}
@@ -95,54 +95,95 @@ export default function Dashboard() {
   } else if (inscripciones.length > 0) {
     inscripcionActual = inscripciones[0];
   }
-  
+
   const estadoActual = inscripcionActual?.estado_inscripcion || inscripcionActual?.estado;
 
   if (!inscripcionActual) {
     return (
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8">
+      <main className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-gray-900">Panel del Delegado</h1>
-          <p className="mt-2 text-gray-600">Bienvenido al centro de administración de tu equipo.</p>
+          <p className="mt-2 text-gray-500">Bienvenido al centro de administración de tu equipo.</p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-gray-900">Estado de Inscripción</h3>
+        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          {/* Header */}
+          <div className="bg-primary-600 px-6 py-5">
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <Trophy className="w-5 h-5" /> Estado de Inscripción
+            </h2>
+            <p className="mt-1 text-primary-100 text-sm">Aún no has registrado ningún equipo.</p>
+          </div>
 
+          {/* Status */}
+          <div className="px-6 pt-5 pb-2 flex items-center gap-3 border-b border-gray-100">
+            <span className="text-sm font-medium text-gray-500">Estado actual:</span>
             {isLoading ? (
-              <div className="mt-4 flex flex-col gap-2">
-                <Skeleton className="h-6 w-1/2" />
-                <Skeleton className="h-16 w-full mt-2" />
-              </div>
+              <Skeleton className="h-6 w-24" />
             ) : isError ? (
-              <div className="mt-4 text-sm text-red-500 flex items-center gap-2">
+              <div className="text-sm text-red-500 flex items-center gap-1">
                 <ShieldAlert className="w-4 h-4" /> Error de conexión
               </div>
             ) : (
-              <>
-                <div className="mt-4 flex items-center gap-3">
-                  <span className="text-sm font-medium text-gray-500">Estado actual:</span>
-                  <StatusBadge status="Desconocido" />
-                </div>
-                <p className="mt-4 text-sm text-gray-600">
-                  Aún no has registrado ningún equipo.
-                </p>
-                <div className="mt-auto pt-6 flex flex-col gap-2">
-                  <Link
-                    to="/delegado/inscripcion"
-                    className="inline-flex w-full items-center justify-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700"
-                  >
-                    Inscribir Nuevo Equipo
-                  </Link>
-                </div>
-              </>
+              <StatusBadge status="Desconocido" />
             )}
+          </div>
+
+          {/* Instructions */}
+          <div className="px-6 py-6">
+            <p className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">
+              ¿Cómo funciona el proceso?
+            </p>
+            <ol className="space-y-4">
+              {[
+                {
+                  step: 1,
+                  title: 'Inscribe tu equipo',
+                  desc: 'Selecciona el torneo y la categoría, completa los datos del equipo y sube el comprobante de pago.',
+                },
+                {
+                  step: 2,
+                  title: 'Espera la aprobación',
+                  desc: 'El administrador revisará tu solicitud y comprobante. Recibirás un cambio de estado en tu panel.',
+                },
+                {
+                  step: 3,
+                  title: 'Gestiona tu plantilla',
+                  desc: 'Una vez aprobado, ingresa a "Plantilla" para agregar cada jugador con sus datos y número de camiseta.',
+                },
+                {
+                  step: 4,
+                  title: '¡Listo para competir!',
+                  desc: 'Tu equipo y sus jugadores aparecerán en el directorio público del torneo.',
+                },
+              ].map(({ step, title, desc }) => (
+                <li key={step} className="flex items-start gap-4">
+                  <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-50 text-primary-700 font-bold text-sm flex items-center justify-center border border-primary-100">
+                    {step}
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-800">{title}</p>
+                    <p className="text-sm text-gray-500 leading-relaxed">{desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          {/* CTA */}
+          <div className="px-6 pb-6">
+            <Link
+              to="/delegado/inscripcion"
+              className="inline-flex w-full items-center justify-center rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-primary-700 shadow-md hover:shadow-lg hover:-translate-y-0.5"
+            >
+              Inscribir Nuevo Equipo
+            </Link>
           </div>
         </div>
       </main>
     );
   }
+
 
   return (
     <div className="relative w-full">
@@ -187,7 +228,7 @@ export default function Dashboard() {
 
         <p className="text-sm text-gray-600 mb-6 leading-relaxed">
           {estadoActual === 'pendiente'
-            ? 'TU EQUIPO ESTÁ PENDIENTE DE APROBACIÓN POR PARTE DEL ADMINISTRADOR.'
+            ? 'Tu equipo está pendiente de aprobación por parte del administrador.'
             : estadoActual === 'aprobado'
               ? 'Tu equipo ha sido aprobado exitosamente. ¡Mantén tu plantilla al día!'
               : 'Tu inscripción ha sido rechazada. Revisa las observaciones.'}

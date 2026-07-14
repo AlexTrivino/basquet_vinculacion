@@ -4,10 +4,11 @@ Servicio de lógica de negocio para la entidad Plantilla (Decisión #10).
 Contiene la lógica de negocio más crítica del sistema: la validación
 completa antes de agregar un jugador a la nómina de un torneo.
 
-Tres validaciones secuenciales en ``crear_plantilla``:
+Cuatro validaciones secuenciales en ``crear_plantilla``:
     1. El equipo debe tener una inscripción APROBADA en el torneo.
     2. El jugador debe cumplir el rango de edad de la categoría inscrita.
     3. El jugador no puede estar en dos equipos de la misma categoría dentro del torneo.
+    4. El número de camiseta no puede repetirse dentro del mismo equipo en el mismo torneo.
 """
 from datetime import date
 
@@ -103,7 +104,7 @@ def crear_plantilla(data):
     **Validación 1 — Inscripción aprobada:**
         El equipo debe tener una ``Inscripcion`` con
         ``estado_inscripcion='aprobado'`` en el torneo indicado.
-        Si la inscripción no existe o está pendiente/rechazada,
+        Si la inscripción no existe, está pendiente o fue rechazada,
         no se permite agregar jugadores.
 
     **Validación 2 — Rango de edad:**
@@ -116,6 +117,11 @@ def crear_plantilla(data):
         Consulta si el jugador ya tiene una entrada activa en
         ``Plantillas`` para la MISMA categoría (en cualquier equipo).
         Previene que un jugador represente a dos equipos en la misma categoría.
+    **Validación 4 — Número de camiseta único en el equipo:**
+        Verifica que ningún jugador activo en el mismo equipo/torneo
+        tenga ya el mismo ``numero_camiseta``. Se omite si el campo
+        viene como ``None`` (camiseta opcional).
+
         Se refuerza con ``flush()`` + ``except IntegrityError`` para
         la seguridad concurrente a nivel de BD.
 
@@ -132,22 +138,22 @@ def crear_plantilla(data):
     id_equipo = data['id_equipo']
     id_torneo = data['id_torneo']
 
-    # ── Validación 1: Inscripción válida (aprobada o pendiente) ─────────
+    # ── Validación 1: Inscripción aprobada ───────────────────────────
     inscripcion = (
         Inscripcion.query
         .options(joinedload(Inscripcion.categoria))
         .filter(
             Inscripcion.id_equipo == id_equipo,
             Inscripcion.id_torneo == id_torneo,
-            Inscripcion.estado_inscripcion.in_(['aprobado', 'pendiente'])
+            Inscripcion.estado_inscripcion == 'aprobado'
         )
         .first()
     )
 
     if inscripcion is None:
         raise ValueError(
-            'El equipo no tiene una inscripción válida en este torneo. '
-            'Solo se pueden agregar jugadores a equipos con inscripción pendiente o aprobada.'
+            'El equipo no tiene una inscripción aprobada en este torneo. '
+            'Solo se pueden agregar jugadores una vez que el administrador apruebe la inscripción.'
         )
 
     # ── Validación 2: Rango de edad de la categoría ───────────────
@@ -180,7 +186,7 @@ def crear_plantilla(data):
         .join(Inscripcion, db.and_(
             Inscripcion.id_equipo == Plantilla.id_equipo,
             Inscripcion.id_torneo == Plantilla.id_torneo,
-            Inscripcion.estado_inscripcion.in_(['aprobado', 'pendiente'])
+            Inscripcion.estado_inscripcion == 'aprobado'
         ))
         .filter(
             Plantilla.id_jugador == id_jugador,
@@ -196,6 +202,25 @@ def crear_plantilla(data):
             'El jugador ya está inscrito en esta categoría dentro del torneo. '
             'Solo puede participar una vez por categoría.'
         )
+
+    # ── Validación 4: Número de camiseta único en el equipo ───────
+    numero_camiseta = data.get('numero_camiseta')
+    if numero_camiseta is not None:
+        camiseta_ocupada = (
+            Plantilla.query
+            .filter_by(
+                id_equipo=id_equipo,
+                id_torneo=id_torneo,
+                numero_camiseta=numero_camiseta,
+                estado='activo'
+            )
+            .first()
+        )
+        if camiseta_ocupada is not None:
+            raise ValueError(
+                f'El número de camiseta {numero_camiseta} ya está en uso '
+                'por otro jugador de este equipo en este torneo.'
+            )
 
     # ── Inserción con seguridad concurrente (flush + IntegrityError) ─
     try:

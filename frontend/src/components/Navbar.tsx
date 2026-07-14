@@ -60,7 +60,10 @@ export function Navbar() {
             const eq = ins.equipo;
             if (!eq) return null;
             const id = eq.id_equipo || eq.id;
-            return <option key={id} value={id}>{eq.nombre_equipo}</option>;
+            const catNombre = ins.categoria?.nombre_categoria || '';
+            const catGenero = ins.categoria?.genero_categoria || '';
+            const catLabel = catNombre ? ` — ${catNombre} (${catGenero})` : '';
+            return <option key={id} value={id}>{eq.nombre_equipo}{catLabel}</option>;
           })}
         </select>
       </div>
@@ -89,8 +92,8 @@ export function Navbar() {
             >
               <Menu className="h-6 w-6" />
             </button>
-            <Link to="/" className="flex items-center gap-2">
-              <img src="/logo.png" alt="Torneos Baloncesto Manta Logo" className="h-8 w-8 object-contain" />
+            <Link to="/" className="flex items-center gap-3">
+              <img src="/logo.png" alt="Torneos Baloncesto Manta Logo" className="h-12 w-12 object-contain" />
               <span className="text-xl font-bold text-primary-600 hidden sm:block">Torneos Baloncesto Manta</span>
             </Link>
           </div>

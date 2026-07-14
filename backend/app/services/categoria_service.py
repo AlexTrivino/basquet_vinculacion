@@ -8,12 +8,13 @@ poblar selects en el frontend y validar elegibilidad de jugadores.
 from app.models.categoria import Categoria
 
 
-def listar_categorias(genero=None):
-    """Retorna la query de todas las categorías, opcionalmente filtrada por género.
+def listar_categorias(genero=None, id_torneo=None):
+    """Retorna la query de todas las categorías, opcionalmente filtrada por género y torneo.
 
     Args:
         genero: Filtra por ``'masculino'`` o ``'femenino'``. Si es ``None``,
                 retorna todas las categorías.
+        id_torneo: Filtra por ID de torneo.
 
     Returns:
         Query de SQLAlchemy sin ejecutar, lista para ``paginate_query()``
@@ -26,6 +27,9 @@ def listar_categorias(genero=None):
 
     if genero in ('masculino', 'femenino'):
         query = query.filter_by(genero_categoria=genero)
+
+    if id_torneo is not None:
+        query = query.filter_by(id_torneo=id_torneo)
 
     return query
 

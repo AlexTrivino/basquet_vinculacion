@@ -88,8 +88,13 @@ def agregar_jugador():
         entrada = plantilla_service.crear_plantilla(data)
     except ValueError as e:
         mensaje = str(e)
-        # Distinguir conflicto de torneo (409) de validación de negocio (422)
-        es_conflicto = 'ya pertenece' in mensaje or 'ya registrado' in mensaje
+        # Distinguir conflicto de negocio (409) de error de validación de formato (422)
+        es_conflicto = (
+            'ya pertenece' in mensaje
+            or 'ya registrado' in mensaje
+            or 'ya está inscrito' in mensaje
+            or 'ya está en uso' in mensaje
+        )
         return api_error(
             'CONFLICT' if es_conflicto else 'VALIDATION_ERROR',
             mensaje,

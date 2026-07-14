@@ -27,6 +27,7 @@ def listar_categorias():
     sin paginación para simplificar el consumo en selects del frontend.
     """
     genero = request.args.get('genero')
+    id_torneo = request.args.get('id_torneo', type=int)
 
     if genero and genero not in ('masculino', 'femenino'):
         return api_error(
@@ -35,7 +36,7 @@ def listar_categorias():
             422,
         )
 
-    categorias = categoria_service.listar_categorias(genero=genero).all()
+    categorias = categoria_service.listar_categorias(genero=genero, id_torneo=id_torneo).all()
     return api_response(data=_public_many.dump(categorias))
 
 

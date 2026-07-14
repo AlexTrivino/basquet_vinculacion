@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { useAuth, type UserRole } from '../../../context/AuthContext';
 import { loginWithSupabase } from '../api/auth.api';
 import { AsyncButton } from '../../../components/AsyncButton';
+import api from '../../../api/axios.config';
 
 // 1. Esquema de Validación con Zod
 const loginSchema = z.object({
@@ -35,9 +36,14 @@ export function LoginForm() {
       const response = await loginWithSupabase(data.email, data.password);
       
       const token = response.access_token;
-      // Extraemos el rol desde Supabase claims.
-      // Por defecto 'delegado' si no está explícitamente en metadata.
-      const role = (response.user?.app_metadata?.rol || response.user?.user_metadata?.rol || 'delegado') as UserRole;
+      
+      // Consultamos el rol directamente de nuestra base de datos (public.usuarios)
+      // porque si se edita el rol manualmente en la tabla, el token JWT de Supabase
+      // no se entera automáticamente.
+      const meResponse = await api.get('/usuarios/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const role = (meResponse.data?.data?.rol || 'delegado') as UserRole;
 
       login(token, role);
       toast.success('Inicio de sesión exitoso');

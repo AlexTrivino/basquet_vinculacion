@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -28,17 +28,11 @@ export function InscripcionWizard() {
     queryFn: () => getTorneos(1, 100),
   });
 
-  const { data: categoriasRes, isLoading: isLoadingCategorias } = useQuery({
-    queryKey: ['categorias'],
-    queryFn: () => getCategorias(1, 100),
-  });
-
-  const torneos = torneosRes?.data?.filter(t => t.estado === 'en_curso' || t.estado === 'programado') || [];
-  const categorias = categoriasRes?.data || [];
-
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<InscripcionValues>({
     resolver: zodResolver(inscripcionSchema),
@@ -48,6 +42,23 @@ export function InscripcionWizard() {
       categoria: '',
     },
   });
+
+  const selectedTorneo = watch('torneo');
+
+  const { data: categoriasRes, isLoading: isLoadingCategorias } = useQuery({
+    queryKey: ['categorias', selectedTorneo],
+    queryFn: () => getCategorias(1, 100, Number(selectedTorneo)),
+    enabled: !!selectedTorneo,
+  });
+
+  const torneos = torneosRes?.data?.filter(t => t.estado === 'en_curso' || t.estado === 'programado') || [];
+  const categorias = categoriasRes?.data || [];
+
+  // Cuando cambie el torneo, resetear la categoría
+  useEffect(() => {
+    setValue('categoria', '');
+  }, [selectedTorneo, setValue]);
+
 
   const onSubmit = async (data: InscripcionValues) => {
     if (!comprobanteFile) {
@@ -114,7 +125,7 @@ export function InscripcionWizard() {
             id="categoria"
             {...register('categoria')}
             className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:bg-gray-100 disabled:text-gray-500"
-            disabled={isLoadingCategorias || categorias.length === 0}
+            disabled={!selectedTorneo || isLoadingCategorias || categorias.length === 0}
           >
             <option value="">-- Selecciona una categoría --</option>
             {categorias.map(c => (

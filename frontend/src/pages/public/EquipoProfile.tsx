@@ -14,6 +14,10 @@ import { Skeleton } from '../../components/Skeleton';
 import { StatusBadge } from '../../components/StatusBadge';
 import { DesactivarEquipoModal } from '../../features/equipos/components/DesactivarEquipoModal';
 
+// 🚩 FEATURE FLAG: Subida de imágenes de equipo por delegados.
+// Cambiar a `true` para reactivar los overlays de foto de banner y logo.
+const TEAM_UPLOADS_ENABLED = false;
+
 export default function EquipoProfile({ teamId }: { teamId?: number }) {
   const { id } = useParams<{ id: string }>();
   const idEquipo = teamId || Number(id);
@@ -156,7 +160,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
           <div className="w-full h-full bg-gradient-to-r from-blue-500 to-indigo-600" />
         )}
         
-        {isOwner && (
+        {isOwner && TEAM_UPLOADS_ENABLED && (
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 z-20">
             <span className="absolute bottom-4 text-white/90 text-xs font-semibold drop-shadow-md">Tamaño máximo: 1 MB</span>
             <input type="file" className="hidden" ref={bannerInputRef} accept="image/*" onChange={handleBannerChange} />
@@ -172,7 +176,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
         )}
       </div>
 
-      {isOwner && equipo.estado === 'activo' && (
+      {isOwner && equipo.estado === 'activo' && userRole === 'super_admin' && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 flex justify-end">
           <button 
             onClick={() => setIsDeactivateModalOpen(true)}
@@ -209,7 +213,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
                 </div>
               )}
               
-              {isOwner && (
+              {isOwner && TEAM_UPLOADS_ENABLED && (
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
                   <span className="absolute bottom-4 text-white/90 text-xs font-semibold drop-shadow-md text-center px-2 leading-tight">Máximo: 500 KB</span>
                   <div className="flex gap-3">
