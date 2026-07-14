@@ -8,15 +8,16 @@ import { useState } from 'react';
 
 interface PartidosListProps {
   torneoId: string;
+  idCategoria?: number;
 }
 
-export function PartidosList({ torneoId }: PartidosListProps) {
+export function PartidosList({ torneoId, idCategoria }: PartidosListProps) {
   const [selectedMatch, setSelectedMatch] = useState<any | null>(null);
 
 
   const { data: response, isLoading, isError } = useQuery({
-    queryKey: ['torneos', torneoId, 'partidos'],
-    queryFn: () => getPartidosByTorneo(torneoId),
+    queryKey: ['torneos', torneoId, 'partidos', idCategoria],
+    queryFn: () => getPartidosByTorneo(torneoId, 1, 100, idCategoria),
   });
 
   const partidos = response?.data || [];

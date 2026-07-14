@@ -17,7 +17,7 @@ from app.services import partido_service
 from app.utils.auth_middleware import token_required
 from app.utils.pagination import paginate_query
 from app.utils.response import api_error, api_response
-from app.utils.storage import TIPOS_DOCUMENTO, validar_archivo, subir_archivo, borrar_archivo
+from app.utils.storage import TIPOS_DOCUMENTO, MAX_COMPROBANTE, validar_archivo, subir_archivo, borrar_archivo
 from app import db
 
 partido_bp = Blueprint('partidos', __name__, url_prefix='/api/partidos')
@@ -38,7 +38,8 @@ def listar_partidos():
     id_torneo = request.args.get('id_torneo', type=int)
     estado = request.args.get('estado')
     id_equipo = request.args.get('id_equipo', type=int)
-    query = partido_service.listar_partidos(id_torneo=id_torneo, estado=estado, id_equipo=id_equipo)
+    id_categoria = request.args.get('id_categoria', type=int)
+    query = partido_service.listar_partidos(id_torneo=id_torneo, estado=estado, id_equipo=id_equipo, id_categoria=id_categoria)
     items, pagination = paginate_query(query)
     return api_response(data=_public_many.dump(items), pagination=pagination)
 
@@ -83,7 +84,11 @@ def subir_acta_partido(id_partido):
             except Exception as e:
                 pass # Continue even if delete fails
                 
-        mime_type = validar_archivo(file.stream, TIPOS_DOCUMENTO)
+        mime_type = validar_archivo(
+            file.stream,
+            tipos_aceptados=TIPOS_DOCUMENTO,
+            max_bytes=MAX_COMPROBANTE,
+        )
         url = subir_archivo(file.stream, file.filename, f'actas_fiba/{id_partido}', mime_type)
         
         partido.url_planilla_fiba = url

@@ -15,6 +15,7 @@ import { getSanciones } from '../../sanciones/api/sanciones.api';
 import type { Plantilla } from '../../../types/api.types';
 import { Skeleton } from '../../../components/Skeleton';
 import { EmptyState } from '../../../components/EmptyState';
+import { ConfirmarJugadorModal } from './ConfirmarJugadorModal';
 
 const jugadorSchema = z.object({
   nombres: z.string().min(2, 'Nombres requeridos'),
@@ -34,6 +35,10 @@ export function GestorPlantilla() {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
   const [selectedJugadorId, setSelectedJugadorId] = useState<number | null>(null);
   
+  const [existingPlayer, setExistingPlayer] = useState<any>(null);
+  const [savedFormData, setSavedFormData] = useState<JugadorFormValues | null>(null);
+  const [isLinking, setIsLinking] = useState(false);
+
   const queryClient = useQueryClient();
 
   const { activeTeamId } = useAuth();
@@ -117,6 +122,12 @@ export function GestorPlantilla() {
       setFotoFile(null);
       setShowForm(false);
     } catch (error: any) {
+      if (error.response?.status === 409 && error.response?.data?.data) {
+        setExistingPlayer(error.response.data.data);
+        setSavedFormData(data);
+        return;
+      }
+
       let message = error.response?.data?.message || error.response?.data?.errors || error.message || 'Ocurrió un error al registrar el jugador.';
       if (typeof message === 'object' && message !== null) {
         try {
@@ -128,6 +139,34 @@ export function GestorPlantilla() {
         }
       }
       toast.error(String(message));
+    }
+  };
+
+  const handleVincularJugador = async () => {
+    if (!existingPlayer || !savedFormData || !idEquipo || !idTorneo) return;
+    
+    setIsLinking(true);
+    try {
+      const idJugador = existingPlayer.id_jugador || existingPlayer.id;
+      
+      await createPlantilla({
+        id_jugador: idJugador,
+        id_equipo: idEquipo,
+        id_torneo: idTorneo,
+        numero_camiseta: savedFormData.numero_camiseta,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['plantillas', idEquipo] });
+      toast.success('Jugador vinculado a la plantilla exitosamente');
+      reset();
+      setFotoFile(null);
+      setShowForm(false);
+      setExistingPlayer(null);
+      setSavedFormData(null);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Error al vincular jugador preexistente.');
+    } finally {
+      setIsLinking(false);
     }
   };
 
@@ -172,7 +211,7 @@ export function GestorPlantilla() {
       header: 'Nombre', 
       render: (row) => {
         const fotoUrl = row.jugador?.url_foto;
-        const inicial = row.jugador?.nombres?.charAt(0) || '?';
+        const inicial = row.jugador?.nombre?.charAt(0) || '?';
         const idJugador = row.jugador?.id_jugador || row.jugador?.id || row.id_jugador;
         const amonestado = amonestacionesActivas.some(s => s.id_jugador === idJugador);
         return (
@@ -185,7 +224,7 @@ export function GestorPlantilla() {
               </div>
             )}
             <span className="font-medium text-gray-900 flex items-center gap-2">
-              {row.jugador?.nombres} {row.jugador?.apellidos}
+              {row.jugador?.nombre}
               {amonestado && <span title="Jugador Amonestado (Faltas Activas)"><AlertTriangle className="w-4 h-4 text-yellow-500" /></span>}
             </span>
           </div>
@@ -346,6 +385,17 @@ export function GestorPlantilla() {
           ariaLabel="Tabla de jugadores de la plantilla"
         />
       )}
+
+      <ConfirmarJugadorModal 
+        isOpen={!!existingPlayer}
+        jugador={existingPlayer}
+        onClose={() => {
+          setExistingPlayer(null);
+          setSavedFormData(null);
+        }}
+        onConfirm={handleVincularJugador}
+        isPending={isLinking}
+      />
     </div>
   );
 }

@@ -139,7 +139,7 @@ def subir_foto_jugador(id_jugador):
     El tipo MIME se verifica por **magic bytes** (no por extensión del archivo).
     No acepta PDFs (solo imágenes de perfil).
     """
-    from app.utils.storage import TIPOS_IMAGEN, subir_archivo, validar_archivo, borrar_archivo
+    from app.utils.storage import TIPOS_IMAGEN, MAX_FOTO_JUGADOR, subir_archivo, validar_archivo, borrar_archivo
 
     jugador = jugador_service.obtener_jugador_por_id(id_jugador)
     if jugador is None:
@@ -161,6 +161,7 @@ def subir_foto_jugador(id_jugador):
         mime = validar_archivo(
             archivo.stream,
             tipos_aceptados=TIPOS_IMAGEN,
+            max_bytes=MAX_FOTO_JUGADOR,
         )
     except ValueError as e:
         return api_error('UNSUPPORTED_MEDIA_TYPE', str(e), 415)

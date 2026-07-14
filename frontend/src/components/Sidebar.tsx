@@ -13,9 +13,10 @@ interface SidebarProps {
   isAuthenticated: boolean;
   onLogout: () => void;
   topContent?: React.ReactNode;
+  disabledPaths?: string[];
 }
 
-export function Sidebar({ isOpen, onClose, links, isAuthenticated, onLogout, topContent }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, links, isAuthenticated, onLogout, topContent, disabledPaths = [] }: SidebarProps) {
   return (
     <>
       {/* Overlay oscuro */}
@@ -54,20 +55,33 @@ export function Sidebar({ isOpen, onClose, links, isAuthenticated, onLogout, top
               {topContent}
             </div>
           )}
-          {links.map((link) => (
-            <NavLink
-              key={link.path}
-              to={link.path}
-              onClick={onClose}
-              className={({ isActive }) =>
-                `rounded-md px-3 py-2 text-sm font-medium ${
-                  isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                }`
-              }
-            >
-              {link.name}
-            </NavLink>
-          ))}
+          {links.map((link) => {
+            if (disabledPaths.includes(link.path)) {
+              return (
+                <span
+                  key={link.path}
+                  className="rounded-md px-3 py-2 text-sm font-medium text-gray-400 cursor-not-allowed"
+                  title="Límite de 3 equipos alcanzado"
+                >
+                  {link.name}
+                </span>
+              );
+            }
+            return (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                onClick={onClose}
+                className={({ isActive }) =>
+                  `rounded-md px-3 py-2 text-sm font-medium ${
+                    isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                  }`
+                }
+              >
+                {link.name}
+              </NavLink>
+            );
+          })}
           {isAuthenticated && (
             <button
               type="button"

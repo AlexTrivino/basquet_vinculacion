@@ -51,13 +51,14 @@ def _base_query_con_relaciones():
 
 # ── Funciones de servicio ─────────────────────────────────────────
 
-def listar_partidos(id_torneo=None, estado=None, id_equipo=None):
+def listar_partidos(id_torneo=None, estado=None, id_equipo=None, id_categoria=None):
     """Retorna la query de partidos con filtros opcionales para paginación.
 
     Args:
         id_torneo: Filtra por torneo.
         estado: Filtra por estado del partido.
         id_equipo: Filtra partidos donde el equipo sea local o visitante.
+        id_categoria: Filtra por categoría.
 
     Returns:
         Query de SQLAlchemy lista para ``paginate_query()``.
@@ -74,6 +75,9 @@ def listar_partidos(id_torneo=None, estado=None, id_equipo=None):
 
     if id_equipo is not None:
         query = query.filter(or_(Partido.id_equipo_local == id_equipo, Partido.id_equipo_visitante == id_equipo))
+
+    if id_categoria is not None:
+        query = query.filter(Partido.id_categoria == id_categoria)
 
     return query
 
@@ -109,6 +113,7 @@ def crear_partido(data):
         ValueError: Si alguna validación falla con mensaje descriptivo.
     """
     id_torneo = data['id_torneo']
+    id_categoria = data['id_categoria']
     id_local = data['id_equipo_local']
     id_visitante = data['id_equipo_visitante']
 
@@ -119,20 +124,25 @@ def crear_partido(data):
     # ── Validación 1 y 2: Ambos equipos inscritos y aprobados ─────
     # Se ejecutan en dos queries distintas (más legible que un JOIN complejo)
     # dado que son validaciones de integridad, no consultas de listado.
-    for id_equipo, rol in [(id_local, 'local'), (id_visitante, 'visitante')]:
-        inscripcion = Inscripcion.query.filter_by(
-            id_equipo=id_equipo,
-            id_torneo=id_torneo,
-            estado_inscripcion='aprobado',
-        ).first()
+    inscripcion_local = Inscripcion.query.filter_by(
+        id_torneo=id_torneo, id_equipo=id_local, id_categoria=id_categoria, estado_inscripcion='aprobado'
+    ).first()
 
-        if inscripcion is None:
-            raise ValueError(
-                f'El equipo {rol} no tiene una inscripción aprobada '
-                f'en el torneo especificado.'
-            )
+    if not inscripcion_local:
+        raise ValueError(
+            'El equipo local no tiene una inscripción aprobada para este torneo en esta categoría.'
+        )
 
-    # ── Inserción ─────────────────────────────────────────────────
+    inscripcion_visitante = Inscripcion.query.filter_by(
+        id_torneo=id_torneo, id_equipo=id_visitante, id_categoria=id_categoria, estado_inscripcion='aprobado'
+    ).first()
+
+    if not inscripcion_visitante:
+        raise ValueError(
+            'El equipo visitante no tiene una inscripción aprobada para este torneo en esta categoría.'
+        )
+
+    # ── Creación ──────────────────────────────────────────────────
     try:
         partido = Partido(**data)
         db.session.add(partido)
@@ -207,8 +217,7 @@ def obtener_box_score(partido):
             stat = stats_by_jugador.get(jug.id_jugador)
             res.append({
                 'id_jugador': jug.id_jugador,
-                'nombre_jugador': jug.nombres,
-                'apellido_jugador': jug.apellidos,
+                'nombre_jugador': jug.nombre,
                 'dorsal': p.numero_camiseta,
                 'puntos_anotados': stat.puntos_anotados if stat else 0,
                 'triples_anotados': stat.triples_anotados if stat else 0,

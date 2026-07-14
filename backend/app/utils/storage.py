@@ -60,6 +60,12 @@ TIPOS_IMAGEN = frozenset({'image/jpeg', 'image/png', 'image/webp'})
 TIPOS_DOCUMENTO = frozenset({'application/pdf'})
 TIPOS_PERMITIDOS = TIPOS_IMAGEN | TIPOS_DOCUMENTO
 
+# Tamaños máximos permitidos por contexto (en bytes)
+MAX_FOTO_JUGADOR = 500 * 1024        # 500 KB
+MAX_LOGO_EQUIPO = 500 * 1024         # 500 KB
+MAX_BANNER_EQUIPO = 1 * 1024 * 1024  # 1 MB
+MAX_COMPROBANTE = 5 * 1024 * 1024    # 5 MB
+
 
 # ── Función de validación ─────────────────────────────────────────
 
@@ -91,23 +97,31 @@ def detectar_mime(file_stream: IO) -> str | None:
     return None  # Tipo no reconocido → rechazar
 
 
-def validar_archivo(file_stream: IO, tipos_aceptados: frozenset) -> str:
-    """Valida el tipo real de un archivo por sus magic bytes.
-
-    El límite de tamaño se aplica globalmente vía ``MAX_CONTENT_LENGTH`` en
-    la configuración de Flask, evitando así una segunda lectura completa del
-    stream (doble consumo de memoria) en esta función.
+def validar_archivo(file_stream: IO, tipos_aceptados: frozenset, max_bytes: int = None) -> str:
+    """Valida el tipo real de un archivo por sus magic bytes y su tamaño máximo.
 
     Args:
         file_stream: Stream del archivo.
         tipos_aceptados: Conjunto de MIME types permitidos (ej. ``TIPOS_IMAGEN``).
+        max_bytes: Tamaño máximo permitido en bytes.
 
     Returns:
         MIME type detectado (string).
 
     Raises:
-        ValueError: Si el tipo real del archivo no coincide con los permitidos.
+        ValueError: Si el tipo real no coincide o si el archivo excede el tamaño.
     """
+    if max_bytes is not None:
+        file_stream.seek(0, 2)  # Mover cursor al final
+        tamaño_bytes = file_stream.tell()
+        file_stream.seek(0)     # Devolver cursor al inicio
+        
+        if tamaño_bytes > max_bytes:
+            mb = max_bytes / (1024 * 1024)
+            raise ValueError(
+                f'El archivo excede el tamaño máximo permitido de {mb:g} MB.'
+            )
+
     mime = detectar_mime(file_stream)
 
     if mime is None or mime not in tipos_aceptados:

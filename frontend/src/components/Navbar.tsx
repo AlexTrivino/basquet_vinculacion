@@ -97,17 +97,36 @@ export function Navbar() {
 
           {/* Enlaces de navegación (Desktop) */}
           <div className="hidden lg:flex lg:items-center lg:gap-6">
-            {links.map((link) => (
-              <NavLink
-                key={link.path}
-                to={link.path}
-                className={({ isActive }) =>
-                  `text-sm font-medium ${isActive ? 'text-primary-600' : 'text-gray-600 hover:text-primary-600'}`
-                }
-              >
-                {link.name}
-              </NavLink>
-            ))}
+            {links.map((link) => {
+              const isInscripcionDisabled = 
+                link.path === '/delegado/inscripcion' && 
+                userRole === 'delegado' && 
+                inscripciones.length >= 3;
+              
+              if (isInscripcionDisabled) {
+                return (
+                  <span
+                    key={link.path}
+                    className="text-sm font-medium text-gray-400 cursor-not-allowed py-2"
+                    title="Límite de 3 equipos alcanzado"
+                  >
+                    {link.name}
+                  </span>
+                );
+              }
+              
+              return (
+                <NavLink
+                  key={link.path}
+                  to={link.path}
+                  className={({ isActive }) =>
+                    `text-sm font-medium ${isActive ? 'text-primary-600' : 'text-gray-600 hover:text-primary-600'}`
+                  }
+                >
+                  {link.name}
+                </NavLink>
+              );
+            })}
             {userRole === 'super_admin' && (
               <div className="flex items-center gap-4 ml-4 pl-4 border-l-2 border-gray-200">
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Vistas de Usuario</span>
@@ -179,6 +198,7 @@ export function Navbar() {
         isAuthenticated={isAuthenticated}
         onLogout={handleLogout}
         topContent={renderTeamSwitcher()}
+        disabledPaths={userRole === 'delegado' && inscripciones.length >= 3 ? ['/delegado/inscripcion'] : []}
       />
     </>
   );

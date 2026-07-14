@@ -7,7 +7,7 @@ Validaciones de negocio en schemas de entrada:
 """
 from datetime import date
 
-from marshmallow import Schema, ValidationError, fields, validate, validates, validates_schema
+from marshmallow import Schema, ValidationError, fields, validate, validates, validates_schema, post_load
 
 
 # ── Schemas de entrada ────────────────────────────────────────────
@@ -60,6 +60,13 @@ class JugadorCreateSchema(Schema):
                 'La fecha de nacimiento debe ser una fecha en el pasado.'
             )
 
+    @post_load
+    def unificar_nombres_apellidos(self, data, **kwargs):
+        """Une nombres y apellidos en el campo nombre antes de pasar al backend."""
+        if 'nombres' in data and 'apellidos' in data:
+            data['nombre'] = f"{data.pop('nombres')} {data.pop('apellidos')}"
+        return data
+
 
 class JugadorUpdateSchema(Schema):
     """Validación de actualización parcial de un jugador. Todos los campos son opcionales.
@@ -95,6 +102,15 @@ class JugadorUpdateSchema(Schema):
                 'La fecha de nacimiento debe ser una fecha en el pasado.'
             )
 
+    @post_load
+    def unificar_nombres_apellidos(self, data, **kwargs):
+        """Une nombres y apellidos si se envían ambos para actualizar."""
+        if 'nombres' in data and 'apellidos' in data:
+            data['nombre'] = f"{data.pop('nombres')} {data.pop('apellidos')}"
+        elif 'nombres' in data or 'apellidos' in data:
+            raise ValidationError('Debe enviar nombres y apellidos juntos si desea actualizar el nombre.')
+        return data
+
 
 # ── Schemas de salida (DTO) ───────────────────────────────────────
 
@@ -105,8 +121,7 @@ class JugadorPublicSchema(Schema):
     """
 
     id_jugador = fields.Integer(dump_only=True)
-    nombres = fields.String()
-    apellidos = fields.String()
+    nombre = fields.String()
     genero = fields.String()
     documento_identificacion = fields.String()
     fecha_nacimiento = fields.Date()
@@ -118,8 +133,7 @@ class JugadorAdminSchema(Schema):
     """Serialización completa para el panel de administración."""
 
     id_jugador = fields.Integer(dump_only=True)
-    nombres = fields.String()
-    apellidos = fields.String()
+    nombre = fields.String()
     genero = fields.String()
     documento_identificacion = fields.String()
     fecha_nacimiento = fields.Date()

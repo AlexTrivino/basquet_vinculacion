@@ -132,22 +132,22 @@ def crear_plantilla(data):
     id_equipo = data['id_equipo']
     id_torneo = data['id_torneo']
 
-    # ── Validación 1: Inscripción aprobada ────────────────────────
+    # ── Validación 1: Inscripción válida (aprobada o pendiente) ─────────
     inscripcion = (
         Inscripcion.query
         .options(joinedload(Inscripcion.categoria))
-        .filter_by(
-            id_equipo=id_equipo,
-            id_torneo=id_torneo,
-            estado_inscripcion='aprobado',
+        .filter(
+            Inscripcion.id_equipo == id_equipo,
+            Inscripcion.id_torneo == id_torneo,
+            Inscripcion.estado_inscripcion.in_(['aprobado', 'pendiente'])
         )
         .first()
     )
 
     if inscripcion is None:
         raise ValueError(
-            'El equipo no tiene una inscripción aprobada en este torneo. '
-            'Solo se pueden agregar jugadores a equipos con inscripción aprobada.'
+            'El equipo no tiene una inscripción válida en este torneo. '
+            'Solo se pueden agregar jugadores a equipos con inscripción pendiente o aprobada.'
         )
 
     # ── Validación 2: Rango de edad de la categoría ───────────────

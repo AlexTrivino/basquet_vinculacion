@@ -25,6 +25,7 @@ const partidoSchema = z.object({
   hora: z.string().min(1, 'Hora es requerida'),
   fase: z.string().min(1, 'Fase es requerida'),
   ubicacion: z.string().min(1, 'Ubicación es requerida'),
+  id_categoria: z.number().min(1, 'La categoría es requerida'),
   id_equipo_local: z.number().min(1, 'Local es requerido'),
   id_equipo_visitante: z.number().min(1, 'Visitante es requerido'),
 }).refine(data => data.id_equipo_local !== data.id_equipo_visitante, {
@@ -68,13 +69,6 @@ export function GestorPartidos() {
   });
   const partidos = partidosRes?.data || [];
 
-  const { data: inscripcionesRes } = useQuery({
-    queryKey: ['inscripciones', selectedTorneo, 'aprobado'],
-    queryFn: () => getInscripciones(1, 100, selectedTorneo as number, 'aprobado'),
-    enabled: !!selectedTorneo
-  });
-  const equiposDisponibles = inscripcionesRes?.data || [];
-
   const { register: registerCreate, handleSubmit: handleCreate, watch: watchCreate, reset: resetCreate, formState: { errors: errorsCreate } } = useForm<PartidoFormValues>({
     resolver: zodResolver(partidoSchema),
     defaultValues: {
@@ -82,8 +76,16 @@ export function GestorPartidos() {
     }
   });
 
+  const watchCategoria = watchCreate('id_categoria');
   const watchLocal = watchCreate('id_equipo_local');
   const watchVisitante = watchCreate('id_equipo_visitante');
+
+  const { data: inscripcionesRes } = useQuery({
+    queryKey: ['inscripciones', selectedTorneo, 'aprobado', watchCategoria],
+    queryFn: () => getInscripciones(1, 100, selectedTorneo as number, 'aprobado', watchCategoria ? Number(watchCategoria) : undefined),
+    enabled: !!selectedTorneo && !!watchCategoria
+  });
+  const equiposDisponibles = inscripcionesRes?.data || [];
 
   const onSubmitCreate = async (data: PartidoFormValues) => {
     if (!selectedTorneo) return;
@@ -267,7 +269,11 @@ export function GestorPartidos() {
         )}
       </div>
 
-      {showProgramar && selectedTorneo && (
+      {showProgramar && selectedTorneo && (() => {
+        const selectedTorneoObj = torneos.find(t => (t.id_torneo || t.id) === selectedTorneo);
+        const categoriasTorneo = selectedTorneoObj?.categorias || [];
+        
+        return (
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 relative">
           <button onClick={() => setShowProgramar(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
@@ -293,6 +299,21 @@ export function GestorPartidos() {
               <label className="mb-1 block text-sm font-medium text-gray-700">Ubicación</label>
               <input type="text" {...registerCreate('ubicacion')} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
               {errorsCreate.ubicacion && <p className="mt-1 text-xs text-red-600">{errorsCreate.ubicacion.message}</p>}
+            </div>
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-sm font-medium text-gray-700">Categoría</label>
+              <select 
+                {...registerCreate('id_categoria', { valueAsNumber: true })} 
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+              >
+                <option value="">Seleccione una categoría...</option>
+                {categoriasTorneo.map(cat => (
+                  <option key={cat.id_categoria} value={cat.id_categoria}>
+                    {cat.nombre_categoria} ({cat.genero_categoria})
+                  </option>
+                ))}
+              </select>
+              {errorsCreate.id_categoria && <p className="mt-1 text-xs text-red-600">{errorsCreate.id_categoria.message}</p>}
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Equipo Local</label>
@@ -339,7 +360,8 @@ export function GestorPartidos() {
             </div>
           </form>
         </div>
-      )}
+        );
+      })()}
 
       {editingPartido && selectedTorneo && (
         <div className="bg-white border border-primary-200 rounded-xl p-6 relative shadow-lg">

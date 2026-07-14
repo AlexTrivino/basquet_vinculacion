@@ -22,7 +22,7 @@ from app.services import equipo_service
 from app.utils.auth_middleware import token_required
 from app.utils.pagination import paginate_query
 from app.utils.response import api_error, api_response
-from app.utils.storage import subir_archivo, borrar_archivo, validar_archivo, TIPOS_IMAGEN
+from app.utils.storage import subir_archivo, borrar_archivo, validar_archivo, TIPOS_IMAGEN, MAX_LOGO_EQUIPO, MAX_BANNER_EQUIPO
 from app import db
 
 equipo_bp = Blueprint('equipos', __name__, url_prefix='/api/equipos')
@@ -223,7 +223,7 @@ def subir_logo_equipo(id_equipo):
             except Exception:
                 pass
                 
-        mime_type = validar_archivo(file.stream, TIPOS_IMAGEN)
+        mime_type = validar_archivo(file.stream, TIPOS_IMAGEN, max_bytes=MAX_LOGO_EQUIPO)
         url = subir_archivo(file.stream, file.filename, f'equipos/{id_equipo}/logo', mime_type)
         equipo.url_logo = url
         db.session.commit()
@@ -283,7 +283,7 @@ def subir_banner_equipo(id_equipo):
             except Exception:
                 pass
                 
-        mime_type = validar_archivo(file.stream, TIPOS_IMAGEN)
+        mime_type = validar_archivo(file.stream, TIPOS_IMAGEN, max_bytes=MAX_BANNER_EQUIPO)
         url = subir_archivo(file.stream, file.filename, f'equipos/{id_equipo}/banner', mime_type)
         equipo.url_foto_equipo = url
         db.session.commit()

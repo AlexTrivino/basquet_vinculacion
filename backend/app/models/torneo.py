@@ -24,6 +24,7 @@ class Torneo(db.Model):
     documentacion_items = db.relationship('Documentacion', back_populates='torneo', lazy='select')
     plantillas = db.relationship('Plantilla', back_populates='torneo', lazy='select')
     patrocinadores_torneos = db.relationship('PatrocinadorTorneo', back_populates='torneo', lazy='select')
+    categorias = db.relationship('Categoria', back_populates='torneo', lazy='select', cascade='all, delete-orphan')
 
     # ── Restricciones ──────────────────────────────────────────────
     __table_args__ = (

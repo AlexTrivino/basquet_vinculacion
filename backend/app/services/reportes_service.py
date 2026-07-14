@@ -144,7 +144,7 @@ def _tabla_equipo(estadisticas: list, numero_camiseta_map: dict) -> Table:
 
     for e in estadisticas:
         camiseta = numero_camiseta_map.get(e.id_jugador, '-')
-        nombre = f'{e.jugador.apellidos}, {e.jugador.nombres}'
+        nombre = e.jugador.nombre
         filas.append([
             str(camiseta),
             nombre[:30],              # Truncar nombres muy largos

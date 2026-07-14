@@ -58,9 +58,9 @@ export default function Dashboard() {
             );
           })}
           {(() => {
-            const cuposOcupados = inscripciones.filter(
-              (ins) => ins.equipo?.estado === 'activo' && ins.estado_inscripcion !== 'rechazado'
-            ).length;
+            // El backend ya filtra equipos inactivos, así que todas las 
+            // inscripciones devueltas son de equipos activos del delegado.
+            const cuposOcupados = inscripciones.length;
             const hasReachedLimit = cuposOcupados >= 3;
 
             return (

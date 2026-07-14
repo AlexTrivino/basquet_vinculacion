@@ -13,8 +13,7 @@ class _JugadorEnPlantillaSchema(Schema):
     """Resumen del jugador para serialización anidada en Plantilla."""
 
     id_jugador = fields.Integer()
-    nombres = fields.String()
-    apellidos = fields.String()
+    nombre = fields.String()
     genero = fields.String()
     documento_identificacion = fields.String()
     fecha_nacimiento = fields.Date()

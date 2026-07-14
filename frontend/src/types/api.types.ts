@@ -30,7 +30,7 @@ export interface Categoria {
   descripcion?: string;
   genero_categoria?: string;
   edad_minima?: number;
-  edad_maxima?: number;
+  edad_maxima?: number | null;
 }
 
 export interface Torneo {
@@ -43,6 +43,7 @@ export interface Torneo {
   fecha_fin: string;
   ubicacion?: string;
   estado: string;
+  categorias?: Categoria[];
 }
 
 export interface Equipo {
@@ -55,6 +56,7 @@ export interface Equipo {
   id_usuario?: string;
   entrenador?: string;
   estado?: string;
+  usuario?: { nombre: string; correo: string; };
 }
 
 export interface Inscripcion {
@@ -77,8 +79,7 @@ export interface Inscripcion {
 export interface Jugador {
   id: number;
   id_jugador?: number;
-  nombres: string;
-  apellidos: string;
+  nombre: string;
   documento_identificacion: string;
   fecha_nacimiento: string;
   url_foto?: string;
@@ -132,7 +133,7 @@ export interface Sancion {
   id_jugador: number;
   id_partido: number;
   created_at: string;
-  jugador?: { id_jugador: number; nombres: string; apellidos: string };
+  jugador?: { id_jugador: number; nombre: string };
   partido?: { id_partido: number; fecha_programada: string; estado: string };
 }
 
@@ -152,8 +153,7 @@ export interface PosicionFIBA {
 
 export interface JugadorPerfilResponse {
   id_jugador: number;
-  nombres: string;
-  apellidos: string;
+  nombre: string;
   url_foto?: string;
   equipo_actual?: string;
   torneo_actual?: string;

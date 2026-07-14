@@ -12,6 +12,7 @@ class Categoria(db.Model):
     genero_categoria = db.Column(db.String(20), nullable=False)
     edad_minima = db.Column(db.Integer, nullable=False, default=0)
     edad_maxima = db.Column(db.Integer, nullable=True)
+    id_torneo = db.Column(db.Integer, db.ForeignKey('torneos.id_torneo', ondelete='CASCADE'), nullable=True)
 
     created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
     updated_at = db.Column(
@@ -20,6 +21,8 @@ class Categoria(db.Model):
 
     # ── Relaciones ─────────────────────────────────────────────────
     inscripciones = db.relationship('Inscripcion', back_populates='categoria', lazy='select')
+    torneo = db.relationship('Torneo', back_populates='categorias', lazy='select')
+    partidos = db.relationship('Partido', back_populates='categoria', lazy='select')
 
     # ── Restricciones ──────────────────────────────────────────────
     __table_args__ = (

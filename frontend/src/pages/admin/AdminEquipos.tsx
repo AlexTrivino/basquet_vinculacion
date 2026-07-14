@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getEquiposAdmin, reactivarEquipo, desactivarEquipo } from '../../features/equipos/api/equipos.api';
+import { getEquiposAdmin, reactivarEquipo } from '../../features/equipos/api/equipos.api';
 import { DataGridTable, type Column } from '../../components/DataGridTable';
 import { StatusBadge } from '../../components/StatusBadge';
 import { toast } from 'sonner';
 import { Search } from 'lucide-react';
+import { DesactivarEquipoModal } from '../../features/equipos/components/DesactivarEquipoModal';
 
 export default function AdminEquipos() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const perPage = 10;
+  const [equipoToDeactivate, setEquipoToDeactivate] = useState<number | null>(null);
 
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -38,20 +40,37 @@ export default function AdminEquipos() {
     },
   });
 
-  const desactivarMutation = useMutation({
-    mutationFn: desactivarEquipo,
-    onSuccess: () => {
-      toast.success('Equipo desactivado exitosamente.');
-      queryClient.invalidateQueries({ queryKey: ['admin-equipos'] });
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al desactivar el equipo');
-    },
-  });
-
   const columns: Column<any>[] = [
     { key: 'id_equipo', header: 'ID' },
     { key: 'nombre_equipo', header: 'Nombre de Equipo' },
+    {
+      key: 'torneo',
+      header: 'Torneo',
+      render: (row) => {
+        const torneos = row.inscripciones?.map((i: any) => i.torneo?.nombre).filter(Boolean);
+        if (!torneos || torneos.length === 0) return <span className="text-gray-400 text-sm">Sin torneo</span>;
+        return Array.from(new Set(torneos)).join(', ');
+      }
+    },
+    {
+      key: 'categoria',
+      header: 'Categoría',
+      render: (row) => {
+        const categorias = row.inscripciones?.map((i: any) => i.categoria?.nombre_categoria).filter(Boolean);
+        if (!categorias || categorias.length === 0) return <span className="text-gray-400 text-sm">Sin categoría</span>;
+        return Array.from(new Set(categorias)).join(', ');
+      }
+    },
+    {
+      key: 'delegado',
+      header: 'Delegado',
+      render: (row) => (
+        <div className="flex flex-col">
+          <span className="font-medium text-gray-900">{row.usuario?.nombre || 'Desconocido'}</span>
+          <span className="text-xs text-gray-500">{row.usuario?.correo || 'Sin correo'}</span>
+        </div>
+      )
+    },
     {
       key: 'estado',
       header: 'Estado',
@@ -63,8 +82,8 @@ export default function AdminEquipos() {
       render: (row) => (
         <div className="flex gap-2">
           <button
-            onClick={() => desactivarMutation.mutate(row.id_equipo)}
-            disabled={row.estado === 'inactivo' || desactivarMutation.isPending}
+            onClick={() => setEquipoToDeactivate(row.id_equipo)}
+            disabled={row.estado === 'inactivo'}
             className={`px-3 py-1 rounded text-white text-sm font-medium ${
               row.estado === 'inactivo' ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600'
             }`}
@@ -86,7 +105,7 @@ export default function AdminEquipos() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="mx-auto w-fit min-w-[60%] px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Gestión de Equipos</h1>
@@ -134,6 +153,13 @@ export default function AdminEquipos() {
           </div>
         )}
       </div>
+
+      <DesactivarEquipoModal
+        isOpen={equipoToDeactivate !== null}
+        onClose={() => setEquipoToDeactivate(null)}
+        idEquipo={equipoToDeactivate || 0}
+        isAdmin={true}
+      />
     </div>
   );
 }

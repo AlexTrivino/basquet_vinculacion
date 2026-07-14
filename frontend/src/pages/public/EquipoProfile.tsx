@@ -313,7 +313,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
                         </div>
                         <div className="flex flex-col truncate">
                           <span className="text-sm font-bold text-gray-900 truncate group-hover:text-primary-700 transition-colors">
-                            {jugador.jugador?.nombres} {jugador.jugador?.apellidos}
+                            {jugador.jugador?.nombre}
                           </span>
                           <span className="text-xs text-gray-500">Jugador</span>
                         </div>

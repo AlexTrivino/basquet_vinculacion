@@ -1,18 +1,23 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ShieldAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 import { desactivarEquipo } from '../api/equipos.api';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   idEquipo: number;
+  isAdmin?: boolean;
 }
 
-export function DesactivarEquipoModal({ isOpen, onClose, idEquipo }: Props) {
+export function DesactivarEquipoModal({ isOpen, onClose, idEquipo, isAdmin = false }: Props) {
   const [countdown, setCountdown] = useState(15);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { setActiveTeamId } = useAuth();
 
   useEffect(() => {
     if (isOpen) {
@@ -21,7 +26,7 @@ export function DesactivarEquipoModal({ isOpen, onClose, idEquipo }: Props) {
   }, [isOpen]);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    let timer: ReturnType<typeof setInterval>;
     if (isOpen && countdown > 0) {
       timer = setInterval(() => {
         setCountdown((prev) => prev - 1);
@@ -34,12 +39,16 @@ export function DesactivarEquipoModal({ isOpen, onClose, idEquipo }: Props) {
     mutationFn: (id: number) => desactivarEquipo(id),
     onSuccess: () => {
       toast.success('El equipo ha sido desactivado permanentemente.');
-      queryClient.invalidateQueries({ queryKey: ['inscripciones', 'delegado'] });
-      queryClient.invalidateQueries({ queryKey: ['equipo', idEquipo] });
-      onClose();
-      setTimeout(() => {
-        window.location.href = '/delegado/dashboard';
-      }, 500);
+      if (isAdmin) {
+        queryClient.invalidateQueries({ queryKey: ['admin-equipos'] });
+        onClose();
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['inscripciones', 'delegado'] });
+        queryClient.invalidateQueries({ queryKey: ['equipo', idEquipo] });
+        setActiveTeamId(null);
+        onClose();
+        navigate('/delegado/dashboard');
+      }
     },
     onError: () => {
       toast.error('Ocurrió un error al intentar desactivar el equipo.');
@@ -69,7 +78,9 @@ export function DesactivarEquipoModal({ isOpen, onClose, idEquipo }: Props) {
           </h2>
           
           <p className="text-sm text-gray-600 mb-6 font-medium leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-200">
-            LA DESACTIVACIÓN DE UN EQUIPO SOLO PUEDE SER REVOCADA POR EL ADMINISTRADOR DE LA ORGANIZACIÓN. ESTA ACCIÓN LE PERMITIRÁ REGISTRAR UN NUEVO EQUIPO EN CASO DE TENER CUPOS DISPONIBLES.
+            {isAdmin 
+              ? "LA DESACTIVACIÓN DE UN EQUIPO PUEDE SER REVOCADA DESDE EL PANEL DE GESTIÓN DE EQUIPOS." 
+              : "LA DESACTIVACIÓN DE UN EQUIPO SOLO PUEDE SER REVOCADA POR EL ADMINISTRADOR DE LA ORGANIZACIÓN. ESTA ACCIÓN LE PERMITIRÁ REGISTRAR UN NUEVO EQUIPO EN CASO DE TENER CUPOS DISPONIBLES."}
           </p>
           
           <div className="w-full flex gap-3">
@@ -83,12 +94,16 @@ export function DesactivarEquipoModal({ isOpen, onClose, idEquipo }: Props) {
             <button
               onClick={handleDesactivar}
               disabled={countdown > 0 || desactivarMutation.isPending}
-              className={\lex-1 px-4 py-2.5 rounded-xl font-bold text-white transition-all shadow-sm \\}
+              className={`flex-1 px-4 py-2.5 rounded-xl font-bold text-white transition-all shadow-sm ${
+                countdown > 0 || desactivarMutation.isPending
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-red-600 hover:bg-red-700 hover:shadow-md"
+              }`}
             >
               {desactivarMutation.isPending 
                 ? 'Procesando...' 
                 : countdown > 0 
-                  ? \Desactivar en \s\ 
+                  ? `Desactivar en ${countdown}s` 
                   : 'Desactivar Equipo'}
             </button>
           </div>

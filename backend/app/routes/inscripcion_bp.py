@@ -68,9 +68,10 @@ def listar_inscripciones():
     """
     id_torneo = request.args.get('id_torneo', type=int)
     estado = request.args.get('estado')
+    id_categoria = request.args.get('id_categoria', type=int)
 
     query = inscripcion_service.listar_inscripciones(
-        id_torneo=id_torneo, estado=estado
+        id_torneo=id_torneo, estado=estado, id_categoria=id_categoria
     )
 
     # ── Filtro de propietario para delegados ──────────────────────
@@ -190,7 +191,7 @@ def subir_comprobante(id_inscripcion):
     from app import db
     from app.models.equipo import Equipo
     from app.models.inscripcion import Inscripcion as InscripcionModel
-    from app.utils.storage import TIPOS_DOCUMENTO, TIPOS_IMAGEN, subir_archivo, validar_archivo
+    from app.utils.storage import TIPOS_DOCUMENTO, TIPOS_IMAGEN, MAX_COMPROBANTE, subir_archivo, validar_archivo
 
     # ── SELECT único: verificar existencia y cargar objeto ────────
     # Este mismo objeto se muta en memoria más adelante (patrón
@@ -227,6 +228,7 @@ def subir_comprobante(id_inscripcion):
         mime = validar_archivo(
             archivo.stream,
             tipos_aceptados=TIPOS_DOCUMENTO | TIPOS_IMAGEN,
+            max_bytes=MAX_COMPROBANTE,
         )
     except ValueError as e:
         return api_error('UNSUPPORTED_MEDIA_TYPE', str(e), 415)
@@ -263,7 +265,8 @@ def crear_inscripcion_completa():
     from app import db
     from app.models.equipo import Equipo
     from app.models.inscripcion import Inscripcion as InscripcionModel
-    from app.utils.storage import TIPOS_DOCUMENTO, TIPOS_IMAGEN, subir_archivo, validar_archivo, borrar_archivo
+    from app.utils.storage import TIPOS_DOCUMENTO, TIPOS_IMAGEN, MAX_COMPROBANTE, subir_archivo, validar_archivo, borrar_archivo
+    from app.utils.text_utils import normalizar_mayusculas
 
     nombre_equipo = request.form.get('nombre_equipo')
     id_torneo = request.form.get('id_torneo')
@@ -283,6 +286,7 @@ def crear_inscripcion_completa():
         mime = validar_archivo(
             archivo.stream,
             tipos_aceptados=TIPOS_DOCUMENTO | TIPOS_IMAGEN,
+            max_bytes=MAX_COMPROBANTE,
         )
     except ValueError as e:
         return api_error('UNSUPPORTED_MEDIA_TYPE', str(e), 415)
@@ -298,8 +302,9 @@ def crear_inscripcion_completa():
             return api_error('CONFLICT', 'No puedes administrar más de 3 equipos simultáneamente. Límite alcanzado.', 409)
 
         # Transacción de base de datos
+        datos_equipo = normalizar_mayusculas({'nombre_equipo': nombre_equipo}, ['nombre_equipo'])
         nuevo_equipo = Equipo(
-            nombre_equipo=nombre_equipo,
+            nombre_equipo=datos_equipo['nombre_equipo'],
             id_usuario=g.usuario_id
         )
         db.session.add(nuevo_equipo)

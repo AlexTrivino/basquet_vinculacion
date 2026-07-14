@@ -8,8 +8,7 @@ class Jugador(db.Model):
     __tablename__ = 'jugadores'
 
     id_jugador = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nombres = db.Column(db.String(100), nullable=False)
-    apellidos = db.Column(db.String(100), nullable=False)
+    nombre = db.Column(db.String(200), nullable=False)
     genero = db.Column(db.String(20), nullable=False)
     documento_identificacion = db.Column(db.String(20), unique=True, nullable=False)
     fecha_nacimiento = db.Column(db.Date, nullable=False)
@@ -46,8 +45,7 @@ class Jugador(db.Model):
         """Serializa la instancia a un diccionario JSON-compatible."""
         return {
             'id_jugador': self.id_jugador,
-            'nombres': self.nombres,
-            'apellidos': self.apellidos,
+            'nombre': self.nombre,
             'genero': self.genero,
             'documento_identificacion': self.documento_identificacion,
             'fecha_nacimiento': self.fecha_nacimiento.isoformat() if self.fecha_nacimiento else None,
@@ -60,4 +58,4 @@ class Jugador(db.Model):
         }
 
     def __repr__(self) -> str:
-        return f'<Jugador {self.nombres} {self.apellidos}>'
+        return f'<Jugador {self.nombre}>'

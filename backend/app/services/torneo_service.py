@@ -8,8 +8,10 @@ from app import db
 from app.models.torneo import Torneo
 
 
+from app.models.categoria import Categoria
+
 def crear_torneo(data):
-    """Crea un nuevo torneo en la base de datos.
+    """Crea un nuevo torneo en la base de datos junto con sus categorías.
 
     Args:
         data: Dict validado por ``TorneoCreateSchema``.
@@ -17,8 +19,15 @@ def crear_torneo(data):
     Returns:
         Instancia de ``Torneo`` recién creada.
     """
+    categorias_data = data.pop('categorias', [])
     torneo = Torneo(**data)
     db.session.add(torneo)
+    db.session.flush()  # Para obtener el ID del torneo
+
+    for cat_data in categorias_data:
+        categoria = Categoria(**cat_data, id_torneo=torneo.id_torneo)
+        db.session.add(categoria)
+
     db.session.commit()
     return torneo
 

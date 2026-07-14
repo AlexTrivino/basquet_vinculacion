@@ -79,7 +79,7 @@ def crear_torneo():
     try:
         data = _create_schema.load(json_data)
     except ValidationError as err:
-        return api_error('VALIDATION_ERROR', err.messages, 422)
+        return api_error('VALIDATION_ERROR', 'Datos de torneo inválidos', 422, data=err.messages)
 
     torneo = torneo_service.crear_torneo(data)
     return api_response(
@@ -160,7 +160,9 @@ def tabla_de_posiciones(id_torneo):
         return api_error('NOT_FOUND', 'Torneo no encontrado.', 404)
 
     from app.services.standings import recalcular_tabla
-    posiciones = recalcular_tabla(id_torneo)
+    cat_param = request.args.get('id_categoria')
+    id_categoria = int(cat_param) if cat_param and cat_param.isdigit() else None
+    posiciones = recalcular_tabla(id_torneo, id_categoria)
 
     return api_response(
         data=posiciones,

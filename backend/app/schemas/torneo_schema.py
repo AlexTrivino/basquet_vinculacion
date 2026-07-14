@@ -7,8 +7,8 @@ Define schemas diferenciados según el consumidor:
     - ``TorneoPublicSchema``: Serialización para vistas públicas.
     - ``TorneoAdminSchema``: Serialización para el panel de administración.
 """
-from marshmallow import Schema, fields, validate, validates_schema, ValidationError
-
+from marshmallow import Schema, fields, validate, validates_schema, ValidationError, EXCLUDE
+from app.schemas.categoria_schema import CategoriaCreateSchema, CategoriaPublicSchema
 
 # ── Schemas de entrada (carga / validación) ───────────────────────
 
@@ -18,6 +18,8 @@ class TorneoCreateSchema(Schema):
     Campos requeridos: ``nombre``, ``fecha_inicio``, ``fecha_fin``.
     Regla de negocio: ``fecha_fin`` >= ``fecha_inicio``.
     """
+    class Meta:
+        unknown = EXCLUDE
 
     nombre = fields.String(
         required=True,
@@ -28,6 +30,7 @@ class TorneoCreateSchema(Schema):
     )
     fecha_inicio = fields.Date(required=True)
     fecha_fin = fields.Date(required=True)
+    categorias = fields.List(fields.Nested(CategoriaCreateSchema), required=False, missing=list)
 
     @validates_schema
     def validar_rango_fechas(self, data, **kwargs):
@@ -51,6 +54,9 @@ class TorneoUpdateSchema(Schema):
     Nota: ``estado`` solo acepta transiciones válidas. El valor
     ``'inactivo'`` NO se permite aquí (se gestiona via DELETE / soft delete).
     """
+    
+    class Meta:
+        unknown = EXCLUDE
 
     nombre = fields.String(
         validate=validate.Length(
@@ -93,6 +99,7 @@ class TorneoPublicSchema(Schema):
     fecha_inicio = fields.Date()
     fecha_fin = fields.Date()
     estado = fields.String()
+    categorias = fields.Nested(CategoriaPublicSchema, many=True, dump_only=True)
 
 
 class TorneoAdminSchema(Schema):

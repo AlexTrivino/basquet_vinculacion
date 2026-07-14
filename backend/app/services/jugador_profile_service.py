@@ -41,8 +41,7 @@ def obtener_perfil_publico(id_jugador):
 
     return {
         "id_jugador": jugador.id_jugador,
-        "nombres": jugador.nombres,
-        "apellidos": jugador.apellidos,
+        "nombre": jugador.nombre,
         "url_foto": jugador.url_foto,
         "equipo_actual": equipo_actual,
         "torneo_actual": torneo_actual,

@@ -12,6 +12,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app import db
 from app.models.equipo import Equipo
+from app.utils.text_utils import normalizar_mayusculas
 
 
 def listar_equipos_activos():
@@ -60,10 +61,13 @@ def crear_equipo(data):
         Instancia de ``Equipo`` recién creada.
 
     Raises:
-        ValueError: Si el delegado ya tiene un equipo con el mismo nombre, o si alcanza el límite de 3 equipos.
+        ValueError: Si ya existe un equipo con el mismo nombre exacto.
     """
     from app.models.inscripcion import Inscripcion
     
+    data = normalizar_mayusculas(data, ['nombre_equipo'])
+    data['id_usuario'] = g.usuario_id
+
     # ── Validación de Límite de 3 Equipos ──────────────────────────
     equipos_usuario = Equipo.query.filter_by(id_usuario=g.usuario_id, estado='activo').all()
     equipos_ocupados = 0
@@ -77,10 +81,7 @@ def crear_equipo(data):
         raise ValueError('Límite alcanzado: Un delegado solo puede administrar un máximo de 3 equipos simultáneamente.')
 
     try:
-        equipo = Equipo(
-            id_usuario=g.usuario_id,
-            **data,
-        )
+        equipo = Equipo(**data)
         db.session.add(equipo)
         db.session.commit()
         return equipo
@@ -100,10 +101,12 @@ def actualizar_equipo(equipo, data, verificar_propietario=True):
 
     Returns:
         Instancia de ``Equipo`` actualizada.
-
+        
     Raises:
-        PermissionError: Si el delegado intenta editar un equipo ajeno.
+        ValueError: Si el nuevo nombre colisiona con otro equipo existente.
     """
+    data = normalizar_mayusculas(data, ['nombre_equipo'])
+    
     if verificar_propietario and equipo.id_usuario != g.usuario_id:
         raise PermissionError(
             'No tienes permiso para modificar este equipo.'

@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app import db
 from app.models.jugador import Jugador
+from app.utils.text_utils import normalizar_mayusculas
 
 class JugadorDuplicadoError(Exception):
     def __init__(self, mensaje, jugador):
@@ -25,7 +26,7 @@ def listar_jugadores_activos(genero=None):
     Returns:
         Query de SQLAlchemy sin ejecutar, lista para ``paginate_query()``.
     """
-    query = Jugador.activos().order_by(Jugador.apellidos, Jugador.nombres)
+    query = Jugador.activos().order_by(Jugador.nombre)
 
     if genero in ('masculino', 'femenino'):
         query = query.filter_by(genero=genero)
@@ -68,8 +69,10 @@ def crear_jugador(data):
         Instancia de ``Jugador`` recién creada.
 
     Raises:
-        ValueError: Si ya existe un jugador con la misma cédula.
+        ValueError: Si la nueva cédula ya está registrada.
     """
+    data = normalizar_mayusculas(data, ['nombre', 'documento_identificacion', 'telefono'])
+    
     try:
         jugador = Jugador(**data)
         db.session.add(jugador)
@@ -99,6 +102,7 @@ def actualizar_jugador(jugador, data):
     Returns:
         Instancia de ``Jugador`` actualizada.
     """
+    data = normalizar_mayusculas(data, ['nombre', 'documento_identificacion', 'telefono'])
     for key, value in data.items():
         setattr(jugador, key, value)
 

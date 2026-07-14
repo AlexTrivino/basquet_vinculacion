@@ -16,15 +16,17 @@ export async function getTorneoById(id: string | number): Promise<ApiResponse<To
   return response.data;
 }
 
-export async function getPosicionesByTorneo(id: string | number): Promise<ApiResponse<PosicionFIBA[]>> {
-  const response = await axiosInstance.get(`/torneos/${id}/posiciones`);
+export async function getPosicionesByTorneo(id: string | number, idCategoria?: number): Promise<ApiResponse<PosicionFIBA[]>> {
+  const params: any = {};
+  if (idCategoria) params.id_categoria = idCategoria;
+  const response = await axiosInstance.get(`/torneos/${id}/posiciones`, { params });
   return response.data;
 }
 
-export async function getPartidosByTorneo(idTorneo: string | number, page = 1, perPage = 20): Promise<ApiResponse<Partido[]>> {
-  const response = await axiosInstance.get('/partidos', {
-    params: { id_torneo: idTorneo, page, per_page: perPage },
-  });
+export async function getPartidosByTorneo(idTorneo: string | number, page = 1, perPage = 20, idCategoria?: number): Promise<ApiResponse<Partido[]>> {
+  const params: any = { id_torneo: idTorneo, page, per_page: perPage };
+  if (idCategoria) params.id_categoria = idCategoria;
+  const response = await axiosInstance.get('/partidos', { params });
   return response.data;
 }
 

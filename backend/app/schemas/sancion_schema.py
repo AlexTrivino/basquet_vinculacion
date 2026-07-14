@@ -12,5 +12,5 @@ class SancionSchema(Schema):
     created_at = fields.DateTime(dump_only=True)
     
     # Nested fields para interfaces
-    jugador = fields.Nested(JugadorPublicSchema(only=['id_jugador', 'nombres', 'apellidos']), dump_only=True)
+    jugador = fields.Nested(JugadorPublicSchema(only=['id_jugador', 'nombre']), dump_only=True)
     partido = fields.Nested(PartidoPublicSchema(only=['id_partido', 'fecha', 'estado']), dump_only=True)

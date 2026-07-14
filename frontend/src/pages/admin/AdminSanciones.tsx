@@ -23,7 +23,7 @@ export default function AdminSanciones() {
 
   const columns: Column<Sancion>[] = [
     { key: 'fecha', header: 'Fecha', render: (row) => <span className="text-sm">{row.fecha}</span> },
-    { key: 'jugador', header: 'Infractor', render: (row) => <span className="font-medium text-gray-900">{row.jugador?.nombres} {row.jugador?.apellidos}</span> },
+    { key: 'jugador', header: 'Infractor', render: (row) => <span className="font-medium text-gray-900">{row.jugador?.nombre}</span> },
     { key: 'partido', header: 'Partido Origen', render: (row) => <span className="text-sm text-gray-500">ID: {row.id_partido} - {row.partido?.fecha_programada}</span> },
     { key: 'motivo', header: 'Motivo', render: (row) => <span className="text-sm text-gray-700">{row.motivo}</span> },
     { key: 'estado', header: 'Estado', render: (row) => (

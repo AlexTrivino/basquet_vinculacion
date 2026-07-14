@@ -21,6 +21,9 @@ class Partido(db.Model):
     id_torneo = db.Column(
         db.Integer, db.ForeignKey('torneos.id_torneo'), nullable=False
     )
+    id_categoria = db.Column(
+        db.Integer, db.ForeignKey('categorias.id_categoria'), nullable=False
+    )
     id_equipo_local = db.Column(
         db.Integer, db.ForeignKey('equipos.id_equipo'), nullable=False
     )
@@ -35,6 +38,7 @@ class Partido(db.Model):
 
     # ── Relaciones ─────────────────────────────────────────────────
     torneo = db.relationship('Torneo', back_populates='partidos', lazy='select')
+    categoria = db.relationship('Categoria', back_populates='partidos', lazy='select')
     equipo_local = db.relationship(
         'Equipo',
         foreign_keys=[id_equipo_local],

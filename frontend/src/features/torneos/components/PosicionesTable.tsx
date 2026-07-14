@@ -9,14 +9,15 @@ import { Trophy, Info, X } from 'lucide-react';
 
 interface PosicionesTableProps {
   torneoId: string;
+  idCategoria?: number;
 }
 
-export function PosicionesTable({ torneoId }: PosicionesTableProps) {
+export function PosicionesTable({ torneoId, idCategoria }: PosicionesTableProps) {
   const [selectedPosicion, setSelectedPosicion] = useState<PosicionFIBA | null>(null);
 
   const { data: response, isLoading, isError } = useQuery({
-    queryKey: ['torneos', torneoId, 'posiciones'],
-    queryFn: () => getPosicionesByTorneo(torneoId),
+    queryKey: ['torneos', torneoId, 'posiciones', idCategoria],
+    queryFn: () => getPosicionesByTorneo(torneoId, idCategoria),
   });
 
   const posiciones = response?.data || [];

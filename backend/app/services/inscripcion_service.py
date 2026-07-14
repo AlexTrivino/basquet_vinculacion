@@ -37,7 +37,7 @@ def _base_query_con_relaciones():
     )
 
 
-def listar_inscripciones(id_torneo=None, estado=None):
+def listar_inscripciones(id_torneo=None, estado=None, id_categoria=None):
     """Retorna la query base de inscripciones con filtros opcionales.
 
     Usa ``joinedload`` para traer Torneo, Equipo y Categoría en una
@@ -59,6 +59,9 @@ def listar_inscripciones(id_torneo=None, estado=None):
 
     if estado in ('pendiente', 'aprobado', 'rechazado'):
         query = query.filter(Inscripcion.estado_inscripcion == estado)
+
+    if id_categoria is not None:
+        query = query.filter(Inscripcion.id_categoria == id_categoria)
 
     return query
 

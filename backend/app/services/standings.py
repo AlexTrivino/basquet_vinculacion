@@ -26,8 +26,8 @@ from app import db
 from app.models.partido import Partido
 
 
-def recalcular_tabla(id_torneo: int) -> list[dict]:
-    """Calcula la tabla de posiciones completa para un torneo.
+def recalcular_tabla(id_torneo: int, id_categoria: int = None) -> list[dict]:
+    """Calcula la tabla de posiciones completa para un torneo y categoría.
 
     Algoritmo en tres pasos:
         1. **Una query SQL** → trae partidos finalizados del torneo.
@@ -36,6 +36,7 @@ def recalcular_tabla(id_torneo: int) -> list[dict]:
 
     Args:
         id_torneo: ID del torneo a procesar.
+        id_categoria: ID de la categoría a procesar.
 
     Returns:
         Lista de dicts ordenada por: Puntos DESC → DIF DESC → PF DESC.
@@ -55,14 +56,15 @@ def recalcular_tabla(id_torneo: int) -> list[dict]:
     # ── PASO 1: Una sola query para todos los partidos finalizados ─
     estados_finales = ('finalizado', 'finalizado_wo')
 
-    partidos = (
-        Partido.query
-        .filter(
-            Partido.id_torneo == id_torneo,
-            Partido.estado.in_(estados_finales),
-        )
-        .all()
+    query = Partido.query.filter(
+        Partido.id_torneo == id_torneo,
+        Partido.estado.in_(estados_finales),
     )
+
+    if id_categoria is not None:
+        query = query.filter(Partido.id_categoria == id_categoria)
+
+    partidos = query.all()
 
     if not partidos:
         return []

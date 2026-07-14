@@ -15,6 +15,14 @@ const torneoSchema = z.object({
   nombre: z.string().min(1, 'El nombre es obligatorio').max(100, 'Máximo 100 caracteres'),
   fecha_inicio: z.string().min(1, 'La fecha de inicio es obligatoria'),
   fecha_fin: z.string().min(1, 'La fecha de fin es obligatoria'),
+  categorias: z.array(z.object({
+    id_categoria: z.number().optional(),
+    nombre_categoria: z.string().min(1, 'Obligatorio'),
+    genero_categoria: z.string().min(1, 'Obligatorio'),
+    edad_minima: z.number().min(0, 'Mínimo 0'),
+    edad_maxima: z.number().nullable().optional(),
+  })).optional(),
+  estado: z.string().optional(),
 }).refine((data) => new Date(data.fecha_fin) >= new Date(data.fecha_inicio), {
   message: 'La fecha de fin no puede ser anterior a la fecha de inicio',
   path: ['fecha_fin'],
@@ -34,6 +42,12 @@ export default function TorneosAdmin() {
 
   const torneos = response?.data || [];
 
+  const [categoriasList, setCategoriasList] = useState<any[]>([]);
+  const [newCatNombre, setNewCatNombre] = useState('');
+  const [newCatGenero, setNewCatGenero] = useState('masculino');
+  const [newCatMin, setNewCatMin] = useState<number>(0);
+  const [newCatMax, setNewCatMax] = useState<number | ''>('');
+
   const {
     register,
     handleSubmit,
@@ -50,9 +64,11 @@ export default function TorneosAdmin() {
       setValue('nombre', torneo.nombre || torneo.nombre_torneo || '');
       setValue('fecha_inicio', new Date(torneo.fecha_inicio).toISOString().split('T')[0]);
       setValue('fecha_fin', new Date(torneo.fecha_fin).toISOString().split('T')[0]);
+      setValue('estado', torneo.estado);
     } else {
       setEditingTorneo(null);
-      reset({ nombre: '', fecha_inicio: '', fecha_fin: '' });
+      reset({ nombre: '', fecha_inicio: '', fecha_fin: '', categorias: [], estado: 'programado' });
+      setCategoriasList([]);
     }
     setIsModalOpen(true);
   };
@@ -60,7 +76,33 @@ export default function TorneosAdmin() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingTorneo(null);
+    setCategoriasList([]);
     reset();
+  };
+
+  const handleAddCategoria = () => {
+    if (!newCatNombre.trim() || !newCatGenero || newCatMin < 0) {
+      toast.error('Verifica los datos de la categoría.');
+      return;
+    }
+    const nuevaCategoria = {
+      nombre_categoria: newCatNombre.trim(),
+      genero_categoria: newCatGenero,
+      edad_minima: newCatMin,
+      edad_maxima: newCatMax === '' ? null : Number(newCatMax),
+    };
+    setCategoriasList([...categoriasList, nuevaCategoria]);
+    setValue('categorias', [...categoriasList, nuevaCategoria]);
+
+    setNewCatNombre('');
+    setNewCatMin(0);
+    setNewCatMax('');
+  };
+
+  const handleRemoveCategoria = (index: number) => {
+    const newList = categoriasList.filter((_, i) => i !== index);
+    setCategoriasList(newList);
+    setValue('categorias', newList);
   };
 
   const mutationCreate = useMutation({
@@ -68,6 +110,7 @@ export default function TorneosAdmin() {
     onSuccess: () => {
       toast.success('Torneo creado exitosamente');
       queryClient.invalidateQueries({ queryKey: ['torneos_admin'] });
+      queryClient.invalidateQueries({ queryKey: ['torneos'] });
       closeModal();
     },
     onError: (error: any) => {
@@ -80,6 +123,7 @@ export default function TorneosAdmin() {
     onSuccess: () => {
       toast.success('Torneo actualizado exitosamente');
       queryClient.invalidateQueries({ queryKey: ['torneos_admin'] });
+      queryClient.invalidateQueries({ queryKey: ['torneos'] });
       closeModal();
     },
     onError: (error: any) => {
@@ -92,6 +136,7 @@ export default function TorneosAdmin() {
     onSuccess: () => {
       toast.success('Torneo inactivado exitosamente');
       queryClient.invalidateQueries({ queryKey: ['torneos_admin'] });
+      queryClient.invalidateQueries({ queryKey: ['torneos'] });
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Error al inactivar el torneo');
@@ -102,10 +147,10 @@ export default function TorneosAdmin() {
     if (editingTorneo) {
       const id = editingTorneo.id_torneo || editingTorneo.id;
       if (id) {
-        await mutationUpdate.mutateAsync({ id, payload: data });
+        await mutationUpdate.mutateAsync({ id, payload: data as any });
       }
     } else {
-      await mutationCreate.mutateAsync(data);
+      await mutationCreate.mutateAsync(data as any);
     }
   };
 
@@ -143,7 +188,7 @@ export default function TorneosAdmin() {
           ${row.estado === 'finalizado' ? 'bg-gray-100 text-gray-800' : ''}
           ${row.estado === 'inactivo' ? 'bg-red-100 text-red-800' : ''}
         `}>
-          {row.estado.replace('_', ' ')}
+          {(row.estado || 'programado').replace('_', ' ')}
         </span>
       ),
     },
@@ -201,7 +246,7 @@ export default function TorneosAdmin() {
       {/* Modal CRUD */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
+          <div className="w-full max-w-2xl rounded-xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
               <h2 className="text-xl font-bold text-gray-900">
                 {editingTorneo ? 'Editar Torneo' : 'Crear Nuevo Torneo'}
@@ -211,7 +256,7 @@ export default function TorneosAdmin() {
               </button>
             </div>
             
-            <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit(onSubmit as any)} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">Nombre del Torneo *</label>
                 <input
@@ -245,6 +290,104 @@ export default function TorneosAdmin() {
                 </div>
               </div>
 
+              {editingTorneo && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Estado del Torneo</label>
+                  <select
+                    {...register('estado')}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-3 py-2 border bg-white"
+                  >
+                    <option value="programado">Programado</option>
+                    <option value="en_curso">En Curso</option>
+                    <option value="finalizado">Finalizado</option>
+                  </select>
+                </div>
+              )}
+
+              {/* Sección de Categorías solo visible al Crear Torneo */}
+              {!editingTorneo && (
+                <div className="border-t border-gray-100 pt-4 mt-4">
+                  <h3 className="text-sm font-bold text-gray-900 mb-3">Categorías del Torneo</h3>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 items-end mb-4 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <div className="col-span-2 sm:col-span-2">
+                      <label className="block text-xs font-medium text-gray-700">Nombre</label>
+                      <input 
+                        type="text" 
+                        value={newCatNombre} 
+                        onChange={e => setNewCatNombre(e.target.value)}
+                        placeholder="Ej: Sub-18" 
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-2 py-1.5 border"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700">Género</label>
+                      <select 
+                        value={newCatGenero} 
+                        onChange={e => setNewCatGenero(e.target.value)}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-2 py-1.5 border bg-white"
+                      >
+                        <option value="masculino">Masculino</option>
+                        <option value="femenino">Femenino</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700">Ed. Mín.</label>
+                      <input 
+                        type="number" 
+                        value={newCatMin} 
+                        onChange={e => setNewCatMin(Number(e.target.value))}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-2 py-1.5 border"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700">Ed. Máx.</label>
+                      <div className="flex gap-2">
+                        <input 
+                          type="number" 
+                          value={newCatMax} 
+                          onChange={e => setNewCatMax(e.target.value ? Number(e.target.value) : '')}
+                          placeholder="Sin lim."
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-2 py-1.5 border"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddCategoria}
+                          className="mt-1 flex items-center justify-center rounded-md bg-gray-900 px-2 py-1.5 text-white hover:bg-gray-800 transition-colors"
+                          title="Añadir Categoría"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {categoriasList.length > 0 ? (
+                    <ul className="space-y-2 max-h-32 overflow-y-auto pr-2">
+                      {categoriasList.map((cat, index) => (
+                        <li key={index} className="flex items-center justify-between bg-white border border-gray-200 rounded-md p-2 shadow-sm">
+                          <div className="flex flex-col">
+                            <span className="text-sm font-semibold text-gray-900">{cat.nombre_categoria} <span className="text-xs font-normal text-gray-500 capitalize">({cat.genero_categoria})</span></span>
+                            <span className="text-xs text-gray-500">
+                              Edad: {cat.edad_minima} - {cat.edad_maxima ? cat.edad_maxima : 'Sin límite'}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveCategoria(index)}
+                            className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-xs text-gray-500 text-center italic py-2">No has agregado categorías a este torneo.</p>
+                  )}
+                </div>
+              )}
+
               <div className="mt-6 flex justify-end gap-3 border-t border-gray-100 pt-5">
                 <button
                   type="button"
@@ -254,7 +397,7 @@ export default function TorneosAdmin() {
                   Cancelar
                 </button>
                 <AsyncButton
-                  onClickAction={handleSubmit(onSubmit)}
+                  onClickAction={handleSubmit(onSubmit as any)}
                   className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-500 transition-colors"
                 >
                   {editingTorneo ? 'Guardar Cambios' : 'Crear Torneo'}

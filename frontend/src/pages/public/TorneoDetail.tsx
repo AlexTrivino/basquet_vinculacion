@@ -13,6 +13,7 @@ type Tab = 'posiciones' | 'calendario';
 export default function TorneoDetail() {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<Tab>('posiciones');
+  const [activeCategoriaId, setActiveCategoriaId] = useState<number | undefined>(undefined);
 
   const { data: response, isLoading, isError } = useQuery({
     queryKey: ['torneos', id],
@@ -31,6 +32,11 @@ export default function TorneoDetail() {
         </Link>
       </main>
     );
+  }
+
+  // Set the first category as active by default if none is selected
+  if (torneo?.categorias?.length && activeCategoriaId === undefined) {
+    setActiveCategoriaId(torneo.categorias[0].id_categoria);
   }
 
   return (
@@ -57,7 +63,7 @@ export default function TorneoDetail() {
         )}
       </div>
 
-      {/* Tabs */}
+      {/* Tabs Principales */}
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex space-x-8" aria-label="Tabs">
           <button
@@ -83,10 +89,41 @@ export default function TorneoDetail() {
         </nav>
       </div>
 
+      {/* Tabs de Categorías */}
+      {torneo?.categorias && torneo.categorias.length > 0 && (
+        <div className="mt-6 border-b border-gray-200">
+          <nav className="-mb-px flex space-x-4 overflow-x-auto" aria-label="Categorías">
+            {torneo.categorias.map((cat) => ( 
+              <button
+                key={cat.id_categoria}
+                onClick={() => setActiveCategoriaId(cat.id_categoria)}
+                className={`whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium ${
+                  activeCategoriaId === cat.id_categoria
+                    ? 'border-primary-500 text-primary-600'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                {cat.nombre_categoria} ({cat.genero_categoria})
+              </button>
+            ))}
+          </nav>
+        </div>
+      )}
+
       {/* Renderizado condicional */}
       <div className="mt-8">
-        {id && activeTab === 'posiciones' && <PosicionesTable torneoId={id} />}
-        {id && activeTab === 'calendario' && <PartidosList torneoId={id} />}
+        {!torneo?.categorias?.length && !isLoading && (
+          <div className="text-center text-gray-500 py-10">
+            Este torneo aún no tiene categorías registradas.
+          </div>
+        )}
+        
+        {id && activeCategoriaId && activeTab === 'posiciones' && (
+          <PosicionesTable torneoId={id} idCategoria={activeCategoriaId} />
+        )}
+        {id && activeCategoriaId && activeTab === 'calendario' && (
+          <PartidosList torneoId={id} idCategoria={activeCategoriaId} />
+        )}
       </div>
     </main>
   );

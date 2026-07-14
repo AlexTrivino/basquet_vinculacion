@@ -53,7 +53,7 @@ export default function JugadorProfile() {
   }
 
   const jugador = response.data;
-  const iniciales = `${jugador.nombres.charAt(0)}${jugador.apellidos.charAt(0)}`.toUpperCase();
+  const iniciales = `${jugador.nombre.charAt(0)}${jugador.nombre.split(' ').pop()?.charAt(0) || ''}`.toUpperCase();
 
   return (
     <div className="w-full min-h-screen bg-gray-50 pb-12">
@@ -76,7 +76,7 @@ export default function JugadorProfile() {
         <div className="flex flex-col items-center">
           <div className="w-32 h-32 rounded-full shadow-2xl bg-white border-4 border-white overflow-hidden flex items-center justify-center">
             {jugador.url_foto ? (
-              <img src={jugador.url_foto} alt={`${jugador.nombres} ${jugador.apellidos}`} className="w-full h-full object-cover" />
+              <img src={jugador.url_foto} alt={`${jugador.nombre}`} className="w-full h-full object-cover" />
             ) : (
               <span className="text-4xl font-black text-gray-400">{iniciales}</span>
             )}
@@ -84,7 +84,7 @@ export default function JugadorProfile() {
           
           <div className="mt-4 text-center">
             <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight capitalize">
-              {jugador.nombres.toLowerCase()} {jugador.apellidos.toLowerCase()}
+              {jugador.nombre.toLowerCase()}
             </h1>
             
             {tieneAmonestacionActiva && (
