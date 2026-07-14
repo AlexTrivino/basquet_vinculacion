@@ -72,7 +72,10 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
       toast.success('Logo actualizado');
       queryClient.invalidateQueries({ queryKey: ['equipo', idEquipo] });
     },
-    onError: () => toast.error('Error al subir el logo'),
+    onError: (error: any) => {
+      const message = error.response?.data?.message || '';
+      toast.error(message.toLowerCase().includes('tamaño') || message.toLowerCase().includes('size') ? 'El logo excede el tamaño máximo permitido (500 KB).' : 'Error al subir el logo');
+    },
   });
 
   const deleteLogo = useMutation({
@@ -90,7 +93,10 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
       toast.success('Banner actualizado');
       queryClient.invalidateQueries({ queryKey: ['equipo', idEquipo] });
     },
-    onError: () => toast.error('Error al subir el banner'),
+    onError: (error: any) => {
+      const message = error.response?.data?.message || '';
+      toast.error(message.toLowerCase().includes('tamaño') || message.toLowerCase().includes('size') ? 'El banner excede el tamaño máximo permitido (1 MB).' : 'Error al subir el banner');
+    },
   });
 
   const deleteBanner = useMutation({
@@ -138,7 +144,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
   const finalizados = partidos.filter(p => p.estado === 'finalizado' || p.estado === 'finalizado_wo').sort((a, b) => new Date(`${b.fecha}T${b.hora}`).getTime() - new Date(`${a.fecha}T${a.hora}`).getTime());
   const programados = partidos.filter(p => p.estado === 'programado').sort((a, b) => new Date(`${a.fecha}T${a.hora}`).getTime() - new Date(`${b.fecha}T${b.hora}`).getTime());
   const ultimoPartido = finalizados[0];
-  const categoriasTexto = inscripciones.length > 0 ? Array.from(new Set(inscripciones.map(i => i.categoria?.nombre_categoria))).filter(Boolean).join(', ') : '';
+  const categoriasTexto = inscripciones.length > 0 ? Array.from(new Set(inscripciones.map(i => i.categoria ? `${i.categoria.nombre_categoria} (${i.categoria.genero_categoria})` : null))).filter(Boolean).join(', ') : '';
 
   return (
     <div className="w-full bg-gray-50 pb-12">
@@ -152,6 +158,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
         
         {isOwner && (
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 z-20">
+            <span className="absolute bottom-4 text-white/90 text-xs font-semibold drop-shadow-md">Tamaño máximo: 1 MB</span>
             <input type="file" className="hidden" ref={bannerInputRef} accept="image/*" onChange={handleBannerChange} />
             <button onClick={() => bannerInputRef.current?.click()} className="bg-white text-gray-900 p-3 rounded-full hover:bg-gray-100 shadow-xl transition-transform hover:scale-110" title="Cambiar portada">
               <Camera className="w-6 h-6" />
@@ -203,16 +210,19 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
               )}
               
               {isOwner && (
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                  <input type="file" className="hidden" ref={logoInputRef} accept="image/*" onChange={handleLogoChange} />
-                  <button onClick={() => logoInputRef.current?.click()} className="bg-white text-gray-900 p-2 rounded-full hover:bg-gray-100">
-                    <Camera className="w-5 h-5" />
-                  </button>
-                  {equipo.url_logo && (
-                    <button onClick={() => deleteLogo.mutate()} className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600">
-                      <span className="font-bold px-1">X</span>
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
+                  <span className="absolute bottom-4 text-white/90 text-xs font-semibold drop-shadow-md text-center px-2 leading-tight">Máximo: 500 KB</span>
+                  <div className="flex gap-3">
+                    <input type="file" className="hidden" ref={logoInputRef} accept="image/*" onChange={handleLogoChange} />
+                    <button onClick={() => logoInputRef.current?.click()} className="bg-white text-gray-900 p-2 rounded-full hover:bg-gray-100">
+                      <Camera className="w-5 h-5" />
                     </button>
-                  )}
+                    {equipo.url_logo && (
+                      <button onClick={() => deleteLogo.mutate()} className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600">
+                        <span className="font-bold px-1">X</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -222,7 +232,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
           <div className="pt-4 sm:pt-6 pb-6">
             <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">{equipo.nombre_equipo}</h1>
             {categoriasTexto && (
-              <p className="text-sm font-medium text-gray-500 mt-1">Categorías: {categoriasTexto}</p>
+              <p className="text-sm font-medium text-gray-500 mt-1 capitalize">Categorías: {categoriasTexto}</p>
             )}
             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
               <span className="flex items-center gap-1"><Trophy className="w-4 h-4" /> Torneos inscritos</span>

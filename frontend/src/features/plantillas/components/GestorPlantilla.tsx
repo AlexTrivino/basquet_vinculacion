@@ -138,7 +138,11 @@ export function GestorPlantilla() {
           message = JSON.stringify(message);
         }
       }
-      toast.error(String(message));
+      let finalMessage = String(message);
+      if (finalMessage.toLowerCase().includes('tamaño') || finalMessage.toLowerCase().includes('size')) {
+        finalMessage = 'La foto excede el tamaño máximo permitido (500 KB).';
+      }
+      toast.error(finalMessage);
     }
   };
 
@@ -191,7 +195,8 @@ export function GestorPlantilla() {
       toast.success('Foto actualizada exitosamente.');
       queryClient.invalidateQueries({ queryKey: ['plantillas', idEquipo] });
     } catch (error: any) {
-      toast.error('Error al actualizar la foto.');
+      const message = error.response?.data?.message || 'Error al actualizar la foto.';
+      toast.error(message.toLowerCase().includes('tamaño') || message.toLowerCase().includes('size') ? 'La foto excede el tamaño máximo permitido (500 KB).' : message);
     } finally {
       if (hiddenFileInput.current) {
         hiddenFileInput.current.value = '';
@@ -351,6 +356,9 @@ export function GestorPlantilla() {
             </div>
             <div className="sm:col-span-2">
               <label className="mb-1 block text-sm font-medium text-gray-700">Foto de Perfil (Opcional)</label>
+              <p className="mb-2 text-xs text-gray-500">
+                Tamaño máximo permitido: 500 KB.
+              </p>
               <input 
                 type="file" 
                 accept="image/jpeg, image/png, image/webp"

@@ -65,11 +65,14 @@ export function InscripcionWizard() {
       await inscribirEquipoCompleto(formData);
       
       queryClient.invalidateQueries({ queryKey: ['inscripciones', 'delegado'] });
-      toast.success('COMUNIQUESE CON EL REPRESENTANTE DE LA ORGANIZACION');
+      toast.success('Comuniquese con el representante de la organización');
       navigate('/delegado/dashboard');
     } catch (error: any) {
       console.error(error);
-      const message = error.response?.data?.message || 'Error al procesar la inscripción';
+      let message = error.response?.data?.message || 'Error al procesar la inscripción';
+      if (message.toLowerCase().includes('tamaño') || message.toLowerCase().includes('size')) {
+        message = 'El comprobante excede el tamaño máximo permitido (5 MB).';
+      }
       toast.error(message);
     }
   };
@@ -115,7 +118,7 @@ export function InscripcionWizard() {
           >
             <option value="">-- Selecciona una categoría --</option>
             {categorias.map(c => (
-              <option key={c.id_categoria || c.id} value={c.id_categoria || c.id}>{c.nombre_categoria || c.nombre}</option>
+              <option key={c.id_categoria || c.id} value={c.id_categoria || c.id} className="capitalize">{c.nombre_categoria || c.nombre} ({c.genero_categoria})</option>
             ))}
           </select>
           {errors.categoria && <p className="mt-1 text-xs text-red-600">{errors.categoria.message}</p>}
@@ -139,6 +142,9 @@ export function InscripcionWizard() {
           <label htmlFor="comprobante" className="mb-1 block text-sm font-medium text-gray-700">
             Archivo de Comprobante (PDF, JPG, PNG)
           </label>
+          <p className="mb-2 text-xs text-gray-500">
+            Tamaño máximo permitido: 5 MB.
+          </p>
           <input
             id="comprobante"
             type="file"

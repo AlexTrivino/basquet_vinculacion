@@ -56,9 +56,9 @@ export default function AdminEquipos() {
       key: 'categoria',
       header: 'Categoría',
       render: (row) => {
-        const categorias = row.inscripciones?.map((i: any) => i.categoria?.nombre_categoria).filter(Boolean);
+        const categorias = row.inscripciones?.map((i: any) => i.categoria ? `${i.categoria.nombre_categoria} (${i.categoria.genero_categoria})` : null).filter(Boolean);
         if (!categorias || categorias.length === 0) return <span className="text-gray-400 text-sm">Sin categoría</span>;
-        return Array.from(new Set(categorias)).join(', ');
+        return <span className="capitalize">{Array.from(new Set(categorias)).join(', ')}</span>;
       }
     },
     {

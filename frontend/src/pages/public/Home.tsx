@@ -28,14 +28,18 @@ export default function Home() {
   return (
     <main>
       {/* Hero Section */}
-      <section className="bg-primary-900 px-4 py-20 text-center sm:px-6 lg:px-8 flex flex-col items-center">
-        <img src="/logo.png" alt="BaloncestoManta Logo" className="h-32 w-32 object-contain mb-6 drop-shadow-xl" />
-        <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-          BaloncestoManta
-        </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-xl text-primary-100">
-          Plataforma para gestionar y seguir de cerca los torneos de baloncesto de nuestra comunidad.
-        </p>
+      <section className="bg-primary-900 px-4 py-20 sm:px-6 lg:px-8 flex justify-center">
+        <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10 max-w-5xl">
+          <img src="/logo.png" alt="Torneos Baloncesto Manta Logo" className="h-48 w-48 object-contain drop-shadow-2xl" />
+          <div className="text-center sm:text-left">
+            <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Torneos Baloncesto Manta
+            </h1>
+            <p className="mt-4 max-w-2xl text-xl text-primary-100">
+              Desde el 2019 reactivando el baloncesto de la ciudad
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* Carrusel de Auspiciantes */}

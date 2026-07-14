@@ -7,7 +7,7 @@ completa antes de agregar un jugador a la nómina de un torneo.
 Tres validaciones secuenciales en ``crear_plantilla``:
     1. El equipo debe tener una inscripción APROBADA en el torneo.
     2. El jugador debe cumplir el rango de edad de la categoría inscrita.
-    3. El jugador no puede estar en dos equipos del mismo torneo.
+    3. El jugador no puede estar en dos equipos de la misma categoría dentro del torneo.
 """
 from datetime import date
 
@@ -112,10 +112,10 @@ def crear_plantilla(data):
         ``categoria.edad_maxima`` de la inscripción del equipo.
         Rechaza con ``ValueError`` si está fuera de rango.
 
-    **Validación 3 — Jugador ya en el torneo:**
+    **Validación 3 — Jugador no duplicado en la categoría:**
         Consulta si el jugador ya tiene una entrada activa en
-        ``Plantillas`` para el mismo torneo (en cualquier equipo).
-        Previene que un jugador represente a dos equipos en un mismo torneo.
+        ``Plantillas`` para la MISMA categoría (en cualquier equipo).
+        Previene que un jugador represente a dos equipos en la misma categoría.
         Se refuerza con ``flush()`` + ``except IntegrityError`` para
         la seguridad concurrente a nivel de BD.
 
@@ -173,17 +173,28 @@ def crear_plantilla(data):
             f'"{categoria.nombre_categoria}".'
         )
 
-    # ── Validación 3: Jugador no duplicado en el torneo ──────────
-    ya_en_torneo = (
+    # ── Validación 3: Jugador no duplicado en la categoría ──────────
+    id_categoria_destino = inscripcion.id_categoria
+    ya_en_categoria = (
         Plantilla.query
-        .filter_by(id_jugador=id_jugador, id_torneo=id_torneo, estado='activo')
+        .join(Inscripcion, db.and_(
+            Inscripcion.id_equipo == Plantilla.id_equipo,
+            Inscripcion.id_torneo == Plantilla.id_torneo,
+            Inscripcion.estado_inscripcion.in_(['aprobado', 'pendiente'])
+        ))
+        .filter(
+            Plantilla.id_jugador == id_jugador,
+            Plantilla.id_torneo == id_torneo,
+            Plantilla.estado == 'activo',
+            Inscripcion.id_categoria == id_categoria_destino
+        )
         .first()
     )
 
-    if ya_en_torneo is not None:
+    if ya_en_categoria is not None:
         raise ValueError(
-            'El jugador ya pertenece a otro equipo en este torneo. '
-            'Un jugador no puede representar a dos equipos en el mismo torneo.'
+            'El jugador ya está inscrito en esta categoría dentro del torneo. '
+            'Solo puede participar una vez por categoría.'
         )
 
     # ── Inserción con seguridad concurrente (flush + IntegrityError) ─

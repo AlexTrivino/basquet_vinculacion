@@ -59,7 +59,7 @@ def agregar_jugador():
     Ejecuta 3 validaciones en el servicio:
         1. Inscripción del equipo aprobada en el torneo.
         2. Edad del jugador dentro del rango de la categoría.
-        3. El jugador no pertenece ya a otro equipo en el mismo torneo.
+        3. El jugador no pertenece ya a otra plantilla de la misma categoría en el torneo.
 
     Para delegados, verifica además que el equipo le pertenezca.
     """

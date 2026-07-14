@@ -36,8 +36,8 @@ export function Sidebar({ isOpen, onClose, links, isAuthenticated, onLogout, top
       >
         <div className="flex h-16 items-center justify-between border-b px-4">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="BaloncestoManta Logo" className="h-6 w-6 object-contain" />
-            <span className="text-lg font-bold text-primary-600">BaloncestoManta</span>
+            <img src="/logo.png" alt="Torneos Baloncesto Manta Logo" className="h-6 w-6 object-contain" />
+            <span className="text-lg font-bold text-primary-600">Torneos Baloncesto Manta</span>
           </div>
           <button
             type="button"

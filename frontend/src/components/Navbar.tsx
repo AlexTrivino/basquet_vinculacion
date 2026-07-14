@@ -78,7 +78,7 @@ export function Navbar() {
   return (
     <>
       <nav className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4">
             {/* Botón hamburguesa (Mobile) */}
             <button
@@ -90,13 +90,13 @@ export function Navbar() {
               <Menu className="h-6 w-6" />
             </button>
             <Link to="/" className="flex items-center gap-2">
-              <img src="/logo.png" alt="BaloncestoManta Logo" className="h-8 w-8 object-contain" />
-              <span className="text-xl font-bold text-primary-600 hidden sm:block">BaloncestoManta</span>
+              <img src="/logo.png" alt="Torneos Baloncesto Manta Logo" className="h-8 w-8 object-contain" />
+              <span className="text-xl font-bold text-primary-600 hidden sm:block">Torneos Baloncesto Manta</span>
             </Link>
           </div>
 
           {/* Enlaces de navegación (Desktop) */}
-          <div className="hidden lg:flex lg:items-center lg:gap-6">
+          <div className="hidden lg:flex flex-1 justify-center lg:items-center lg:gap-8">
             {links.map((link) => {
               const isInscripcionDisabled = 
                 link.path === '/delegado/inscripcion' && 

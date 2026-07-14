@@ -105,8 +105,8 @@ export default function DirectorioEquipos() {
                   <h3 className="text-lg font-bold text-gray-900 leading-tight mb-1 line-clamp-2">
                     {insc.equipo?.nombre_equipo}
                   </h3>
-                  <p className="text-sm text-gray-500 font-medium">
-                    {insc.categoria?.nombre_categoria}
+                  <p className="text-sm text-gray-500 font-medium capitalize">
+                    {insc.categoria?.nombre_categoria} ({insc.categoria?.genero_categoria})
                   </p>
                 </Link>
               ))}
