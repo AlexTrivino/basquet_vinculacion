@@ -50,7 +50,8 @@ Este documento detalla exhaustivamente cómo cada endpoint, esquema (DTO) y camp
 **Mapeo Frontend:**
 - **Flujo de Delegado (`/delegado/equipos`)**:
   - Pantalla "Mis Equipos". Llama a `GET /` (el backend ya filtra por el token del delegado).
-  - Al crear, llama a `POST /`. 
+  - Al crear, llama a `POST /`. **Nota:** El backend y frontend restringen la creación a un máximo de **3 equipos** por delegado.
+  - La opción de Desactivar Equipo está oculta para el delegado (solo para super_admin). 
   - **Nota Analítica:** No existe un endpoint explícito como `/api/equipos/<id>/logo`. El backend probablemente asuma que los logos se manejan via bucket (ej. Supabase Storage) y luego el string se actualiza via PUT, o requiere desarrollo de este endpoint.
 
 ---
@@ -88,9 +89,11 @@ Este documento detalla exhaustivamente cómo cada endpoint, esquema (DTO) y camp
 
 **Mapeo Frontend:**
 - **Gestor de Roster Delegado (`/delegado/plantilla`)**:
+  - **REGLA ESTRICTA:** Solo se habilita la gestión si el equipo tiene una inscripción `aprobada`. Si está 'pendiente', el backend devolverá `422`.
   - UI dividida en 2: "Base de datos de mis jugadores" y "Nómina para este torneo".
-  - **Nuevo Jugador**: Formulario conectado a `POST /api/jugadores` (Zod debe validar cédula de 10 dígitos y fecha en el pasado). Luego lanza `POST /api/jugadores/<id>/foto`.
-  - **Inclusión**: Botón "Añadir a Roster" lanza `POST /api/plantillas` enviando el `id_jugador` y un `numero_camiseta`.
+  - **Nuevo Jugador**: Formulario conectado a `POST /api/jugadores`. (La subida de foto vía `POST /<id>/foto` está deshabilitada temporalmente por feature flag).
+  - **Inclusión**: Botón "Añadir a Roster" lanza `POST /api/plantillas` enviando el `id_jugador` y `numero_camiseta`.
+  - **Validaciones:** El backend devolverá `409 Conflict` si el `numero_camiseta` ya está en uso en el mismo equipo/torneo, o si el jugador ya está inscrito en la misma categoría. Sin embargo, permite inscripciones multicategoría.
 
 ---
 

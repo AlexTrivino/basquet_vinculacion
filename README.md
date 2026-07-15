@@ -165,9 +165,10 @@ El sistema aplica el **Principio de Menor Privilegio** con tres roles:
 - **Puntuación:** Ganador = 2 pts, Perdedor = 1 pt. **No hay empates** en baloncesto.
 - **Desempates:** Diferencia de canastas → Overage (promedio de puntos por juego).
 - **Categorías:** Juvenil/Senior (abierta), +30, +40, +50 años — Masculino y Femenino. La edad se valida automáticamente desde `fecha_nacimiento`.
-- **Plantilla:** Mínimo 10 jugadores, máximo 15 por equipo.
+- **Plantilla:** Mínimo 10 jugadores, máximo 15 por equipo. El `numero_camiseta` debe ser único dentro de cada equipo por torneo. Solo se pueden gestionar plantillas de equipos cuya inscripción esté estrictamente **aprobada**.
+- **Multicategoría:** Un mismo jugador puede inscribirse en múltiples equipos del mismo torneo, siempre y cuando no compita en la misma **categoría**.
 - **Borrado lógico:** Cero eliminaciones físicas. Todo cambia a `estado='inactivo'`.
-- **Flujo de inscripción:** El delegado registra equipo + jugadores inmediatamente (todo con estado `'pendiente'`). El Admin aprueba/rechaza el conjunto.
+- **Flujo de inscripción:** El delegado registra el equipo y sube el comprobante. El sistema bloquea el registro de jugadores hasta que el Admin apruebe la inscripción.
 - **Estadísticas:** Ingreso manual por el Admin desde un formulario (no hay parsing de PDFs en el MVP).
 
 ---
@@ -193,9 +194,11 @@ El sistema aplica el **Principio de Menor Privilegio** con tres roles:
 | 4 | Campo `ubicacion` en `Partidos` | Default en BD para escalabilidad futura, no hardcodeado |
 | 5 | Estadísticas manuales (MVP) | Robustez sobre parsing de PDFs/CSVs |
 | 6 | Soft delete en `Plantillas` | Consistencia con el borrado lógico del resto de entidades |
-| 7 | Inscripción sin bloqueo | Delegado registra todo inmediato, Admin aprueba después |
+| 7 | Inscripción Estricta | Bloqueo de gestión de plantilla hasta que la inscripción esté 'aprobada' para mantener limpieza de datos |
 | 8 | `edad_minima` / `edad_maxima` en `Categorias` | Validación dinámica sin Magic Numbers |
 | 9 | TailwindCSS en el frontend | Última versión estable compatible con Vite |
+| 10 | Multicategoría y Unicidad de Camiseta | El backend previene 409 Conflicts concurrentes; un jugador puede estar en varias categorías, pero un número no se repite en el equipo |
+| 11 | Filtro Dinámico de Categorías | El UI bloquea la carga de categorías hasta seleccionar un torneo, evitando UI sucia |
 
 ---
 

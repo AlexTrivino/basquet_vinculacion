@@ -21,8 +21,9 @@ Esta cola de tareas está diseñada de manera atómica para evitar regresiones. 
 **Objetivo:** Refactorizar el formulario de Inscripción del Delegado.
 **Acción:**
 1. Modifica la UI de inscripción. El delegado debe tener un selector de "Mis Equipos" o un botón para "Crear Nuevo Equipo" (que dispara a `POST /api/equipos`).
-2. Una vez que el delegado tenga un `id_equipo`, el submit principal del formulario debe ejecutar `POST /api/inscripciones` con los datos estrictos que pide `InscripcionCreateSchema` (`id_torneo`, `id_equipo`, `id_categoria`).
-3. Conectar el error `409 CONFLICT` del backend (cuando un equipo ya está inscrito) a un Toast de error.
+2. Las categorías deben filtrarse dinámicamente según el Torneo seleccionado (usar `watch()` de React Hook Form para pasar el `id_torneo` al query).
+3. Una vez que el delegado tenga un `id_equipo`, el submit principal del formulario debe ejecutar `POST /api/inscripciones` con los datos estrictos que pide `InscripcionCreateSchema` (`id_torneo`, `id_equipo`, `id_categoria`).
+4. Conectar el error `409 CONFLICT` del backend a un Toast de error.
 
 ### Tarea 4
 **Objetivo:** Integrar el cambio de estado de Inscripción en el panel Admin.

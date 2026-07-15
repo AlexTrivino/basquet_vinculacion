@@ -11,6 +11,11 @@ Aplica a todo el workspace: `backend/` y `frontend/`.
 El agente debe actuar proactivamente, aplicar principios SOLID, DRY y YAGNI,
 y nunca escribir código de relleno ni sobre-diseñar.
 
+### Restricciones Adicionales de Negocio
+- **Límite de Equipos:** Un usuario delegado puede crear y gestionar un **máximo de 3 equipos**.
+- **Gestión Estricta:** La gestión de plantillas solo se permite si la inscripción está estrictamente **aprobada**.
+- **Acciones Destructivas:** La desactivación de equipos es exclusiva del `super_admin`. Los delegados no tienen acceso a esta función.
+
 ---
 
 ## Stack Tecnológico
@@ -211,8 +216,8 @@ Desktop (≥1024px)              Mobile (<1024px)
 | Auth | `/auth/login` | — | Login con Supabase (`signInWithPassword`) |
 | Auth | `/auth/recuperar` | — | Solicitud de reset de contraseña |
 | Delegado | `/delegado/dashboard` | `delegado` | Panel: estado de inscripción del equipo |
-| Delegado | `/delegado/inscripcion` | `delegado` | Wizard: datos del equipo + logo + comprobante |
-| Delegado | `/delegado/plantilla` | `delegado` | Gestor de roster: jugadores, fotos y documentos |
+| Delegado | `/delegado/inscripcion` | `delegado` | Wizard: datos del equipo + comprobante (Logo temporalmente deshabilitado por feature flag) |
+| Delegado | `/delegado/plantilla` | `delegado` | Gestor de roster: jugadores y documentos (Fotos temporalmente deshabilitadas por feature flag) |
 | Admin | `/admin/dashboard` | `super_admin` | Resumen de inscripciones pendientes |
 | Admin | `/admin/auditoria` | `super_admin` | Visor dual: info + PDF. Aprobar / Rechazar |
 | Admin | `/admin/partidos` | `super_admin` | Programación de calendario y fases |
@@ -255,7 +260,7 @@ Desktop (≥1024px)              Mobile (<1024px)
 ## Siguiente Etapa: Integración Frontend-Backend
 
 La etapa de UI/Maquetado ha finalizado. El proyecto entra en la **Etapa de Integración**.
-Consulta `Docs/PLAN_INTEGRACION.md` para el roadmap exacto. El enfoque actual será:
+Consulta `Docs/03_plan_integracion.md` para el roadmap exacto. El enfoque actual será:
 
 1. Setup de tipados e interfaces (mapeo con Marshmallow).
 2. Conexión de endpoints (Supabase + Flask REST API) vía Axios.
