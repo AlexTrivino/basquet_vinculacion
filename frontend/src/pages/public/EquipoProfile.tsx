@@ -15,8 +15,8 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { DesactivarEquipoModal } from '../../features/equipos/components/DesactivarEquipoModal';
 
 // 🚩 FEATURE FLAG: Subida de imágenes de equipo por delegados.
-// Cambiar a `true` para reactivar los overlays de foto de banner y logo.
-const TEAM_UPLOADS_ENABLED = false;
+// Activado para habilitar los overlays de foto de banner y logo en hover.
+const TEAM_UPLOADS_ENABLED = true;
 
 export default function EquipoProfile({ teamId }: { teamId?: number }) {
   const { id } = useParams<{ id: string }>();

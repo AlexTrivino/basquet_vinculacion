@@ -22,6 +22,7 @@ export function InscripcionWizard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [comprobanteFile, setComprobanteFile] = useState<File | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
 
   const { data: torneosRes, isLoading: isLoadingTorneos } = useQuery({
     queryKey: ['torneos_activos'],
@@ -72,6 +73,9 @@ export function InscripcionWizard() {
       formData.append('id_torneo', data.torneo);
       formData.append('id_categoria', data.categoria);
       formData.append('archivo', comprobanteFile);
+      if (logoFile) {
+        formData.append('logo', logoFile);
+      }
 
       await inscribirEquipoCompleto(formData);
       
@@ -165,6 +169,28 @@ export function InscripcionWizard() {
                 setComprobanteFile(e.target.files[0]);
               } else {
                 setComprobanteFile(null);
+              }
+            }}
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="logo" className="mb-1 block text-sm font-medium text-gray-700">
+            Logo del Equipo (Opcional)
+          </label>
+          <p className="mb-2 text-xs text-gray-500">
+            Tamaño máximo permitido: 500 KB. (JPG, PNG, WebP)
+          </p>
+          <input
+            id="logo"
+            type="file"
+            accept=".jpg, .jpeg, .png, .webp"
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                setLogoFile(e.target.files[0]);
+              } else {
+                setLogoFile(null);
               }
             }}
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"

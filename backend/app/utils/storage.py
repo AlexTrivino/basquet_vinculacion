@@ -26,11 +26,10 @@ Variables de entorno requeridas:
 """
 import os
 import uuid
+import urllib.request
+import urllib.error
 from typing import IO
 
-import boto3
-from botocore.config import Config
-from botocore.exceptions import BotoCoreError, ClientError
 from werkzeug.utils import secure_filename
 from flask import current_app
 
@@ -135,36 +134,6 @@ def validar_archivo(file_stream: IO, tipos_aceptados: frozenset, max_bytes: int 
     return mime
 
 
-# ── Cliente boto3 (lazy singleton) ───────────────────────────────
-
-_s3_client = None
-
-
-def _get_s3_client():
-    """Retorna (o crea) el cliente boto3 apuntando a Supabase Storage S3.
-
-    El cliente se inicializa una sola vez (singleton lazy) para
-    reutilizar la conexión HTTP entre requests.
-
-    Supabase Storage es S3-compatible. El endpoint tiene la forma:
-    ``https://<project-ref>.supabase.co/storage/v1/s3``
-    """
-    global _s3_client
-
-    if _s3_client is None:
-        supabase_url = os.getenv('SUPABASE_URL', '').rstrip('/')
-        _s3_client = boto3.client(
-            's3',
-            endpoint_url=f'{supabase_url}/storage/v1/s3',
-            aws_access_key_id=os.getenv('SUPABASE_STORAGE_KEY'),
-            aws_secret_access_key=os.getenv('SUPABASE_STORAGE_SECRET'),
-            region_name='us-east-1',  # Supabase siempre usa esta región
-            config=Config(s3={'addressing_style': 'path'}),
-        )
-
-    return _s3_client
-
-
 # ── Función principal de subida ───────────────────────────────────
 
 def subir_archivo(
@@ -173,85 +142,69 @@ def subir_archivo(
     carpeta: str,
     mime_type: str,
 ) -> str:
-    """Sube un archivo a Supabase Storage y retorna su URL pública.
-
-    El archivo viaja en memoria directamente desde el request HTTP
-    hasta Supabase — **cero escrituras en disco** del servidor.
-
-    Naming convention del archivo en Storage::
-
-        {carpeta}/{uuid4}_{nombre_seguro}
-        ej: jugadores/fotos/3f2a1b4c_alex_gonzalez.jpg
-
-    Usar UUID garantiza unicidad y previene sobrescritura accidental.
-
-    Args:
-        file_stream: Stream del archivo ya validado y posicionado en 0.
-        nombre_original: Nombre original del archivo (del cliente).
-        carpeta: Ruta de destino dentro del bucket (ej. ``'jugadores/fotos'``).
-        mime_type: MIME type detectado (ej. ``'image/jpeg'``).
-
-    Returns:
-        URL pública del archivo subido.
-
-    Raises:
-        RuntimeError: Si la subida a S3 falla.
-    """
+    """Sube un archivo a Supabase Storage y retorna su URL pública."""
     bucket = os.getenv('SUPABASE_STORAGE_BUCKET', 'archivos')
     supabase_url = os.getenv('SUPABASE_URL', '').rstrip('/')
+    service_role_key = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
 
-    # Nombre seguro: elimina rutas, caracteres especiales y espacios
+    if not service_role_key:
+        raise RuntimeError('Falta la credencial SUPABASE_SERVICE_ROLE_KEY en el servidor.')
+
     nombre_base = secure_filename(nombre_original)
     extension = _EXTENSIONES.get(mime_type, '')
     nombre_unico = f'{uuid.uuid4().hex}_{nombre_base}'
 
-    # Asegurar extensión canónica según MIME real (no la del cliente)
     if extension and not nombre_unico.lower().endswith(extension):
         nombre_unico = f'{nombre_unico}{extension}'
 
     ruta_objeto = f'{carpeta.strip("/")}/{nombre_unico}'
+    upload_url = f'{supabase_url}/storage/v1/object/{bucket}/{ruta_objeto}'
 
     try:
-        s3 = _get_s3_client()
-        s3.upload_fileobj(
-            file_stream,
-            bucket,
-            ruta_objeto,
-            ExtraArgs={
-                'ContentType': mime_type,
-                'ACL': 'public-read',
+        data = file_stream.read()
+        req = urllib.request.Request(
+            upload_url,
+            data=data,
+            headers={
+                'Authorization': f'Bearer {service_role_key}',
+                'Content-Type': mime_type,
             },
+            method='POST'
         )
-    except (BotoCoreError, ClientError) as e:
-        current_app.logger.exception('Error de Storage de S3:')
+        with urllib.request.urlopen(req) as response:
+            pass
+    except urllib.error.URLError as e:
+        current_app.logger.exception('Error de Storage (REST API):')
         raise RuntimeError(
             'No se pudo establecer conexión con el servidor de almacenamiento. Intente de nuevo más tarde.'
         )
 
-    # URL pública de Supabase Storage
-    url_publica = (
-        f'{supabase_url}/storage/v1/object/public/{bucket}/{ruta_objeto}'
-    )
+    public_url_base = os.getenv('SUPABASE_PUBLIC_URL', supabase_url).rstrip('/')
+    url_publica = f'{public_url_base}/storage/v1/object/public/{bucket}/{ruta_objeto}'
     return url_publica
 
+
 def borrar_archivo(ruta_objeto: str):
-    """Elimina un objeto de Supabase Storage.
-    
-    Permite eliminar archivos huérfanos si una transacción en base de datos falla.
-    Si la ruta_objeto incluye la URL base de Supabase, la recorta a la llave real.
-    """
+    """Elimina un objeto de Supabase Storage."""
     bucket = os.getenv('SUPABASE_STORAGE_BUCKET', 'archivos')
+    supabase_url = os.getenv('SUPABASE_URL', '').rstrip('/')
+    service_role_key = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
     
     prefijo_url = f"/storage/v1/object/public/{bucket}/"
     if prefijo_url in ruta_objeto:
         ruta_objeto = ruta_objeto.split(prefijo_url)[-1]
         
+    delete_url = f'{supabase_url}/storage/v1/object/{bucket}/{ruta_objeto}'
+        
     try:
-        s3 = _get_s3_client()
-        s3.delete_object(
-            Bucket=bucket,
-            Key=ruta_objeto
+        req = urllib.request.Request(
+            delete_url,
+            headers={'Authorization': f'Bearer {service_role_key}'},
+            method='DELETE'
         )
-    except (BotoCoreError, ClientError) as e:
-        current_app.logger.exception('Error de Storage de S3:')
-        raise RuntimeError('No se pudo establecer conexión con el servidor de almacenamiento. Intente de nuevo más tarde.')
+        with urllib.request.urlopen(req) as response:
+            pass
+    except urllib.error.URLError as e:
+        current_app.logger.exception('Error al borrar en Storage (REST API):')
+        # Silenciamos el error para no bloquear transacciones
+        pass

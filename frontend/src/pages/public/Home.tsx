@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getTorneos } from '../../features/torneos/api/torneos.api';
 import { Skeleton } from '../../components/Skeleton';
 import { EmptyState } from '../../components/EmptyState';
+import { StatusBadge } from '../../components/StatusBadge';
 import { Trophy } from 'lucide-react';
 import { SponsorsCarousel } from '../../components/SponsorsCarousel';
 
@@ -42,9 +43,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Carrusel de Auspiciantes */}
-      <SponsorsCarousel />
-
       {/* Grid de Torneos */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <h2 className="mb-8 text-2xl font-bold text-gray-900">Torneos 2026</h2>
@@ -68,19 +66,12 @@ export default function Home() {
             {torneos.map((torneo) => (
               <div key={torneo.id_torneo || torneo.id} className="flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
                 <h3 className="text-lg font-bold text-gray-900">{torneo.nombre_torneo || torneo.nombre}</h3>
-                <div className="mt-4 flex flex-col gap-1 text-sm text-gray-600">
-                  <div className="flex justify-between">
-                    <span className="font-medium text-gray-900">Inicio:</span>
-                    <span>{new Date(torneo.fecha_inicio).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-medium text-gray-900">Fin:</span>
-                    <span>{new Date(torneo.fecha_fin).toLocaleDateString()}</span>
-                  </div>
+                
+                <div className="mt-4 flex items-center justify-between text-sm">
+                  <span className="font-medium text-gray-600">Estado:</span>
+                  <StatusBadge status={torneo.estado.replace('_', ' ')} />
                 </div>
-                <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
-                  <span>Estado: <strong className="capitalize">{torneo.estado.replace('_', ' ')}</strong></span>
-                </div>
+
                 <div className="mt-auto pt-6">
                   <Link
                     to={`/torneos/${torneo.id_torneo || torneo.id}`}
@@ -94,6 +85,9 @@ export default function Home() {
           </div>
         )}
       </section>
+
+      {/* Carrusel de Auspiciantes */}
+      <SponsorsCarousel />
     </main>
   );
 }

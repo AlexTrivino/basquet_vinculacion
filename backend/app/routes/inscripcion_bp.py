@@ -265,7 +265,7 @@ def crear_inscripcion_completa():
     from app import db
     from app.models.equipo import Equipo
     from app.models.inscripcion import Inscripcion as InscripcionModel
-    from app.utils.storage import TIPOS_DOCUMENTO, TIPOS_IMAGEN, MAX_COMPROBANTE, subir_archivo, validar_archivo, borrar_archivo
+    from app.utils.storage import TIPOS_DOCUMENTO, TIPOS_IMAGEN, MAX_COMPROBANTE, MAX_LOGO_EQUIPO, subir_archivo, validar_archivo, borrar_archivo
     from app.utils.text_utils import normalizar_mayusculas
 
     nombre_equipo = request.form.get('nombre_equipo')
@@ -291,7 +291,20 @@ def crear_inscripcion_completa():
     except ValueError as e:
         return api_error('UNSUPPORTED_MEDIA_TYPE', str(e), 415)
 
+    logo_file = request.files.get('logo')
+    logo_mime = None
+    if logo_file:
+        try:
+            logo_mime = validar_archivo(
+                logo_file.stream,
+                tipos_aceptados=TIPOS_IMAGEN,
+                max_bytes=MAX_LOGO_EQUIPO,
+            )
+        except ValueError as e:
+            return api_error('UNSUPPORTED_MEDIA_TYPE', f'Logo: {e}', 415)
+
     url_archivo = None
+    url_logo = None
     try:
         # ── Validación de Límite de 3 Equipos ──────────────────────────
         equipos_activos = Equipo.query.filter_by(
@@ -319,7 +332,7 @@ def crear_inscripcion_completa():
         db.session.add(nueva_inscripcion)
         db.session.flush()
 
-        # Subir archivo
+        # Subir archivo comprobante
         url_archivo = subir_archivo(
             file_stream=archivo.stream,
             nombre_original=archivo.filename,
@@ -329,6 +342,16 @@ def crear_inscripcion_completa():
 
         nueva_inscripcion.url_comprobante_pago = url_archivo
         
+        # Subir logo opcional
+        if logo_file:
+            url_logo = subir_archivo(
+                file_stream=logo_file.stream,
+                nombre_original=logo_file.filename,
+                carpeta=f'equipos/{nuevo_equipo.id_equipo}/logo',
+                mime_type=logo_mime,
+            )
+            nuevo_equipo.url_logo = url_logo
+
         # Commit de la transacción
         db.session.commit()
 
@@ -341,10 +364,15 @@ def crear_inscripcion_completa():
     except Exception as e:
         db.session.rollback()
         current_app.logger.exception(f'Error en inscripción: {e}')
-        # Si falló después de subir el archivo, lo borramos de S3
+        # Si falló después de subir archivos, los borramos de S3
         if url_archivo:
             try:
                 borrar_archivo(url_archivo)
+            except Exception:
+                pass
+        if url_logo:
+            try:
+                borrar_archivo(url_logo)
             except Exception:
                 pass
 
