@@ -8,7 +8,3 @@ dist/
 build/
 .pytest_cache/
 instance/
-
-# Scripts de base de datos
-seed_database.py
-reset_database.py
