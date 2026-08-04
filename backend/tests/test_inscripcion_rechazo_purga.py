@@ -155,3 +155,71 @@ class TestInscripcionRechazoPurga(unittest.TestCase):
         self.assertEqual(jug_db.documento_identificacion, cedula_shared)
         # La plantilla de eq1 sigue viva
         self.assertEqual(Plantilla.query.filter_by(id_equipo=eq1.id_equipo, id_jugador=id_jug).count(), 1)
+
+    def test_purgar_inscripciones_expiradas(self):
+        from datetime import datetime, timedelta
+
+        user = Usuario.query.first()
+        t = Torneo(nombre=f"Torneo Purga {uuid.uuid4().hex[:4]}", fecha_inicio=date.today(), fecha_fin=date.today(), estado="en_curso")
+        db.session.add(t)
+        db.session.flush()
+
+        c = Categoria(nombre_categoria="Cat Purga", genero_categoria="masculino", edad_minima=15, edad_maxima=40, id_torneo=t.id_torneo)
+        db.session.add(c)
+        db.session.flush()
+
+        # 1. Borrador antiguo (>30 días)
+        eq_viejo = Equipo(nombre_equipo=f"Equipo Viejo {uuid.uuid4().hex[:4]}", id_usuario=user.id_usuario)
+        db.session.add(eq_viejo)
+        db.session.flush()
+        insc_vieja = Inscripcion(
+            id_torneo=t.id_torneo,
+            id_equipo=eq_viejo.id_equipo,
+            id_categoria=c.id_categoria,
+            estado_inscripcion='borrador',
+            fecha_inscripcion=datetime.utcnow() - timedelta(days=35),
+            updated_at=datetime.utcnow() - timedelta(days=35)
+        )
+        db.session.add(insc_vieja)
+
+        # 2. Borrador reciente (<30 días)
+        eq_nuevo = Equipo(nombre_equipo=f"Equipo Nuevo {uuid.uuid4().hex[:4]}", id_usuario=user.id_usuario)
+        db.session.add(eq_nuevo)
+        db.session.flush()
+        insc_nueva = Inscripcion(
+            id_torneo=t.id_torneo,
+            id_equipo=eq_nuevo.id_equipo,
+            id_categoria=c.id_categoria,
+            estado_inscripcion='borrador',
+            fecha_inscripcion=datetime.utcnow() - timedelta(days=5),
+            updated_at=datetime.utcnow() - timedelta(days=5)
+        )
+        db.session.add(insc_nueva)
+
+        # 3. Inscripción aprobada antigua (>30 días) - NUNCA debe purgarse
+        eq_aprobado = Equipo(nombre_equipo=f"Equipo Aprobado {uuid.uuid4().hex[:4]}", id_usuario=user.id_usuario)
+        db.session.add(eq_aprobado)
+        db.session.flush()
+        insc_aprobada = Inscripcion(
+            id_torneo=t.id_torneo,
+            id_equipo=eq_aprobado.id_equipo,
+            id_categoria=c.id_categoria,
+            estado_inscripcion='aprobado',
+            fecha_inscripcion=datetime.utcnow() - timedelta(days=40),
+            updated_at=datetime.utcnow() - timedelta(days=40)
+        )
+        db.session.add(insc_aprobada)
+        db.session.commit()
+
+        id_vieja = insc_vieja.id_inscripcion
+        id_nueva = insc_nueva.id_inscripcion
+        id_aprobada = insc_aprobada.id_inscripcion
+
+        # Ejecutamos purga de 30 días
+        res = inscripcion_service.purgar_inscripciones_expiradas(dias=30)
+
+        self.assertGreaterEqual(res['inscripciones_purgadas'], 1)
+        self.assertIsNone(db.session.get(Inscripcion, id_vieja))
+        self.assertIsNotNone(db.session.get(Inscripcion, id_nueva))
+        self.assertIsNotNone(db.session.get(Inscripcion, id_aprobada))
+

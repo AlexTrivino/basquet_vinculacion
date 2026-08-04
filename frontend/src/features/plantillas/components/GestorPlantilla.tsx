@@ -48,7 +48,7 @@ import { EditarCamisetaModal } from './EditarCamisetaModal';
 import { ConfirmarEliminarJugadorModal } from './ConfirmarEliminarJugadorModal';
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB
-const MIN_JUGADORES = 10;
+const MIN_JUGADORES = 1;
 const MAX_JUGADORES = 18;
 
 const jugadorSchema = z.object({

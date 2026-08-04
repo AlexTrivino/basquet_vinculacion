@@ -113,3 +113,11 @@ export const finalizarBorradorInscripcion = async (idInscripcion: number | strin
   return response.data;
 };
 
+export const purgarInscripcionesExpiradas = async (dias = 30): Promise<ApiResponse<{ inscripciones_purgadas: number; equipos_eliminados: number; dias_umbral: number }>> => {
+  const response = await axiosInstance.post('/inscripciones/purgar-expiradas', null, {
+    params: { dias },
+  });
+  return response.data;
+};
+
+

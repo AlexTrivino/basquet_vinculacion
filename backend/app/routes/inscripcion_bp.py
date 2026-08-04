@@ -475,4 +475,28 @@ def finalizar_borrador_inscripcion(id_inscripcion):
     )
 
 
+# ── POST /api/inscripciones/purgar-expiradas ───────────────────────
+
+@inscripcion_bp.route('/purgar-expiradas', methods=['POST'])
+@token_required(allowed_roles=['super_admin'])
+def purgar_expiradas():
+    """Elimina permanentemente inscripciones y borradores abandonados
+    inactivos por más de 30 días (o los días especificados en query param).
+
+    Exclusivo para super_admin.
+    """
+    dias = request.args.get('dias', default=30, type=int)
+    if dias < 1:
+        return api_error('BAD_REQUEST', 'El parámetro días debe ser un entero positivo.', 400)
+
+    resultado = inscripcion_service.purgar_inscripciones_expiradas(dias=dias)
+
+    return api_response(
+        data=resultado,
+        message=f"Purga completada: {resultado['inscripciones_purgadas']} inscripción(es) y {resultado['equipos_eliminados']} equipo(s) eliminados.",
+        status=200,
+    )
+
+
+
 
