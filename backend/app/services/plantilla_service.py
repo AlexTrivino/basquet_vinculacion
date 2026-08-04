@@ -22,7 +22,7 @@ from app.models.plantilla import Plantilla
 
 
 # ── Constantes de Reglas de Negocio ───────────────────────────────
-MIN_JUGADORES_PLANTILLA = 1
+MIN_JUGADORES_PLANTILLA = 10
 MAX_JUGADORES_PLANTILLA = 18
 
 
