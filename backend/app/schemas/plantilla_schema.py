@@ -17,7 +17,11 @@ class _JugadorEnPlantillaSchema(Schema):
     genero = fields.String()
     documento_identificacion = fields.String()
     fecha_nacimiento = fields.Date()
+    telefono = fields.String(allow_none=True)
+    correo = fields.String(allow_none=True)
     url_foto = fields.String(allow_none=True)
+    url_cedula = fields.String(allow_none=True)
+    url_acta_bachiller = fields.String(allow_none=True)
 
 
 # ── Schemas de entrada ────────────────────────────────────────────
@@ -31,6 +35,18 @@ class PlantillaCreateSchema(Schema):
     numero_camiseta = fields.Integer(
         allow_none=True,
         load_default=None,
+        validate=validate.Range(
+            min=0, max=99,
+            error='El número de camiseta debe estar entre 0 y 99.',
+        ),
+    )
+
+
+class PlantillaUpdateSchema(Schema):
+    """Validación de entrada para actualizar el número de camiseta de una plantilla."""
+
+    numero_camiseta = fields.Integer(
+        required=True,
         validate=validate.Range(
             min=0, max=99,
             error='El número de camiseta debe estar entre 0 y 99.',

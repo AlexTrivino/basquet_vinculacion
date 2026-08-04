@@ -21,36 +21,29 @@ from app.models.jugador import Jugador
 from app.models.plantilla import Plantilla
 
 
+# ── Constantes de Reglas de Negocio ───────────────────────────────
+MIN_JUGADORES_PLANTILLA = 10
+MAX_JUGADORES_PLANTILLA = 18
+
+
 # ── Utilidad de cálculo de edad ───────────────────────────────────
 
 def calcular_edad(fecha_nacimiento: date) -> int:
-    """Calcula la edad exacta en años completos a la fecha actual.
+    """Calcula la edad deportiva basada en el año natural (año calendario).
 
-    Algoritmo: resta el año de nacimiento al año actual, luego
-    descuenta 1 si el cumpleaños de este año aún no ha ocurrido.
-    Esto evita el error clásico de solo restar años
-    (ej. alguien nacido el 31/12 que aparentemente "ya cumplió").
+    Reglamento deportivo: La edad de los jugadores se calcula directamente
+    restando el año de nacimiento al año en curso, sin importar el día o mes.
+    (Ej. alguien nacido el 01/01/2000 y alguien nacido el 31/12/2000 en el año 2026
+    tienen ambos 26 años).
 
     Args:
         fecha_nacimiento: Objeto ``date`` de la BD (campo del Jugador).
 
     Returns:
-        Edad en años completos como entero.
-
-    Example:
-        >>> # Hoy es 2024-06-14, nacido el 2000-12-31
-        >>> calcular_edad(date(2000, 12, 31))
-        23   # El cumpleaños 2024 aún no ocurrió → 2024-2000-1 = 23
-        >>> # Hoy es 2024-06-14, nacido el 2000-06-01
-        >>> calcular_edad(date(2000, 6, 1))
-        24   # El cumpleaños 2024 ya ocurrió → 2024-2000-0 = 24
+        Edad en años basada en el año natural como entero.
     """
     hoy = date.today()
-    return (
-        hoy.year
-        - fecha_nacimiento.year
-        - ((hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day))
-    )
+    return hoy.year - fecha_nacimiento.year
 
 
 # ── Query base con joinedload ─────────────────────────────────────
@@ -99,7 +92,7 @@ def obtener_entrada_plantilla(id_plantilla):
 def crear_plantilla(data):
     """Agrega un jugador a la nómina de un equipo en un torneo.
 
-    Ejecuta tres validaciones secuenciales antes de persistir:
+    Ejecuta cinco validaciones secuenciales antes de persistir:
 
     **Validación 1 — Inscripción aprobada:**
         El equipo debe tener una ``Inscripcion`` con
@@ -107,17 +100,22 @@ def crear_plantilla(data):
         Si la inscripción no existe, está pendiente o fue rechazada,
         no se permite agregar jugadores.
 
-    **Validación 2 — Rango de edad:**
+    **Validación 2 — Límite máximo de jugadores:**
+        El equipo no puede tener más de ``MAX_JUGADORES_PLANTILLA`` (18)
+        jugadores activos registrados en el torneo.
+
+    **Validación 3 — Rango de edad:**
         Calcula la edad actual del jugador usando ``calcular_edad()``
         y la compara contra ``categoria.edad_minima`` y
         ``categoria.edad_maxima`` de la inscripción del equipo.
         Rechaza con ``ValueError`` si está fuera de rango.
 
-    **Validación 3 — Jugador no duplicado en la categoría:**
+    **Validación 4 — Jugador no duplicado en la categoría:**
         Consulta si el jugador ya tiene una entrada activa en
         ``Plantillas`` para la MISMA categoría (en cualquier equipo).
         Previene que un jugador represente a dos equipos en la misma categoría.
-    **Validación 4 — Número de camiseta único en el equipo:**
+
+    **Validación 5 — Número de camiseta único en el equipo:**
         Verifica que ningún jugador activo en el mismo equipo/torneo
         tenga ya el mismo ``numero_camiseta``. Se omite si el campo
         viene como ``None`` (camiseta opcional).
@@ -138,25 +136,42 @@ def crear_plantilla(data):
     id_equipo = data['id_equipo']
     id_torneo = data['id_torneo']
 
-    # ── Validación 1: Inscripción aprobada ───────────────────────────
+    # ── Validación 1: Inscripción activa o en proceso ───────────────────
     inscripcion = (
         Inscripcion.query
         .options(joinedload(Inscripcion.categoria))
         .filter(
             Inscripcion.id_equipo == id_equipo,
             Inscripcion.id_torneo == id_torneo,
-            Inscripcion.estado_inscripcion == 'aprobado'
+            Inscripcion.estado_inscripcion.in_(['borrador', 'pendiente', 'aprobado'])
         )
         .first()
     )
 
     if inscripcion is None:
         raise ValueError(
-            'El equipo no tiene una inscripción aprobada en este torneo. '
-            'Solo se pueden agregar jugadores una vez que el administrador apruebe la inscripción.'
+            'El equipo no tiene una inscripción válida o en proceso para este torneo. '
+            'No se pueden agregar jugadores si la inscripción fue rechazada o no existe.'
         )
 
-    # ── Validación 2: Rango de edad de la categoría ───────────────
+    # ── Validación 2: Límite máximo de jugadores en plantilla ────────
+    total_jugadores = (
+        Plantilla.query
+        .filter_by(
+            id_equipo=id_equipo,
+            id_torneo=id_torneo,
+            estado='activo'
+        )
+        .count()
+    )
+
+    if total_jugadores >= MAX_JUGADORES_PLANTILLA:
+        raise ValueError(
+            f'El equipo ya ha alcanzado el límite máximo permitido de '
+            f'{MAX_JUGADORES_PLANTILLA} jugadores en la plantilla.'
+        )
+
+    # ── Validación 3: Rango de edad de la categoría ───────────────
     jugador = db.session.get(Jugador, id_jugador)
 
     if jugador is None or jugador.estado == 'inactivo':
@@ -257,3 +272,82 @@ def eliminar_de_plantilla(id_plantilla):
     plantilla.estado = 'inactivo'
     db.session.commit()
     return plantilla
+
+
+def verificar_jugador_en_torneo(id_jugador: int, id_torneo: int) -> dict:
+    """Verifica si un jugador ya está registrado en alguna plantilla activa del torneo.
+
+    Args:
+        id_jugador: PK del jugador a consultar.
+        id_torneo: PK del torneo a consultar.
+
+    Returns:
+        Dict con ``ya_en_torneo`` (bool), ``equipo_torneo`` (str o None), e ``id_equipo`` (int o None).
+    """
+    entrada = (
+        Plantilla.activos()
+        .options(joinedload(Plantilla.equipo))
+        .filter(
+            Plantilla.id_jugador == id_jugador,
+            Plantilla.id_torneo == id_torneo,
+        )
+        .first()
+    )
+
+    if entrada and entrada.equipo:
+        return {
+            'ya_en_torneo': True,
+            'equipo_torneo': entrada.equipo.nombre_equipo,
+            'id_equipo': entrada.id_equipo,
+        }
+
+    return {
+        'ya_en_torneo': False,
+        'equipo_torneo': None,
+        'id_equipo': None,
+    }
+
+
+def actualizar_numero_camiseta(id_plantilla: int, numero_camiseta: int):
+    """Actualiza el número de camiseta de un jugador en la plantilla.
+
+    Verifica que el número no esté ya en uso por otro jugador del mismo
+    equipo en el mismo torneo.
+
+    Args:
+        id_plantilla: PK de la entrada de plantilla a actualizar.
+        numero_camiseta: Nuevo número de camiseta (0-99).
+
+    Returns:
+        Instancia de ``Plantilla`` actualizada con jugador cargado,
+        o ``None`` si la entrada no existe o está inactiva.
+
+    Raises:
+        ValueError: Si el número de camiseta ya está ocupado por otro jugador.
+    """
+    plantilla = db.session.get(Plantilla, id_plantilla)
+    if plantilla is None or plantilla.estado == 'inactivo':
+        return None
+
+    if numero_camiseta is not None:
+        camiseta_ocupada = (
+            Plantilla.activos()
+            .filter(
+                Plantilla.id_equipo == plantilla.id_equipo,
+                Plantilla.id_torneo == plantilla.id_torneo,
+                Plantilla.numero_camiseta == numero_camiseta,
+                Plantilla.id_plantilla != id_plantilla,
+            )
+            .first()
+        )
+        if camiseta_ocupada is not None:
+            raise ValueError(
+                f'El número de camiseta {numero_camiseta} ya está en uso '
+                'por otro jugador de este equipo en este torneo.'
+            )
+
+    plantilla.numero_camiseta = numero_camiseta
+    db.session.commit()
+
+    return obtener_entrada_plantilla(id_plantilla)
+

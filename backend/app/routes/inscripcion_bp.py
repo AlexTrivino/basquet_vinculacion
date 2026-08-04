@@ -70,8 +70,9 @@ def listar_inscripciones():
     estado = request.args.get('estado')
     id_categoria = request.args.get('id_categoria', type=int)
 
+    es_delegado = g.usuario_rol == 'delegado'
     query = inscripcion_service.listar_inscripciones(
-        id_torneo=id_torneo, estado=estado, id_categoria=id_categoria
+        id_torneo=id_torneo, estado=estado, id_categoria=id_categoria, incluir_borradores=es_delegado
     )
 
     # ── Filtro de propietario para delegados ──────────────────────
@@ -327,7 +328,7 @@ def crear_inscripcion_completa():
             id_torneo=int(id_torneo),
             id_equipo=nuevo_equipo.id_equipo,
             id_categoria=int(id_categoria),
-            estado_inscripcion='pendiente'
+            estado_inscripcion='borrador'
         )
         db.session.add(nueva_inscripcion)
         db.session.flush()
@@ -357,7 +358,7 @@ def crear_inscripcion_completa():
 
         return api_response(
             data=_admin_schema.dump(nueva_inscripcion),
-            message='Inscripción y comprobante procesados exitosamente.',
+            message='Datos del club y comprobante registrados en borrador. Procede al registro de jugadores.',
             status=201
         )
 
@@ -377,5 +378,101 @@ def crear_inscripcion_completa():
                 pass
 
         return api_error('SERVER_ERROR', 'Ocurrió un error inesperado al procesar la inscripción.', 500)
+
+
+# ── POST /api/inscripciones/<id>/finalizar-borrador ───────────────
+
+@inscripcion_bp.route('/<int:id_inscripcion>/finalizar-borrador', methods=['POST'])
+@token_required(allowed_roles=['super_admin', 'delegado'])
+def finalizar_borrador_inscripcion(id_inscripcion):
+    """Valida que la plantilla cumpla con el mínimo de 10 y máximo de 18 jugadores
+
+    y cambia el estado de 'borrador' a 'pendiente' para revisión del Administrador.
+    """
+    from sqlalchemy.orm import joinedload
+    from app import db
+    from app.models.inscripcion import Inscripcion as InscripcionModel
+    from app.models.plantilla import Plantilla
+    from app.models.equipo import Equipo
+
+    from app.services.plantilla_service import MIN_JUGADORES_PLANTILLA, MAX_JUGADORES_PLANTILLA
+
+    inscripcion = (
+        InscripcionModel.query
+        .options(
+            joinedload(InscripcionModel.torneo),
+            joinedload(InscripcionModel.equipo),
+            joinedload(InscripcionModel.categoria),
+        )
+        .filter(InscripcionModel.id_inscripcion == id_inscripcion)
+        .first()
+    )
+
+    if not inscripcion:
+        return api_error('NOT_FOUND', 'Inscripción no encontrada.', 404)
+
+    # Validar propiedad para delegados
+    if g.usuario_rol == 'delegado':
+        equipo = db.session.get(Equipo, inscripcion.id_equipo)
+        if not equipo or equipo.id_usuario != g.usuario_id:
+            return api_error('FORBIDDEN', 'No tienes permiso para gestionar esta inscripción.', 403)
+
+    if inscripcion.estado_inscripcion not in ('borrador', 'pendiente'):
+        return api_error(
+            'CONFLICT',
+            f'La inscripción ya se encuentra en estado "{inscripcion.estado_inscripcion}".',
+            409,
+        )
+
+    # Validar que cuente con comprobante de pago
+    if not inscripcion.url_comprobante_pago:
+        return api_error(
+            'UNPROCESSABLE_ENTITY',
+            'La inscripción debe contar con el comprobante de pago adjunto antes de ser enviada.',
+            422,
+        )
+
+    # Validar cantidad y dorsales de jugadores en la plantilla
+    plantillas_activas = (
+        Plantilla.query.filter_by(
+            id_equipo=inscripcion.id_equipo,
+            id_torneo=inscripcion.id_torneo,
+            estado='activo',
+        ).all()
+    )
+    total_jugadores = len(plantillas_activas)
+
+    if total_jugadores < MIN_JUGADORES_PLANTILLA:
+        return api_error(
+            'UNPROCESSABLE_ENTITY',
+            f'El equipo cuenta con {total_jugadores} jugador(es). Se requiere un mínimo de {MIN_JUGADORES_PLANTILLA} jugadores para enviar la inscripción.',
+            422,
+        )
+
+    if total_jugadores > MAX_JUGADORES_PLANTILLA:
+        return api_error(
+            'UNPROCESSABLE_ENTITY',
+            f'El equipo cuenta con {total_jugadores} jugadores. Se permite un máximo de {MAX_JUGADORES_PLANTILLA} jugadores.',
+            422,
+        )
+
+    # Validar unicidad de números de camiseta en el equipo para el torneo
+    dorsales = [p.numero_camiseta for p in plantillas_activas if p.numero_camiseta is not None]
+    if len(dorsales) != len(set(dorsales)):
+        return api_error(
+            'UNPROCESSABLE_ENTITY',
+            'Existen números de camiseta duplicados en la nómina. Cada jugador debe tener un dorsal único.',
+            422,
+        )
+
+    inscripcion.estado_inscripcion = 'pendiente'
+    db.session.commit()
+
+    return api_response(
+        data=_admin_schema.dump(inscripcion) if g.usuario_rol == 'super_admin' else _public_schema.dump(inscripcion),
+        message='Inscripción enviada exitosamente a revisión con su nómina de jugadores.',
+        status=200,
+    )
+
 
 

@@ -9,10 +9,12 @@ class Jugador(db.Model):
 
     id_jugador = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nombre = db.Column(db.String(200), nullable=False)
-    genero = db.Column(db.String(20), nullable=False)
+    genero = db.Column(db.String(20), nullable=True)
     documento_identificacion = db.Column(db.String(20), unique=True, nullable=False)
     fecha_nacimiento = db.Column(db.Date, nullable=False)
     url_foto = db.Column(db.Text, nullable=True)
+    url_cedula = db.Column(db.Text, nullable=True)
+    url_acta_bachiller = db.Column(db.Text, nullable=True)
     correo = db.Column(db.String(150), nullable=True)
     telefono = db.Column(db.String(20), nullable=True)
     estado = db.Column(db.String(20), nullable=False, default='activo')
@@ -32,7 +34,7 @@ class Jugador(db.Model):
     __table_args__ = (
         db.CheckConstraint("estado IN ('activo', 'inactivo')", name='ck_jugadores_estado'),
         db.CheckConstraint(
-            "genero IN ('masculino', 'femenino')", name='ck_jugadores_genero'
+            "genero IS NULL OR genero IN ('masculino', 'femenino')", name='ck_jugadores_genero'
         ),
     )
 
@@ -50,6 +52,8 @@ class Jugador(db.Model):
             'documento_identificacion': self.documento_identificacion,
             'fecha_nacimiento': self.fecha_nacimiento.isoformat() if self.fecha_nacimiento else None,
             'url_foto': self.url_foto,
+            'url_cedula': self.url_cedula,
+            'url_acta_bachiller': self.url_acta_bachiller,
             'correo': self.correo,
             'telefono': self.telefono,
             'estado': self.estado,

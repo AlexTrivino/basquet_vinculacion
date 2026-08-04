@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { User, Mail, Shield, Lock } from 'lucide-react';
 import { getPerfil, actualizarPerfil } from '../../features/auth/api/usuarios.api';
 import { updatePasswordWithSupabase } from '../../features/auth/api/auth.api';
 import { AsyncButton } from '../../components/AsyncButton';
+import { useAuth } from '../../context/AuthContext';
 
 interface PerfilFormValues {
   nombre: string;
@@ -15,6 +16,9 @@ interface PerfilFormValues {
 
 export default function MiPerfil() {
   const [newPassword, setNewPassword] = useState('');
+  const { setUserName } = useAuth();
+  const queryClient = useQueryClient();
+
   const { data: response, isLoading } = useQuery({
     queryKey: ['mi_perfil'],
     queryFn: getPerfil,
@@ -35,6 +39,8 @@ export default function MiPerfil() {
   const onSubmit = async (data: PerfilFormValues) => {
     try {
       await actualizarPerfil(data.nombre);
+      setUserName(data.nombre);
+      queryClient.invalidateQueries({ queryKey: ['mi_perfil'] });
       toast.success('Perfil actualizado correctamente');
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Error al actualizar el perfil');

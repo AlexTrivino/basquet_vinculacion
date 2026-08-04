@@ -22,6 +22,10 @@ export function StatusBadge({ status }: StatusBadgeProps) {
       bgColor = 'bg-red-100';
       textColor = 'text-red-800';
       break;
+    case 'borrador':
+      bgColor = 'bg-amber-100';
+      textColor = 'text-amber-800';
+      break;
     case 'pendiente':
     case 'en curso':
       bgColor = 'bg-yellow-100';

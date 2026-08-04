@@ -16,7 +16,9 @@ export function AuditoriaEquipos() {
     queryFn: () => getInscripciones(1, 100), // En MVP traemos bastantes
   });
 
-  const inscripciones = response?.data || [];
+  const inscripciones = (response?.data || []).filter(
+    i => (i.estado_inscripcion || i.estado) !== 'borrador'
+  );
 
   const updateEstadoMutation = useMutation({
     mutationFn: ({ id, estado }: { id: number; estado: 'aprobado' | 'rechazado' }) =>

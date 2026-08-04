@@ -53,13 +53,13 @@ class InscripcionCreateSchema(Schema):
 
 
 class InscripcionEstadoSchema(Schema):
-    """Validación para el cambio de estado por parte del Admin (PATCH)."""
+    """Validación para el cambio de estado por parte del Admin o Sistema (PATCH)."""
 
     estado_inscripcion = fields.String(
         required=True,
         validate=validate.OneOf(
-            ['pendiente', 'aprobado', 'rechazado'],
-            error="Estado inválido. Valores permitidos: 'pendiente', 'aprobado', 'rechazado'.",
+            ['borrador', 'pendiente', 'aprobado', 'rechazado'],
+            error="Estado inválido. Valores permitidos: 'borrador', 'pendiente', 'aprobado', 'rechazado'.",
         ),
     )
 

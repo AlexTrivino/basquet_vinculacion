@@ -18,6 +18,9 @@ import { DesactivarEquipoModal } from '../../features/equipos/components/Desacti
 // Activado para habilitar los overlays de foto de banner y logo en hover.
 const TEAM_UPLOADS_ENABLED = true;
 
+const MAX_LOGO_SIZE = 2 * 1024 * 1024;   // 2 MB
+const MAX_BANNER_SIZE = 5 * 1024 * 1024; // 5 MB
+
 export default function EquipoProfile({ teamId }: { teamId?: number }) {
   const { id } = useParams<{ id: string }>();
   const idEquipo = teamId || Number(id);
@@ -78,7 +81,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || '';
-      toast.error(message.toLowerCase().includes('tamaño') || message.toLowerCase().includes('size') ? 'El logo excede el tamaño máximo permitido (500 KB).' : 'Error al subir el logo');
+      toast.error(message.toLowerCase().includes('tamaño') || message.toLowerCase().includes('size') ? 'El logo excede el tamaño máximo permitido (2 MB).' : 'Error al subir el logo');
     },
   });
 
@@ -99,7 +102,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || '';
-      toast.error(message.toLowerCase().includes('tamaño') || message.toLowerCase().includes('size') ? 'El banner excede el tamaño máximo permitido (1 MB).' : 'Error al subir el banner');
+      toast.error(message.toLowerCase().includes('tamaño') || message.toLowerCase().includes('size') ? 'El banner excede el tamaño máximo permitido (5 MB).' : 'Error al subir el banner');
     },
   });
 
@@ -114,12 +117,24 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) uploadLogo.mutate(file);
+    if (!file) return;
+    if (file.size > MAX_LOGO_SIZE) {
+      toast.error('El logo excede el tamaño máximo permitido (2 MB).');
+      if (logoInputRef.current) logoInputRef.current.value = '';
+      return;
+    }
+    uploadLogo.mutate(file);
   };
 
   const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) uploadBanner.mutate(file);
+    if (!file) return;
+    if (file.size > MAX_BANNER_SIZE) {
+      toast.error('El banner excede el tamaño máximo permitido (5 MB).');
+      if (bannerInputRef.current) bannerInputRef.current.value = '';
+      return;
+    }
+    uploadBanner.mutate(file);
   };
 
   if (loadingEquipo) {
@@ -153,7 +168,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
   return (
     <div className="w-full bg-gray-50 pb-12">
       {/* Banner Section */}
-      <div className="relative aspect-[21/9] sm:aspect-[21/6] w-full object-cover group">
+      <div className="relative aspect-[21/9] sm:aspect-[21/6] w-full overflow-hidden group">
         {equipo.url_foto_equipo ? (
           <img src={equipo.url_foto_equipo} alt={`Banner de ${equipo.nombre_equipo}`} className="w-full h-full object-cover" />
         ) : (
@@ -161,17 +176,30 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
         )}
         
         {isOwner && TEAM_UPLOADS_ENABLED && (
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 z-20">
-            <span className="absolute bottom-4 text-white/90 text-xs font-semibold drop-shadow-md">Tamaño máximo: 1 MB</span>
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex flex-col items-center justify-center gap-3">
             <input type="file" className="hidden" ref={bannerInputRef} accept="image/*" onChange={handleBannerChange} />
-            <button onClick={() => bannerInputRef.current?.click()} className="bg-white text-gray-900 p-3 rounded-full hover:bg-gray-100 shadow-xl transition-transform hover:scale-110" title="Cambiar portada">
-              <Camera className="w-6 h-6" />
-            </button>
-            {equipo.url_foto_equipo && (
-              <button onClick={() => deleteBanner.mutate()} className="bg-red-500 text-white p-3 rounded-full hover:bg-red-600 shadow-xl transition-transform hover:scale-110" title="Eliminar portada">
-                <Trash2 className="w-6 h-6" />
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => bannerInputRef.current?.click()} 
+                className="flex items-center gap-2 bg-white text-gray-900 px-4 py-2.5 rounded-full font-semibold hover:bg-gray-100 shadow-xl transition-transform hover:scale-105 text-sm" 
+                title="Cambiar portada"
+              >
+                <Camera className="w-5 h-5 text-gray-700" />
+                <span>Cambiar portada</span>
               </button>
-            )}
+              {equipo.url_foto_equipo && (
+                <button 
+                  onClick={() => deleteBanner.mutate()} 
+                  className="bg-red-500 text-white p-2.5 rounded-full hover:bg-red-600 shadow-xl transition-transform hover:scale-105" 
+                  title="Eliminar portada"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+            <span className="text-white/90 text-xs font-medium drop-shadow-md bg-black/30 px-3 py-1 rounded-full backdrop-blur-xs">
+              Tamaño máximo: 5 MB
+            </span>
           </div>
         )}
       </div>
@@ -199,12 +227,12 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
       )}
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row gap-6 relative">
           
           {/* Logo */}
-          <div className="relative -mt-16 sm:-mt-24 ml-4 sm:ml-8 flex-shrink-0 z-10">
-            <div className="aspect-square w-32 h-32 sm:w-48 sm:h-48 rounded-2xl bg-white border-4 border-white shadow-lg overflow-hidden relative group">
+          <div className="relative -mt-16 sm:-mt-24 ml-4 sm:ml-8 flex-shrink-0 z-30">
+            <div className="aspect-square w-32 h-32 sm:w-48 sm:h-48 rounded-2xl bg-white border-4 border-white shadow-xl overflow-hidden relative group">
               {equipo.url_logo ? (
                 <img src={equipo.url_logo} alt={`Logo de ${equipo.nombre_equipo}`} className="w-full h-full object-cover" />
               ) : (
@@ -215,7 +243,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
               
               {isOwner && TEAM_UPLOADS_ENABLED && (
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
-                  <span className="absolute bottom-4 text-white/90 text-xs font-semibold drop-shadow-md text-center px-2 leading-tight">Máximo: 500 KB</span>
+                  <span className="absolute bottom-4 text-white/90 text-xs font-semibold drop-shadow-md text-center px-2 leading-tight">Máximo: 2 MB</span>
                   <div className="flex gap-3">
                     <input type="file" className="hidden" ref={logoInputRef} accept="image/*" onChange={handleLogoChange} />
                     <button onClick={() => logoInputRef.current?.click()} className="bg-white text-gray-900 p-2 rounded-full hover:bg-gray-100">

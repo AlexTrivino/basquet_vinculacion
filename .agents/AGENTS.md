@@ -14,6 +14,7 @@ y nunca escribir código de relleno ni sobre-diseñar.
 ### Restricciones Adicionales de Negocio
 - **Límite de Equipos:** Un usuario delegado puede crear y gestionar un **máximo de 3 equipos**.
 - **Gestión Estricta:** La gestión de plantillas solo se permite si la inscripción está estrictamente **aprobada**.
+- **Tamaño de Plantilla:** Un equipo debe tener un **mínimo de 10 jugadores** para estar reglamentariamente habilitado a competir, y un **máximo de 18 jugadores** registrados.
 - **Acciones Destructivas:** La desactivación de equipos es exclusiva del `super_admin`. Los delegados no tienen acceso a esta función.
 
 ---

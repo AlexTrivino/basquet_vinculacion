@@ -37,7 +37,7 @@ def _base_query_con_relaciones():
     )
 
 
-def listar_inscripciones(id_torneo=None, estado=None, id_categoria=None):
+def listar_inscripciones(id_torneo=None, estado=None, id_categoria=None, incluir_borradores=False):
     """Retorna la query base de inscripciones con filtros opcionales.
 
     Usa ``joinedload`` para traer Torneo, Equipo y Categoría en una
@@ -45,7 +45,10 @@ def listar_inscripciones(id_torneo=None, estado=None, id_categoria=None):
 
     Args:
         id_torneo: Filtra por torneo específico.
-        estado: Filtra por ``estado_inscripcion`` (pendiente/aprobado/rechazado).
+        estado: Filtra por ``estado_inscripcion`` (pendiente/aprobado/rechazado/borrador).
+        id_categoria: Filtra por categoría.
+        incluir_borradores: Si es False y no se especificó un estado explícito,
+            excluye inscripciones en estado 'borrador'.
 
     Returns:
         Query de SQLAlchemy sin ejecutar, lista para ``paginate_query()``.
@@ -57,8 +60,11 @@ def listar_inscripciones(id_torneo=None, estado=None, id_categoria=None):
     if id_torneo is not None:
         query = query.filter(Inscripcion.id_torneo == id_torneo)
 
-    if estado in ('pendiente', 'aprobado', 'rechazado'):
+    if estado in ('pendiente', 'aprobado', 'rechazado', 'borrador'):
         query = query.filter(Inscripcion.estado_inscripcion == estado)
+    elif not incluir_borradores:
+        # Por defecto, nunca incluir borradores en listados generales para admin o público
+        query = query.filter(Inscripcion.estado_inscripcion != 'borrador')
 
     if id_categoria is not None:
         query = query.filter(Inscripcion.id_categoria == id_categoria)
@@ -140,8 +146,11 @@ def crear_inscripcion(data):
 def cambiar_estado_inscripcion(id_inscripcion, nuevo_estado):
     """Cambia el estado de una inscripción (aprobación/rechazo del Admin).
 
-    Si el estado es 'rechazado', se eliminan físicamente la inscripción,
-    las plantillas asociadas y el equipo, liberando el cupo del delegado.
+    Si el estado es 'rechazado', se eliminan físicamente:
+      1. Las plantillas del equipo.
+      2. Los jugadores creados exclusivamente para esta inscripción (sin historial en otros equipos).
+      3. Los archivos de Supabase Storage (fotos, cédulas, actas, comprobante, logo).
+      4. La inscripción y el equipo, liberando el cupo del delegado y las cédulas.
 
     Args:
         id_inscripcion: PK de la inscripción a actualizar.
@@ -158,19 +167,64 @@ def cambiar_estado_inscripcion(id_inscripcion, nuevo_estado):
 
     if nuevo_estado == 'rechazado':
         from app.models.plantilla import Plantilla
+        from app.models.jugador import Jugador
+        from app.models.sancion import Sancion
+        from app.models.estadistica import Estadistica
+        from app.models.documento_jugador import DocumentoJugador
+        from app.utils.storage import borrar_archivo
+
         equipo = inscripcion.equipo
-        
-        # 1. Eliminar plantillas asociadas
-        Plantilla.query.filter_by(id_equipo=equipo.id_equipo).delete()
-        
-        # 2. Eliminar inscripción
+        id_equipo = equipo.id_equipo if equipo else inscripcion.id_equipo
+
+        # 1. Identificar todos los jugadores de la plantilla del equipo
+        plantillas = Plantilla.query.filter_by(id_equipo=id_equipo).all()
+        id_jugadores = list({p.id_jugador for p in plantillas})
+
+        # 2. Eliminar plantillas del equipo
+        Plantilla.query.filter_by(id_equipo=id_equipo).delete()
+        db.session.flush()
+
+        # 3. Limpieza de jugadores exclusivos (sin otros equipos ni estadísticas/sanciones)
+        for id_jug in id_jugadores:
+            otras_plantillas = Plantilla.query.filter_by(id_jugador=id_jug).count()
+            tiene_sanciones = Sancion.query.filter_by(id_jugador=id_jug).count()
+            tiene_estadisticas = Estadistica.query.filter_by(id_jugador=id_jug).count()
+
+            if otras_plantillas == 0 and tiene_sanciones == 0 and tiene_estadisticas == 0:
+                jugador = db.session.get(Jugador, id_jug)
+                if jugador:
+                    # Borrar archivos asociados del storage
+                    if jugador.url_foto:
+                        borrar_archivo(jugador.url_foto)
+                    if jugador.url_cedula:
+                        borrar_archivo(jugador.url_cedula)
+                    if jugador.url_acta_bachiller:
+                        borrar_archivo(jugador.url_acta_bachiller)
+
+                    # Borrar documentos adicionales si existían
+                    docs = DocumentoJugador.query.filter_by(id_jugador=id_jug).all()
+                    for doc in docs:
+                        if doc.url_documento:
+                            borrar_archivo(doc.url_documento)
+                        db.session.delete(doc)
+
+                    # Eliminar al jugador de la base de datos (libera su cédula)
+                    db.session.delete(jugador)
+
+        # 4. Borrar archivos adjuntos a la inscripción y al equipo
+        if inscripcion.url_comprobante_pago:
+            borrar_archivo(inscripcion.url_comprobante_pago)
+
+        if equipo and equipo.url_logo:
+            borrar_archivo(equipo.url_logo)
+
+        # 5. Eliminar inscripción y equipo
         db.session.delete(inscripcion)
-        
-        # 3. Eliminar equipo
-        db.session.delete(equipo)
-        
+        if equipo:
+            db.session.delete(equipo)
+
         db.session.commit()
-        
+
         # Retornamos un string sentinel para que la ruta sepa que fue eliminado
         return 'DELETED'
 

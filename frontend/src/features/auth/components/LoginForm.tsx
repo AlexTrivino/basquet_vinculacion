@@ -44,8 +44,9 @@ export function LoginForm() {
         headers: { Authorization: `Bearer ${token}` }
       });
       const role = (meResponse.data?.data?.rol || 'delegado') as UserRole;
+      const nombre = meResponse.data?.data?.nombre || '';
 
-      login(token, role);
+      login(token, role, nombre);
       toast.success('Inicio de sesión exitoso');
       
       if (role === 'super_admin') {

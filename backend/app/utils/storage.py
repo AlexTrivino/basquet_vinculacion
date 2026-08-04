@@ -60,10 +60,11 @@ TIPOS_DOCUMENTO = frozenset({'application/pdf'})
 TIPOS_PERMITIDOS = TIPOS_IMAGEN | TIPOS_DOCUMENTO
 
 # Tamaños máximos permitidos por contexto (en bytes)
-MAX_FOTO_JUGADOR = 500 * 1024        # 500 KB
-MAX_LOGO_EQUIPO = 500 * 1024         # 500 KB
-MAX_BANNER_EQUIPO = 1 * 1024 * 1024  # 1 MB
-MAX_COMPROBANTE = 5 * 1024 * 1024    # 5 MB
+MAX_FOTO_JUGADOR = 4 * 1024 * 1024       # 4 MB
+MAX_DOCUMENTO_JUGADOR = 4 * 1024 * 1024  # 4 MB
+MAX_LOGO_EQUIPO = 2 * 1024 * 1024        # 2 MB
+MAX_BANNER_EQUIPO = 5 * 1024 * 1024      # 5 MB
+MAX_COMPROBANTE = 5 * 1024 * 1024        # 5 MB
 
 
 # ── Función de validación ─────────────────────────────────────────

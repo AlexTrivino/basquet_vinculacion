@@ -27,13 +27,15 @@ export type UserRole = 'super_admin' | 'delegado' | null;
 interface AuthState {
   isAuthenticated: boolean;
   userRole: UserRole;
+  userName: string | null;
   activeTeamId: number | null;
 }
 
 interface AuthContextValue extends AuthState {
-  login: (token: string, role: UserRole) => void;
+  login: (token: string, role: UserRole, userName?: string | null) => void;
   logout: () => void;
   setActiveTeamId: (id: number | null) => void;
+  setUserName: (name: string | null) => void;
 }
 
 // ── Contexto ─────────────────────────────────────────────────────
@@ -45,11 +47,13 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 function loadInitialState(): AuthState {
   const token = localStorage.getItem('access_token');
   const role = localStorage.getItem('user_role') as UserRole;
+  const userName = localStorage.getItem('user_name');
   const teamId = localStorage.getItem('ag_active_team_id');
 
   return {
     isAuthenticated: token !== null,
     userRole: token ? role : null,
+    userName: token ? userName : null,
     activeTeamId: teamId ? Number(teamId) : null,
   };
 }
@@ -59,25 +63,44 @@ function loadInitialState(): AuthState {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(loadInitialState);
 
-  const login = useCallback((token: string, role: UserRole) => {
+  const login = useCallback((token: string, role: UserRole, userName?: string | null) => {
     localStorage.setItem('access_token', token);
 
     if (role) {
       localStorage.setItem('user_role', role);
     }
+    if (userName) {
+      localStorage.setItem('user_name', userName);
+    }
 
-    setState(prev => ({ ...prev, isAuthenticated: true, userRole: role }));
+    setState(prev => ({ 
+      ...prev, 
+      isAuthenticated: true, 
+      userRole: role,
+      userName: userName || prev.userName || null
+    }));
   }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user_role');
+    localStorage.removeItem('user_name');
     localStorage.removeItem('ag_active_team_id');
+    setState({ isAuthenticated: false, userRole: null, userName: null, activeTeamId: null });
     window.location.href = '/auth/login';
   }, []);
 
   const setActiveTeamId = useCallback((id: number | null) => {
     setState(prev => ({ ...prev, activeTeamId: id }));
+  }, []);
+
+  const setUserName = useCallback((name: string | null) => {
+    if (name) {
+      localStorage.setItem('user_name', name);
+    } else {
+      localStorage.removeItem('user_name');
+    }
+    setState(prev => ({ ...prev, userName: name }));
   }, []);
 
   useEffect(() => {
@@ -89,8 +112,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [state.activeTeamId]);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ ...state, login, logout, setActiveTeamId }),
-    [state, login, logout, setActiveTeamId],
+    () => ({ ...state, login, logout, setActiveTeamId, setUserName }),
+    [state, login, logout, setActiveTeamId, setUserName],
   );
 
   return (

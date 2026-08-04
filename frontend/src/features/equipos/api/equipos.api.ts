@@ -107,3 +107,9 @@ export const reactivarEquipo = async (idEquipo: number) => {
 export const desactivarEquipo = async (idEquipo: number) => {
   return (await axiosInstance.delete(`/equipos/${idEquipo}`)).data;
 };
+
+export const finalizarBorradorInscripcion = async (idInscripcion: number | string): Promise<ApiResponse<Inscripcion>> => {
+  const response = await axiosInstance.post(`/inscripciones/${idInscripcion}/finalizar-borrador`);
+  return response.data;
+};
+

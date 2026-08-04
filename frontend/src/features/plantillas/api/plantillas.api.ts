@@ -9,7 +9,7 @@ export async function getJugadores(page = 1, perPage = 20): Promise<ApiResponse<
   return response.data;
 }
 
-export async function createJugador(data: { nombres: string; apellidos: string; documento_identificacion: string; fecha_nacimiento: string; genero: string; telefono?: string; correo?: string }): Promise<ApiResponse<any>> {
+export async function createJugador(data: { nombre: string; documento_identificacion: string; fecha_nacimiento: string; genero?: string; telefono?: string; correo?: string }): Promise<ApiResponse<any>> {
   const response = await axiosInstance.post('/jugadores', data);
   return response.data;
 }
@@ -37,11 +37,51 @@ export async function deletePlantilla(idPlantilla: number): Promise<ApiResponse<
   return response.data;
 }
 
+export async function updateNumeroCamiseta(idPlantilla: number, numeroCamiseta: number): Promise<ApiResponse<Plantilla>> {
+  const response = await axiosInstance.patch(`/plantillas/${idPlantilla}`, {
+    numero_camiseta: numeroCamiseta,
+  });
+  return response.data;
+}
+
+export async function buscarJugadorPorCedula(cedula: string, idTorneo?: number): Promise<ApiResponse<Jugador | null>> {
+  const params: Record<string, any> = { cedula };
+  if (idTorneo) {
+    params.id_torneo = idTorneo;
+  }
+  const response = await axiosInstance.get('/jugadores/buscar', { params });
+  return response.data;
+}
+
 export async function uploadFotoJugador(idJugador: number, file: File): Promise<ApiResponse<any>> {
   const formData = new FormData();
   formData.append('archivo', file);
   
   const response = await axiosInstance.post(`/jugadores/${idJugador}/foto`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+}
+
+export async function uploadCedulaJugador(idJugador: number, file: File): Promise<ApiResponse<any>> {
+  const formData = new FormData();
+  formData.append('archivo', file);
+  
+  const response = await axiosInstance.post(`/jugadores/${idJugador}/cedula`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+}
+
+export async function uploadActaJugador(idJugador: number, file: File): Promise<ApiResponse<any>> {
+  const formData = new FormData();
+  formData.append('archivo', file);
+  
+  const response = await axiosInstance.post(`/jugadores/${idJugador}/acta`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },

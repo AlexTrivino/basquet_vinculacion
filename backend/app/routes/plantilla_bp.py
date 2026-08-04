@@ -15,6 +15,7 @@ from app.schemas.plantilla_schema import (
     PlantillaAdminSchema,
     PlantillaCreateSchema,
     PlantillaPublicSchema,
+    PlantillaUpdateSchema,
 )
 from app.services import plantilla_service
 from app.utils.auth_middleware import token_required
@@ -27,6 +28,7 @@ _public_schema = PlantillaPublicSchema()
 _public_many = PlantillaPublicSchema(many=True)
 _admin_schema = PlantillaAdminSchema()
 _create_schema = PlantillaCreateSchema()
+_update_schema = PlantillaUpdateSchema()
 
 
 @plantilla_bp.route('', methods=['GET'])
@@ -105,6 +107,50 @@ def agregar_jugador():
         data=_admin_schema.dump(entrada),
         message='Jugador agregado a la plantilla exitosamente.',
         status=201,
+    )
+
+
+@plantilla_bp.route('/<int:id_plantilla>', methods=['PATCH'])
+@token_required(allowed_roles=['super_admin', 'delegado'])
+def actualizar_camiseta(id_plantilla):
+    """Actualiza el número de camiseta de una entrada de plantilla.
+
+    Para delegados, verifica que el equipo de la entrada le pertenezca.
+    """
+    entrada = plantilla_service.obtener_entrada_plantilla(id_plantilla)
+    if entrada is None:
+        return api_error('NOT_FOUND', 'Entrada de plantilla no encontrada.', 404)
+
+    if g.usuario_rol == 'delegado':
+        from app import db
+        from app.models.equipo import Equipo
+        equipo = db.session.get(Equipo, entrada.id_equipo)
+        if equipo is None or equipo.id_usuario != g.usuario_id:
+            return api_error(
+                'FORBIDDEN',
+                'No tienes permiso para modificar la plantilla de este equipo.',
+                403,
+            )
+
+    json_data = request.get_json(silent=True)
+    if json_data is None:
+        return api_error('BAD_REQUEST', 'El cuerpo debe ser JSON válido.', 400)
+
+    try:
+        data = _update_schema.load(json_data)
+    except ValidationError as err:
+        return api_error('VALIDATION_ERROR', err.messages, 422)
+
+    try:
+        entrada_actualizada = plantilla_service.actualizar_numero_camiseta(
+            id_plantilla, data['numero_camiseta']
+        )
+    except ValueError as e:
+        return api_error('CONFLICT', str(e), 409)
+
+    return api_response(
+        data=_admin_schema.dump(entrada_actualizada),
+        message='Número de camiseta actualizado exitosamente.',
     )
 
 

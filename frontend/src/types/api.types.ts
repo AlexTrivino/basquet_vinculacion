@@ -65,8 +65,8 @@ export interface Inscripcion {
   id_torneo: number;
   id_equipo: number;
   id_categoria: number;
-  estado?: 'pendiente' | 'aprobado' | 'rechazado';
-  estado_inscripcion?: 'pendiente' | 'aprobado' | 'rechazado';
+  estado?: 'borrador' | 'pendiente' | 'aprobado' | 'rechazado';
+  estado_inscripcion?: 'borrador' | 'pendiente' | 'aprobado' | 'rechazado';
   url_comprobante_pago?: string;
   fecha_inscripcion: string;
   
@@ -76,15 +76,33 @@ export interface Inscripcion {
   categoria?: Categoria;
 }
 
+export interface JugadorPlantillaInfo {
+  id_plantilla: number;
+  numero_camiseta?: number | null;
+  id_equipo: number;
+  nombre_equipo?: string;
+  id_torneo: number;
+  nombre_torneo?: string;
+}
+
 export interface Jugador {
-  id: number;
+  id?: number;
   id_jugador?: number;
   nombre: string;
+  genero?: string;
   documento_identificacion: string;
   fecha_nacimiento: string;
   url_foto?: string;
+  url_cedula?: string;
+  url_acta_bachiller?: string;
   telefono?: string;
   correo?: string;
+  estado?: string;
+  plantillas?: JugadorPlantillaInfo[];
+  ya_en_torneo?: boolean;
+  equipo_torneo?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Plantilla {

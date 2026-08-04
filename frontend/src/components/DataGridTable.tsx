@@ -4,6 +4,8 @@ export interface Column<T> {
   key: string;
   header: string;
   render?: (row: T) => ReactNode;
+  headerClassName?: string;
+  cellClassName?: string;
 }
 
 interface DataGridTableProps<T> {
@@ -12,6 +14,8 @@ interface DataGridTableProps<T> {
   isLoading?: boolean;
   emptyMessage?: string;
   ariaLabel?: string;
+  compact?: boolean;
+  className?: string;
 }
 
 export function DataGridTable<T extends { id?: string | number }>({
@@ -20,6 +24,8 @@ export function DataGridTable<T extends { id?: string | number }>({
   isLoading = false,
   emptyMessage = 'No hay datos disponibles.',
   ariaLabel = 'Tabla de datos',
+  compact = false,
+  className = '',
 }: DataGridTableProps<T>) {
   if (isLoading) {
     return (
@@ -37,12 +43,23 @@ export function DataGridTable<T extends { id?: string | number }>({
   }
 
   return (
-    <div className="w-full overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-      <table className="w-full whitespace-nowrap text-left text-sm text-gray-600" aria-label={ariaLabel}>
+    <div className={`w-full overflow-x-auto rounded-lg border border-gray-200 shadow-sm ${className}`}>
+      <table
+        className={`w-full text-left text-gray-600 ${
+          compact ? 'text-xs' : 'whitespace-nowrap text-sm'
+        }`}
+        aria-label={ariaLabel}
+      >
         <thead className="border-b border-gray-200 bg-gray-50 text-gray-900">
           <tr>
             {columns.map((col) => (
-              <th key={col.key} scope="col" className="px-6 py-3 font-semibold">
+              <th
+                key={col.key}
+                scope="col"
+                className={`${
+                  compact ? 'px-3.5 py-2.5 text-xs font-bold text-slate-700' : 'px-6 py-3 font-semibold'
+                } ${col.headerClassName || ''}`}
+              >
                 {col.header}
               </th>
             ))}
@@ -50,9 +67,14 @@ export function DataGridTable<T extends { id?: string | number }>({
         </thead>
         <tbody className="divide-y divide-gray-200 bg-white">
           {data.map((row, index) => (
-            <tr key={row.id || index} className="hover:bg-gray-50">
+            <tr key={row.id || index} className="hover:bg-gray-50/80 transition-colors">
               {columns.map((col) => (
-                <td key={col.key} className="px-6 py-4">
+                <td
+                  key={col.key}
+                  className={`${
+                    compact ? 'px-3.5 py-2.5 align-middle' : 'px-6 py-4'
+                  } ${col.cellClassName || ''}`}
+                >
                   {col.render ? col.render(row) : String((row as any)[col.key] ?? '')}
                 </td>
               ))}
@@ -63,3 +85,4 @@ export function DataGridTable<T extends { id?: string | number }>({
     </div>
   );
 }
+
