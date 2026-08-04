@@ -1,6 +1,8 @@
 """
 Script de Seed para BaloncestoManta.
-Genera usuarios, torneos (con 2 categorías cada uno), equipos, jugadores, plantillas, partidos y sanciones de forma determinística e idempotente.
+Genera usuarios, torneos (con 2 categorías cada uno), equipos con logos, comprobantes de pago,
+jugadores reglamentarios (>=10 por plantilla con fotos y documentos), plantillas, partidos y sanciones
+de forma determinística e idempotente.
 """
 import uuid
 import sys
@@ -26,18 +28,35 @@ DEL2_ID = "e99de3aa-8902-4189-a0de-8615748c594e"
 DEL3_ID = "47aae445-9c91-4006-ba9a-e75e7f10ebc5"
 DEL4_ID = "b07591e5-40e9-4796-85d4-49a7632f10db"
 
+# URLs de fotos de perfil de demostración para jugadores
+FOTOS_JUGADORES_DEMO = [
+    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1528892952291-009c663ce843?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80",
+    "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80"
+]
+
+DOC_PDF_DEMO = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+DOC_IMG_DEMO = "https://images.unsplash.com/photo-1580048915913-4f8f5cb481c4?auto=format&fit=crop&w=800&q=80"
+
 
 def seed_usuarios():
     print("Iniciando Seed de Usuarios...")
     usuarios_data = [
         {"id": ADMIN_ID, "nombre": "Super Admin", "correo": "admin@test.com", "rol": "super_admin"},
-        {"id": DEL1_ID, "nombre": "Delegado 1", "correo": "delegado1@test.com", "rol": "delegado"},
-        {"id": DEL2_ID, "nombre": "Delegado 2", "correo": "delegado2@test.com", "rol": "delegado"},
-        {"id": DEL3_ID, "nombre": "Delegado 3", "correo": "delegado3@test.com", "rol": "delegado"},
-        {"id": DEL4_ID, "nombre": "Delegado 4", "correo": "delegado4@test.com", "rol": "delegado"}
+        {"id": DEL1_ID, "nombre": "Delegado 1 (Carlos)", "correo": "delegado1@test.com", "rol": "delegado"},
+        {"id": DEL2_ID, "nombre": "Delegado 2 (Marcos)", "correo": "delegado2@test.com", "rol": "delegado"},
+        {"id": DEL3_ID, "nombre": "Delegado 3 (Esteban)", "correo": "delegado3@test.com", "rol": "delegado"},
+        {"id": DEL4_ID, "nombre": "Delegado 4 (Roberto)", "correo": "delegado4@test.com", "rol": "delegado"}
     ]
-    
-    correos = tuple(u["correo"] for u in usuarios_data)
     
     for u in usuarios_data:
         # Insertar en auth.users (Supabase)
@@ -95,7 +114,7 @@ def seed_usuarios():
 
 
 def seed_tablas():
-    print("Iniciando Seed de Tablas (Torneos, 2 Categorías por Torneo, Equipos, Jugadores, Plantillas, Partidos, Sanciones)...", flush=True)
+    print("Iniciando Seed de Tablas (Torneos, Categorías, Equipos con Roster Reglamentario >=10, Comprobantes, Partidos, Sanciones)...", flush=True)
     
     # 0. Limpieza previa de tablas en orden de dependencias para asegurar idempotencia
     print("- Limpiando datos antiguos...", flush=True)
@@ -133,7 +152,7 @@ def seed_tablas():
         print("Error: No se encontraron los usuarios delegados en la BD. Ejecuta la Opción 1 primero.", flush=True)
         return
 
-    # 2. Torneos y 2 Categorías por cada Torneo
+    # 2. Torneos y Categorías
     fecha_actual = datetime.now().date()
     torneo1 = Torneo(
         nombre="Copa Verano Manta 2026",
@@ -142,7 +161,7 @@ def seed_tablas():
         fecha_fin=fecha_actual + timedelta(days=80)
     )
     torneo2 = Torneo(
-        nombre="Liga de Campeones Manabi",
+        nombre="Liga de Campeones Manabí",
         estado="finalizado",
         fecha_inicio=fecha_actual - timedelta(days=100),
         fecha_fin=fecha_actual - timedelta(days=10)
@@ -152,9 +171,10 @@ def seed_tablas():
     
     # Torneo 1: 2 Categorías
     cat_t1_libre = Categoria(
-        nombre_categoria="Categoria Libre",
+        nombre_categoria="Senior Libre",
         genero_categoria="masculino",
         edad_minima=18,
+        edad_maxima=35,
         id_torneo=torneo1.id_torneo
     )
     cat_t1_maxi = Categoria(
@@ -166,13 +186,13 @@ def seed_tablas():
     
     # Torneo 2: 2 Categorías
     cat_t2_libre = Categoria(
-        nombre_categoria="Categoria Libre",
+        nombre_categoria="Senior Libre",
         genero_categoria="masculino",
         edad_minima=18,
         id_torneo=torneo2.id_torneo
     )
     cat_t2_sub21 = Categoria(
-        nombre_categoria="Sub-21",
+        nombre_categoria="Sub-21 Juvenil",
         genero_categoria="masculino",
         edad_minima=15,
         edad_maxima=21,
@@ -181,22 +201,83 @@ def seed_tablas():
     
     db.session.add_all([cat_t1_libre, cat_t1_maxi, cat_t2_libre, cat_t2_sub21])
     db.session.commit()
-    print(f"- 2 Torneos creados con 2 Categorías cada uno (Total: 4 categorías).", flush=True)
+    print(f"- 2 Torneos creados con sus Categorías (Total: 4 categorías).", flush=True)
 
-    # 3. Equipos y Distribución por Delegado
+    # 3. Equipos, Inscripciones con Comprobantes y Estados
     equipos_config = [
-        # (Nombre, Delegado, Torneo, Categoría, Estado Inscripción)
-        ("Delfines BC", del1.id_usuario, torneo1, cat_t1_libre, "aprobado"),
-        ("Manta Bulls", del1.id_usuario, torneo1, cat_t1_maxi, "rechazado"),
-        ("Tiburones de Manta", del1.id_usuario, torneo1, cat_t1_libre, "pendiente"),
-        ("Portoviejo Stars", del2.id_usuario, torneo1, cat_t1_libre, "aprobado"),
-        ("Chone Heat", del2.id_usuario, torneo2, cat_t2_libre, "aprobado"),
-        ("Jipijapa Lakers", del3.id_usuario, torneo2, cat_t2_libre, "aprobado"),
+        # (Nombre, Delegado, Torneo, Categoría, Estado Inscripcion, Comprobante URL, Num Jugadores)
+        (
+            "Delfines BC",
+            del1.id_usuario,
+            torneo1,
+            cat_t1_libre,
+            "aprobado",
+            "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80",
+            11
+        ),
+        (
+            "Tiburones de Manta",
+            del1.id_usuario,
+            torneo1,
+            cat_t1_libre,
+            "pendiente",
+            "https://images.unsplash.com/photo-1580048915913-4f8f5cb481c4?auto=format&fit=crop&w=800&q=80",
+            11
+        ),
+        (
+            "Manta Bulls",
+            del1.id_usuario,
+            torneo1,
+            cat_t1_maxi,
+            "rechazado",
+            DOC_PDF_DEMO,
+            10
+        ),
+        (
+            "Portoviejo Stars",
+            del2.id_usuario,
+            torneo1,
+            cat_t1_libre,
+            "aprobado",
+            DOC_PDF_DEMO,
+            11
+        ),
+        (
+            "Halcones del Mar",
+            del2.id_usuario,
+            torneo1,
+            cat_t1_libre,
+            "borrador",
+            None,
+            6  # Demuestra estado incompleto (<10 jugadores)
+        ),
+        (
+            "Chone Heat",
+            del2.id_usuario,
+            torneo2,
+            cat_t2_libre,
+            "aprobado",
+            "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80",
+            11
+        ),
+        (
+            "Jipijapa Lakers",
+            del3.id_usuario,
+            torneo2,
+            cat_t2_libre,
+            "aprobado",
+            "https://images.unsplash.com/photo-1580048915913-4f8f5cb481c4?auto=format&fit=crop&w=800&q=80",
+            11
+        ),
     ]
 
     equipos_creados = []
-    for nombre, id_us, tor, cat, estado_ins in equipos_config:
-        eq = Equipo(nombre_equipo=nombre, id_usuario=id_us, estado="activo")
+    for nombre, id_us, tor, cat, estado_ins, url_comp, num_jug in equipos_config:
+        eq = Equipo(
+            nombre_equipo=nombre,
+            id_usuario=id_us,
+            estado="activo"
+        )
         db.session.add(eq)
         db.session.flush()
         
@@ -204,40 +285,64 @@ def seed_tablas():
             id_equipo=eq.id_equipo,
             id_torneo=tor.id_torneo,
             id_categoria=cat.id_categoria,
-            estado_inscripcion=estado_ins
+            estado_inscripcion=estado_ins,
+            url_comprobante_pago=url_comp
         )
         db.session.add(ins)
-        equipos_creados.append((eq, tor, cat, estado_ins))
+        equipos_creados.append((eq, tor, cat, estado_ins, num_jug))
 
     db.session.commit()
-    print(f"- 6 Equipos creados e inscritos: Del 1 (3), Del 2 (2), Del 3 (1), Del 4 (0).", flush=True)
+    print(f"- 7 Equipos creados e inscritos con comprobantes y estados (Aprobado, Pendiente, Rechazado, Borrador).", flush=True)
 
-    # 4. Generación de 48 Jugadores (8 jugadores por cada uno de los 6 equipos)
-    nombres_base = ["Juan", "Carlos", "Luis", "Pedro", "Javier", "Andres", "Miguel", "Jose", "Diego", "Mateo", "Gabriel", "Fernando"]
-    apellidos_base = ["Perez", "Gomez", "Lopez", "Garcia", "Martinez", "Rodriguez", "Sanchez", "Ramirez", "Torres", "Flores"]
+    # 4. Generación de Jugadores Reglamentarios con Fotos y Documentos
+    nombres_base = [
+        "Michael", "Carlos", "Luis", "Pedro", "Javier", "Andres", "Miguel", "Jose",
+        "Diego", "Mateo", "Gabriel", "Fernando", "Alejandro", "Daniel", "Lucas", "Christian"
+    ]
+    apellidos_base = [
+        "Jordan", "Gomez", "Lopez", "Garcia", "Martinez", "Rodriguez", "Sanchez",
+        "Ramirez", "Torres", "Flores", "Cedeño", "Alvarado", "Zambrano", "Mendoza"
+    ]
     
     jugador_idx = 1
     primeros_jugadores = []
     jugadores_y_equipos = []
 
-    for eq, tor, _, _ in equipos_creados:
-        for camiseta in range(1, 9):  # 8 jugadores por equipo (números 1 al 8)
+    for eq, tor, cat, _, num_jug in equipos_creados:
+        # Año base ajustado según edad mínima de categoría
+        anio_base = 2000 if not cat.edad_minima or cat.edad_minima < 30 else 1986
+
+        for camiseta_idx in range(1, num_jug + 1):
             nom = nombres_base[(jugador_idx - 1) % len(nombres_base)]
             ape = apellidos_base[((jugador_idx - 1) // len(nombres_base)) % len(apellidos_base)]
             
+            # Asignar foto de demostración
+            url_foto = FOTOS_JUGADORES_DEMO[(jugador_idx - 1) % len(FOTOS_JUGADORES_DEMO)]
+            
+            # Asignar cédula (y acta de bachiller al 50% de jugadores)
+            url_cedula = DOC_PDF_DEMO if jugador_idx % 2 == 0 else DOC_IMG_DEMO
+            url_acta = DOC_PDF_DEMO if jugador_idx % 3 == 0 else None
+
+            # Dorsales comunes de baloncesto
+            dorsales_comunes = [4, 5, 7, 8, 9, 10, 11, 13, 15, 23, 24, 30, 32, 33]
+            numero_camiseta = dorsales_comunes[(camiseta_idx - 1) % len(dorsales_comunes)] + (camiseta_idx // len(dorsales_comunes))
+
             jug = Jugador(
-                nombre=f"{nom} {ape} {jugador_idx}",
-                documento_identificacion=f"1300{jugador_idx:06d}",
-                fecha_nacimiento=datetime(2000, 1, 1).date() - timedelta(days=jugador_idx * 80),
+                nombre=f"{nom} {ape}",
+                documento_identificacion=f"130{jugador_idx:07d}",
+                fecha_nacimiento=datetime(anio_base, 1, 1).date() - timedelta(days=(camiseta_idx * 150)),
                 genero="masculino",
+                url_foto=url_foto,
+                url_cedula=url_cedula,
+                url_acta_bachiller=url_acta,
                 telefono=f"099{jugador_idx:07d}",
                 correo=f"jugador{jugador_idx}@test.com",
                 estado="activo"
             )
             db.session.add(jug)
-            jugadores_y_equipos.append((jug, eq.id_equipo, tor.id_torneo, camiseta))
+            jugadores_y_equipos.append((jug, eq.id_equipo, tor.id_torneo, numero_camiseta))
             
-            if camiseta == 1:
+            if camiseta_idx == 1:
                 primeros_jugadores.append(jug)
             jugador_idx += 1
 
@@ -254,9 +359,9 @@ def seed_tablas():
         db.session.add(plan)
 
     db.session.commit()
-    print(f"- 48 Jugadores y Plantillas creadas (8 jugadores exactamente por cada equipo).", flush=True)
+    print(f"- {len(jugadores_y_equipos)} Jugadores y Plantillas creadas con fotos, cédulas y dorsales reglamentarios.", flush=True)
 
-    # 5. Partidos
+    # 5. Partidos de Demostración
     # Torneo 1 (Equipos aprobados en Categoría Libre: Equipos 0 -> Delfines BC y 3 -> Portoviejo Stars)
     eq_delfines = equipos_creados[0][0]
     eq_portoviejo = equipos_creados[3][0]
@@ -290,9 +395,9 @@ def seed_tablas():
         stats_visitante_procesadas=False
     )
 
-    # Torneo 2 (Equipos aprobados en Categoría Libre: Equipos 4 -> Chone Heat y 5 -> Jipijapa Lakers)
-    eq_chone = equipos_creados[4][0]
-    eq_jipijapa = equipos_creados[5][0]
+    # Torneo 2 (Equipos aprobados: Equipos 5 -> Chone Heat y 6 -> Jipijapa Lakers)
+    eq_chone = equipos_creados[5][0]
+    eq_jipijapa = equipos_creados[6][0]
 
     p1_t2 = Partido(
         id_torneo=torneo2.id_torneo,
@@ -308,52 +413,33 @@ def seed_tablas():
         stats_local_procesadas=True,
         stats_visitante_procesadas=True
     )
-    p2_t2 = Partido(
-        id_torneo=torneo2.id_torneo,
-        id_categoria=cat_t2_libre.id_categoria,
-        id_equipo_local=eq_jipijapa.id_equipo,
-        id_equipo_visitante=eq_chone.id_equipo,
-        fecha=fecha_actual - timedelta(days=25),
-        hora=datetime.strptime('20:00', '%H:%M').time(),
-        estado="finalizado",
-        fase="Semifinal",
-        marcador_local=88,
-        marcador_visitante=85,
-        stats_local_procesadas=True,
-        stats_visitante_procesadas=True
-    )
 
-    db.session.add_all([p1_t1, p2_t1, p1_t2, p2_t2])
+    db.session.add_all([p1_t1, p2_t1, p1_t2])
     db.session.flush()
 
     # 6. Sanciones de prueba
-    if primeros_jugadores:
+    if len(primeros_jugadores) >= 3:
         s1 = Sancion(
             id_jugador=primeros_jugadores[0].id_jugador,
             id_partido=p1_t1.id_partido,
-            motivo="Falta tecnica grave (Insulto al arbitro)",
+            motivo="Falta técnica grave (Reclamo airado al árbitro)",
             fecha=fecha_actual - timedelta(days=2),
             estado="activa"
         )
         s2 = Sancion(
-            id_jugador=primeros_jugadores[3].id_jugador,
+            id_jugador=primeros_jugadores[1].id_jugador,
             id_partido=p1_t1.id_partido,
             motivo="Doble falta antideportiva",
             fecha=fecha_actual - timedelta(days=2),
             estado="cumplida"
         )
-        s3 = Sancion(
-            id_jugador=primeros_jugadores[4].id_jugador,
-            id_partido=p1_t2.id_partido,
-            motivo="Acumulacion de faltas personales",
-            fecha=fecha_actual - timedelta(days=20),
-            estado="activa"
-        )
-        db.session.add_all([s1, s2, s3])
+        db.session.add_all([s1, s2])
 
     db.session.commit()
-    print("- Partidos y Sanciones creadas.", flush=True)
-    print("\nSEED DE TABLAS COMPLETADO EXITOSAMENTE.", flush=True)
+    print("- Partidos y Sanciones creadas exitosamente.", flush=True)
+    print("\n========================================", flush=True)
+    print(" SEED DE TABLAS COMPLETADO EXITOSAMENTE ", flush=True)
+    print("========================================", flush=True)
 
 
 def seed_usuarios_produccion():
