@@ -710,7 +710,6 @@ export function GestorPlantilla({
       headerClassName: 'text-right w-20 xl:w-24',
       cellClassName: 'text-right',
       render: (row) => {
-        const idPlantilla = row.id_plantilla || row.id || 0;
         const idJugador = row.jugador?.id_jugador || row.jugador?.id || row.id_jugador;
         return (
           <div className="flex items-center justify-end gap-0.5">

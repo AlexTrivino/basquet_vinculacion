@@ -302,7 +302,6 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
   // ── Indicador de Pasos ──────────────────────────────────────────
 
   const StepIndicator = () => {
-    const isStep1 = currentStep === 1;
     const isStep2 = currentStep === 2;
 
     return (
