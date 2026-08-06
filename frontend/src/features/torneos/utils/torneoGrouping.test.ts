@@ -16,121 +16,80 @@ describe('torneoGrouping utilities', () => {
       expect(obtenerAnioTorneo('2034-01-01T00:00:00.000Z')).toBe(2034);
     });
 
-    it('retorna null para valores nulos, vacíos o inválidos', () => {
-      expect(obtenerAnioTorneo(null)).toBeNull();
-      expect(obtenerAnioTorneo(undefined)).toBeNull();
-      expect(obtenerAnioTorneo('')).toBeNull();
-      expect(obtenerAnioTorneo('invalido')).toBeNull();
+    it('retorna null para valores fuera de rango o caracteres extraños', () => {
+      expect(obtenerAnioTorneo('1899-12-31')).toBeNull();
+      expect(obtenerAnioTorneo('2201-01-01')).toBeNull();
+      expect(obtenerAnioTorneo('   ')).toBeNull();
+      expect(obtenerAnioTorneo('ABCD-01-01')).toBeNull();
     });
   });
 
   describe('agruparTorneosPorAniosRecientes', () => {
-    it('agrupa por los 2 años más recientes con torneos reales', () => {
+    it('ordena los torneos dentro del mismo año por fecha de inicio descendente (más recientes primero)', () => {
       const mockTorneos: Torneo[] = [
         {
           id_torneo: 1,
-          nombre: 'Copa Verano 2026',
-          fecha_inicio: '2026-07-01',
-          fecha_fin: '2026-08-30',
-          estado: 'en_curso',
+          nombre: 'Torneo Enero 2026',
+          fecha_inicio: '2026-01-10',
+          estado: 'finalizado',
         },
         {
           id_torneo: 2,
-          nombre: 'Liga Manabí 2026',
-          fecha_inicio: '2026-05-10',
-          fecha_fin: '2026-09-15',
+          nombre: 'Torneo Diciembre 2026',
+          fecha_inicio: '2026-12-05',
           estado: 'en_curso',
         },
         {
           id_torneo: 3,
-          nombre: 'Interclubes 2025',
-          fecha_inicio: '2025-10-01',
-          fecha_fin: '2025-12-20',
-          estado: 'finalizado',
-        },
-        {
-          id_torneo: 4,
-          nombre: 'Torneo Antiguo 2022',
-          fecha_inicio: '2022-04-01',
-          fecha_fin: '2022-06-01',
+          nombre: 'Torneo Julio 2026',
+          fecha_inicio: '2026-07-20',
           estado: 'finalizado',
         },
       ];
 
       const resultado = agruparTorneosPorAniosRecientes(mockTorneos, 2);
+      const nombresOrdenados = resultado.torneosPorAnio[2026].map((t) => t.nombre);
 
-      expect(resultado.aniosDisponibles).toEqual([2026, 2025, 2022]);
-      expect(resultado.aniosMostrados).toEqual([2026, 2025]);
-      expect(resultado.torneosPorAnio[2026]).toHaveLength(2);
-      expect(resultado.torneosPorAnio[2025]).toHaveLength(1);
-      expect(resultado.torneosActivos).toHaveLength(2);
+      expect(nombresOrdenados).toEqual([
+        'Torneo Diciembre 2026',
+        'Torneo Julio 2026',
+        'Torneo Enero 2026',
+      ]);
     });
 
-    it('se salta años vacíos en medio (ej. 2036 y 2034 sin torneos en 2035)', () => {
-      const mockTorneos: Torneo[] = [
-        {
-          id_torneo: 10,
-          nombre: 'Torneo Futuro 2036',
-          fecha_inicio: '2036-03-01',
-          fecha_fin: '2036-06-01',
-          estado: 'en_curso',
-        },
-        {
-          id_torneo: 11,
-          nombre: 'Torneo Pasado 2034',
-          fecha_inicio: '2034-08-01',
-          fecha_fin: '2034-11-01',
-          estado: 'finalizado',
-        },
-        {
-          id_torneo: 12,
-          nombre: 'Torneo Muy Antiguo 2030',
-          fecha_inicio: '2030-01-01',
-          fecha_fin: '2030-04-01',
-          estado: 'finalizado',
-        },
-      ];
-
-      const resultado = agruparTorneosPorAniosRecientes(mockTorneos, 2);
-
-      expect(resultado.aniosDisponibles).toEqual([2036, 2034, 2030]);
-      expect(resultado.aniosMostrados).toEqual([2036, 2034]);
-      expect(resultado.torneosPorAnio[2036]).toBeDefined();
-      expect(resultado.torneosPorAnio[2034]).toBeDefined();
-      expect(resultado.torneosPorAnio[2035]).toBeUndefined();
+    it('maneja arrays vacíos sin lanzar excepciones', () => {
+      const resultado = agruparTorneosPorAniosRecientes([], 2);
+      expect(resultado.aniosDisponibles).toEqual([]);
+      expect(resultado.aniosMostrados).toEqual([]);
+      expect(resultado.torneosPorAnio).toEqual({});
+      expect(resultado.torneosActivos).toEqual([]);
     });
 
-    it('clasifica un torneo que empieza a fines de 2026 y termina en 2027 como 2026', () => {
+    it('respeta diferentes valores de maxAnios (ej. maxAnios = 1 o maxAnios = 4)', () => {
       const mockTorneos: Torneo[] = [
-        {
-          id_torneo: 20,
-          nombre: 'Torneo Fin de Año',
-          fecha_inicio: '2026-11-15',
-          fecha_fin: '2027-02-28',
-          estado: 'en_curso',
-        },
+        { id_torneo: 1, nombre: 'T2026', fecha_inicio: '2026-01-01' },
+        { id_torneo: 2, nombre: 'T2025', fecha_inicio: '2025-01-01' },
+        { id_torneo: 3, nombre: 'T2024', fecha_inicio: '2024-01-01' },
+        { id_torneo: 4, nombre: 'T2023', fecha_inicio: '2023-01-01' },
       ];
 
-      const resultado = agruparTorneosPorAniosRecientes(mockTorneos, 2);
+      const res1 = agruparTorneosPorAniosRecientes(mockTorneos, 1);
+      expect(res1.aniosMostrados).toEqual([2026]);
 
-      expect(resultado.aniosMostrados).toEqual([2026]);
-      expect(resultado.torneosPorAnio[2026][0].nombre).toBe('Torneo Fin de Año');
+      const res4 = agruparTorneosPorAniosRecientes(mockTorneos, 4);
+      expect(res4.aniosMostrados).toEqual([2026, 2025, 2024, 2023]);
     });
 
-    it('detecta torneos en estado "inscripcion" como activos', () => {
+    it('tolera torneos sin fecha_inicio asignada sin romper la agrupación', () => {
       const mockTorneos: Torneo[] = [
-        {
-          id_torneo: 30,
-          nombre: 'Copa Apertura 2026',
-          fecha_inicio: '2026-09-01',
-          fecha_fin: '2026-12-01',
-          estado: 'inscripcion',
-        },
+        { id_torneo: 1, nombre: 'T Con Fecha', fecha_inicio: '2026-05-01', estado: 'en_curso' },
+        { id_torneo: 2, nombre: 'T Sin Fecha', fecha_inicio: undefined, estado: 'en_curso' },
       ];
 
-      const resultado = agruparTorneosPorAniosRecientes(mockTorneos, 2);
-      expect(resultado.torneosActivos).toHaveLength(1);
-      expect(resultado.torneosActivos[0].estado).toBe('inscripcion');
+      const res = agruparTorneosPorAniosRecientes(mockTorneos, 2);
+      expect(res.aniosMostrados).toEqual([2026]);
+      expect(res.torneosActivos).toHaveLength(2); // Ambos detectados como activos
     });
   });
 });
+

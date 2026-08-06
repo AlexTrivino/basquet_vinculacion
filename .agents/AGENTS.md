@@ -296,3 +296,25 @@ Durante cualquier proceso de conexión entre el Frontend (React) y el Backend (F
    - El código debe usar siempre fallbacks seguros (`|| []`, `|| null`, `?.`) para tolerar registros históricos con campos nulos o estructuras previas.
    - Las consultas SQL/ORM que agreguen relaciones nuevas deben usar `outerjoin()` / `LEFT JOIN` para no excluir registros históricos que carezcan de la nueva relación.
 
+---
+
+## Directiva de Calidad y Rigurosidad en Testing (Obligatoria para toda Solución)
+
+> [!IMPORTANT]
+> **Toda solución técnica, refactor o nueva funcionalidad propuesta por el Agente debe incluir pruebas automatizadas exhaustivas y de alta rigurosidad.**
+
+### Requisitos Mandatorios de Pruebas:
+1. **Cobertura de Casos Borde y Situaciones de Estrés ("What-If"):**
+   - Simulación de datos nulos, vacíos (`[]`), respuestas de error 404/500, strings mal formateados y valores fuera de rango.
+   - Pruebas de permisos y RBAC: verificación de qué ve un usuario no autenticado, un delegado y un super_admin.
+   - Pruebas matemáticas de límites en paginación (páginas fuera de rango, página 1 de 1, página 0, páginas negativas, números flotantes).
+2. **Pruebas de Componentes e Integración UI (Vitest + RTL):**
+   - Verificar estados de carga (`Skeleton`), estados vacíos (`EmptyState`), errores de red y transiciones visuales.
+   - Probar interacción real del usuario (clicks en pestañas, cambios de filtros en selects, avance/retroceso de carruseles y paginadores).
+   - Comprobar que no existan loops de renderizado o re-renders innecesarios en componentes con hooks `useMemo` o `useEffect`.
+3. **Pruebas de Backend (Pytest):**
+   - Validación rigurosa de DTOs/Schemas Marshmallow y modelos SQLAlchemy.
+   - Pruebas de integridad transaccional (rollback en fallo, prevención de duplicados vía `UniqueConstraint`).
+   - Pruebas de reglas de negocio (límite de 3 equipos por delegado, rango de 10-18 jugadores por plantilla, deshabilitación de equipos).
+
+

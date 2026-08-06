@@ -172,5 +172,52 @@ describe('JugadorProfile', () => {
     expect(screen.queryByText('Equipo D (2022)')).not.toBeInTheDocument();
     expect(screen.getByText('1 / 2')).toBeInTheDocument();
   });
+
+  it('permite cambiar el filtro de estadísticas para ver números específicos de un torneo', async () => {
+    vi.mocked(jugadoresApi.getJugadorPerfil).mockResolvedValue({
+      data: mockJugadorData as any,
+    } as any);
+
+    renderWithProviders();
+
+    // Por defecto muestra las estadísticas globales (220 puntos)
+    expect(await screen.findByText('220')).toBeInTheDocument();
+
+    // Cambiar el select a Torneo 1 (160 puntos)
+    const selectFiltro = screen.getByLabelText(/Ver:/i);
+    fireEvent.change(selectFiltro, { target: { value: '1' } });
+
+    expect(await screen.findByText('160')).toBeInTheDocument();
+    expect(screen.queryByText('220')).not.toBeInTheDocument();
+  });
+
+  it('muestra la pantalla de error "Jugador no encontrado" cuando la API retorna null o falla', async () => {
+    vi.mocked(jugadoresApi.getJugadorPerfil).mockResolvedValue({
+      data: null as any,
+    } as any);
+
+    renderWithProviders();
+
+    expect(await screen.findByText('Jugador no encontrado')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Volver al inicio/i })).toBeInTheDocument();
+  });
+
+  it('muestra el estado vacío cuando el jugador no tiene participaciones registradas', async () => {
+    const jugadorSinParticipaciones = {
+      ...mockJugadorData,
+      participaciones: [],
+    };
+
+    vi.mocked(jugadoresApi.getJugadorPerfil).mockResolvedValue({
+      data: jugadorSinParticipaciones as any,
+    } as any);
+
+    renderWithProviders();
+
+    expect(
+      await screen.findByText(/Actualmente no registra equipos activos asignados/i)
+    ).toBeInTheDocument();
+  });
 });
+
 

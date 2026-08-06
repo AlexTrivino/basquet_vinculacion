@@ -251,10 +251,10 @@ def purgar_inscripciones_expiradas(dias=30):
     Returns:
         dict: Resumen estadístico de elementos purgados.
     """
-    from datetime import datetime, timedelta
+    from datetime import datetime, timezone, timedelta
     from sqlalchemy import func
 
-    limite = datetime.utcnow() - timedelta(days=dias)
+    limite = datetime.now(timezone.utc) - timedelta(days=dias)
 
     # Buscamos borradores o rechazados que superen la fecha límite
     expiradas = (

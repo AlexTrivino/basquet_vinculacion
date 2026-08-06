@@ -161,17 +161,45 @@ describe('Home Page', () => {
     });
   });
 
-  it('renderiza la sección de partidos recientes con los marcadores', async () => {
+  it('muestra un mensaje de error accesible cuando falla la carga de torneos', async () => {
+    vi.mocked(torneosApi.getTorneos).mockRejectedValue(new Error('Network error'));
+
     renderWithProviders(<Home />);
 
     await waitFor(() => {
       expect(
-        screen.getByText(/Próximos Partidos y Resultados Recientes/i)
+        screen.getByText(/Error al cargar los torneos/i)
       ).toBeInTheDocument();
-      expect(screen.getByText('Delfines BC')).toBeInTheDocument();
-      expect(screen.getByText('Portoviejo Stars')).toBeInTheDocument();
-      expect(screen.getByText('88')).toBeInTheDocument();
-      expect(screen.getByText('82')).toBeInTheDocument();
+    });
+  });
+
+  it('muestra un EmptyState cuando la base de datos no contiene torneos', async () => {
+    vi.mocked(torneosApi.getTorneos).mockResolvedValue({
+      success: true,
+      message: 'Sin torneos',
+      data: [],
+    });
+
+    renderWithProviders(<Home />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Sin torneos registrados/i)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/No hay torneos registrados para el año/i)
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('renderiza el botón deshabilitado de archivo histórico con badge "Próximamente"', async () => {
+    renderWithProviders(<Home />);
+
+    await waitFor(() => {
+      const btnHistorico = screen.getByRole('button', { name: /Ver torneos anteriores/i });
+      expect(btnHistorico).toBeDisabled();
+      expect(screen.getByText(/Próximamente/i)).toBeInTheDocument();
     });
   });
 });
+

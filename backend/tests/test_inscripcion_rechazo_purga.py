@@ -1,6 +1,6 @@
 import unittest
 import uuid
-from datetime import date
+from datetime import date, datetime, timezone, timedelta
 from app import create_app, db
 from app.models.usuario import Usuario
 from app.models.inscripcion import Inscripcion
@@ -177,8 +177,8 @@ class TestInscripcionRechazoPurga(unittest.TestCase):
             id_equipo=eq_viejo.id_equipo,
             id_categoria=c.id_categoria,
             estado_inscripcion='borrador',
-            fecha_inscripcion=datetime.utcnow() - timedelta(days=35),
-            updated_at=datetime.utcnow() - timedelta(days=35)
+            fecha_inscripcion=datetime.now(timezone.utc) - timedelta(days=35),
+            updated_at=datetime.now(timezone.utc) - timedelta(days=35)
         )
         db.session.add(insc_vieja)
 
@@ -191,8 +191,8 @@ class TestInscripcionRechazoPurga(unittest.TestCase):
             id_equipo=eq_nuevo.id_equipo,
             id_categoria=c.id_categoria,
             estado_inscripcion='borrador',
-            fecha_inscripcion=datetime.utcnow() - timedelta(days=5),
-            updated_at=datetime.utcnow() - timedelta(days=5)
+            fecha_inscripcion=datetime.now(timezone.utc) - timedelta(days=5),
+            updated_at=datetime.now(timezone.utc) - timedelta(days=5)
         )
         db.session.add(insc_nueva)
 
@@ -205,8 +205,8 @@ class TestInscripcionRechazoPurga(unittest.TestCase):
             id_equipo=eq_aprobado.id_equipo,
             id_categoria=c.id_categoria,
             estado_inscripcion='aprobado',
-            fecha_inscripcion=datetime.utcnow() - timedelta(days=40),
-            updated_at=datetime.utcnow() - timedelta(days=40)
+            fecha_inscripcion=datetime.now(timezone.utc) - timedelta(days=40),
+            updated_at=datetime.now(timezone.utc) - timedelta(days=40)
         )
         db.session.add(insc_aprobada)
         db.session.commit()

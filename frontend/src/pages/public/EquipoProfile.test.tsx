@@ -268,4 +268,72 @@ describe('EquipoProfile Component', () => {
 
     expect(await screen.findByRole('heading', { name: 'Copa Verano Manta 2026' })).toBeInTheDocument();
   });
+
+  it('detecta correctamente una derrota en el último partido cuando el rival anota más puntos', async () => {
+    const partidoDerrota = [
+      {
+        ...mockPartidos[0],
+        marcador_local: 70,
+        marcador_visitante: 85, // Delfines es local con 70 vs 85
+      },
+    ];
+
+    vi.spyOn(partidosApi, 'getPartidosByEquipo').mockResolvedValue({
+      success: true,
+      data: partidoDerrota,
+      message: 'Partidos obtenidos',
+    });
+
+    renderComponent();
+
+    expect(await screen.findByText('Derrota')).toBeInTheDocument();
+  });
+
+  it('muestra el banner de advertencia cuando el equipo está inactivo', async () => {
+    vi.spyOn(equiposApi, 'getEquipoById').mockResolvedValue({
+      success: true,
+      data: { ...mockEquipo, estado: 'inactivo' },
+      message: 'Equipo inactivo',
+    });
+
+    renderComponent();
+
+    expect(
+      await screen.findByText(/Este equipo se encuentra actualmente inactivo en la liga/i)
+    ).toBeInTheDocument();
+  });
+
+  it('muestra los EmptyStates correspondientes cuando el club no tiene partidos ni participaciones', async () => {
+    vi.spyOn(partidosApi, 'getPartidosByEquipo').mockResolvedValue({
+      success: true,
+      data: [],
+      message: 'Sin partidos',
+    });
+
+    vi.spyOn(equiposApi, 'getInscripcionesPublicas').mockResolvedValue({
+      success: true,
+      data: [],
+      message: 'Sin inscripciones',
+    });
+
+    renderComponent();
+
+    expect(await screen.findByText('Sin partidos finalizados')).toBeInTheDocument();
+    expect(screen.getByText('Sin compromisos programados')).toBeInTheDocument();
+    expect(screen.getByText('Aún no registra participaciones oficiales aprobadas.')).toBeInTheDocument();
+  });
+
+  it('muestra la pantalla de error "Equipo no encontrado" cuando la API retorna null', async () => {
+    vi.spyOn(equiposApi, 'getEquipoById').mockResolvedValue({
+      success: true,
+      data: null as any,
+      message: 'No encontrado',
+    });
+
+    renderComponent();
+
+    expect(await screen.findByText('Equipo no encontrado')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Volver al Directorio/i })).toBeInTheDocument();
+  });
 });
+
