@@ -278,3 +278,21 @@ Durante cualquier proceso de conexión entre el Frontend (React) y el Backend (F
 2. El Modelo de SQLAlchemy (`backend/app/models/`).
 
 *Ejemplo de contexto:* Nombres como `estado` o `id` podrían ser en realidad `estado_inscripcion` o `id_equipo` dependiendo del Schema. Los objetos anidados devueltos por `fields.Nested` en Flask no desempaquetan sus IDs en la raíz, sino dentro de objetos hijos (ej. `equipo.id_equipo`). El agente **debe** verificar esto antes de escribir el código frontend que lee dichas variables para evitar que las variables devuelvan `undefined`.
+
+---
+
+## Directiva Crítica: Entorno en Producción y Protección de Datos
+
+> [!CAUTION]
+> **El proyecto ya se encuentra en PRODUCCIÓN en un servidor externo con datos reales persistidos en la base de datos.**
+
+### Reglas de Integridad y Modificación Segura:
+1. **Cero Cambios Destructivos:**
+   - Queda estrictamente prohibido ejecutar `DROP TABLE`, `DROP COLUMN`, truncate, alteración de tipos incompatibles o añadir columnas `NOT NULL` sin un `server_default` o migración segura en dos pasos.
+2. **Retrocompatibilidad 100% Obligatoria:**
+   - Cualquier ajuste a endpoints existentes (`/api/...`), schemas de Marshmallow o modelos SQLAlchemy debe mantener compatibilidad retroactiva con los datos ya almacenados.
+   - Las respuestas de endpoints existentes no deben eliminar ni renombrar propiedades que el frontend o servicios externos consuman.
+3. **Manejo Defensivo en Frontend y Backend:**
+   - El código debe usar siempre fallbacks seguros (`|| []`, `|| null`, `?.`) para tolerar registros históricos con campos nulos o estructuras previas.
+   - Las consultas SQL/ORM que agreguen relaciones nuevas deben usar `outerjoin()` / `LEFT JOIN` para no excluir registros históricos que carezcan de la nueva relación.
+

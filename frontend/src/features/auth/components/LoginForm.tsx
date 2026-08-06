@@ -13,6 +13,7 @@ import api from '../../../api/axios.config';
 const loginSchema = z.object({
   email: z.string().email('Ingresa un correo electrónico válido'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+  rememberMe: z.boolean().default(true),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -25,6 +26,11 @@ export function LoginForm() {
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+      rememberMe: true,
+    },
   });
 
   const { login } = useAuth();
@@ -46,7 +52,7 @@ export function LoginForm() {
       const role = (meResponse.data?.data?.rol || 'delegado') as UserRole;
       const nombre = meResponse.data?.data?.nombre || '';
 
-      login(token, role, nombre);
+      login(token, role, nombre, data.rememberMe);
       toast.success('Inicio de sesión exitoso');
       
       if (role === 'super_admin') {
@@ -97,6 +103,23 @@ export function LoginForm() {
         )}
       </div>
 
+      {/* Opción Recordar mi sesión + Olvidaste contraseña alineados */}
+      <div className="flex items-center justify-between">
+        <label htmlFor="rememberMe" className="flex items-center gap-2 cursor-pointer select-none">
+          <input
+            id="rememberMe"
+            type="checkbox"
+            {...register('rememberMe')}
+            className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+          />
+          <span className="text-sm text-gray-700">Recordar mi sesión</span>
+        </label>
+
+        <Link to="/auth/recuperar" className="text-sm font-medium text-primary-600 hover:text-primary-500">
+          ¿Olvidaste tu contraseña?
+        </Link>
+      </div>
+
       {/* Uso obligatorio de AsyncButton como se solicitó, interceptando el Submit de RHF */}
       <AsyncButton
         type="button"
@@ -106,10 +129,7 @@ export function LoginForm() {
         Ingresar
       </AsyncButton>
 
-      <div className="mt-4 flex flex-col items-center gap-2 text-sm text-gray-600">
-        <Link to="/auth/recuperar" className="font-medium text-primary-600 hover:text-primary-500">
-          ¿Olvidaste tu contraseña?
-        </Link>
+      <div className="mt-2 flex flex-col items-center gap-2 text-sm text-gray-600">
         <div>
           ¿No tienes una cuenta?{' '}
           <Link to="/auth/registro" className="font-semibold text-primary-600 hover:text-primary-500">

@@ -19,6 +19,14 @@ import {
   useEffect,
   type ReactNode,
 } from 'react';
+import {
+  AUTH_KEYS,
+  getAuthItem,
+  setAuthItem,
+  removeAuthItem,
+  clearAllAuthStorage,
+  isTokenExpired,
+} from '../utils/authStorage';
 
 // ── Tipos estrictos ──────────────────────────────────────────────
 
@@ -32,7 +40,7 @@ interface AuthState {
 }
 
 interface AuthContextValue extends AuthState {
-  login: (token: string, role: UserRole, userName?: string | null) => void;
+  login: (token: string, role: UserRole, userName?: string | null, rememberMe?: boolean) => void;
   logout: () => void;
   setActiveTeamId: (id: number | null) => void;
   setUserName: (name: string | null) => void;
@@ -42,20 +50,43 @@ interface AuthContextValue extends AuthState {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// ── Helpers de localStorage ──────────────────────────────────────
+// ── Helpers de inicialización ────────────────────────────────────
 
 function loadInitialState(): AuthState {
-  const token = localStorage.getItem('access_token');
-  const role = localStorage.getItem('user_role') as UserRole;
-  const userName = localStorage.getItem('user_name');
-  const teamId = localStorage.getItem('ag_active_team_id');
+  const token = getAuthItem(AUTH_KEYS.ACCESS_TOKEN);
+
+  // Si no hay token o ya expiró según el timestamp de su payload, purgamos y retornamos estado limpio
+  if (!token || isTokenExpired(token)) {
+    if (token) {
+      clearAllAuthStorage();
+    }
+    return {
+      isAuthenticated: false,
+      userRole: null,
+      userName: null,
+      activeTeamId: null,
+    };
+  }
+
+  const role = getAuthItem(AUTH_KEYS.USER_ROLE) as UserRole;
+  const userName = getAuthItem(AUTH_KEYS.USER_NAME);
+  const teamId = getAuthItem(AUTH_KEYS.ACTIVE_TEAM_ID);
 
   return {
-    isAuthenticated: token !== null,
-    userRole: token ? role : null,
-    userName: token ? userName : null,
+    isAuthenticated: true,
+    userRole: role,
+    userName: userName || null,
     activeTeamId: teamId ? Number(teamId) : null,
   };
+}
+
+// Helper para saber si la sesión actual es persistente (localStorage) o temporal (sessionStorage)
+function isSessionPersistent(): boolean {
+  try {
+    return localStorage.getItem(AUTH_KEYS.ACCESS_TOKEN) !== null;
+  } catch {
+    return true;
+  }
 }
 
 // ── Provider ─────────────────────────────────────────────────────
@@ -63,14 +94,14 @@ function loadInitialState(): AuthState {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(loadInitialState);
 
-  const login = useCallback((token: string, role: UserRole, userName?: string | null) => {
-    localStorage.setItem('access_token', token);
+  const login = useCallback((token: string, role: UserRole, userName?: string | null, rememberMe: boolean = true) => {
+    setAuthItem(AUTH_KEYS.ACCESS_TOKEN, token, rememberMe);
 
     if (role) {
-      localStorage.setItem('user_role', role);
+      setAuthItem(AUTH_KEYS.USER_ROLE, role, rememberMe);
     }
     if (userName) {
-      localStorage.setItem('user_name', userName);
+      setAuthItem(AUTH_KEYS.USER_NAME, userName, rememberMe);
     }
 
     setState(prev => ({ 
@@ -82,10 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('user_role');
-    localStorage.removeItem('user_name');
-    localStorage.removeItem('ag_active_team_id');
+    clearAllAuthStorage();
     setState({ isAuthenticated: false, userRole: null, userName: null, activeTeamId: null });
     window.location.href = '/auth/login';
   }, []);
@@ -95,19 +123,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setUserName = useCallback((name: string | null) => {
+    const persistent = isSessionPersistent();
     if (name) {
-      localStorage.setItem('user_name', name);
+      setAuthItem(AUTH_KEYS.USER_NAME, name, persistent);
     } else {
-      localStorage.removeItem('user_name');
+      removeAuthItem(AUTH_KEYS.USER_NAME);
     }
     setState(prev => ({ ...prev, userName: name }));
   }, []);
 
   useEffect(() => {
+    const persistent = isSessionPersistent();
     if (state.activeTeamId !== null) {
-      localStorage.setItem('ag_active_team_id', state.activeTeamId.toString());
+      setAuthItem(AUTH_KEYS.ACTIVE_TEAM_ID, state.activeTeamId.toString(), persistent);
     } else {
-      localStorage.removeItem('ag_active_team_id');
+      removeAuthItem(AUTH_KEYS.ACTIVE_TEAM_ID);
     }
   }, [state.activeTeamId]);
 

@@ -28,6 +28,12 @@ def create_app() -> Flask:
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5 MB
 
+    # ── Opciones del Engine (Pooler de Supabase resiliente) ────────
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'pool_pre_ping': True,  # Verifica la salud de la conexión antes de ejecutar consultas
+        'pool_recycle': 300,    # Recicla conexiones cada 5 minutos para evitar timeouts del pooler
+    }
+
     # ── Depuración SQLAlchemy (opcional) ─────────────────────────────
     #app.config['SQLALCHEMY_ECHO'] = True
 

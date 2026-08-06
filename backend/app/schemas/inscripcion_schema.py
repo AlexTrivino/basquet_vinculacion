@@ -16,6 +16,8 @@ class _TorneoResumenSchema(Schema):
     id_torneo = fields.Integer()
     nombre = fields.String()
     estado = fields.String()
+    fecha_inicio = fields.Date(allow_none=True)
+    fecha_fin = fields.Date(allow_none=True)
 
 
 class _UsuarioResumenSchema(Schema):

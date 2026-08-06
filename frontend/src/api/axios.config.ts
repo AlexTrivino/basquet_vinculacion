@@ -9,6 +9,7 @@
  *   const { data } = await api.get('/torneos');
  */
 import axios from 'axios';
+import { getAuthItem, clearAllAuthStorage, AUTH_KEYS } from '../utils/authStorage';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
@@ -18,9 +19,9 @@ const api = axios.create({
 });
 
 // ── Interceptor de Request ───────────────────────────────────────
-// Inyecta el JWT en cada petición si existe en localStorage.
+// Inyecta el JWT en cada petición si existe en localStorage o sessionStorage.
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
+  const token = getAuthItem(AUTH_KEYS.ACCESS_TOKEN);
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -45,8 +46,7 @@ api.interceptors.response.use(
     const status = error.response?.status;
 
     if (status === 401) {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user_role');
+      clearAllAuthStorage();
       
       const errorMessage = error.response?.data?.message || 'Tu sesión ha expirado o es inválida.';
       window.location.href = `/auth/login?error_msg=${encodeURIComponent(errorMessage)}`;

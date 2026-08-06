@@ -7,6 +7,7 @@ import { getPerfil, actualizarPerfil } from '../../features/auth/api/usuarios.ap
 import { updatePasswordWithSupabase } from '../../features/auth/api/auth.api';
 import { AsyncButton } from '../../components/AsyncButton';
 import { useAuth } from '../../context/AuthContext';
+import { getAuthToken } from '../../utils/authStorage';
 
 interface PerfilFormValues {
   nombre: string;
@@ -52,7 +53,7 @@ export default function MiPerfil() {
       toast.error('La contraseña debe tener al menos 6 caracteres');
       return;
     }
-    const token = localStorage.getItem('access_token');
+    const token = getAuthToken();
     if (!token) {
       toast.error('No se encontró el token de sesión');
       return;
