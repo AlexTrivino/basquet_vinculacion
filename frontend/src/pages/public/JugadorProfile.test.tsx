@@ -1,6 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import JugadorProfile from './JugadorProfile';
 import * as jugadoresApi from '../../features/jugadores/api/jugadores.api';
@@ -130,7 +129,7 @@ describe('JugadorProfile', () => {
     expect(screen.getByText('Libre Masculino')).toBeInTheDocument();
   });
 
-  it('pagina las participaciones mostrando un máximo de 3 a la vez y permite navegar adelante y atrás sin duplicar', async () => {
+  it('pagina las participaciones mostrando un máximo de 4 a la vez y permite navegar adelante y atrás sin duplicar', async () => {
     const jugadorConMuchasParticipaciones = {
       ...mockJugadorData,
       participaciones: [
@@ -138,6 +137,7 @@ describe('JugadorProfile', () => {
         { id_plantilla: 2, id_equipo: 2, nombre_equipo: 'Equipo B (2024)', anio: 2024, id_torneo: 2, nombre_torneo: 'Torneo 2024', numero_camiseta: 2, nombre_categoria: 'Libre' },
         { id_plantilla: 3, id_equipo: 3, nombre_equipo: 'Equipo C (2023)', anio: 2023, id_torneo: 3, nombre_torneo: 'Torneo 2023', numero_camiseta: 3, nombre_categoria: 'Libre' },
         { id_plantilla: 4, id_equipo: 4, nombre_equipo: 'Equipo D (2022)', anio: 2022, id_torneo: 4, nombre_torneo: 'Torneo 2022', numero_camiseta: 4, nombre_categoria: 'Libre' },
+        { id_plantilla: 5, id_equipo: 5, nombre_equipo: 'Equipo E (2021)', anio: 2021, id_torneo: 5, nombre_torneo: 'Torneo 2021', numero_camiseta: 5, nombre_categoria: 'Libre' },
       ],
     };
 
@@ -147,19 +147,20 @@ describe('JugadorProfile', () => {
 
     renderWithProviders();
 
-    // Página 1: Muestra los 3 más recientes (2026, 2024, 2023)
+    // Página 1: Muestra los 4 más recientes (2026, 2024, 2023, 2022)
     expect(await screen.findByText('Equipo A (2026)')).toBeInTheDocument();
     expect(screen.getByText('Equipo B (2024)')).toBeInTheDocument();
     expect(screen.getByText('Equipo C (2023)')).toBeInTheDocument();
-    expect(screen.queryByText('Equipo D (2022)')).not.toBeInTheDocument();
+    expect(screen.getByText('Equipo D (2022)')).toBeInTheDocument();
+    expect(screen.queryByText('Equipo E (2021)')).not.toBeInTheDocument();
     expect(screen.getByText('1 / 2')).toBeInTheDocument();
 
     // Navegar a la página 2
     const btnSiguiente = screen.getByRole('button', { name: /página siguiente/i });
     fireEvent.click(btnSiguiente);
 
-    // Página 2: Muestra el 4to equipo (2022) y oculta los de la pág 1
-    expect(await screen.findByText('Equipo D (2022)')).toBeInTheDocument();
+    // Página 2: Muestra el 5to equipo (2021) y oculta los de la pág 1
+    expect(await screen.findByText('Equipo E (2021)')).toBeInTheDocument();
     expect(screen.queryByText('Equipo A (2026)')).not.toBeInTheDocument();
     expect(screen.getByText('2 / 2')).toBeInTheDocument();
 
@@ -169,7 +170,7 @@ describe('JugadorProfile', () => {
 
     // Página 1 nuevamente
     expect(await screen.findByText('Equipo A (2026)')).toBeInTheDocument();
-    expect(screen.queryByText('Equipo D (2022)')).not.toBeInTheDocument();
+    expect(screen.queryByText('Equipo E (2021)')).not.toBeInTheDocument();
     expect(screen.getByText('1 / 2')).toBeInTheDocument();
   });
 

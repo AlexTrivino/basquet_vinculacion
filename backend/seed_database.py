@@ -291,9 +291,11 @@ def seed_tablas():
         # ── Torneo 1 (2026) ──
         ("Delfines BC", torneo1, cat_t1_libre, "aprobado", "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80"),
         ("Delfines BC", torneo1, cat_t1_maxi, "aprobado", "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80"),
-        ("Tiburones de Manta", torneo1, cat_t1_libre, "pendiente", "https://images.unsplash.com/photo-1580048915913-4f8f5cb481c4?auto=format&fit=crop&w=800&q=80"),
+        ("Tiburones de Manta", torneo1, cat_t1_libre, "aprobado", "https://images.unsplash.com/photo-1580048915913-4f8f5cb481c4?auto=format&fit=crop&w=800&q=80"),
         ("Manta Bulls", torneo1, cat_t1_maxi, "aprobado", DOC_PDF_DEMO),
         ("Portoviejo Stars", torneo1, cat_t1_libre, "aprobado", DOC_PDF_DEMO),
+        ("Chone Heat", torneo1, cat_t1_libre, "aprobado", "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80"),
+        ("Jipijapa Lakers", torneo1, cat_t1_libre, "aprobado", "https://images.unsplash.com/photo-1580048915913-4f8f5cb481c4?auto=format&fit=crop&w=800&q=80"),
         ("Halcones del Mar", torneo1, cat_t1_libre, "borrador", None),
 
         # ── Torneo 2 (2024) ──
@@ -302,6 +304,7 @@ def seed_tablas():
         ("Tiburones de Manta", torneo2, cat_t2_sub21, "aprobado", DOC_PDF_DEMO),
         ("Manta Bulls", torneo2, cat_t2_maxi, "aprobado", DOC_PDF_DEMO),
         ("Portoviejo Stars", torneo2, cat_t2_libre, "aprobado", DOC_PDF_DEMO),
+        ("Portoviejo Stars", torneo2, cat_t2_sub21, "aprobado", DOC_PDF_DEMO),
         ("Chone Heat", torneo2, cat_t2_libre, "aprobado", "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80"),
         ("Jipijapa Lakers", torneo2, cat_t2_libre, "aprobado", "https://images.unsplash.com/photo-1580048915913-4f8f5cb481c4?auto=format&fit=crop&w=800&q=80"),
         ("Montecristi Warriors", torneo2, cat_t2_maxi, "aprobado", DOC_PDF_DEMO),
@@ -309,6 +312,7 @@ def seed_tablas():
 
         # ── Torneo 3 (2023) ──
         ("Delfines BC", torneo3, cat_t3_libre, "aprobado", DOC_PDF_DEMO),
+        ("Tiburones de Manta", torneo3, cat_t3_libre, "aprobado", DOC_PDF_DEMO),
         ("Manta Bulls", torneo3, cat_t3_maxi, "aprobado", DOC_PDF_DEMO),
         ("Portoviejo Stars", torneo3, cat_t3_libre, "aprobado", DOC_PDF_DEMO),
         ("Chone Heat", torneo3, cat_t3_libre, "aprobado", DOC_PDF_DEMO),
@@ -319,7 +323,10 @@ def seed_tablas():
         ("Tiburones de Manta", torneo4, cat_t4_libre, "aprobado", DOC_PDF_DEMO),
         ("Manta Bulls", torneo4, cat_t4_maxi, "aprobado", DOC_PDF_DEMO),
         ("Portoviejo Stars", torneo4, cat_t4_libre, "aprobado", DOC_PDF_DEMO),
+        ("Chone Heat", torneo4, cat_t4_libre, "aprobado", DOC_PDF_DEMO),
+        ("Jipijapa Lakers", torneo4, cat_t4_libre, "aprobado", DOC_PDF_DEMO),
     ]
+
 
     for eq_nom, tor, cat, est, comp in inscripciones_config:
         eq_obj = equipos_map[eq_nom]
@@ -718,6 +725,21 @@ def seed_tablas():
         stats_visitante_procesadas=True
     )
 
+    p4_t3 = Partido(
+        id_torneo=torneo3.id_torneo,
+        id_categoria=cat_t3_libre.id_categoria,
+        id_equipo_local=equipos_map["Tiburones de Manta"].id_equipo,
+        id_equipo_visitante=equipos_map["Chone Heat"].id_equipo,
+        fecha=datetime(2023, 9, 20).date(),
+        hora=datetime.strptime('18:00', '%H:%M').time(),
+        estado="finalizado",
+        fase="Cuartos de Final",
+        marcador_local=88,
+        marcador_visitante=84,
+        stats_local_procesadas=True,
+        stats_visitante_procesadas=True
+    )
+
     # ── Torneo 4: Copa Ciudad de Manta 2022 (Finalizado Completo) ───────────
     p1_t4 = Partido(
         id_torneo=torneo4.id_torneo,
@@ -747,12 +769,26 @@ def seed_tablas():
         stats_local_procesadas=True,
         stats_visitante_procesadas=True
     )
+    p3_t4 = Partido(
+        id_torneo=torneo4.id_torneo,
+        id_categoria=cat_t4_libre.id_categoria,
+        id_equipo_local=equipos_map["Chone Heat"].id_equipo,
+        id_equipo_visitante=equipos_map["Jipijapa Lakers"].id_equipo,
+        fecha=datetime(2022, 10, 10).date(),
+        hora=datetime.strptime('17:00', '%H:%M').time(),
+        estado="finalizado",
+        fase="Cuartos de Final",
+        marcador_local=78,
+        marcador_visitante=72,
+        stats_local_procesadas=True,
+        stats_visitante_procesadas=True
+    )
 
     partidos_todos = [
         p1_t1, p2_t1, p3_t1, p4_t1, p5_t1, p6_t1, p7_t1, p8_t1,
         p1_t2, p2_t2, p3_t2, p4_t2, p5_t2,
-        p1_t3, p2_t3, p3_t3,
-        p1_t4, p2_t4
+        p1_t3, p2_t3, p3_t3, p4_t3,
+        p1_t4, p2_t4, p3_t4
     ]
     db.session.add_all(partidos_todos)
     db.session.flush()

@@ -67,10 +67,10 @@ describe('torneoGrouping utilities', () => {
 
     it('respeta diferentes valores de maxAnios (ej. maxAnios = 1 o maxAnios = 4)', () => {
       const mockTorneos: Torneo[] = [
-        { id_torneo: 1, nombre: 'T2026', fecha_inicio: '2026-01-01' },
-        { id_torneo: 2, nombre: 'T2025', fecha_inicio: '2025-01-01' },
-        { id_torneo: 3, nombre: 'T2024', fecha_inicio: '2024-01-01' },
-        { id_torneo: 4, nombre: 'T2023', fecha_inicio: '2023-01-01' },
+        { id_torneo: 1, nombre: 'T2026', fecha_inicio: '2026-01-01', estado: 'programado' },
+        { id_torneo: 2, nombre: 'T2025', fecha_inicio: '2025-01-01', estado: 'programado' },
+        { id_torneo: 3, nombre: 'T2024', fecha_inicio: '2024-01-01', estado: 'programado' },
+        { id_torneo: 4, nombre: 'T2023', fecha_inicio: '2023-01-01', estado: 'programado' },
       ];
 
       const res1 = agruparTorneosPorAniosRecientes(mockTorneos, 1);

@@ -62,8 +62,8 @@ export default function TorneosAdmin() {
     if (torneo) {
       setEditingTorneo(torneo);
       setValue('nombre', torneo.nombre || torneo.nombre_torneo || '');
-      setValue('fecha_inicio', new Date(torneo.fecha_inicio).toISOString().split('T')[0]);
-      setValue('fecha_fin', new Date(torneo.fecha_fin).toISOString().split('T')[0]);
+      setValue('fecha_inicio', torneo.fecha_inicio ? new Date(torneo.fecha_inicio).toISOString().split('T')[0] : '');
+      setValue('fecha_fin', torneo.fecha_fin ? new Date(torneo.fecha_fin).toISOString().split('T')[0] : '');
       setValue('estado', torneo.estado);
     } else {
       setEditingTorneo(null);
@@ -171,12 +171,12 @@ export default function TorneosAdmin() {
     {
       key: 'fecha_inicio',
       header: 'Fecha Inicio',
-      render: (row) => new Date(row.fecha_inicio).toLocaleDateString(),
+      render: (row) => row.fecha_inicio ? new Date(row.fecha_inicio).toLocaleDateString() : 'N/A',
     },
     {
       key: 'fecha_fin',
       header: 'Fecha Fin',
-      render: (row) => new Date(row.fecha_fin).toLocaleDateString(),
+      render: (row) => row.fecha_fin ? new Date(row.fecha_fin).toLocaleDateString() : 'N/A',
     },
     {
       key: 'estado',

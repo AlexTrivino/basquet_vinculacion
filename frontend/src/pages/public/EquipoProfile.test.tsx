@@ -31,8 +31,9 @@ const mockEquipo = {
   },
 };
 
-const mockPlantillas = [
+const mockPlantillas: any[] = [
   {
+    id: 101,
     id_plantilla: 101,
     id_jugador: 50,
     id_equipo: 1,
@@ -45,6 +46,7 @@ const mockPlantillas = [
     },
   },
   {
+    id: 102,
     id_plantilla: 102,
     id_jugador: 51,
     id_equipo: 1,
@@ -58,12 +60,12 @@ const mockPlantillas = [
   },
 ];
 
-const mockPartidos = [
+const mockPartidos: any[] = [
   {
     id_partido: 201,
     fecha: '2026-03-10',
     hora: '19:30',
-    estado: 'finalizado',
+    estado: 'finalizado' as any,
     marcador_local: 84,
     marcador_visitante: 76,
     id_equipo_local: 1,
@@ -77,7 +79,7 @@ const mockPartidos = [
     id_partido: 202,
     fecha: '2026-03-18',
     hora: '20:00',
-    estado: 'programado',
+    estado: 'programado' as any,
     marcador_local: 0,
     marcador_visitante: 0,
     id_equipo_local: 3,
@@ -90,12 +92,13 @@ const mockPartidos = [
   },
 ];
 
-const mockInscripciones = [
+const mockInscripciones: any[] = [
   {
     id_inscripcion: 301,
     id_torneo: 1,
     id_equipo: 1,
     id_categoria: 10,
+    fecha_inscripcion: '2026-01-01T00:00:00Z',
     estado_inscripcion: 'aprobado',
     torneo: {
       id_torneo: 1,
@@ -113,6 +116,7 @@ const mockInscripciones = [
     id_torneo: 2,
     id_equipo: 1,
     id_categoria: 11,
+    fecha_inscripcion: '2024-01-01T00:00:00Z',
     estado_inscripcion: 'aprobado',
     torneo: {
       id_torneo: 2,
@@ -130,6 +134,7 @@ const mockInscripciones = [
     id_torneo: 3,
     id_equipo: 1,
     id_categoria: 12,
+    fecha_inscripcion: '2023-01-01T00:00:00Z',
     estado_inscripcion: 'aprobado',
     torneo: {
       id_torneo: 3,
@@ -147,6 +152,7 @@ const mockInscripciones = [
     id_torneo: 4,
     id_equipo: 1,
     id_categoria: 13,
+    fecha_inscripcion: '2022-01-01T00:00:00Z',
     estado_inscripcion: 'aprobado',
     torneo: {
       id_torneo: 4,
@@ -280,7 +286,7 @@ describe('EquipoProfile Component', () => {
 
     vi.spyOn(partidosApi, 'getPartidosByEquipo').mockResolvedValue({
       success: true,
-      data: partidoDerrota,
+      data: partidoDerrota as any,
       message: 'Partidos obtenidos',
     });
 

@@ -13,7 +13,7 @@ import api from '../../../api/axios.config';
 const loginSchema = z.object({
   email: z.string().email('Ingresa un correo electrónico válido'),
   password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
-  rememberMe: z.boolean().default(true),
+  rememberMe: z.boolean(),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -123,7 +123,7 @@ export function LoginForm() {
       {/* Uso obligatorio de AsyncButton como se solicitó, interceptando el Submit de RHF */}
       <AsyncButton
         type="button"
-        onClickAction={handleSubmit(onSubmit)}
+        onClickAction={() => handleSubmit(onSubmit)()}
         className="mt-2 w-full bg-primary-600 py-2.5 text-white hover:bg-primary-700"
       >
         Ingresar

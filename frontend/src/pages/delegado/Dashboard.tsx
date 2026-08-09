@@ -40,7 +40,7 @@ export default function Dashboard() {
             const inicial = eq.nombre_equipo?.charAt(0) || '?';
             const esBorrador = ins.estado_inscripcion === 'borrador' || ins.estado === 'borrador';
             return (
-              <div key={idEq} className={`bg-white rounded-2xl shadow-sm border overflow-hidden flex flex-col items-center p-6 hover:shadow-md transition-shadow ${
+              <div key={ins.id_inscripcion || `${idEq}-${ins.id_torneo}-${ins.id_categoria}`} className={`bg-white rounded-2xl shadow-sm border overflow-hidden flex flex-col items-center p-6 hover:shadow-md transition-shadow ${
                 esBorrador ? 'border-amber-300' : 'border-gray-200'
               }`}>
                 {esBorrador && (
@@ -52,7 +52,15 @@ export default function Dashboard() {
                 <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4 overflow-hidden border-4 border-gray-50 shadow-inner">
                   {logo ? <img src={logo} alt={eq.nombre_equipo} className="w-full h-full object-cover" /> : <span className="text-2xl font-bold text-gray-400">{inicial}</span>}
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{eq.nombre_equipo}</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-1 text-center">{eq.nombre_equipo}</h3>
+                <p className="text-xs font-semibold text-primary-700 bg-primary-50 px-2.5 py-0.5 rounded-full mb-1">
+                  {ins.torneo?.nombre || 'Torneo Oficial'}
+                </p>
+                {ins.categoria && (
+                  <p className="text-xs text-gray-500 mb-3 capitalize">
+                    {ins.categoria.nombre_categoria} ({ins.categoria.genero_categoria})
+                  </p>
+                )}
                 <StatusBadge status={esBorrador ? 'Borrador' : ins.estado_inscripcion ?? ins.estado ?? 'Desconocido'} />
                 <div className="w-full mt-4 space-y-2">
                   {esBorrador ? (

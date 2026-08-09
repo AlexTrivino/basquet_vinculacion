@@ -14,13 +14,19 @@ export default function DirectorioEquipos() {
     queryFn: () => getTorneos(1, 100),
   });
   const torneos = useMemo(() => {
-    return (torneosRes?.data || []).filter(t => t.estado === 'programado' || t.estado === 'en_curso');
+    return (torneosRes?.data || []).sort((a, b) => {
+      const anioA = (a as any).anio || (a.fecha_inicio ? new Date(a.fecha_inicio).getFullYear() : 0);
+      const anioB = (b as any).anio || (b.fecha_inicio ? new Date(b.fecha_inicio).getFullYear() : 0);
+      if (anioB !== anioA) return anioB - anioA;
+      return (b.id_torneo || 0) - (a.id_torneo || 0);
+    });
   }, [torneosRes]);
 
-  // Set initial selected torneo to the first active one
+  // Set initial selected torneo to the first active one or the most recent
   useEffect(() => {
     if (torneos.length > 0 && selectedTorneo === '') {
-      setSelectedTorneo(torneos[0].id_torneo!);
+      const primerActivo = torneos.find(t => t.estado === 'en_curso') || torneos[0];
+      setSelectedTorneo(primerActivo.id_torneo!);
     }
   }, [torneos, selectedTorneo]);
 
@@ -46,7 +52,7 @@ export default function DirectorioEquipos() {
 
         {/* Filters */}
         <div className="flex justify-center mb-10">
-          <div className="w-full max-w-sm">
+          <div className="w-full max-w-md">
             {loadingTorneos ? (
               <Skeleton className="h-12 w-full rounded-xl" />
             ) : (
@@ -54,12 +60,12 @@ export default function DirectorioEquipos() {
                 <select
                   value={selectedTorneo}
                   onChange={(e) => setSelectedTorneo(Number(e.target.value))}
-                  className="block w-full pl-4 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-xl shadow-sm appearance-none bg-white cursor-pointer"
+                  className="block w-full pl-4 pr-10 py-3 text-base font-semibold text-gray-800 border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-xl shadow-sm appearance-none bg-white cursor-pointer"
                 >
                   <option value="" disabled>Seleccione un torneo...</option>
                   {torneos.map((t) => (
                     <option key={t.id_torneo} value={t.id_torneo}>
-                      {t.nombre}
+                      {t.nombre} {t.estado === 'en_curso' ? '🔥 (En Curso)' : t.estado === 'programado' ? '⏳ (Próximo)' : '🏆 (Finalizado)'}
                     </option>
                   ))}
                 </select>

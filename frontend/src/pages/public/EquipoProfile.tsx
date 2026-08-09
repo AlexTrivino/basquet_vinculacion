@@ -175,7 +175,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
   };
 
   // ── Partidos procesados ─────────────────────────────────────────
-  const { finalizados, programados, ultimoPartido, resultadoUltimoPartido } = useMemo(() => {
+  const { programados, ultimoPartido, resultadoUltimoPartido } = useMemo(() => {
     const fin = (partidos || [])
       .filter((p) => p.estado === 'finalizado' || p.estado === 'finalizado_wo')
       .sort((a, b) => {
@@ -197,7 +197,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
 
     if (ult) {
       const esLocal =
-        ult.id_equipo_local === idEquipo || ult.equipo_local?.id_equipo === idEquipo;
+        (ult as any).id_equipo_local === idEquipo || ult.equipo_local?.id_equipo === idEquipo;
       const misPuntos = esLocal ? (ult.marcador_local ?? 0) : (ult.marcador_visitante ?? 0);
       const rivalPuntos = esLocal ? (ult.marcador_visitante ?? 0) : (ult.marcador_local ?? 0);
 
@@ -651,7 +651,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
               <div className="bg-white rounded-3xl border border-gray-200 shadow-2xs divide-y divide-gray-100 overflow-hidden flex-1 flex flex-col justify-between">
                 {programados.slice(0, 3).map((p) => {
                   const esLocal =
-                    p.id_equipo_local === idEquipo || p.equipo_local?.id_equipo === idEquipo;
+                    (p as any).id_equipo_local === idEquipo || p.equipo_local?.id_equipo === idEquipo;
                   const rival = esLocal ? p.equipo_visitante : p.equipo_local;
 
                   return (

@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getEquiposAdmin, reactivarEquipo } from '../../features/equipos/api/equipos.api';
+import { getTorneos } from '../../features/torneos/api/torneos.api';
+import { getCategorias } from '../../features/categorias/api/categorias.api';
 import { DataGridTable, type Column } from '../../components/DataGridTable';
 import { StatusBadge } from '../../components/StatusBadge';
 import { toast } from 'sonner';
-import { Search } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import { DesactivarEquipoModal } from '../../features/equipos/components/DesactivarEquipoModal';
 
 export default function AdminEquipos() {
@@ -13,6 +15,8 @@ export default function AdminEquipos() {
   const perPage = 10;
   const [equipoToDeactivate, setEquipoToDeactivate] = useState<number | null>(null);
 
+  const [selectedTorneo, setSelectedTorneo] = useState<number | ''>('');
+  const [selectedCategoria, setSelectedCategoria] = useState<number | ''>('');
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
@@ -24,9 +28,39 @@ export default function AdminEquipos() {
     return () => clearTimeout(timer);
   }, [searchInput]);
 
+  // Torneos para filtro
+  const { data: torneosRes } = useQuery({
+    queryKey: ['torneos', 'admin-filter'],
+    queryFn: () => getTorneos(1, 100),
+  });
+
+  const torneos = useMemo(() => {
+    return (torneosRes?.data || []).sort((a, b) => {
+      const anioA = (a as any).anio || (a.fecha_inicio ? new Date(a.fecha_inicio).getFullYear() : 0);
+      const anioB = (b as any).anio || (b.fecha_inicio ? new Date(b.fecha_inicio).getFullYear() : 0);
+      if (anioB !== anioA) return anioB - anioA;
+      return (b.id_torneo || 0) - (a.id_torneo || 0);
+    });
+  }, [torneosRes]);
+
+  // Categorías dependientes del torneo seleccionado
+  const { data: categoriasRes } = useQuery({
+    queryKey: ['categorias', selectedTorneo],
+    queryFn: () => getCategorias(1, 100, Number(selectedTorneo)),
+    enabled: selectedTorneo !== '',
+  });
+  const categorias = categoriasRes?.data || [];
+
   const { data, isLoading } = useQuery({
-    queryKey: ['admin-equipos', page, debouncedSearch],
-    queryFn: () => getEquiposAdmin(page, perPage, undefined, undefined, debouncedSearch),
+    queryKey: ['admin-equipos', page, selectedTorneo, selectedCategoria, debouncedSearch],
+    queryFn: () =>
+      getEquiposAdmin(
+        page,
+        perPage,
+        selectedTorneo ? Number(selectedTorneo) : undefined,
+        selectedCategoria ? Number(selectedCategoria) : undefined,
+        debouncedSearch
+      ),
   });
 
   const reactivarMutation = useMutation({
@@ -105,19 +139,63 @@ export default function AdminEquipos() {
   ];
 
   return (
-    <div className="mx-auto w-fit min-w-[60%] px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Gestión de Equipos</h1>
-          <p className="mt-1 text-sm text-gray-500">Panel administrativo para control del estado de los equipos.</p>
+          <p className="mt-1 text-sm text-gray-500">Panel administrativo para control del estado de los equipos y torneos.</p>
         </div>
-        <div className="relative w-full sm:w-80">
+      </div>
+
+      {/* Barra de Filtros */}
+      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-gray-500" />
+            <select
+              value={selectedTorneo}
+              onChange={(e) => {
+                setSelectedTorneo(e.target.value ? Number(e.target.value) : '');
+                setSelectedCategoria('');
+                setPage(1);
+              }}
+              className="text-sm font-medium bg-gray-50 border border-gray-300 rounded-xl px-3 py-2 text-gray-700 focus:ring-2 focus:ring-primary-500 focus:outline-none"
+            >
+              <option value="">Todos los torneos</option>
+              {torneos.map((t) => (
+                <option key={t.id_torneo} value={t.id_torneo}>
+                  {t.nombre} {t.estado === 'en_curso' ? '(En Curso)' : t.estado === 'programado' ? '(Próximo)' : '(Finalizado)'}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {selectedTorneo !== '' && categorias.length > 0 && (
+            <select
+              value={selectedCategoria}
+              onChange={(e) => {
+                setSelectedCategoria(e.target.value ? Number(e.target.value) : '');
+                setPage(1);
+              }}
+              className="text-sm font-medium bg-gray-50 border border-gray-300 rounded-xl px-3 py-2 text-gray-700 focus:ring-2 focus:ring-primary-500 focus:outline-none capitalize"
+            >
+              <option value="">Todas las categorías</option>
+              {categorias.map((c: any) => (
+                <option key={c.id_categoria} value={c.id_categoria}>
+                  {c.nombre_categoria} ({c.genero_categoria})
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        <div className="relative w-full md:w-80">
           <input
             type="text"
             placeholder="Buscar por nombre de equipo..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 shadow-sm"
           />
           <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
         </div>
