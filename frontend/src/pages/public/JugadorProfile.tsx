@@ -254,7 +254,7 @@ export default function JugadorProfile() {
               </h1>
             </div>
 
-            {/* Atributos: Edad, Género, Club */}
+            {/* Atributos: Edad, Género, Equipo */}
             <div className="w-full mt-4 pt-4 border-t border-gray-100 flex flex-wrap items-center justify-center gap-2 text-xs font-semibold text-gray-600">
               {edad !== null && (
                 <span className="inline-flex items-center gap-1 bg-gray-100 px-2.5 py-1 rounded-lg">
@@ -428,7 +428,7 @@ export default function JugadorProfile() {
               </div>
               <div>
                 <h2 className="text-lg font-black text-gray-900 tracking-tight">Historial de Equipos y Categorías</h2>
-                <p className="text-xs font-semibold text-gray-500">Nóminas y clubes registrados por orden cronológico</p>
+                <p className="text-xs font-semibold text-gray-500">Nóminas y equipos registrados por orden cronológico</p>
               </div>
             </div>
 

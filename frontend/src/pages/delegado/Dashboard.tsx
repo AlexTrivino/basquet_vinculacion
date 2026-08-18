@@ -61,7 +61,7 @@ export default function Dashboard() {
                     {ins.categoria.nombre_categoria} ({ins.categoria.genero_categoria})
                   </p>
                 )}
-                <StatusBadge status={esBorrador ? 'Borrador' : ins.estado_inscripcion ?? ins.estado ?? 'Desconocido'} />
+                <StatusBadge status={esBorrador ? 'Borrador' : (ins.estado_inscripcion ?? ins.estado ?? 'Desconocido')} />
                 <div className="w-full mt-4 space-y-2">
                   {esBorrador ? (
                     <Link
@@ -128,7 +128,7 @@ export default function Dashboard() {
               ¡Bienvenido al Panel de Delegado!
             </h1>
             <p className="mt-3 text-base text-primary-100 leading-relaxed">
-              Registra tu club, sube el comprobante de pago y añade a tus jugadores para participar en los torneos oficiales de baloncesto.
+              Registra tu equipo, sube el comprobante de pago y añade a tus jugadores para participar en los torneos oficiales de baloncesto.
             </p>
           </div>
           <div className="absolute -top-12 -right-12 h-64 w-64 rounded-full bg-white/10 blur-2xl pointer-events-none" />
@@ -156,7 +156,7 @@ export default function Dashboard() {
               {[
                 {
                   step: 1,
-                  title: 'Datos del Club y Comprobante',
+                  title: 'Datos del Equipo y Comprobante',
                   desc: 'Selecciona torneo y categoría, completa la información de tu equipo y adjunta el comprobante de pago.',
                 },
                 {
@@ -218,7 +218,7 @@ export default function Dashboard() {
           <h2 className="font-bold text-gray-900 text-lg flex items-center gap-2">
             <Trophy className="w-5 h-5 text-primary-600" /> Administración
           </h2>
-          <StatusBadge status={estadoActual === 'pendiente' ? 'Pendiente' : estadoActual === 'aprobado' ? 'Aprobado' : 'Rechazado'} />
+          <StatusBadge status={estadoActual || 'Desconocido'} />
         </div>
         <p className="text-sm text-gray-500 mb-4 leading-relaxed">
         {estadoActual === 'borrador'
@@ -278,7 +278,7 @@ export default function Dashboard() {
 
         <div className="mb-4">
           <span className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1 block">Estatus del Equipo</span>
-          <StatusBadge status={estadoActual === 'pendiente' ? 'Pendiente' : estadoActual === 'aprobado' ? 'Aprobado' : 'Rechazado'} />
+          <StatusBadge status={estadoActual || 'Desconocido'} />
         </div>
 
         <p className="text-sm text-gray-600 mb-6 leading-relaxed">

@@ -9,6 +9,7 @@ import { TorneoCardHome } from '../../features/torneos/components/TorneoCardHome
 import { PartidosRecientesSection } from '../../features/torneos/components/PartidosRecientesSection';
 import { Skeleton } from '../../components/Skeleton';
 import { EmptyState } from '../../components/EmptyState';
+import { SponsorsCarousel } from '../../components/SponsorsCarousel';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -74,7 +75,7 @@ export default function Home() {
             <img
               src="/logo.png"
               alt="Torneos Baloncesto Manta Logo"
-              className="h-28 w-28 sm:h-36 sm:w-36 object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-300"
+              className="h-40 w-40 sm:h-56 sm:w-56 object-contain hover:scale-105 transition-transform duration-300 drop-shadow-2xl"
             />
             <div className="text-center sm:text-left">
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">
@@ -195,6 +196,11 @@ export default function Home() {
            ═══════════════════════════════════════════════════════════════════ */}
         <PartidosRecientesSection />
       </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          CARRUSEL DE AUSPICIANTES FIJO AL INFERIOR
+         ═══════════════════════════════════════════════════════════════════ */}
+      <SponsorsCarousel />
     </main>
   );
 }

@@ -100,7 +100,7 @@ describe('ModalExpedienteInscripcion', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('renderiza información del club, delegado y comprobante', async () => {
+  it('renderiza información del equipo, delegado y comprobante', async () => {
     vi.spyOn(plantillasApi, 'getPlantillas').mockResolvedValueOnce({
       success: true,
       message: 'OK',

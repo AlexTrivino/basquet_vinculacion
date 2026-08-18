@@ -127,7 +127,7 @@ export function AuditoriaEquipos() {
   const columns: Column<Inscripcion>[] = [
     {
       key: 'equipo',
-      header: 'Equipo / Club',
+      header: 'Equipo',
       render: (row) => {
         const nombre = row.equipo?.nombre_equipo || row.equipo?.nombre || 'Equipo';
         const logo = row.equipo?.url_logo;

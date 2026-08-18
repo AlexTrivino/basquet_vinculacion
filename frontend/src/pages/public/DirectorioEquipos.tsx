@@ -43,7 +43,7 @@ export default function DirectorioEquipos() {
         <div className="text-center mb-12">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4 flex items-center justify-center gap-3">
             <Trophy className="w-8 h-8 text-primary-600" />
-            Directorio de Clubes
+            Directorio de Equipos
           </h1>
           <p className="text-gray-500 max-w-2xl mx-auto text-lg">
             Explora los equipos registrados en nuestros torneos, conoce sus plantillas y sigue su progreso en la competición.

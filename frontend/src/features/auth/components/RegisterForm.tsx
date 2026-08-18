@@ -145,7 +145,8 @@ export function RegisterForm() {
           </div>
           <h3 className="text-2xl font-bold text-gray-900 mb-2">¡Revisa tu correo!</h3>
           <p className="text-gray-600 mb-8 text-sm">
-            Hemos enviado un enlace de confirmación a tu correo electrónico. Por favor, haz clic en él para activar tu cuenta.
+            Hemos enviado un enlace de confirmación a tu correo electrónico. Por favor, haz clic en él para activar tu cuenta.<br/><br/>
+            <span className="font-semibold text-gray-800">Nota:</span> Si no encuentras el correo en tu bandeja principal, recuerda revisar tu carpeta de <span className="font-semibold">Spam o Correo no deseado</span>.
           </p>
           <button
             type="button"

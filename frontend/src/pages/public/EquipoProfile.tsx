@@ -321,7 +321,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
           </div>
           <h2 className="text-2xl font-black text-gray-900 mb-2">Equipo no encontrado</h2>
           <p className="text-gray-500 text-sm mb-6">
-            El club solicitado no existe o ha sido deshabilitado del sistema.
+            El equipo solicitado no existe o ha sido deshabilitado del sistema.
           </p>
           <Link
             to="/directorio-equipos"
@@ -445,7 +445,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
             {/* Info Info */}
             <div className="min-w-0 pb-1">
               <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-primary-50 border border-primary-100 text-primary-700 text-xs font-bold mb-1.5 uppercase tracking-wider">
-                <Shield className="w-3.5 h-3.5" /> Club Oficial
+                <Shield className="w-3.5 h-3.5" /> Equipo Oficial
               </div>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight uppercase">
                 {equipo.nombre_equipo}
@@ -833,7 +833,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
                 <Trophy className="w-5 h-5 text-amber-500" /> Historial de Participaciones
               </h2>
               <p className="text-xs font-semibold text-gray-500 mt-0.5">
-                Competiciones y categorías oficiales disputadas por el club.
+                Competiciones y categorías oficiales disputadas por el equipo.
               </p>
             </div>
 

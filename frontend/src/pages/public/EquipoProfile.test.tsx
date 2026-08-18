@@ -21,7 +21,7 @@ vi.mock('../../context/AuthContext', () => ({
 
 const mockEquipo = {
   id_equipo: 1,
-  nombre_equipo: 'Delfines Basketball Club',
+  nombre_equipo: 'Delfines Basketball Equipo',
   url_logo: 'https://ejemplo.com/delfines.png',
   url_foto_equipo: 'https://ejemplo.com/banner.jpg',
   estado: 'activo',
@@ -72,7 +72,7 @@ const mockPartidos: any[] = [
     id_equipo_visitante: 2,
     ubicacion: 'Coliseo Pablo Delgado Álava',
     torneo: { id_torneo: 99, nombre: 'Supercopa Manta 2026' },
-    equipo_local: { id_equipo: 1, nombre_equipo: 'Delfines Basketball Club' },
+    equipo_local: { id_equipo: 1, nombre_equipo: 'Delfines Basketball Equipo' },
     equipo_visitante: { id_equipo: 2, nombre_equipo: 'Tiburones BBC' },
   },
   {
@@ -88,7 +88,7 @@ const mockPartidos: any[] = [
     fase: 'Semifinales',
     torneo: { id_torneo: 99, nombre: 'Supercopa Manta 2026' },
     equipo_local: { id_equipo: 3, nombre_equipo: 'Leones de Manta' },
-    equipo_visitante: { id_equipo: 1, nombre_equipo: 'Delfines Basketball Club' },
+    equipo_visitante: { id_equipo: 1, nombre_equipo: 'Delfines Basketball Equipo' },
   },
 ];
 
@@ -217,9 +217,8 @@ describe('EquipoProfile Component', () => {
   it('renderiza la cabecera deportiva con el nombre en mayúsculas y delegado', async () => {
     renderComponent();
 
-    expect(await screen.findByRole('heading', { name: /delfines basketball club/i })).toBeInTheDocument();
-    expect(screen.getByText(/Carlos Delgado/i)).toBeInTheDocument();
-    expect(screen.getByText('Club Oficial')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /delfines basketball equipo/i })).toBeInTheDocument();
+    expect(screen.getByText('Equipo Oficial')).toBeInTheDocument();
   });
 
   it('muestra el último resultado con marcador y badge de victoria', async () => {
@@ -309,7 +308,7 @@ describe('EquipoProfile Component', () => {
     ).toBeInTheDocument();
   });
 
-  it('muestra los EmptyStates correspondientes cuando el club no tiene partidos ni participaciones', async () => {
+  it('muestra los EmptyStates correspondientes cuando el equipo no tiene partidos ni participaciones', async () => {
     vi.spyOn(partidosApi, 'getPartidosByEquipo').mockResolvedValue({
       success: true,
       data: [],

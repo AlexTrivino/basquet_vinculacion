@@ -139,7 +139,7 @@ export function ModalExpedienteInscripcion({
 
           {/* Contenido Principal en 2 Columnas Desahogadas */}
           <div className="p-6 sm:p-8 overflow-y-auto grid grid-cols-1 lg:grid-cols-12 gap-8 bg-gray-50/70 flex-1">
-            {/* Columna Izquierda: Información del Club, Delegado y Comprobante (4 columnas) */}
+            {/* Columna Izquierda: Información del Equipo, Delegado y Comprobante (4 columnas) */}
             <div className="lg:col-span-4 space-y-6">
               {/* Tarjeta de Información General */}
               <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-5">
@@ -150,7 +150,7 @@ export function ModalExpedienteInscripcion({
 
                 <div className="space-y-3.5 text-sm">
                   <div className="flex items-start justify-between border-b border-gray-100 pb-3">
-                    <span className="text-gray-500 font-medium">Club / Equipo:</span>
+                    <span className="text-gray-500 font-medium">Equipo:</span>
                     <span className="font-bold text-gray-900 text-right text-base">{nombreEquipo}</span>
                   </div>
 

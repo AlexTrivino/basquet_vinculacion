@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { CheckCircle2, Users, ChevronRight, Trophy, X } from 'lucide-react';
+import { CheckCircle2, Users, ChevronRight, Trophy, X, Trash2, Shield } from 'lucide-react';
 import { AsyncButton } from '../../../components/AsyncButton';
-import { inscribirEquipoCompleto, finalizarBorradorInscripcion } from '../api/equipos.api';
+import { inscribirEquipoCompleto, finalizarBorradorInscripcion, desactivarEquipo } from '../api/equipos.api';
 import { getTorneos } from '../../torneos/api/torneos.api';
 import { getCategorias } from '../../categorias/api/categorias.api';
 import { GestorPlantilla } from '../../plantillas/components/GestorPlantilla';
@@ -153,6 +153,9 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
+  const comprobanteInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
   // Datos de la inscripción creada al finalizar el Paso 1
   const [borradorData, setBorradorData] = useState<{
     idInscripcion: number;
@@ -276,7 +279,7 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
       });
 
       setCurrentStep(2);
-      toast.success('Datos del club guardados. Ahora registra los jugadores de tu equipo.');
+      toast.success('Datos del equipo guardados. Ahora registra los jugadores de tu equipo.');
     } catch (error: any) {
       let message = error?.response?.data?.message || 'Error al procesar la inscripción';
       if (message.toLowerCase().includes('logo') && message.toLowerCase().includes('tamaño')) {
@@ -323,7 +326,7 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
                 isStep2 ? 'text-emerald-700' : 'text-primary-700'
               }`}
             >
-              1. Datos del Club
+              1. Datos del Equipo
             </span>
           </div>
 
@@ -371,25 +374,49 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
     return (
       <div className="w-full flex flex-col gap-5">
         {/* Cabecera Paso 2 */}
-        <div className="max-w-4xl w-full mx-auto">
-          <div className="flex items-center gap-2 text-xs text-gray-500 font-medium mb-1">
-            <span>Inscripción</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-gray-800 font-semibold">{borradorData.nombreEquipo}</span>
+        <div className="max-w-4xl w-full mx-auto flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs text-gray-500 font-medium mb-1">
+              <span>Inscripción</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+              <span className="text-gray-800 font-semibold">{borradorData.nombreEquipo}</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Paso 2 — Registro de Jugadores</h1>
+            <p className="text-xs text-gray-500 mt-1">
+              Registra entre 10 y 18 jugadores. Cuando completes el mínimo de 10, se habilitará el botón de envío.
+            </p>
           </div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Paso 2 — Registro de Jugadores</h1>
-          <p className="text-xs text-gray-500 mt-1">
-            Registra entre 10 y 18 jugadores. Cuando completes el mínimo de 10, se habilitará el botón de envío.
-          </p>
+          
+          <AsyncButton
+            onClickAction={async () => {
+              if (window.confirm("¿Estás seguro de descartar esta inscripción? Se borrarán todos los datos ingresados y tendrás que empezar de nuevo.")) {
+                try {
+                  await desactivarEquipo(borradorData.idEquipo);
+                  queryClient.invalidateQueries({ queryKey: ['inscripciones', 'delegado'] });
+                  setBorradorData(null);
+                  setCurrentStep(1);
+                  toast.success('Inscripción descartada correctamente.');
+                } catch (error) {
+                  toast.error('Error al descartar la inscripción.');
+                }
+              }
+            }}
+            className="inline-flex items-center justify-center gap-2 text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 px-4 py-2 rounded-xl text-sm font-bold transition-colors shadow-sm whitespace-nowrap"
+          >
+            <Trash2 className="w-4 h-4" /> Descartar y volver
+          </AsyncButton>
         </div>
 
         {/* Info del equipo */}
-        <div className="flex flex-wrap gap-2 text-xs max-w-4xl w-full mx-auto">
-          <span className="inline-flex items-center gap-1.5 bg-primary-50 text-primary-800 px-3 py-1.5 rounded-full font-medium border border-primary-100">
-            🏀 {borradorData.nombreTorneo}
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3 max-w-4xl w-full mx-auto">
+          <span className="inline-flex items-center gap-2 bg-blue-50 text-blue-800 px-5 py-2.5 rounded-xl font-black border border-blue-200 text-base shadow-sm">
+            <Shield className="w-5 h-5 text-blue-600" /> Equipo: {borradorData.nombreEquipo}
           </span>
-          <span className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full font-medium border border-gray-200">
-            {borradorData.nombreCategoria}
+          <span className="inline-flex items-center gap-2 bg-primary-50 text-primary-800 px-5 py-2.5 rounded-xl font-bold border border-primary-200 text-base shadow-sm">
+            <Trophy className="w-5 h-5 text-primary-600" /> Torneo: {borradorData.nombreTorneo}
+          </span>
+          <span className="inline-flex items-center gap-2 bg-gray-50 text-gray-800 px-5 py-2.5 rounded-xl font-bold border border-gray-200 text-base shadow-sm">
+            Categoría: {borradorData.nombreCategoria}
           </span>
         </div>
 
@@ -427,7 +454,7 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
   return (
     <div className="mx-auto max-w-2xl rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
       <StepIndicator />
-      <h2 className="text-xl font-bold text-gray-900">Paso 1 — Datos del Club</h2>
+      <h2 className="text-xl font-bold text-gray-900">Paso 1 — Datos del Equipo</h2>
       <p className="mb-6 mt-1 text-sm text-gray-500">
         Completa los campos y adjunta el comprobante de pago. Al continuar crearemos el borrador de tu inscripción.
       </p>
@@ -500,26 +527,42 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
           <p className="mb-2 text-xs text-gray-500">
             Formato PDF o Imagen (JPG, PNG). Tamaño máximo: 5 MB.
           </p>
-          <input
-            id="comprobante"
-            type="file"
-            accept=".pdf, .jpg, .jpeg, .png, .webp"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                if (file.size > MAX_COMPROBANTE_SIZE) {
-                  toast.error('El comprobante excede el tamaño máximo permitido (5 MB).');
-                  e.target.value = '';
+          <div className="flex items-center gap-2">
+            <input
+              id="comprobante"
+              type="file"
+              ref={comprobanteInputRef}
+              accept=".pdf, .jpg, .jpeg, .png, .webp"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  if (file.size > MAX_COMPROBANTE_SIZE) {
+                    toast.error('El comprobante excede el tamaño máximo permitido (5 MB).');
+                    e.target.value = '';
+                    setComprobanteFile(null);
+                    return;
+                  }
+                  setComprobanteFile(file);
+                } else {
                   setComprobanteFile(null);
-                  return;
                 }
-                setComprobanteFile(file);
-              } else {
-                setComprobanteFile(null);
-              }
-            }}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
-          />
+              }}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+            />
+            {comprobanteFile && (
+              <button
+                type="button"
+                onClick={() => {
+                  setComprobanteFile(null);
+                  if (comprobanteInputRef.current) comprobanteInputRef.current.value = '';
+                }}
+                className="shrink-0 p-2 text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                title="Eliminar archivo"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Logo del Equipo (Opcional) */}
@@ -530,26 +573,42 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
           <p className="mb-2 text-xs text-gray-500">
             Tamaño máximo permitido: 2 MB. (JPG, PNG, WebP)
           </p>
-          <input
-            id="logo"
-            type="file"
-            accept=".jpg, .jpeg, .png, .webp"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                if (file.size > MAX_LOGO_SIZE) {
-                  toast.error('El logo excede el tamaño máximo permitido (2 MB).');
-                  e.target.value = '';
+          <div className="flex items-center gap-2">
+            <input
+              id="logo"
+              type="file"
+              ref={logoInputRef}
+              accept=".jpg, .jpeg, .png, .webp"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  if (file.size > MAX_LOGO_SIZE) {
+                    toast.error('El logo excede el tamaño máximo permitido (2 MB).');
+                    e.target.value = '';
+                    setLogoFile(null);
+                    return;
+                  }
+                  setLogoFile(file);
+                } else {
                   setLogoFile(null);
-                  return;
                 }
-                setLogoFile(file);
-              } else {
-                setLogoFile(null);
-              }
-            }}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
-          />
+              }}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+            />
+            {logoFile && (
+              <button
+                type="button"
+                onClick={() => {
+                  setLogoFile(null);
+                  if (logoInputRef.current) logoInputRef.current.value = '';
+                }}
+                className="shrink-0 p-2 text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                title="Eliminar logo"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="mt-4 border-t border-gray-100 pt-5">

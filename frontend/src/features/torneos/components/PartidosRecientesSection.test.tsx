@@ -28,8 +28,8 @@ const mockPartidos = [
     marcador_visitante: 92,
     fecha: '2026-07-28',
     ubicacion: 'Cancha 2',
-    equipo_local: { id_equipo: 3, nombre_equipo: 'Club A' },
-    equipo_visitante: { id_equipo: 4, nombre_equipo: 'Club Ganador B' },
+    equipo_local: { id_equipo: 3, nombre_equipo: 'Equipo A' },
+    equipo_visitante: { id_equipo: 4, nombre_equipo: 'Equipo Ganador B' },
   },
   {
     id_partido: 103,
@@ -40,8 +40,8 @@ const mockPartidos = [
     marcador_visitante: 0,
     fecha: '2026-08-10',
     ubicacion: 'Coliseo Municipal',
-    equipo_local: { id_equipo: 5, nombre_equipo: 'Club Futuro 1' },
-    equipo_visitante: { id_equipo: 6, nombre_equipo: 'Club Futuro 2' },
+    equipo_local: { id_equipo: 5, nombre_equipo: 'Equipo Futuro 1' },
+    equipo_visitante: { id_equipo: 6, nombre_equipo: 'Equipo Futuro 2' },
   },
 ];
 
@@ -97,7 +97,7 @@ describe('PartidosRecientesSection Component', () => {
     renderSection();
 
     expect(await screen.findByText('Finalizado')).toBeInTheDocument();
-    expect(screen.getByText('Club Ganador B')).toBeInTheDocument();
+    expect(screen.getByText('Equipo Ganador B')).toBeInTheDocument();
     expect(screen.getByText('92')).toBeInTheDocument();
     expect(screen.getByText('85')).toBeInTheDocument();
   });
@@ -110,7 +110,7 @@ describe('PartidosRecientesSection Component', () => {
     renderSection();
 
     expect(await screen.findByText('Programado')).toBeInTheDocument();
-    expect(screen.getByText('Club Futuro 1')).toBeInTheDocument();
-    expect(screen.getByText('Club Futuro 2')).toBeInTheDocument();
+    expect(screen.getByText('Equipo Futuro 1')).toBeInTheDocument();
+    expect(screen.getByText('Equipo Futuro 2')).toBeInTheDocument();
   });
 });

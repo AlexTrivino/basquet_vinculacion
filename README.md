@@ -203,6 +203,49 @@ En la carpeta [`documentacion/`](documentacion/) se encuentran disponibles las e
 
 ---
 
+## 🚀 Mantenimiento y Despliegue en Producción
+
+### Automatización de Despliegue (Deploy Script)
+Para facilitar la actualización del servidor en producción, se incluye el script `deploy.sh` en la raíz del proyecto. Este script ejecuta la secuencia estándar de actualización:
+1. Descarga el código desde la rama `main` en GitHub.
+2. Compila la versión de producción de React (`npm run build`).
+3. Instala dependencias nuevas del backend y ejecuta las migraciones de Base de Datos.
+4. Reinicia el servicio de Gunicorn/SystemD.
+
+**Uso en el servidor:**
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+### Operaciones Manuales y Scripts de Base de Datos
+En un entorno productivo es común enfrentarse a problemas que requieren la modificación directa de la base de datos sin afectar la UI o generar nuevas vistas. Para ello, se utilizan **Scripts de Contexto (Application Context)** en Flask.
+
+Ejemplo de script para inyectar información (como crear nuevas categorías sin límite de edad para un torneo existente) directamente en producción:
+
+```python
+# add_categorias.py (Ejecutado directamente en el servidor)
+from app import create_app, db
+from app.models.categoria import Categoria
+
+app = create_app()
+
+with app.app_context():
+    nuevas_categorias = [
+        Categoria(
+            nombre_categoria="Cadetes +30 Femenino",
+            genero_categoria="femenino",
+            edad_minima=0, edad_maxima=None,
+            id_torneo=1
+        )
+    ]
+    db.session.add_all(nuevas_categorias)
+    db.session.commit()
+```
+*Se recomienda almacenar este tipo de scripts operacionales en la carpeta `backend/scripts/` para referencia futura.*
+
+---
+
 ## 📝 Licencia
 
 Proyecto desarrollado con fines académicos y de vinculación con la comunidad — Universidad Laica Eloy Alfaro de Manabí (ULEAM). Todos los derechos reservados.

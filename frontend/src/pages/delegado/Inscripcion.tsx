@@ -27,7 +27,7 @@ export default function Inscripcion() {
       <div className="mb-6 max-w-4xl mx-auto">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Registro de Equipo</h1>
         <p className="mt-1.5 text-sm text-gray-600 font-medium">
-          Proporciona la información requerida para avalar a tu club en el torneo actual.<br/>
+          Proporciona la información requerida para avalar a tu equipo en el torneo actual.<br/>
           Solo se permite un máximo de {MAX_EQUIPOS_DELEGADO} equipos por delegado.
         </p>
       </div>
