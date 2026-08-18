@@ -63,7 +63,7 @@
 }
 
 .animate-marquee {
-  animation: marquee 28s linear infinite;
+  animation: marquee 45s linear infinite;
   display: flex;
   width: max-content;
 }
