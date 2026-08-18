@@ -32,7 +32,7 @@ export function ActiveTournamentBadge({ torneosActivos }: ActiveTournamentBadgeP
     return (
       <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 text-primary-200 text-xs font-semibold backdrop-blur-md border border-white/10 shadow-sm">
         <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-        <span>Baloncesto Formativo & Competitivo en Manta</span>
+        <span>Baloncesto competitivo en Manta</span>
       </div>
     );
   }

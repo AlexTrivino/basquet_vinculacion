@@ -82,7 +82,7 @@ export default function Home() {
                 Torneos Baloncesto Manta
               </h1>
               <p className="mt-2 text-base sm:text-xl font-medium text-primary-200 max-w-xl">
-                Desde el 2019 reactivando el baloncesto formativo y competitivo de la ciudad
+                Desde el 2019 reactivando el baloncesto de la ciudad de Manta
               </p>
             </div>
           </div>

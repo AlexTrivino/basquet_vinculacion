@@ -21,7 +21,7 @@ describe('ActiveTournamentBadge Component', () => {
     );
 
     expect(
-      screen.getByText('Baloncesto Formativo & Competitivo en Manta')
+      screen.getByText('Baloncesto competitivo en Manta')
     ).toBeInTheDocument();
   });
 
