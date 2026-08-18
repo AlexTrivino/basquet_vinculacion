@@ -35,7 +35,8 @@ cd ..
 echo ""
 echo "4. Reiniciando los servicios del servidor..."
 # Ajusta el nombre de tu servicio de Gunicorn/SystemD aquí
-sudo systemctl restart basquet_backend
+sudo systemctl restart basquet
+sudo systemctl reload nginx
 
 echo ""
 echo "✅ ¡Actualización completada exitosamente!"
