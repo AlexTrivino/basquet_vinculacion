@@ -70,6 +70,7 @@ MAX_LOGO_EQUIPO = 2 * 1024 * 1024        # 2 MB
 MAX_BANNER_EQUIPO = 5 * 1024 * 1024      # 5 MB
 MAX_COMPROBANTE = 5 * 1024 * 1024        # 5 MB
 MAX_CALENDARIO_TORNEO = 5 * 1024 * 1024  # 5 MB
+MAX_LOGO_PATROCINADOR = 10 * 1024 * 1024 # 10 MB
 
 
 # ── Función de validación ─────────────────────────────────────────

@@ -1,32 +1,33 @@
-const SPONSORS = [
-  { name: 'Auspiciante 1', image: '/auspiciantes/a1.jpeg?v=2' },
-  { name: 'Auspiciante 2', image: '/auspiciantes/a2.png?v=3', customClass: 'scale-125' },
-  { name: 'Auspiciante 7', image: '/auspiciantes/a8.png?v=2', customClass: 'scale-125' },
-  { name: 'Auspiciante 3', image: '/auspiciantes/a4.png?v=2' },
-  { name: 'Auspiciante 4', image: '/auspiciantes/a5.png?v=2' },
-  { name: 'Auspiciante 5', image: '/auspiciantes/a6.png?v=3' },
-  { name: 'Auspiciante 6', image: '/auspiciantes/a7.png?v=2' },
-];
-
-// Cuadruplicamos la lista en lugar de duplicarla. 
-// Esto asegura que la mitad del carrusel (el 50% que se anima en index.css) 
-// mida más de 2500px y nunca se quede sin contenido antes de hacer el loop en pantallas anchas.
-const ALL_SPONSORS = [...SPONSORS, ...SPONSORS, ...SPONSORS, ...SPONSORS];
+import { useQuery } from '@tanstack/react-query';
+import { getPatrocinadores } from '../features/patrocinadores/api/patrocinadores.api';
 
 export function SponsorsCarousel() {
+  const { data: patrocinadores = [], isLoading } = useQuery({
+    queryKey: ['patrocinadores-publico'],
+    queryFn: getPatrocinadores,
+    staleTime: 1000 * 60 * 60, // 1 hora
+  });
+
+  if (isLoading || !patrocinadores || patrocinadores.length === 0) {
+    return null;
+  }
+
+  // Cuadruplicamos la lista para asegurar que el carrusel CSS fluya bien en pantallas ultra anchas
+  const ALL_SPONSORS = [...patrocinadores, ...patrocinadores, ...patrocinadores, ...patrocinadores];
+
   return (
     <section className="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-sm border-t border-gray-200 py-5 shadow-[0_-10px_30px_rgba(0,0,0,0.1)] z-[100] overflow-hidden">
       <div className="overflow-hidden">
         <div className="animate-marquee flex w-max items-center">
           {ALL_SPONSORS.map((sponsor, i) => (
             <div
-              key={`${sponsor.name}-${i}`}
+              key={`${sponsor.id_patrocinador}-${i}`}
               className="mx-8 flex items-center justify-center w-36 h-20"
             >
               <img 
-                src={sponsor.image} 
-                alt={sponsor.name}
-                className={`w-full h-full object-contain transition-transform duration-300 cursor-pointer drop-shadow-sm ${sponsor.customClass || ''}`}
+                src={sponsor.url_logo_patrocinador || ''} 
+                alt={sponsor.nombre_patrocinador}
+                className="w-full h-full object-contain transition-transform duration-300 cursor-pointer drop-shadow-sm"
               />
             </div>
           ))}

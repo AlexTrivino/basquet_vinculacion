@@ -22,9 +22,9 @@ _bulk_schema = EstadisticasBulkSchema()
 @stats_bp.route('/dashboard', methods=['GET'])
 @token_required(allowed_roles=['super_admin'])
 def dashboard_stats():
-    """Retorna los contadores para el Dashboard del Admin (Fase 13)."""
+    """Retorna los contadores para el Dashboard del Admin."""
     from app.models import Inscripcion, Partido, Equipo
-    from sqlalchemy import func
+    from sqlalchemy import or_
     
     # 1. Inscripciones pendientes
     inscripciones_pendientes = Inscripcion.query.filter_by(estado_inscripcion='pendiente').count()
@@ -35,11 +35,57 @@ def dashboard_stats():
     # 3. Equipos inscritos
     equipos_totales = Equipo.query.count()
     
+    # 4. Partidos sin estadísticas
+    partidos_sin_estadisticas = Partido.query.filter(
+        Partido.estado == 'finalizado',
+        or_(Partido.stats_local_procesadas == False, Partido.stats_visitante_procesadas == False)
+    ).count()
+    
     return api_response({
         'inscripciones_pendientes': inscripciones_pendientes,
         'partidos_hoy': partidos_hoy,
-        'equipos_totales': equipos_totales
+        'equipos_totales': equipos_totales,
+        'partidos_sin_estadisticas': partidos_sin_estadisticas
     })
+
+
+@stats_bp.route('/dashboard/actividad-reciente', methods=['GET'])
+@token_required(allowed_roles=['super_admin'])
+def actividad_reciente():
+    """Retorna los últimos eventos relevantes en el sistema."""
+    from app.models import Inscripcion, Partido
+    
+    # Obtener últimas inscripciones
+    ultimas_inscripciones = Inscripcion.query.order_by(Inscripcion.updated_at.desc()).limit(5).all()
+    
+    # Obtener últimos partidos finalizados
+    ultimos_partidos = Partido.query.filter_by(estado='finalizado').order_by(Partido.updated_at.desc()).limit(5).all()
+    
+    eventos = []
+    
+    for insc in ultimas_inscripciones:
+        eventos.append({
+            'tipo': 'inscripcion',
+            'titulo': f'Inscripción {insc.estado_inscripcion.upper()}',
+            'descripcion': f'Equipo ID {insc.id_equipo} en Torneo ID {insc.id_torneo}',
+            'fecha': insc.updated_at.isoformat() if insc.updated_at else None,
+            'estado': insc.estado_inscripcion
+        })
+        
+    for part in ultimos_partidos:
+        eventos.append({
+            'tipo': 'partido',
+            'titulo': f'Partido Finalizado',
+            'descripcion': f'{part.marcador_local} - {part.marcador_visitante}',
+            'fecha': part.updated_at.isoformat() if part.updated_at else None,
+            'estado': part.estado
+        })
+        
+    # Ordenar por fecha descendente y tomar los top 8
+    eventos.sort(key=lambda x: x['fecha'] or '', reverse=True)
+    eventos = eventos[:8]
+    
+    return api_response(eventos)
 
 
 

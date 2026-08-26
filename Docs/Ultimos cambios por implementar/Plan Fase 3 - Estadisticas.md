@@ -48,8 +48,12 @@ Actualmente el perfil del jugador muestra las estadísticas globales (carrera co
 - **UI:** Renderizar el segundo `<select>` al lado del existente.
 
 #### 3. `TorneoDetail.tsx` (Vista Pública del Torneo)
-- **Pestaña de Estadísticas Desglosadas:** Dentro del área de estadísticas del torneo, añadir un selector de categorías.
-- **Rankings Específicos:** Al cambiar la categoría, el componente solicitará o filtrará los líderes (Máximos Goleadores, Triplistas, etc.) de manera que solo se muestren los jugadores relevantes para esa categoría en particular.
+- **Reestructuración de Pestañas (Tabs):** Se cambiará el orden y visibilidad de las pestañas al entrar a la vista de un torneo. El nuevo orden obligatorio es:
+  1. **Calendario (Default):** Mostrará el cronograma de partidos y los resultados. Será la pestaña seleccionada por defecto.
+  2. **Posiciones:** La tabla de posiciones dividida por categoría.
+  3. **Estadísticas:** La pestaña de estadísticas.
+- **Pestaña de Estadísticas Desglosadas:** Dentro de la nueva pestaña de estadísticas del torneo, añadir un selector de categorías.
+- **Rankings Específicos:** Al cambiar la categoría, el componente solicitará o filtrará los líderes (Máximos Anotadores, Triplistas, Reboteros) de manera que solo se muestren los jugadores relevantes para esa categoría en particular.
 
 ## Plan de Verificación (Pruebas Manuales)
 1. Ingresar al perfil de un jugador (público) que tenga participaciones en torneos con estado `en_curso` o `finalizado`.

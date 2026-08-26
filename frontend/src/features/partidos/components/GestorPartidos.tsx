@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Calendar as CalendarIcon, Edit, Plus, X, FileText, BarChart2, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -43,6 +44,7 @@ type ActualizarPartidoFormValues = z.infer<typeof actualizarPartidoSchema>;
 
 export function GestorPartidos() {
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedTorneo, setSelectedTorneo] = useState<number | ''>('');
   const [showProgramar, setShowProgramar] = useState(false);
   const [editingPartido, setEditingPartido] = useState<Partido | null>(null);
@@ -68,6 +70,15 @@ export function GestorPartidos() {
     enabled: !!selectedTorneo
   });
   const partidos = partidosRes?.data || [];
+
+  // Auto-seleccionar torneo si viene de URL
+  useEffect(() => {
+    const idTorneoUrl = searchParams.get('id_torneo');
+    const uploadStatsId = searchParams.get('upload_stats');
+    if (idTorneoUrl && uploadStatsId && !selectedTorneo) {
+      setSelectedTorneo(Number(idTorneoUrl));
+    }
+  }, [searchParams, selectedTorneo]);
 
   const { register: registerCreate, handleSubmit: handleCreate, watch: watchCreate, reset: resetCreate, formState: { errors: errorsCreate } } = useForm<PartidoFormValues>({
     resolver: zodResolver(partidoSchema),
@@ -113,6 +124,21 @@ export function GestorPartidos() {
     setValueUpdate('marcador_visitante', partido.marcador_visitante || 0);
     setShowProgramar(false);
   };
+
+  // Auto-abrir modal de edición para subir stats
+  useEffect(() => {
+    const uploadStatsId = searchParams.get('upload_stats');
+    if (uploadStatsId && partidos.length > 0) {
+      const targetPartido = partidos.find(p => (p.id_partido || p.id) === Number(uploadStatsId));
+      if (targetPartido && !editingPartido) {
+        handleEditClick(targetPartido);
+        // Limpiamos la URL para no reabrir si recarga
+        searchParams.delete('upload_stats');
+        searchParams.delete('id_torneo');
+        setSearchParams(searchParams, { replace: true });
+      }
+    }
+  }, [partidos, searchParams, setSearchParams, editingPartido]);
 
   const onSubmitUpdate = async (data: ActualizarPartidoFormValues) => {
     const id = editingPartido?.id_partido || editingPartido?.id;

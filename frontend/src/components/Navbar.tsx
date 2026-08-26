@@ -30,6 +30,7 @@ const NAV_LINKS = {
     { name: 'Partidos', path: '/admin/partidos' },
     { name: 'Inscripciones', path: '/admin/auditoria' },
     { name: 'Sanciones', path: '/admin/sanciones' },
+    { name: 'Auspiciantes', path: '/admin/patrocinadores' },
   ],
   public_admin: [
     { name: 'Inicio', path: '/' },

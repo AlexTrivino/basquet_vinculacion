@@ -113,3 +113,31 @@ El objetivo crítico de esta fase es asegurar que el principio de **"Un Equipo p
 3. **Resultado esperado:** El sistema debe rechazar el archivo y lanzar un error indicando "Tipo de archivo no permitido".
 4. Sube un archivo de Excel real (`.xlsx`).
 5. **Resultado esperado:** Se sube correctamente, el componente actualiza su UI para mostrar el link del archivo actual, y al visitar la vista pública del torneo, debe aparecer el botón "Descargar Calendario" en la cabecera.
+
+---
+
+## FASE 5: Rediseño de Gestión de Equipos y Dashboard de Admin
+
+### Escenario 5.1: Paginación y Edición Libre de Plantilla (Delegado)
+**Objetivo:** Verificar que el delegado pueda gestionar libremente cualquier aspecto de su equipo y que la plantilla sea paginada.
+1. Inicia sesión como `delegado1@test.com`.
+2. Ve al Dashboard y haz clic en "Gestionar Equipo".
+3. **Verificación Visual:** La interfaz debe ser tipo Pestañas (tabs) dividiendo "Datos Generales" y "Plantilla Histórica".
+4. En **Datos Generales**, cambia el nombre del equipo y sube un logo distinto. Al guardar, debe aparecer un toast verde y los datos deben actualizarse instantáneamente sin recargar la página.
+5. En **Plantilla Histórica**, verifica que la lista de jugadores esté paginada (no scrolleable). Debe haber botones de `Anterior` y `Siguiente`, y selector de `Filas por página`.
+6. En la descripción superior de la plantilla, el texto debe aclarar: *"Aquí se ven todos los jugadores que en algún momento se han inscrito en el equipo. Si deseas modificar datos de algún jugador, ve a la sección Gestión de Jugadores"*.
+
+### Escenario 5.2: Dashboard Dinámico de Administrador (KPIs y Atajos)
+**Objetivo:** Asegurar que el nuevo diseño del Dashboard de Super Admin muestre datos reales, contenga enlaces rápidos funcionales y redireccione a la carga de estadísticas.
+1. Inicia sesión como `admin@test.com`.
+2. Ve a `/admin/dashboard`.
+3. **Verificación de Tarjetas:** Deben aparecer las tarjetas de `Inscripciones Pendientes`, `Partidos Hoy/Próximos`, `Equipos Registrados` y el conteo de `Jugadores Activos`. Al dar clic en ellas, debes ser redirigido a las rutas correctas (`/admin/auditoria`, `/admin/partidos`, `/admin/equipos`, etc.).
+4. **Partidos Pendientes de Estadísticas:** Debe existir un widget listando los partidos finalizados que no tienen stats subidas. 
+5. Haz clic en el botón "Subir Stats" de uno de esos partidos.
+6. **Resultado Esperado (Flujo Mágico):** El sistema debe redirigirte a `/admin/partidos`, abrir automáticamente el modal de Gestión de Estadísticas y pre-seleccionar el partido correspondiente sin necesidad de que busques nada.
+
+### Escenario 5.3: Timeline de Actividad Reciente (Admin)
+**Objetivo:** Validar que las acciones recientes del sistema aparezcan cronológicamente en el Dashboard.
+1. En el Dashboard del Admin, revisa el componente lateral de "Actividad Reciente".
+2. **Resultado Esperado:** Deben listarse eventos reales con su fecha relativa (ej. "hace 2 horas"), incluyendo nuevas inscripciones y partidos finalizados.
+3. Para validar que funciona en vivo, ve a `/admin/partidos`, cambia un partido a "finalizado". Vuelve al Dashboard y ese evento debe aparecer primero en la lista.

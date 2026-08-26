@@ -85,6 +85,7 @@ def create_app() -> Flask:
     from app.routes.usuario_bp import usuario_bp
     from app.routes.sancion_bp import sancion_bp
     from app.routes.config_bp import config_bp
+    from app.routes.patrocinador_bp import patrocinador_bp
     
     app.register_blueprint(health_bp)
     app.register_blueprint(config_bp)
@@ -99,7 +100,7 @@ def create_app() -> Flask:
     app.register_blueprint(reportes_bp)
     app.register_blueprint(usuario_bp)
     app.register_blueprint(sancion_bp, url_prefix='/api/sanciones')
-
+    app.register_blueprint(patrocinador_bp)
     # ── Manejadores de errores ─────────────────────────────────────
     from app.utils.error_handlers import register_error_handlers
     register_error_handlers(app)

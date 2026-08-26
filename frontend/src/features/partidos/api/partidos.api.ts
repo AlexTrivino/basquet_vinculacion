@@ -21,6 +21,11 @@ export async function crearPartido(data: {
   return response.data;
 }
 
+export async function getPartidos(params?: { pendientes_stats?: boolean; limit?: number }): Promise<ApiResponse<Partido[]>> {
+  const response = await axiosInstance.get('/partidos', { params });
+  return response.data;
+}
+
 export async function getBoxScore(idPartido: number): Promise<ApiResponse<any>> {
   const response = await axiosInstance.get(`/partidos/${idPartido}/estadisticas`);
   return response.data;

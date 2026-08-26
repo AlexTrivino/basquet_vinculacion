@@ -51,7 +51,7 @@ def _base_query_con_relaciones():
 
 # ── Funciones de servicio ─────────────────────────────────────────
 
-def listar_partidos(id_torneo=None, estado=None, id_equipo=None, id_categoria=None):
+def listar_partidos(id_torneo=None, estado=None, id_equipo=None, id_categoria=None, pendientes_stats=None):
     """Retorna la query de partidos con filtros opcionales para paginación.
 
     Args:
@@ -59,6 +59,7 @@ def listar_partidos(id_torneo=None, estado=None, id_equipo=None, id_categoria=No
         estado: Filtra por estado del partido.
         id_equipo: Filtra partidos donde el equipo sea local o visitante.
         id_categoria: Filtra por categoría.
+        pendientes_stats: Filtra partidos finalizados sin estadísticas procesadas.
 
     Returns:
         Query de SQLAlchemy lista para ``paginate_query()``.
@@ -78,6 +79,12 @@ def listar_partidos(id_torneo=None, estado=None, id_equipo=None, id_categoria=No
 
     if id_categoria is not None:
         query = query.filter(Partido.id_categoria == id_categoria)
+
+    if pendientes_stats:
+        query = query.filter(
+            Partido.estado == 'finalizado',
+            or_(Partido.stats_local_procesadas == False, Partido.stats_visitante_procesadas == False)
+        )
 
     return query
 

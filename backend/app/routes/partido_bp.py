@@ -33,13 +33,20 @@ _update_schema = PartidoUpdateSchema()
 def listar_partidos():
     """Lista partidos con paginación y filtros opcionales.
 
-    Query params: ``id_torneo``, ``estado``, ``id_equipo``.
+    Query params: ``id_torneo``, ``estado``, ``id_equipo``, ``id_categoria``, ``pendientes_stats``.
     """
     id_torneo = request.args.get('id_torneo', type=int)
     estado = request.args.get('estado')
     id_equipo = request.args.get('id_equipo', type=int)
     id_categoria = request.args.get('id_categoria', type=int)
-    query = partido_service.listar_partidos(id_torneo=id_torneo, estado=estado, id_equipo=id_equipo, id_categoria=id_categoria)
+    pendientes_stats = request.args.get('pendientes_stats', type=lambda v: v.lower() == 'true')
+    query = partido_service.listar_partidos(
+        id_torneo=id_torneo, 
+        estado=estado, 
+        id_equipo=id_equipo, 
+        id_categoria=id_categoria,
+        pendientes_stats=pendientes_stats
+    )
     items, pagination = paginate_query(query)
     return api_response(data=_public_many.dump(items), pagination=pagination)
 
