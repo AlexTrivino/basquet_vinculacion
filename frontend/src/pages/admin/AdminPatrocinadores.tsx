@@ -6,7 +6,6 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { getPatrocinadores, createPatrocinador, updatePatrocinador, deletePatrocinador, type Patrocinador } from '../../features/patrocinadores/api/patrocinadores.api';
 import { DataGridTable, type Column } from '../../components/DataGridTable';
-import { FileUploadButton } from '../../components/FileUploadButton';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import { Loader2, Award, Plus, Trash2, X, Image as ImageIcon } from 'lucide-react';
 

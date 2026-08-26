@@ -1,6 +1,7 @@
 import api from "../../../api/axios.config";
 
 export interface Patrocinador {
+  id?: number; // Para compatibilidad con DataGridTable
   id_patrocinador: number;
   nombre_patrocinador: string;
   url_logo_patrocinador: string | null;
