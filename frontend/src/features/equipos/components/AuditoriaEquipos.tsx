@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DataGridTable, type Column } from '../../../components/DataGridTable';
 import { StatusBadge } from '../../../components/StatusBadge';
 import { AsyncButton } from '../../../components/AsyncButton';
-import { getInscripciones, updateInscripcionEstado, purgarInscripcionesExpiradas } from '../api/equipos.api';
+import { getInscripciones, updateInscripcionEstado, purgarInscripcionesExpiradas, retirarEquipo } from '../api/equipos.api';
 import { getTorneos } from '../../torneos/api/torneos.api';
 import type { Inscripcion, Torneo } from '../../../types/api.types';
 import { EmptyState } from '../../../components/EmptyState';
@@ -23,12 +23,14 @@ import {
 } from 'lucide-react';
 import { ModalExpedienteInscripcion } from './ModalExpedienteInscripcion';
 import { ModalRechazarInscripcion } from './ModalRechazarInscripcion';
+import { ModalRetirarEquipo } from './ModalRetirarEquipo';
 
 export function AuditoriaEquipos() {
   const queryClient = useQueryClient();
   const [selectedInscripcion, setSelectedInscripcion] = useState<Inscripcion | null>(null);
   const [rechazarTarget, setRechazarTarget] = useState<{ id: number; nombre: string } | null>(null);
-  const [filterEstado, setFilterEstado] = useState<'todos' | 'pendiente' | 'aprobado'>('pendiente');
+  const [retirarTarget, setRetirarTarget] = useState<{ id: number; nombre: string } | null>(null);
+  const [filterEstado, setFilterEstado] = useState<'todos' | 'pendiente' | 'aprobado' | 'retirado'>('pendiente');
   const [selectedTorneoId, setSelectedTorneoId] = useState<number | 'todos'>('todos');
 
   // Consulta de Inscripciones
@@ -79,6 +81,20 @@ export function AuditoriaEquipos() {
     },
   });
 
+  const retirarMutation = useMutation({
+    mutationFn: (id: number) => retirarEquipo(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['inscripciones', 'admin'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard_stats'] });
+      queryClient.invalidateQueries({ queryKey: ['equipos'] });
+      setRetirarTarget(null);
+      toast.success('El equipo ha sido retirado del torneo exitosamente.');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Error al retirar el equipo');
+    },
+  });
+
   // Mutación para Purga de Expiradas (>30 días)
   const purgaMutation = useMutation({
     mutationFn: (dias: number) => purgarInscripcionesExpiradas(dias),
@@ -112,7 +128,13 @@ export function AuditoriaEquipos() {
       toast.success(`Inscripción del equipo ${nombre} rechazada y eliminada permanentemente.`);
       setRechazarTarget(null);
     } catch (error) {
-      toast.error(`Error al rechazar equipo ${nombre}.`);
+      toast.error('Ocurrió un error al cambiar el estado.');
+    }
+  };
+
+  const handleConfirmRetirar = async () => {
+    if (retirarTarget) {
+      await retirarMutation.mutateAsync(retirarTarget.id);
     }
   };
 
@@ -203,7 +225,7 @@ export function AuditoriaEquipos() {
       header: 'Estado',
       render: (row) => {
         const estado = row.estado_inscripcion || row.estado;
-        return <StatusBadge status={estado === 'pendiente' ? 'Pendiente' : estado === 'aprobado' ? 'Aprobado' : 'Rechazado'} />;
+        return <StatusBadge status={estado === 'pendiente' ? 'Pendiente' : estado === 'aprobado' ? 'Aprobado' : estado === 'retirado' ? 'Rechazado' : 'Rechazado'} textOverride={estado === 'retirado' ? 'Retirado' : undefined} />;
       },
     },
     {
@@ -216,7 +238,6 @@ export function AuditoriaEquipos() {
 
         return (
           <div className="flex items-center gap-2.5">
-            {/* Botón principal para abrir el expediente */}
             <button
               onClick={() => setSelectedInscripcion(row)}
               className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-bold text-primary-700 bg-primary-50 border border-primary-200 rounded-xl hover:bg-primary-100 active:bg-primary-200 transition-all shadow-xs"
@@ -247,6 +268,18 @@ export function AuditoriaEquipos() {
                 </button>
               </>
             )}
+
+            {estado === 'aprobado' && (row.torneo?.estado === 'en_curso' || row.torneo?.estado === 'programado') && (
+              <button
+                type="button"
+                onClick={() => setRetirarTarget({ id, nombre: nombreEquipo })}
+                className="inline-flex items-center gap-1.5 bg-red-50 text-red-600 hover:bg-red-100 active:bg-red-200 border border-red-200 px-3 py-2 text-sm font-semibold rounded-xl transition-colors shadow-xs"
+                title="Retirar equipo del torneo en curso"
+              >
+                <Ban className="w-4 h-4" />
+                Retirar
+              </button>
+            )}
           </div>
         );
       },
@@ -255,9 +288,7 @@ export function AuditoriaEquipos() {
 
   return (
     <div className="space-y-6">
-      {/* Barra de Filtros, Pestañas y Herramientas */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
-        {/* Pestañas de Estado */}
         <div className="flex items-center gap-1.5 p-1.5 bg-gray-100 rounded-xl">
           <button
             type="button"
@@ -278,21 +309,29 @@ export function AuditoriaEquipos() {
           </button>
 
           <button
-            type="button"
             onClick={() => setFilterEstado('aprobado')}
-            className={`flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg transition-all ${
+            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all ${
               filterEstado === 'aprobado'
-                ? 'bg-white text-primary-700 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
             }`}
           >
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            Aprobadas
+            Aprobados
             <span className="ml-1 text-xs text-gray-400">({conteoAprobados})</span>
           </button>
-
           <button
-            type="button"
+            onClick={() => setFilterEstado('retirado')}
+            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all ${
+              filterEstado === 'retirado'
+                ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
+            }`}
+          >
+            <Ban className="w-4 h-4 text-red-600" />
+            Retirados
+          </button>
+          <button
             onClick={() => setFilterEstado('todos')}
             className={`flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg transition-all ${
               filterEstado === 'todos'
@@ -405,6 +444,15 @@ export function AuditoriaEquipos() {
         onConfirm={handleConfirmRechazar}
         nombreEquipo={rechazarTarget?.nombre || ''}
         isLoading={updateEstadoMutation.isPending}
+      />
+
+      {/* Modal de Confirmación de Retiro */}
+      <ModalRetirarEquipo
+        isOpen={!!retirarTarget}
+        onClose={() => setRetirarTarget(null)}
+        onConfirm={handleConfirmRetirar}
+        nombreEquipo={retirarTarget?.nombre || ''}
+        isLoading={retirarMutation.isPending}
       />
     </div>
   );

@@ -68,7 +68,7 @@ def obtener_torneo_por_id(id_torneo, incluir_inactivos=False):
     if torneo is None:
         return None
 
-    if not incluir_inactivos and torneo.estado == 'inactivo':
+    if not incluir_inactivos and torneo.estado in ('inactivo', 'anulado'):
         return None
 
     return torneo
@@ -126,5 +126,27 @@ def eliminar_torneo(id_torneo):
         return None
 
     torneo.estado = 'inactivo'
+    db.session.commit()
+    return torneo
+
+
+def anular_torneo(id_torneo):
+    """Anula un torneo.
+
+    Cambia ``estado`` a ``'anulado'`` para que desaparezca de la vista pública,
+    pero se mantenga el historial de partidos e inscripciones en modo solo lectura.
+
+    Args:
+        id_torneo: Identificador del torneo a anular.
+
+    Returns:
+        Instancia de ``Torneo`` anulada, o ``None`` si no existe.
+    """
+    torneo = db.session.get(Torneo, id_torneo)
+
+    if torneo is None or torneo.estado in ('anulado', 'inactivo'):
+        return None
+
+    torneo.estado = 'anulado'
     db.session.commit()
     return torneo

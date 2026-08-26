@@ -18,6 +18,9 @@ class Plantilla(db.Model):
     id_equipo = db.Column(
         db.Integer, db.ForeignKey('equipos.id_equipo'), nullable=False
     )
+    id_categoria = db.Column(
+        db.Integer, db.ForeignKey('categorias.id_categoria'), nullable=True
+    )
     estado = db.Column(db.String(20), nullable=False, default='activo')
 
     created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
@@ -48,6 +51,7 @@ class Plantilla(db.Model):
             'id_jugador': self.id_jugador,
             'id_torneo': self.id_torneo,
             'id_equipo': self.id_equipo,
+            'id_categoria': self.id_categoria,
             'estado': self.estado,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,

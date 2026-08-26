@@ -39,7 +39,8 @@ def listar_plantilla():
     """
     id_equipo = request.args.get('id_equipo', type=int)
     id_torneo = request.args.get('id_torneo', type=int)
-    query = plantilla_service.listar_plantilla(id_equipo=id_equipo, id_torneo=id_torneo)
+    id_categoria = request.args.get('id_categoria', type=int)
+    query = plantilla_service.listar_plantilla(id_equipo=id_equipo, id_torneo=id_torneo, id_categoria=id_categoria)
     items, pagination = paginate_query(query)
     return api_response(data=_public_many.dump(items), pagination=pagination)
 
@@ -87,7 +88,7 @@ def agregar_jugador():
             )
 
     try:
-        entrada = plantilla_service.crear_plantilla(data)
+        entrada = plantilla_service.crear_plantilla(data, usuario_rol=g.usuario_rol)
     except ValueError as e:
         mensaje = str(e)
         # Distinguir conflicto de negocio (409) de error de validación de formato (422)
@@ -143,7 +144,7 @@ def actualizar_camiseta(id_plantilla):
 
     try:
         entrada_actualizada = plantilla_service.actualizar_numero_camiseta(
-            id_plantilla, data['numero_camiseta']
+            id_plantilla, data['numero_camiseta'], usuario_rol=g.usuario_rol
         )
     except ValueError as e:
         return api_error('CONFLICT', str(e), 409)
@@ -176,7 +177,10 @@ def remover_jugador(id_plantilla):
                 403,
             )
 
-    resultado = plantilla_service.eliminar_de_plantilla(id_plantilla)
+    try:
+        resultado = plantilla_service.eliminar_plantilla(id_plantilla, usuario_rol=g.usuario_rol)
+    except ValueError as e:
+        return api_error('VALIDATION_ERROR', str(e), 400)
     if resultado is None:
         return api_error('NOT_FOUND', 'Entrada de plantilla no encontrada.', 404)
 

@@ -24,6 +24,7 @@ const MiPerfil = lazy(() => import('../pages/auth/MiPerfil'));
 // Delegado
 const DelegadoDashboard = lazy(() => import('../pages/delegado/Dashboard'));
 const DelegadoInscripcion = lazy(() => import('../pages/delegado/Inscripcion'));
+const DelegadoReinscripcion = lazy(() => import('../pages/delegado/Reinscripcion'));
 const DelegadoPlantilla = lazy(() => import('../pages/delegado/Plantilla'));
 
 // Admin
@@ -87,6 +88,7 @@ export const router = createBrowserRouter([
         children: [
           { path: 'dashboard', element: withSuspense(DelegadoDashboard) },
           { path: 'inscripcion', element: withSuspense(DelegadoInscripcion) },
+          { path: 'reinscripcion/:idEquipo', element: withSuspense(DelegadoReinscripcion) },
           { path: 'plantilla', element: withSuspense(DelegadoPlantilla) },
         ],
       },

@@ -15,6 +15,7 @@ from app.schemas.inscripcion_schema import (
     InscripcionCreateSchema,
     InscripcionEstadoSchema,
     InscripcionPublicSchema,
+    InscripcionReinscribirSchema,
 )
 from app.services import inscripcion_service
 from app.utils.auth_middleware import token_required
@@ -32,6 +33,7 @@ _public_many = InscripcionPublicSchema(many=True)
 _admin_schema = InscripcionAdminSchema()
 _admin_many = InscripcionAdminSchema(many=True)
 _create_schema = InscripcionCreateSchema()
+_reinscribir_schema = InscripcionReinscribirSchema()
 _estado_schema = InscripcionEstadoSchema()
 
 
@@ -134,6 +136,45 @@ def crear_inscripcion():
     )
 
 
+# ── POST /api/inscripciones/reinscribir ───────────────────────────
+
+@inscripcion_bp.route('/reinscribir', methods=['POST'])
+@token_required(allowed_roles=['super_admin', 'delegado'])
+def reinscribir_equipo():
+    """Reinscribe un equipo existente en un torneo y categoría nuevos,
+    con opción de clonar la plantilla anterior.
+    """
+    json_data = request.get_json(silent=True)
+    if json_data is None:
+        return api_error(
+            'BAD_REQUEST',
+            'El cuerpo de la solicitud debe ser JSON válido.',
+            400,
+        )
+
+    try:
+        data = _reinscribir_schema.load(json_data)
+    except ValidationError as err:
+        return api_error('VALIDATION_ERROR', err.messages, 422)
+
+    try:
+        inscripcion = inscripcion_service.reinscribir_equipo(data)
+    except ValueError as e:
+        mensaje = str(e)
+        es_conflicto = 'ya está inscrito' in mensaje
+        return api_error(
+            'CONFLICT' if es_conflicto else 'VALIDATION_ERROR',
+            mensaje,
+            409 if es_conflicto else 422,
+        )
+
+    return api_response(
+        data=_admin_schema.dump(inscripcion),
+        message='Equipo reinscrito exitosamente. Por favor, suba el nuevo comprobante de pago.',
+        status=201,
+    )
+
+
 # ── PATCH /api/inscripciones/<id>/estado ─────────────────────────
 
 @inscripcion_bp.route('/<int:id_inscripcion>/estado', methods=['PATCH'])
@@ -173,6 +214,45 @@ def cambiar_estado(id_inscripcion):
     return api_response(
         data=_admin_schema.dump(inscripcion),
         message=f"Estado actualizado a '{data['estado_inscripcion']}' exitosamente.",
+    )
+
+
+# ── DELETE /api/inscripciones/<id> ───────────────────────────────
+
+@inscripcion_bp.route('/<int:id_inscripcion>', methods=['DELETE'])
+@token_required(allowed_roles=['delegado'])
+def eliminar_borrador_inscripcion(id_inscripcion):
+    """Permite al delegado eliminar una inscripción que está en estado borrador.
+    Libera los jugadores, el equipo (si no tiene otra inscripción) y borra los archivos.
+    """
+    try:
+        inscripcion_service.eliminar_borrador_delegado(id_inscripcion, g.usuario_id)
+        return api_response(message='El borrador de inscripción fue eliminado correctamente.')
+    except ValueError as e:
+        return api_error('VALIDATION_ERROR', str(e), 400)
+    except Exception as e:
+        current_app.logger.exception(f"Error al eliminar borrador de inscripción {id_inscripcion}: {e}")
+        return api_error('SERVER_ERROR', 'Ocurrió un error inesperado al eliminar el borrador.', 500)
+
+
+# ── PUT /api/inscripciones/<id>/retirar ──────────────────────────
+
+@inscripcion_bp.route('/<int:id_inscripcion>/retirar', methods=['PUT'])
+@token_required(allowed_roles=['super_admin'])
+def retirar_equipo(id_inscripcion):
+    """Retira a un equipo de un torneo en curso. Exclusivo para super_admin.
+    """
+    try:
+        inscripcion = inscripcion_service.retirar_equipo(id_inscripcion)
+    except ValueError as e:
+        return api_error('VALIDATION_ERROR', str(e), 400)
+
+    if inscripcion is None:
+        return api_error('NOT_FOUND', 'Inscripción no encontrada.', 404)
+
+    return api_response(
+        data=_admin_schema.dump(inscripcion),
+        message="El equipo ha sido retirado del torneo exitosamente.",
     )
 
 
@@ -307,13 +387,22 @@ def crear_inscripcion_completa():
     url_archivo = None
     url_logo = None
     try:
-        # ── Validación de Límite de 3 Equipos ──────────────────────────
+        from app.utils.business_rules import MAX_EQUIPOS_POR_DELEGADO
+        # ── Validación de Límite de Equipos ──────────────────────────
         equipos_activos = Equipo.query.filter_by(
             id_usuario=g.usuario_id, estado='activo'
         ).count()
 
-        if equipos_activos >= 3:
-            return api_error('CONFLICT', 'No puedes administrar más de 3 equipos simultáneamente. Límite alcanzado.', 409)
+        if equipos_activos >= MAX_EQUIPOS_POR_DELEGADO:
+            return api_error('CONFLICT', f'No puedes administrar más de {MAX_EQUIPOS_POR_DELEGADO} equipo(s) simultáneamente. Límite alcanzado.', 409)
+
+        # ── Validación de Límite de Borrador ─────────────────────────
+        borradores_existentes = InscripcionModel.query.join(Equipo).filter(
+            Equipo.id_usuario == g.usuario_id,
+            InscripcionModel.estado_inscripcion == 'borrador'
+        ).count()
+        if borradores_existentes >= 1:
+            return api_error('CONFLICT', 'Solo se permite tener una solicitud en borrador a la vez. Debes completar o eliminar tu solicitud actual antes de iniciar otra.', 409)
 
         # Transacción de base de datos
         datos_equipo = normalizar_mayusculas({'nombre_equipo': nombre_equipo}, ['nombre_equipo'])

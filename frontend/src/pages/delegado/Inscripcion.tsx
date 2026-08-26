@@ -6,7 +6,8 @@ import { InscripcionWizard } from '../../features/equipos/components/Inscripcion
 import { Skeleton } from '../../components/Skeleton';
 import { EmptyState } from '../../components/EmptyState';
 
-const MAX_EQUIPOS_DELEGADO = 3;
+import { useBusinessRules } from '../../hooks/useBusinessRules';
+
 
 export default function Inscripcion() {
   // Verificamos si ya existe un borrador para este delegado
@@ -20,7 +21,10 @@ export default function Inscripcion() {
     i => i.estado_inscripcion === 'borrador' || i.estado === 'borrador'
   );
 
-  const yaAlcanzoLimite = inscripciones.length >= MAX_EQUIPOS_DELEGADO && !borradorExistente;
+  const { rules } = useBusinessRules();
+  const maxEquiposDelegado = rules.MAX_EQUIPOS_POR_DELEGADO;
+
+  const yaAlcanzoLimite = inscripciones.length >= maxEquiposDelegado && !borradorExistente;
 
   return (
     <main className="mx-auto w-full max-w-[1700px] px-2 sm:px-4 lg:px-6 py-6 transition-all duration-300">
@@ -28,7 +32,7 @@ export default function Inscripcion() {
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Registro de Equipo</h1>
         <p className="mt-1.5 text-sm text-gray-600 font-medium">
           Proporciona la información requerida para avalar a tu equipo en el torneo actual.<br/>
-          Solo se permite un máximo de {MAX_EQUIPOS_DELEGADO} equipos por delegado.
+          Solo se permite registrar {maxEquiposDelegado} equipo(s) por delegado.
         </p>
       </div>
 
@@ -42,7 +46,7 @@ export default function Inscripcion() {
           <EmptyState
             icon={<Users className="mx-auto h-12 w-12 text-primary-500" />}
             title="Límite de Equipos Alcanzado"
-            description={`Has alcanzado el límite máximo de ${MAX_EQUIPOS_DELEGADO} equipos permitidos por delegado. Administra tus equipos actuales o consulta el estado de tus inscripciones desde el panel principal.`}
+            description={`Has alcanzado el límite de ${maxEquiposDelegado} equipo(s) permitido por delegado. Administra tu equipo actual o consulta el estado de tus inscripciones desde el panel principal.`}
             action={
               <Link
                 to="/delegado/dashboard"

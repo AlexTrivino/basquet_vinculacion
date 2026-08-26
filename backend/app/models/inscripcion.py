@@ -35,7 +35,7 @@ class Inscripcion(db.Model):
     # ── Restricciones ──────────────────────────────────────────────
     __table_args__ = (
         db.CheckConstraint(
-            "estado_inscripcion IN ('borrador', 'pendiente', 'aprobado', 'rechazado')",
+            "estado_inscripcion IN ('borrador', 'pendiente', 'aprobado', 'rechazado', 'retirado')",
             name='ck_inscripciones_estado',
         ),
         db.UniqueConstraint(

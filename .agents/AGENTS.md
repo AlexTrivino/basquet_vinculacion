@@ -287,8 +287,10 @@ Durante cualquier proceso de conexión entre el Frontend (React) y el Backend (F
 > **El proyecto ya se encuentra en PRODUCCIÓN en un servidor externo con datos reales persistidos en la base de datos.**
 
 ### Reglas de Integridad y Modificación Segura:
-1. **Cero Cambios Destructivos:**
+1. **Cero Cambios Destructivos (SAFEGUARD ACTIVO):**
    - Queda estrictamente prohibido ejecutar `DROP TABLE`, `DROP COLUMN`, truncate, alteración de tipos incompatibles o añadir columnas `NOT NULL` sin un `server_default` o migración segura en dos pasos.
+   - El backend cuenta con una clase `SafeSQLAlchemy` en `app/__init__.py` que **bloquea cualquier llamada a `db.drop_all()`** si no detecta la cadena `:memory:` o `sqlite` en la URI y el flag `TESTING=True`.
+   - **Bajo ninguna circunstancia el Agente intentará bypassear o desactivar esta protección**. Todas las pruebas (Unit tests o Integración) **deben obligatoriamente** mockear la base de datos usando SQLite en memoria (`os.environ['DATABASE_URL'] = 'sqlite:///:memory:'`) **antes** de instanciar la app (`create_app()`).
 2. **Retrocompatibilidad 100% Obligatoria:**
    - Cualquier ajuste a endpoints existentes (`/api/...`), schemas de Marshmallow o modelos SQLAlchemy debe mantener compatibilidad retroactiva con los datos ya almacenados.
    - Las respuestas de endpoints existentes no deben eliminar ni renombrar propiedades que el frontend o servicios externos consuman.

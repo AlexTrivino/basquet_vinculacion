@@ -19,6 +19,12 @@ export async function getEquipoById(id: number | string): Promise<ApiResponse<Eq
   return response.data;
 }
 
+export async function updateEquipo(id: number, data: Partial<Equipo>): Promise<ApiResponse<Equipo>> {
+  const response = await axiosInstance.put(`/equipos/${id}`, data);
+  return response.data;
+}
+
+
 export async function getInscripciones(page = 1, perPage = 50, idTorneo?: number, estado?: string, idCategoria?: number): Promise<ApiResponse<Inscripcion[]>> {
   const params: any = { page, per_page: perPage };
   if (idTorneo) params.id_torneo = idTorneo;
@@ -34,8 +40,18 @@ export async function createInscripcion(data: { id_torneo: number; id_equipo: nu
   return response.data;
 }
 
+export async function reinscribirEquipo(data: { id_torneo: number; id_equipo: number; id_categoria: number; clonar_plantilla: boolean }): Promise<ApiResponse<Inscripcion>> {
+  const response = await axiosInstance.post('/inscripciones/reinscribir', data);
+  return response.data;
+}
+
 export async function updateInscripcionEstado(id: number, estado: 'aprobado' | 'rechazado'): Promise<ApiResponse<Inscripcion>> {
   const response = await axiosInstance.patch(`/inscripciones/${id}/estado`, { estado_inscripcion: estado });
+  return response.data;
+}
+
+export async function retirarEquipo(id: number): Promise<ApiResponse<Inscripcion>> {
+  const response = await axiosInstance.put(`/inscripciones/${id}/retirar`);
   return response.data;
 }
 
@@ -96,8 +112,8 @@ export async function getInscripcionesPublicas(idTorneo?: number, idEquipo?: num
   return response.data;
 }
 
-export const getEquiposAdmin = async (page = 1, perPage = 20, idTorneo?: number, idCategoria?: number, search?: string) => {
-  return (await axiosInstance.get('/equipos/admin/list', { params: { page, per_page: perPage, id_torneo: idTorneo, id_categoria: idCategoria, search } })).data;
+export const getEquiposAdmin = async (page = 1, perPage = 20, idTorneo?: number, idCategoria?: number, search?: string, estado?: string) => {
+  return (await axiosInstance.get('/equipos/admin/list', { params: { page, per_page: perPage, id_torneo: idTorneo, id_categoria: idCategoria, search, estado } })).data;
 };
 
 export const reactivarEquipo = async (idEquipo: number) => {
@@ -120,4 +136,10 @@ export const purgarInscripcionesExpiradas = async (dias = 30): Promise<ApiRespon
   return response.data;
 };
 
-
+/**
+ * Elimina una inscripción en estado borrador.
+ */
+export async function deleteBorradorInscripcion(idInscripcion: number): Promise<ApiResponse<null>> {
+  const { data } = await axiosInstance.delete<ApiResponse<null>>(`/inscripciones/${idInscripcion}`);
+  return data;
+}

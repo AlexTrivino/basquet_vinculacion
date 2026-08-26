@@ -52,14 +52,7 @@ export function ModalRechazarInscripcion({
             <strong className="text-gray-900 font-semibold">{nombreEquipo}</strong>?
           </p>
 
-          <div className="p-3.5 rounded-xl bg-red-50/80 border border-red-200/80 text-xs text-red-800 space-y-1">
-            <p className="font-semibold flex items-center gap-1.5">
-              <span>⚠️</span> Acción permanente y destructiva
-            </p>
-            <p className="text-red-700/90 leading-relaxed">
-              Esta acción eliminará el borrador del equipo, su nómina de jugadores y comprobantes de pago asociados, liberando las cédulas de los jugadores y el cupo del delegado.
-            </p>
-          </div>
+
         </div>
 
         {/* Footer con botones de acción */}

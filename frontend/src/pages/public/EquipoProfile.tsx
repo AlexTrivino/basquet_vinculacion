@@ -1,6 +1,7 @@
 import { useRef, useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { StatusBadge } from '../../components/StatusBadge';
 import {
   Camera,
   Calendar,
@@ -46,7 +47,7 @@ const MAX_LOGO_SIZE = 2 * 1024 * 1024;   // 2 MB
 const MAX_BANNER_SIZE = 5 * 1024 * 1024; // 5 MB
 const ITEMS_POR_PAGINA_PARTICIPACIONES = 3;
 
-export default function EquipoProfile({ teamId }: { teamId?: number }) {
+export default function EquipoProfile({ teamId, dashboardStatus, actionButton }: { teamId?: number, dashboardStatus?: string, actionButton?: React.ReactNode }) {
   const { id } = useParams<{ id: string }>();
   const idEquipo = teamId || Number(id);
   const { isAuthenticated, userRole } = useAuth();
@@ -301,6 +302,14 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
     });
   }, [plantillas, torneoRosterFiltro]);
 
+  // ── Torneos Activos ───────────────────────────────────────────────
+  const torneosActivos = useMemo(() => {
+    return participacionesOrdenadas.filter((p) => {
+      const estadoTorneo = p.torneo?.estado;
+      return estadoTorneo === 'programado' || estadoTorneo === 'en_curso';
+    });
+  }, [participacionesOrdenadas]);
+
   if (loadingEquipo) {
     return (
       <div className="w-full bg-gray-50 flex flex-col pb-16">
@@ -444,11 +453,12 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
 
             {/* Info Info */}
             <div className="min-w-0 pb-1">
-              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-primary-50 border border-primary-100 text-primary-700 text-xs font-bold mb-1.5 uppercase tracking-wider">
-                <Shield className="w-3.5 h-3.5" /> Equipo Oficial
-              </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight uppercase">
+
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight uppercase flex flex-wrap items-center gap-3 break-words">
                 {equipo.nombre_equipo}
+                {dashboardStatus && (
+                  <StatusBadge status={dashboardStatus} />
+                )}
               </h1>
 
               {equipo.usuario?.nombre && (
@@ -497,6 +507,12 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
                 <ShieldAlert className="w-4 h-4" /> Desactivar
               </button>
             )}
+            
+            {actionButton && (
+              <div className="ml-0 sm:ml-2 mt-4 sm:mt-0">
+                {actionButton}
+              </div>
+            )}
           </div>
         </div>
 
@@ -509,12 +525,42 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
         {/* ── SECCIÓN 2: CALENDARIO & RESULTADOS (2 COLUMNAS) ──────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-10">
           {/* Columna Izquierda: Último Partido Destacado (5 cols) */}
-          <div className="lg:col-span-5 flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-black text-gray-900 uppercase tracking-wide flex items-center gap-2">
-                <Activity className="w-5 h-5 text-primary-600" /> Último Resultado
-              </h2>
-            </div>
+          <div className="lg:col-span-5 flex flex-col gap-8">
+            
+            {/* Tarjeta de Torneos Activos */}
+            {torneosActivos.length > 0 && (
+              <div className="flex flex-col">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-black text-gray-900 uppercase tracking-wide flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-primary-600" /> Torneos Activos
+                  </h2>
+                </div>
+                <div className="bg-white rounded-3xl border border-gray-200 shadow-2xs p-5 space-y-3">
+                  {torneosActivos.map((participacion) => (
+                    <div key={participacion.id_inscripcion} className="flex flex-wrap items-center justify-between p-3 rounded-2xl bg-gray-50 border border-gray-100 hover:border-primary-200 transition-colors gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center shrink-0">
+                          <Trophy className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-gray-900 leading-tight">{participacion.torneo?.nombre || participacion.torneo?.nombre_torneo}</p>
+                          <p className="text-xs text-gray-500 font-medium">Categoría: {participacion.categoria?.nombre_categoria || participacion.categoria?.nombre}</p>
+                        </div>
+                      </div>
+                      <StatusBadge status={participacion.torneo?.estado || 'programado'} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Último Resultado */}
+            <div className="flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-black text-gray-900 uppercase tracking-wide flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-primary-600" /> Último Resultado
+                </h2>
+              </div>
 
             {loadingPartidos ? (
               <Skeleton className="h-56 rounded-3xl" />
@@ -630,6 +676,7 @@ export default function EquipoProfile({ teamId }: { teamId?: number }) {
                 </p>
               </div>
             )}
+            </div>
           </div>
 
           {/* Columna Derecha: Cola de Próximos Partidos (7 cols) */}

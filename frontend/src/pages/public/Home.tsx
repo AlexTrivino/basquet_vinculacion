@@ -29,9 +29,11 @@ export default function Home() {
 
   const torneos = response?.data || [];
 
+  const [showAllYears, setShowAllYears] = useState(false);
+
   const { aniosMostrados, torneosPorAnio, torneosActivos } = useMemo(() => {
-    return agruparTorneosPorAniosRecientes(torneos, 2);
-  }, [torneos]);
+    return agruparTorneosPorAniosRecientes(torneos, showAllYears ? 100 : 2);
+  }, [torneos, showAllYears]);
 
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
 
@@ -147,20 +149,19 @@ export default function Home() {
           </div>
 
           {/* Botón Maquetado de Años Anteriores (Histórico) */}
-          <div className="shrink-0">
-            <button
-              type="button"
-              disabled
-              title="Próximamente: Consulta el archivo histórico de ediciones pasadas"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-400 bg-gray-50 border border-gray-200/80 cursor-not-allowed opacity-75 hover:opacity-100 transition-opacity"
-            >
-              <History className="w-3.5 h-3.5 text-gray-400" />
-              <span>Ver torneos anteriores</span>
-              <span className="text-[10px] bg-gray-200 text-gray-600 px-1.5 py-0.2 rounded font-semibold">
-                Próximamente
-              </span>
-            </button>
-          </div>
+          {!showAllYears && (
+            <div className="shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowAllYears(true)}
+                title="Consulta el archivo histórico de ediciones pasadas"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                <History className="w-3.5 h-3.5 text-gray-500" />
+                <span>Ver torneos anteriores</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Listado de Tarjetas del Año Seleccionado */}

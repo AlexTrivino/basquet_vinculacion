@@ -32,6 +32,7 @@ class PlantillaCreateSchema(Schema):
     id_jugador = fields.Integer(required=True)
     id_torneo = fields.Integer(required=True)
     id_equipo = fields.Integer(required=True)
+    id_categoria = fields.Integer(required=True)
     numero_camiseta = fields.Integer(
         allow_none=True,
         load_default=None,

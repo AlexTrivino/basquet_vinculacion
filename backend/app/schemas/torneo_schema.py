@@ -31,6 +31,7 @@ class TorneoCreateSchema(Schema):
     fecha_inicio = fields.Date(required=True)
     fecha_fin = fields.Date(required=True)
     categorias = fields.List(fields.Nested(CategoriaCreateSchema), required=False, missing=list)
+    url_calendario_excel = fields.String(allow_none=True)
 
     @validates_schema
     def validar_rango_fechas(self, data, **kwargs):
@@ -68,10 +69,11 @@ class TorneoUpdateSchema(Schema):
     fecha_fin = fields.Date()
     estado = fields.String(
         validate=validate.OneOf(
-            ['programado', 'en_curso', 'finalizado'],
-            error='Estado inválido. Valores permitidos: programado, en_curso, finalizado.',
+            ['programado', 'en_curso', 'finalizado', 'anulado'],
+            error='Estado inválido. Valores permitidos: programado, en_curso, finalizado, anulado.',
         ),
     )
+    url_calendario_excel = fields.String(allow_none=True)
 
     @validates_schema
     def validar_rango_fechas(self, data, **kwargs):
@@ -99,6 +101,7 @@ class TorneoPublicSchema(Schema):
     fecha_inicio = fields.Date()
     fecha_fin = fields.Date()
     estado = fields.String()
+    url_calendario_excel = fields.String(dump_only=True)
     categorias = fields.Nested(CategoriaPublicSchema, many=True, dump_only=True)
 
 
@@ -114,5 +117,7 @@ class TorneoAdminSchema(Schema):
     fecha_inicio = fields.Date()
     fecha_fin = fields.Date()
     estado = fields.String()
+    url_calendario_excel = fields.String(dump_only=True)
+    categorias = fields.Nested(CategoriaPublicSchema, many=True, dump_only=True)
     created_at = fields.DateTime()
     updated_at = fields.DateTime()

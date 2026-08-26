@@ -27,7 +27,6 @@ describe('ModalRechazarInscripcion', () => {
 
     expect(screen.getByText('Rechazar Inscripción')).toBeInTheDocument();
     expect(screen.getByText('Tiburones de Manta')).toBeInTheDocument();
-    expect(screen.getByText(/Acción permanente y destructiva/i)).toBeInTheDocument();
   });
 
   it('llama a onConfirm al presionar el botón de rechazar', () => {

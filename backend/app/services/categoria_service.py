@@ -45,3 +45,41 @@ def obtener_categoria_por_id(id_categoria):
     """
     from app import db
     return db.session.get(Categoria, id_categoria)
+
+
+def agregar_categoria(data):
+    """Crea una nueva categoría y la asocia a un torneo.
+
+    Args:
+        data: Dict validado por schema. Debe incluir id_torneo.
+    
+    Returns:
+        Instancia Categoria creada.
+    """
+    from app import db
+    categoria = Categoria(**data)
+    db.session.add(categoria)
+    db.session.commit()
+    return categoria
+
+
+def eliminar_categoria(id_categoria):
+    """Elimina una categoría si no tiene inscripciones asociadas.
+
+    Raises:
+        ValueError: Si la categoría ya tiene equipos inscritos.
+    """
+    from app import db
+    from app.models.inscripcion import Inscripcion
+    
+    categoria = db.session.get(Categoria, id_categoria)
+    if not categoria:
+        return None
+        
+    inscripciones = db.session.query(Inscripcion).filter_by(id_categoria=id_categoria).count()
+    if inscripciones > 0:
+        raise ValueError("No se puede eliminar la categoría porque ya tiene equipos inscritos. Retire los equipos primero.")
+        
+    db.session.delete(categoria)
+    db.session.commit()
+    return True

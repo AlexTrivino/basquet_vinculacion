@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, User, Shield, ChevronDown, LogOut } from 'lucide-react';
+import { Menu, User, ChevronDown, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useBusinessRules } from '../hooks/useBusinessRules';
 import { Sidebar } from './Sidebar';
 import { useQuery } from '@tanstack/react-query';
 import { getInscripciones } from '../features/equipos/api/equipos.api';
@@ -37,7 +38,9 @@ const NAV_LINKS = {
 };
 
 export function Navbar() {
-  const { userRole, isAuthenticated, logout, activeTeamId, setActiveTeamId, userName } = useAuth();
+  const { userRole, isAuthenticated, logout, activeTeamId, userName } = useAuth();
+  const { rules } = useBusinessRules();
+  const maxEquiposDelegado = rules.MAX_EQUIPOS_POR_DELEGADO || 1;
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -59,43 +62,22 @@ export function Navbar() {
   });
   const inscripciones = response?.data || [];
 
-  const activeInscripcion = activeTeamId 
+  const activeInscripcion = (activeTeamId
     ? inscripciones.find(ins => (ins.equipo?.id_equipo || ins.equipo?.id) === activeTeamId)
-    : (inscripciones.length === 1 ? inscripciones[0] : null);
+    : null) || (inscripciones.length > 0 ? inscripciones[0] : null);
+
+  const borradorExistente = inscripciones.some(i => i.estado_inscripcion === 'borrador' || i.estado === 'borrador');
 
   const isPlantillaDisabled = 
-    userRole === 'delegado' && (
-      !activeInscripcion || 
-      (activeInscripcion.estado_inscripcion !== 'aprobado' && activeInscripcion.estado !== 'aprobado')
-    );
+    userRole === 'delegado' && (!activeTeamId || (activeInscripcion && activeInscripcion.estado_inscripcion !== 'aprobado' && activeInscripcion.estado !== 'aprobado'));
 
   const isInscripcionDisabled = 
-    userRole === 'delegado' && 
-    inscripciones.length >= 3;
+    userRole === 'delegado' &&
+    inscripciones.length >= maxEquiposDelegado &&
+    !borradorExistente;
 
   const renderTeamSwitcher = () => {
-    if (userRole !== 'delegado' || inscripciones.length <= 1) return null;
-    return (
-      <div className="flex items-center gap-2">
-        <Shield className="w-4 h-4 text-gray-400 hidden lg:block" />
-        <select
-          value={activeTeamId || ''}
-          onChange={(e) => setActiveTeamId(Number(e.target.value))}
-          className="bg-gray-50 border border-gray-200 text-gray-700 text-sm font-medium rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2 cursor-pointer outline-none hover:bg-gray-100 transition-colors"
-        >
-          <option value="" disabled>Seleccionar equipo...</option>
-          {inscripciones.map(ins => {
-            const eq = ins.equipo;
-            if (!eq) return null;
-            const id = eq.id_equipo || eq.id;
-            const catNombre = ins.categoria?.nombre_categoria || '';
-            const catGenero = ins.categoria?.genero_categoria || '';
-            const catLabel = catNombre ? ` — ${catNombre} (${catGenero})` : '';
-            return <option key={id} value={id}>{eq.nombre_equipo}{catLabel}</option>;
-          })}
-        </select>
-      </div>
-    );
+    return null; 
   };
 
   const links = userRole === 'super_admin' ? NAV_LINKS.super_admin :
@@ -118,7 +100,6 @@ export function Navbar() {
       <nav className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white shadow-sm">
         <div className="mx-auto flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4">
-            {/* Botón hamburguesa (Mobile) */}
             <button
               type="button"
               className="inline-flex items-center justify-center rounded-md p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 lg:hidden"
@@ -133,7 +114,6 @@ export function Navbar() {
             </Link>
           </div>
 
-          {/* Enlaces de navegación (Desktop) */}
           <div className="hidden lg:flex flex-1 justify-center lg:items-center lg:gap-8">
             {links.map((link) => {
               if (link.path === '/delegado/inscripcion' && isInscripcionDisabled) {
@@ -141,7 +121,7 @@ export function Navbar() {
                   <span
                     key={link.path}
                     className="text-sm font-medium text-gray-400 cursor-not-allowed py-2 select-none"
-                    title="Límite de 3 equipos alcanzado"
+                    title={`Límite de ${maxEquiposDelegado} equipo(s) alcanzado`}
                   >
                     {link.name}
                   </span>

@@ -193,7 +193,8 @@ def listar_equipos_admin_route():
     id_torneo = request.args.get('id_torneo', type=int)
     id_categoria = request.args.get('id_categoria', type=int)
     search_query = request.args.get('search', type=str)
-    query = equipo_service.listar_equipos_admin(id_torneo, id_categoria, search_query)
+    estado = request.args.get('estado', type=str)
+    query = equipo_service.listar_equipos_admin(id_torneo, id_categoria, search_query, estado)
     items, pagination = paginate_query(query)
     
     _admin_many = EquipoAdminSchema(many=True)

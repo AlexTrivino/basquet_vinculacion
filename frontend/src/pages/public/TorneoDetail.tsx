@@ -6,13 +6,13 @@ import { getTorneoById } from '../../features/torneos/api/torneos.api';
 import { PosicionesTable } from '../../features/torneos/components/PosicionesTable';
 import { PartidosList } from '../../features/torneos/components/PartidosList';
 import { Skeleton } from '../../components/Skeleton';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Download } from 'lucide-react';
 
-type Tab = 'posiciones' | 'calendario';
+type Tab = 'calendario' | 'posiciones' | 'estadisticas';
 
 export default function TorneoDetail() {
   const { id } = useParams<{ id: string }>();
-  const [activeTab, setActiveTab] = useState<Tab>('posiciones');
+  const [activeTab, setActiveTab] = useState<Tab>('calendario');
   const [activeCategoriaId, setActiveCategoriaId] = useState<number | undefined>(undefined);
 
   const { data: response, isLoading, isError } = useQuery({
@@ -52,13 +52,27 @@ export default function TorneoDetail() {
             <Skeleton className="h-6 w-full max-w-2xl" />
           </div>
         ) : (
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{torneo?.nombre}</h1>
-            <p className="mt-2 text-gray-600">{torneo?.descripcion}</p>
-            <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-500">
-              <span className="bg-gray-100 px-3 py-1 rounded-full text-gray-700 font-medium capitalize">{torneo?.estado}</span>
-              {torneo?.ubicacion && <span className="bg-gray-100 px-3 py-1 rounded-full text-gray-700">📍 {torneo.ubicacion}</span>}
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">{torneo?.nombre}</h1>
+              <p className="mt-2 text-gray-600">{torneo?.descripcion}</p>
+              <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-500">
+                <span className="bg-gray-100 px-3 py-1 rounded-full text-gray-700 font-medium capitalize">{torneo?.estado}</span>
+                {torneo?.ubicacion && <span className="bg-gray-100 px-3 py-1 rounded-full text-gray-700">📍 {torneo.ubicacion}</span>}
+              </div>
             </div>
+            {torneo?.url_calendario_excel && (
+              <a
+                href={torneo.url_calendario_excel}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-colors"
+                title="Descargar Calendario (Excel)"
+              >
+                <Download className="h-4 w-4 text-gray-500" />
+                Descargar Calendario
+              </a>
+            )}
           </div>
         )}
       </div>
@@ -66,6 +80,16 @@ export default function TorneoDetail() {
       {/* Tabs Principales */}
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+          <button
+            onClick={() => setActiveTab('calendario')}
+            className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
+              activeTab === 'calendario'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+            }`}
+          >
+            Calendario
+          </button>
           <button
             onClick={() => setActiveTab('posiciones')}
             className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
@@ -77,14 +101,14 @@ export default function TorneoDetail() {
             Posiciones
           </button>
           <button
-            onClick={() => setActiveTab('calendario')}
+            onClick={() => setActiveTab('estadisticas')}
             className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium ${
-              activeTab === 'calendario'
+              activeTab === 'estadisticas'
                 ? 'border-primary-500 text-primary-600'
                 : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
             }`}
           >
-            Calendario
+            Estadísticas
           </button>
         </nav>
       </div>
@@ -118,11 +142,16 @@ export default function TorneoDetail() {
           </div>
         )}
         
+        {id && activeCategoriaId && activeTab === 'calendario' && (
+          <PartidosList torneoId={id} idCategoria={activeCategoriaId} />
+        )}
         {id && activeCategoriaId && activeTab === 'posiciones' && (
           <PosicionesTable torneoId={id} idCategoria={activeCategoriaId} />
         )}
-        {id && activeCategoriaId && activeTab === 'calendario' && (
-          <PartidosList torneoId={id} idCategoria={activeCategoriaId} />
+        {id && activeCategoriaId && activeTab === 'estadisticas' && (
+          <div className="text-center py-12 text-gray-500">
+            <p>Las estadísticas para esta categoría estarán disponibles próximamente.</p>
+          </div>
         )}
       </div>
     </main>

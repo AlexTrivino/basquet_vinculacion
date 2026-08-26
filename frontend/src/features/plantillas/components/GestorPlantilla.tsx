@@ -46,10 +46,10 @@ import { EmptyState } from '../../../components/EmptyState';
 import { ConfirmarJugadorModal } from './ConfirmarJugadorModal';
 import { EditarCamisetaModal } from './EditarCamisetaModal';
 import { ConfirmarEliminarJugadorModal } from './ConfirmarEliminarJugadorModal';
+import { useBusinessRules } from '../../../hooks/useBusinessRules';
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB
-const MIN_JUGADORES = 10;
-const MAX_JUGADORES = 18;
+
 
 const jugadorSchema = z.object({
   documento_identificacion: z.string()
@@ -161,8 +161,12 @@ export function GestorPlantilla({
   const [deletingPlantilla, setDeletingPlantilla] = useState<Plantilla | null>(null);
   const [isDeletingPlantilla, setIsDeletingPlantilla] = useState(false);
 
+  const { rules } = useBusinessRules();
+  const MIN_JUGADORES = rules.MIN_JUGADORES_PLANTILLA;
+  const MAX_JUGADORES = rules.MAX_JUGADORES_PLANTILLA;
+
   const queryClient = useQueryClient();
-  const { activeTeamId } = useAuth();
+  const { activeTeamId, userRole } = useAuth();
 
   const isWizardMode = mode === 'wizard';
 
@@ -182,9 +186,9 @@ export function GestorPlantilla({
   const categoriaActiva = categoriaOverride || inscripcion?.categoria;
 
   const { data: plantillasRes, isLoading: isLoadingPlantilla, isError } = useQuery({
-    queryKey: ['plantillas', idEquipo],
-    queryFn: () => getPlantillas(idEquipo),
-    enabled: !!idEquipo,
+    queryKey: ['plantillas', idEquipo, idTorneo, categoriaActiva?.id_categoria || categoriaActiva?.id],
+    queryFn: () => getPlantillas(idEquipo, 1, 50, idTorneo, categoriaActiva?.id_categoria || categoriaActiva?.id),
+    enabled: !!idEquipo && !!idTorneo && !!(categoriaActiva?.id_categoria || categoriaActiva?.id),
   });
   const plantilla = plantillasRes?.data || [];
 
@@ -413,6 +417,7 @@ export function GestorPlantilla({
           id_jugador: idJugador,
           id_equipo: idEquipo,
           id_torneo: idTorneo,
+          id_categoria: categoriaActiva?.id_categoria || categoriaActiva?.id || 0,
           numero_camiseta: data.numero_camiseta,
         });
 
@@ -445,6 +450,7 @@ export function GestorPlantilla({
           id_jugador: idJugador,
           id_equipo: idEquipo,
           id_torneo: idTorneo,
+          id_categoria: categoriaActiva?.id_categoria || categoriaActiva?.id || 0,
           numero_camiseta: data.numero_camiseta,
         });
 
@@ -823,6 +829,32 @@ export function GestorPlantilla({
         </div>
       );
     }
+  }
+
+  const isTorneoEnCurso = inscripcion?.torneo?.estado === 'en_curso';
+  const isDelegado = userRole === 'delegado';
+  const isEditDisabled = isDelegado && isTorneoEnCurso;
+
+  if (isEditDisabled) {
+    return (
+      <div className="max-w-md mx-auto my-12 p-8 bg-white rounded-2xl border border-blue-200 bg-blue-50/40 text-center shadow-sm flex flex-col items-center">
+        <div className="p-3 bg-blue-100 text-blue-700 rounded-2xl mb-4">
+          <Info className="w-8 h-8" />
+        </div>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">
+          Torneo En Curso
+        </h2>
+        <p className="text-sm text-gray-600 mb-6 max-w-sm">
+          El torneo se encuentra activo. La edición de la plantilla (añadir, modificar o eliminar jugadores) está bloqueada. Para registrar lesiones o sanciones, por favor contacta a la administración.
+        </p>
+        <Link
+          to="/delegado/dashboard"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 transition-colors shadow-sm"
+        >
+          Volver al Panel
+        </Link>
+      </div>
+    );
   }
 
   return (

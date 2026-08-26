@@ -65,6 +65,12 @@ class EquipoUpdateSchema(Schema):
             error='El nombre del equipo debe tener entre 2 y 100 caracteres.',
         ),
     )
+    estado = fields.String(
+        validate=validate.OneOf(
+            ['activo', 'inactivo', 'aprobado', 'rechazado', 'pendiente'],
+            error='Estado de equipo inválido.',
+        ),
+    )
 
 
 # ── Schemas de salida (DTO) ───────────────────────────────────────

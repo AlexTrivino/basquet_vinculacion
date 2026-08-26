@@ -54,6 +54,14 @@ class InscripcionCreateSchema(Schema):
     id_categoria = fields.Integer(required=True)
 
 
+class InscripcionReinscribirSchema(Schema):
+    """Validación de entrada para reinscribir un equipo en un nuevo torneo."""
+    id_torneo = fields.Integer(required=True)
+    id_equipo = fields.Integer(required=True)
+    id_categoria = fields.Integer(required=True)
+    clonar_plantilla = fields.Boolean(missing=False)
+
+
 class InscripcionEstadoSchema(Schema):
     """Validación para el cambio de estado por parte del Admin o Sistema (PATCH)."""
 

@@ -55,12 +55,13 @@ def _base_query_con_jugador():
 
 # ── Funciones de servicio ─────────────────────────────────────────
 
-def listar_plantilla(id_equipo=None, id_torneo=None):
+def listar_plantilla(id_equipo=None, id_torneo=None, id_categoria=None):
     """Retorna la query de plantilla con filtros opcionales.
 
     Args:
         id_equipo: Filtra por equipo.
         id_torneo: Filtra por torneo.
+        id_categoria: Filtra por categoría.
 
     Returns:
         Query de SQLAlchemy lista para ``paginate_query()``.
@@ -72,6 +73,9 @@ def listar_plantilla(id_equipo=None, id_torneo=None):
 
     if id_torneo is not None:
         query = query.filter(Plantilla.id_torneo == id_torneo)
+
+    if id_categoria is not None:
+        query = query.filter(Plantilla.id_categoria == id_categoria)
 
     return query
 
@@ -89,7 +93,7 @@ def obtener_entrada_plantilla(id_plantilla):
     )
 
 
-def crear_plantilla(data):
+def crear_plantilla(data, usuario_rol=None):
     """Agrega un jugador a la nómina de un equipo en un torneo.
 
     Ejecuta cinco validaciones secuenciales antes de persistir:
@@ -135,6 +139,15 @@ def crear_plantilla(data):
     id_jugador = data['id_jugador']
     id_equipo = data['id_equipo']
     id_torneo = data['id_torneo']
+    id_categoria = data['id_categoria']
+
+    from app.models.torneo import Torneo
+    torneo = db.session.get(Torneo, id_torneo)
+    if usuario_rol == 'delegado' and torneo and torneo.estado == 'en_curso':
+        raise ValueError(
+            'El torneo está en curso. Para solicitar cambios en la plantilla, '
+            'comunícate con la administración.'
+        )
 
     # ── Validación 1: Inscripción activa o en proceso ───────────────────
     inscripcion = (
@@ -143,6 +156,7 @@ def crear_plantilla(data):
         .filter(
             Inscripcion.id_equipo == id_equipo,
             Inscripcion.id_torneo == id_torneo,
+            Inscripcion.id_categoria == id_categoria,
             Inscripcion.estado_inscripcion.in_(['borrador', 'pendiente', 'aprobado'])
         )
         .first()
@@ -160,6 +174,7 @@ def crear_plantilla(data):
         .filter_by(
             id_equipo=id_equipo,
             id_torneo=id_torneo,
+            id_categoria=id_categoria,
             estado='activo'
         )
         .count()
@@ -226,6 +241,7 @@ def crear_plantilla(data):
             .filter_by(
                 id_equipo=id_equipo,
                 id_torneo=id_torneo,
+                id_categoria=id_categoria,
                 numero_camiseta=numero_camiseta,
                 estado='activo'
             )

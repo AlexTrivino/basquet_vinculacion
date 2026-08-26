@@ -185,7 +185,7 @@ describe('JugadorProfile', () => {
     expect(await screen.findByText('220')).toBeInTheDocument();
 
     // Cambiar el select a Torneo 1 (160 puntos)
-    const selectFiltro = screen.getByLabelText(/Ver:/i);
+    const selectFiltro = screen.getByRole('combobox', { name: /filtro de torneo/i });
     fireEvent.change(selectFiltro, { target: { value: '1' } });
 
     expect(await screen.findByText('160')).toBeInTheDocument();

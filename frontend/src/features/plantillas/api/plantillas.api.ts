@@ -20,14 +20,16 @@ export async function deleteJugador(idJugador: number): Promise<ApiResponse<any>
 }
 
 // Plantillas
-export async function getPlantillas(idEquipo?: number, page = 1, perPage = 50): Promise<ApiResponse<Plantilla[]>> {
-  const response = await axiosInstance.get('/plantillas', {
-    params: { id_equipo: idEquipo, page, per_page: perPage },
-  });
+export async function getPlantillas(idEquipo?: number, page = 1, perPage = 50, idTorneo?: number, idCategoria?: number): Promise<ApiResponse<Plantilla[]>> {
+  const params: any = { id_equipo: idEquipo, page, per_page: perPage };
+  if (idTorneo) params.id_torneo = idTorneo;
+  if (idCategoria) params.id_categoria = idCategoria;
+
+  const response = await axiosInstance.get('/plantillas', { params });
   return response.data;
 }
 
-export async function createPlantilla(data: { id_jugador: number; id_equipo: number; id_torneo: number; numero_camiseta: number }): Promise<ApiResponse<Plantilla>> {
+export async function createPlantilla(data: { id_jugador: number; id_equipo: number; id_torneo: number; id_categoria: number; numero_camiseta: number }): Promise<ApiResponse<Plantilla>> {
   const response = await axiosInstance.post('/plantillas', data);
   return response.data;
 }

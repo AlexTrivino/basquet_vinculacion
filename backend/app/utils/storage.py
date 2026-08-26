@@ -41,6 +41,8 @@ _FIRMAS_MAGIC = [
     (b'\x89PNG\r\n\x1a\n',   'image/png'),    # PNG
     (b'%PDF',                  'application/pdf'),  # PDF
     (b'RIFF',                  'image/webp'),   # WebP (verificación adicional abajo)
+    (b'PK\x03\x04',            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'), # XLSX
+    (b'\xd0\xcf\x11\xe0',      'application/vnd.ms-excel'), # XLS (D0 CF 11 E0)
 ]
 
 # Longitud máxima de firma a leer del stream (PNG tiene 8 bytes)
@@ -52,11 +54,13 @@ _EXTENSIONES = {
     'image/png':        '.png',
     'image/webp':       '.webp',
     'application/pdf':  '.pdf',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '.xlsx',
+    'application/vnd.ms-excel': '.xls',
 }
 
 # Subtipos agrupados para validación contextual
 TIPOS_IMAGEN = frozenset({'image/jpeg', 'image/png', 'image/webp'})
-TIPOS_DOCUMENTO = frozenset({'application/pdf'})
+TIPOS_DOCUMENTO = frozenset({'application/pdf', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'})
 TIPOS_PERMITIDOS = TIPOS_IMAGEN | TIPOS_DOCUMENTO
 
 # Tamaños máximos permitidos por contexto (en bytes)
@@ -65,6 +69,7 @@ MAX_DOCUMENTO_JUGADOR = 4 * 1024 * 1024  # 4 MB
 MAX_LOGO_EQUIPO = 2 * 1024 * 1024        # 2 MB
 MAX_BANNER_EQUIPO = 5 * 1024 * 1024      # 5 MB
 MAX_COMPROBANTE = 5 * 1024 * 1024        # 5 MB
+MAX_CALENDARIO_TORNEO = 5 * 1024 * 1024  # 5 MB
 
 
 # ── Función de validación ─────────────────────────────────────────

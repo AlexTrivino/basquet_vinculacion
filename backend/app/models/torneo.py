@@ -12,6 +12,7 @@ class Torneo(db.Model):
     fecha_inicio = db.Column(db.Date, nullable=False)
     fecha_fin = db.Column(db.Date, nullable=False)
     estado = db.Column(db.String(20), nullable=False, default='programado')
+    url_calendario_excel = db.Column(db.String(500), nullable=True)
 
     created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
     updated_at = db.Column(
@@ -29,7 +30,7 @@ class Torneo(db.Model):
     # ── Restricciones ──────────────────────────────────────────────
     __table_args__ = (
         db.CheckConstraint(
-            "estado IN ('programado', 'en_curso', 'finalizado', 'inactivo')",
+            "estado IN ('programado', 'en_curso', 'finalizado', 'inactivo', 'anulado')",
             name='ck_torneos_estado',
         ),
     )
@@ -39,9 +40,9 @@ class Torneo(db.Model):
         """Retorna query filtrada excluyendo torneos eliminados (soft delete).
 
         Incluye torneos programados, en curso y finalizados.
-        Solo excluye los marcados como 'inactivo'.
+        Solo excluye los marcados como 'inactivo' o 'anulado'.
         """
-        return cls.query.filter(cls.estado != 'inactivo')
+        return cls.query.filter(cls.estado.notin_(['inactivo', 'anulado']))
 
     def to_dict(self) -> dict:
         """Serializa la instancia a un diccionario JSON-compatible."""
@@ -51,6 +52,7 @@ class Torneo(db.Model):
             'fecha_inicio': self.fecha_inicio.isoformat() if self.fecha_inicio else None,
             'fecha_fin': self.fecha_fin.isoformat() if self.fecha_fin else None,
             'estado': self.estado,
+            'url_calendario_excel': self.url_calendario_excel,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }

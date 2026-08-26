@@ -43,6 +43,7 @@ export interface Torneo {
   fecha_fin?: string;
   ubicacion?: string;
   estado: string;
+  url_calendario_excel?: string;
   categorias?: Categoria[];
 }
 
@@ -65,8 +66,8 @@ export interface Inscripcion {
   id_torneo: number;
   id_equipo: number;
   id_categoria: number;
-  estado?: 'borrador' | 'pendiente' | 'aprobado' | 'rechazado';
-  estado_inscripcion?: 'borrador' | 'pendiente' | 'aprobado' | 'rechazado';
+  estado?: 'borrador' | 'pendiente' | 'aprobado' | 'rechazado' | 'retirado';
+  estado_inscripcion?: 'borrador' | 'pendiente' | 'aprobado' | 'rechazado' | 'retirado';
   url_comprobante_pago?: string;
   fecha_inscripcion: string;
   

@@ -11,8 +11,19 @@ export async function getTorneos(page = 1, perPage = 20, anio?: number): Promise
   return response.data;
 }
 
+export async function getTorneosAdmin(page = 1, perPage = 20): Promise<ApiResponse<Torneo[]>> {
+  const params: any = { page, per_page: perPage };
+  const response = await axiosInstance.get('/torneos/admin', { params });
+  return response.data;
+}
+
 export async function getTorneoById(id: string | number): Promise<ApiResponse<Torneo>> {
   const response = await axiosInstance.get(`/torneos/${id}`);
+  return response.data;
+}
+
+export async function getTorneosDisponiblesReinscripcion(): Promise<ApiResponse<Torneo[]>> {
+  const response = await axiosInstance.get('/torneos/disponibles-reinscripcion');
   return response.data;
 }
 
@@ -42,5 +53,30 @@ export async function updateTorneo(id: string | number, payload: Partial<Torneo>
 
 export async function deleteTorneo(id: string | number): Promise<ApiResponse<void>> {
   const response = await axiosInstance.delete(`/torneos/${id}`);
+  return response.data;
+}
+
+export async function anularTorneo(id: string | number): Promise<ApiResponse<void>> {
+  const response = await axiosInstance.put(`/torneos/${id}/anular`);
+  return response.data;
+}
+
+export async function addCategoria(idTorneo: string | number, payload: any): Promise<ApiResponse<any>> {
+  const response = await axiosInstance.post(`/torneos/${idTorneo}/categorias`, payload);
+  return response.data;
+}
+
+export async function deleteCategoria(idCategoria: string | number): Promise<ApiResponse<void>> {
+  const response = await axiosInstance.delete(`/torneos/categorias/${idCategoria}`);
+  return response.data;
+}
+
+export async function uploadCalendario(idTorneo: string | number, file: File): Promise<ApiResponse<{ url: string }>> {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  const response = await axiosInstance.post(`/torneos/${idTorneo}/calendario`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
   return response.data;
 }

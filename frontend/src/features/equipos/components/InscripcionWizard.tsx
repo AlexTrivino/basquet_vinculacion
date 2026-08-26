@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { CheckCircle2, Users, ChevronRight, Trophy, X, Trash2, Shield } from 'lucide-react';
 import { AsyncButton } from '../../../components/AsyncButton';
-import { inscribirEquipoCompleto, finalizarBorradorInscripcion, desactivarEquipo } from '../api/equipos.api';
+import { inscribirEquipoCompleto, finalizarBorradorInscripcion, deleteBorradorInscripcion } from '../api/equipos.api';
 import { getTorneos } from '../../torneos/api/torneos.api';
 import { getCategorias } from '../../categorias/api/categorias.api';
 import { GestorPlantilla } from '../../plantillas/components/GestorPlantilla';
@@ -391,7 +391,7 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
             onClickAction={async () => {
               if (window.confirm("¿Estás seguro de descartar esta inscripción? Se borrarán todos los datos ingresados y tendrás que empezar de nuevo.")) {
                 try {
-                  await desactivarEquipo(borradorData.idEquipo);
+                  await deleteBorradorInscripcion(borradorData.idInscripcion);
                   queryClient.invalidateQueries({ queryKey: ['inscripciones', 'delegado'] });
                   setBorradorData(null);
                   setCurrentStep(1);

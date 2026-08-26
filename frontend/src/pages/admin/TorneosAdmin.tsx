@@ -4,11 +4,12 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { Trophy, Plus, X, Edit, Trash2 } from 'lucide-react';
+import { Trophy, Plus, X, Edit, Trash2, Search, Filter, RefreshCw, FileSpreadsheet } from 'lucide-react';
 
 import { DataGridTable, type Column } from '../../components/DataGridTable';
 import { AsyncButton } from '../../components/AsyncButton';
-import { getTorneos, createTorneo, updateTorneo, deleteTorneo } from '../../features/torneos/api/torneos.api';
+import { FileUploadButton } from '../../components/FileUploadButton';
+import { getTorneosAdmin, createTorneo, updateTorneo, anularTorneo, addCategoria, deleteCategoria, uploadCalendario } from '../../features/torneos/api/torneos.api';
 import type { Torneo } from '../../types/api.types';
 
 const torneoSchema = z.object({
@@ -37,7 +38,7 @@ export default function TorneosAdmin() {
 
   const { data: response, isLoading } = useQuery({
     queryKey: ['torneos_admin'],
-    queryFn: () => getTorneos(1, 100),
+    queryFn: () => getTorneosAdmin(1, 100),
   });
 
   const torneos = response?.data || [];
@@ -65,6 +66,7 @@ export default function TorneosAdmin() {
       setValue('fecha_inicio', torneo.fecha_inicio ? new Date(torneo.fecha_inicio).toISOString().split('T')[0] : '');
       setValue('fecha_fin', torneo.fecha_fin ? new Date(torneo.fecha_fin).toISOString().split('T')[0] : '');
       setValue('estado', torneo.estado);
+      setCategoriasList(torneo.categorias || []);
     } else {
       setEditingTorneo(null);
       reset({ nombre: '', fecha_inicio: '', fecha_fin: '', categorias: [], estado: 'programado' });
@@ -80,7 +82,9 @@ export default function TorneosAdmin() {
     reset();
   };
 
-  const handleAddCategoria = () => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleAddCategoria = async () => {
     if (!newCatNombre.trim() || !newCatGenero || newCatMin < 0) {
       toast.error('Verifica los datos de la categoría.');
       return;
@@ -91,18 +95,76 @@ export default function TorneosAdmin() {
       edad_minima: newCatMin,
       edad_maxima: newCatMax === '' ? null : Number(newCatMax),
     };
-    setCategoriasList([...categoriasList, nuevaCategoria]);
-    setValue('categorias', [...categoriasList, nuevaCategoria]);
+
+    if (editingTorneo) {
+      try {
+        const idTorneo = editingTorneo.id_torneo || editingTorneo.id;
+        const res = await addCategoria(idTorneo as number, nuevaCategoria);
+        toast.success('Categoría agregada al torneo');
+        setCategoriasList([...categoriasList, res.data]);
+        queryClient.invalidateQueries({ queryKey: ['torneos_admin'] });
+      } catch (e: any) {
+        toast.error(e.response?.data?.message || 'Error al agregar categoría');
+      }
+    } else {
+      setCategoriasList([...categoriasList, nuevaCategoria]);
+      setValue('categorias', [...categoriasList, nuevaCategoria]);
+    }
 
     setNewCatNombre('');
     setNewCatMin(0);
     setNewCatMax('');
   };
 
-  const handleRemoveCategoria = (index: number) => {
-    const newList = categoriasList.filter((_, i) => i !== index);
-    setCategoriasList(newList);
-    setValue('categorias', newList);
+  const handleRemoveCategoria = async (index: number, idCat?: number) => {
+    if (editingTorneo && idCat) {
+      if (!confirm('¿Seguro de eliminar esta categoría? Si hay equipos inscritos, fallará.')) return;
+      try {
+        await deleteCategoria(idCat);
+        toast.success('Categoría eliminada');
+        setCategoriasList(categoriasList.filter((c) => c.id_categoria !== idCat && c.id !== idCat));
+        queryClient.invalidateQueries({ queryKey: ['torneos_admin'] });
+      } catch (e: any) {
+        toast.error(e.response?.data?.message || 'Error al eliminar categoría');
+      }
+    } else {
+      const newList = categoriasList.filter((_, i) => i !== index);
+      setCategoriasList(newList);
+      setValue('categorias', newList);
+    }
+  };
+
+  const handleUploadCalendario = async (file: File) => {
+    if (!editingTorneo) return;
+    const idTorneo = editingTorneo.id_torneo || editingTorneo.id;
+    if (!idTorneo) return;
+    
+    setIsUploading(true);
+    try {
+      const res = await uploadCalendario(idTorneo, file);
+      toast.success('Calendario subido exitosamente');
+      setEditingTorneo({ ...editingTorneo, url_calendario_excel: res.data?.url });
+      queryClient.invalidateQueries({ queryKey: ['torneos_admin'] });
+    } catch (e: any) {
+      toast.error(e.response?.data?.message || 'Error al subir calendario');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleRemoveCalendario = async () => {
+    if (!editingTorneo) return;
+    const idTorneo = editingTorneo.id_torneo || editingTorneo.id;
+    if (!idTorneo) return;
+    
+    try {
+      await updateTorneo(idTorneo, { url_calendario_excel: undefined } as any);
+      toast.success('Calendario eliminado');
+      setEditingTorneo({ ...editingTorneo, url_calendario_excel: undefined });
+      queryClient.invalidateQueries({ queryKey: ['torneos_admin'] });
+    } catch {
+      toast.error('Error al eliminar calendario');
+    }
   };
 
   const mutationCreate = useMutation({
@@ -126,20 +188,20 @@ export default function TorneosAdmin() {
       queryClient.invalidateQueries({ queryKey: ['torneos'] });
       closeModal();
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al actualizar el torneo');
+    onError: () => {
+      toast.error('Error al editar el torneo');
     },
   });
 
-  const mutationDelete = useMutation({
-    mutationFn: deleteTorneo,
+  const mutationAnular = useMutation({
+    mutationFn: anularTorneo,
     onSuccess: () => {
-      toast.success('Torneo inactivado exitosamente');
+      toast.success('Torneo anulado exitosamente');
       queryClient.invalidateQueries({ queryKey: ['torneos_admin'] });
       queryClient.invalidateQueries({ queryKey: ['torneos'] });
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Error al inactivar el torneo');
+      toast.error(error.response?.data?.message || 'Error al anular el torneo');
     },
   });
 
@@ -147,18 +209,21 @@ export default function TorneosAdmin() {
     if (editingTorneo) {
       const id = editingTorneo.id_torneo || editingTorneo.id;
       if (id) {
-        await mutationUpdate.mutateAsync({ id, payload: data as any });
+        // Exclude categorias when updating a torneo, because we manage them individually now
+        const payload = { ...data };
+        delete payload.categorias;
+        await mutationUpdate.mutateAsync({ id, payload: payload as any });
       }
     } else {
       await mutationCreate.mutateAsync(data as any);
     }
   };
 
-  const handleInactivar = async (torneo: Torneo) => {
+  const handleAnular = async (torneo: Torneo) => {
     const id = torneo.id_torneo || torneo.id;
     if (!id) return;
-    if (confirm(`¿Estás seguro de inactivar el torneo "${torneo.nombre || torneo.nombre_torneo}"?`)) {
-      await mutationDelete.mutateAsync(id);
+    if (confirm(`¿Estás seguro de ANULAR el torneo "${torneo.nombre || torneo.nombre_torneo}"?\n\nEsta acción lo ocultará del público, pero mantendrá el historial. No se puede revertir.`)) {
+      await mutationAnular.mutateAsync(id);
     }
   };
 
@@ -166,82 +231,218 @@ export default function TorneosAdmin() {
     {
       key: 'nombre',
       header: 'Nombre del Torneo',
-      render: (row) => <span className="font-medium text-gray-900">{row.nombre || row.nombre_torneo}</span>,
+      render: (row) => (
+        <div className="flex flex-col">
+          <span className="font-bold text-slate-900">{row.nombre || row.nombre_torneo}</span>
+          {row.categorias && row.categorias.length > 0 ? (
+             <span className="text-xs text-slate-500 font-medium">{row.categorias.length} categorías</span>
+          ) : (
+             <span className="text-xs text-orange-500 font-medium">Sin categorías</span>
+          )}
+        </div>
+      ),
     },
     {
-      key: 'fecha_inicio',
-      header: 'Fecha Inicio',
-      render: (row) => row.fecha_inicio ? new Date(row.fecha_inicio).toLocaleDateString() : 'N/A',
+      key: 'fechas',
+      header: 'Período',
+      render: (row) => (
+        <div className="flex flex-col text-sm text-slate-600 font-medium">
+          <span><span className="text-slate-400">Del:</span> {row.fecha_inicio ? new Date(row.fecha_inicio).toLocaleDateString() : 'N/A'}</span>
+          <span><span className="text-slate-400">Al:</span> {row.fecha_fin ? new Date(row.fecha_fin).toLocaleDateString() : 'N/A'}</span>
+        </div>
+      ),
     },
     {
-      key: 'fecha_fin',
-      header: 'Fecha Fin',
-      render: (row) => row.fecha_fin ? new Date(row.fecha_fin).toLocaleDateString() : 'N/A',
+      key: 'calendario',
+      header: 'Calendario',
+      render: (row) => (
+        <div className="flex items-center gap-1.5">
+          {row.url_calendario_excel ? (
+            <a
+              href={row.url_calendario_excel}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Ver Calendario Oficial"
+              className="h-7 px-3 rounded-md flex items-center justify-center gap-1.5 text-xs font-bold transition-colors bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200 w-[68px]"
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+              <span>Ver</span>
+            </a>
+          ) : (
+            <span
+              title="Sin calendario"
+              className="h-7 px-3 rounded-md flex items-center justify-center text-xs font-bold transition-colors bg-slate-100 text-slate-400 border border-slate-200 w-[68px]"
+            >
+              <FileSpreadsheet className="w-4 h-4" />
+            </span>
+          )}
+        </div>
+      ),
     },
     {
       key: 'estado',
       header: 'Estado',
-      render: (row) => (
-        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize
-          ${row.estado === 'programado' ? 'bg-blue-100 text-blue-800' : ''}
-          ${row.estado === 'en_curso' ? 'bg-green-100 text-green-800' : ''}
-          ${row.estado === 'finalizado' ? 'bg-gray-100 text-gray-800' : ''}
-          ${row.estado === 'inactivo' ? 'bg-red-100 text-red-800' : ''}
-        `}>
-          {(row.estado || 'programado').replace('_', ' ')}
-        </span>
-      ),
+      render: (row) => {
+        let colors = 'bg-slate-100 text-slate-800 border-slate-200';
+        if (row.estado === 'programado') colors = 'bg-blue-100 text-blue-800 border-blue-200';
+        else if (row.estado === 'en_curso') colors = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+        else if (row.estado === 'finalizado') colors = 'bg-purple-100 text-purple-800 border-purple-200';
+        else if (row.estado === 'anulado') colors = 'bg-rose-100 text-rose-800 border-rose-200';
+
+        return (
+          <span className={`inline-flex items-center justify-center rounded-md px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider border ${colors}`}>
+            {(row.estado || 'programado').replace('_', ' ')}
+          </span>
+        );
+      },
     },
     {
       key: 'acciones',
       header: 'Acciones',
       render: (row) => (
-        <div className="flex gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={() => openModal(row)}
-            className="rounded p-1.5 text-primary-600 hover:bg-primary-50 transition-colors"
+            className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold flex items-center gap-1 border border-blue-200 transition-colors"
             title="Editar Torneo"
           >
-            <Edit className="h-4 w-4" />
+            <Edit className="w-3.5 h-3.5" />
+            <span>Editar</span>
           </button>
+          
           <button
-            onClick={() => handleInactivar(row)}
-            className="rounded p-1.5 text-red-600 hover:bg-red-50 transition-colors"
-            title="Inactivar Torneo"
-            disabled={row.estado === 'inactivo'}
+            onClick={() => handleAnular(row)}
+            disabled={row.estado === 'anulado'}
+            className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 border transition-colors ${
+              row.estado === 'anulado'
+                ? 'bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed opacity-60'
+                : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200'
+            }`}
+            title="Anular Torneo"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
       ),
     },
   ];
 
+  const [searchInput, setSearchInput] = useState('');
+  const [selectedEstado, setSelectedEstado] = useState('');
+
+  const filteredTorneos = torneos.filter((t: Torneo) => {
+    const nombre = (t.nombre || t.nombre_torneo || '').toLowerCase();
+    const searchMatch = nombre.includes(searchInput.toLowerCase());
+    const estadoMatch = selectedEstado ? t.estado === selectedEstado : true;
+    return searchMatch && estadoMatch;
+  });
+
+  const totalTorneos = torneos.length;
+  const hasActiveFilters = searchInput || selectedEstado;
+
+  const handleResetFilters = () => {
+    setSearchInput('');
+    setSelectedEstado('');
+  };
+
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <Trophy className="h-8 w-8 text-primary-600" />
-            Gestión de Torneos
-          </h1>
-          <p className="mt-2 text-gray-600">Administra los torneos, sus fechas y estados.</p>
+    <div className="space-y-6 w-full px-[10%] py-8">
+      {/* Cabecera idéntica a Jugadores */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center border border-blue-500/20">
+            <Trophy className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+                Gestión de Torneos
+              </h1>
+              <span className="px-2.5 py-0.5 text-xs font-bold bg-slate-100 text-slate-700 rounded-full border border-slate-200">
+                {totalTorneos} registros
+              </span>
+            </div>
+            <p className="text-sm text-slate-500 mt-0.5">
+              Administra los torneos, configuración de categorías y calendario de juegos.
+            </p>
+          </div>
         </div>
-        <button
-          onClick={() => openModal()}
-          className="flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 transition-colors"
-        >
-          <Plus className="h-5 w-5" />
-          Nuevo Torneo
-        </button>
+
+        <div className="flex items-center gap-3 self-start sm:self-center">
+          <button
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['torneos_admin'] })}
+            disabled={isLoading}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-blue-600' : ''}`} />
+            <span>Actualizar</span>
+          </button>
+          
+          <button
+            onClick={() => openModal()}
+            className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Nuevo Torneo</span>
+          </button>
+        </div>
       </div>
 
-      <DataGridTable
-        columns={columns}
-        data={torneos}
-        isLoading={isLoading}
-        emptyMessage="No se encontraron torneos registrados en el sistema."
-      />
+      {/* Filter Bar */}
+      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
+            <Filter className="w-4 h-4 text-blue-600" />
+            <span>Filtros y Búsqueda</span>
+          </div>
+
+          {hasActiveFilters && (
+            <button
+              onClick={handleResetFilters}
+              className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+            >
+              Limpiar filtros
+            </button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="lg:col-span-3 relative">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Buscar torneo por nombre..."
+              className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+            />
+          </div>
+
+          <div>
+            <select
+              value={selectedEstado}
+              onChange={(e) => setSelectedEstado(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+            >
+              <option value="">Todos los Estados</option>
+              <option value="programado">Programado</option>
+              <option value="en_curso">En Curso</option>
+              <option value="finalizado">Finalizado</option>
+              <option value="anulado">Anulado</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <DataGridTable
+          columns={columns}
+          data={filteredTorneos}
+          isLoading={isLoading}
+          emptyMessage="No se encontraron torneos con los filtros seleccionados."
+        />
+      </div>
 
       {/* Modal CRUD */}
       {isModalOpen && (
@@ -300,14 +501,30 @@ export default function TorneosAdmin() {
                     <option value="programado">Programado</option>
                     <option value="en_curso">En Curso</option>
                     <option value="finalizado">Finalizado</option>
+                    <option value="anulado">Anulado</option>
                   </select>
                 </div>
               )}
 
-              {/* Sección de Categorías solo visible al Crear Torneo */}
-              {!editingTorneo && (
+              {/* Calendario Excel */}
+              {editingTorneo && (
                 <div className="border-t border-gray-100 pt-4 mt-4">
-                  <h3 className="text-sm font-bold text-gray-900 mb-3">Categorías del Torneo</h3>
+                  <h3 className="text-sm font-bold text-gray-900 mb-2">Calendario de Juegos (Excel)</h3>
+                  <FileUploadButton
+                    onFileSelect={handleUploadCalendario}
+                    accept=".xlsx,.xls"
+                    maxSizeMB={5}
+                    label="Subir Calendario Excel"
+                    isLoading={isUploading}
+                    currentFileUrl={editingTorneo.url_calendario_excel}
+                    onRemove={handleRemoveCalendario}
+                  />
+                </div>
+              )}
+
+              {/* Sección de Categorías */}
+              <div className="border-t border-gray-100 pt-4 mt-4">
+                <h3 className="text-sm font-bold text-gray-900 mb-3">Categorías del Torneo</h3>
                   
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 items-end mb-4 bg-gray-50 p-3 rounded-lg border border-gray-200">
                     <div className="col-span-2 sm:col-span-2">
@@ -374,7 +591,7 @@ export default function TorneosAdmin() {
                           </div>
                           <button
                             type="button"
-                            onClick={() => handleRemoveCategoria(index)}
+                            onClick={() => handleRemoveCategoria(index, cat.id_categoria || cat.id)}
                             className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -385,8 +602,7 @@ export default function TorneosAdmin() {
                   ) : (
                     <p className="text-xs text-gray-500 text-center italic py-2">No has agregado categorías a este torneo.</p>
                   )}
-                </div>
-              )}
+              </div>
 
               <div className="mt-6 flex justify-end gap-3 border-t border-gray-100 pt-5">
                 <button
@@ -407,6 +623,6 @@ export default function TorneosAdmin() {
           </div>
         </div>
       )}
-    </main>
+    </div>
   );
 }

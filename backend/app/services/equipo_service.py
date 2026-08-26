@@ -68,17 +68,12 @@ def crear_equipo(data):
     data = normalizar_mayusculas(data, ['nombre_equipo'])
     data['id_usuario'] = g.usuario_id
 
-    # ── Validación de Límite de 3 Equipos ──────────────────────────
-    equipos_usuario = Equipo.query.filter_by(id_usuario=g.usuario_id, estado='activo').all()
-    equipos_ocupados = 0
-    for eq in equipos_usuario:
-        inscripciones = Inscripcion.query.filter_by(id_equipo=eq.id_equipo).all()
-        # Ocupa cupo si no tiene inscripciones, o si al menos una no está rechazada
-        if not inscripciones or any(i.estado_inscripcion != 'rechazado' for i in inscripciones):
-            equipos_ocupados += 1
-            
-    if equipos_ocupados >= 3:
-        raise ValueError('Límite alcanzado: Un delegado solo puede administrar un máximo de 3 equipos simultáneamente.')
+    from app.utils.business_rules import MAX_EQUIPOS_POR_DELEGADO
+    
+    # ── Validación de Límite de Equipos ───────────────────────────
+    equipos_activos = Equipo.query.filter_by(id_usuario=g.usuario_id, estado='activo').count()
+    if equipos_activos >= MAX_EQUIPOS_POR_DELEGADO:
+        raise ValueError(f'Límite alcanzado: Un delegado solo puede administrar {MAX_EQUIPOS_POR_DELEGADO} equipo(s).')
 
     try:
         equipo = Equipo(**data)
@@ -150,19 +145,19 @@ def reactivar_equipo(id_equipo):
     equipo = db.session.get(Equipo, id_equipo)
     if not equipo or equipo.estado == 'activo': return None
 
-    # Validar límite de 3 equipos activos para el delegado
+    # Validar límite de 1 equipo activo para el delegado
     equipos_activos = Equipo.query.filter_by(
         id_usuario=equipo.id_usuario, estado='activo'
     ).count()
 
-    if equipos_activos >= 3:
-        raise ValueError('Este delegado ya tiene 3 equipos activos.')
+    if equipos_activos >= 1:
+        raise ValueError('Este delegado ya tiene 1 equipo activo.')
 
     equipo.estado = 'activo'
     db.session.commit()
     return equipo
 
-def listar_equipos_admin(id_torneo=None, id_categoria=None, search_query=None):
+def listar_equipos_admin(id_torneo=None, id_categoria=None, search_query=None, estado=None):
     from sqlalchemy.orm import joinedload
     from app.models.inscripcion import Inscripcion
     
@@ -174,6 +169,9 @@ def listar_equipos_admin(id_torneo=None, id_categoria=None, search_query=None):
     
     if search_query:
         query = query.filter(Equipo.nombre_equipo.ilike(f'%{search_query}%'))
+        
+    if estado:
+        query = query.filter(Equipo.estado == estado)
         
     if id_torneo or id_categoria:
         query = query.join(Inscripcion, Equipo.id_equipo == Inscripcion.id_equipo)

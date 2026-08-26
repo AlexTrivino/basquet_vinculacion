@@ -61,15 +61,17 @@ export function ModalExpedienteInscripcion({
   const [modalRechazarOpen, setModalRechazarOpen] = useState(false);
 
   const idEquipo = inscripcion?.equipo?.id_equipo || inscripcion?.equipo?.id || inscripcion?.id_equipo;
+  const idTorneo = inscripcion?.torneo?.id_torneo || inscripcion?.torneo?.id || inscripcion?.id_torneo;
+  const idCategoria = inscripcion?.categoria?.id_categoria || inscripcion?.categoria?.id || inscripcion?.id_categoria;
   const idInscripcion = inscripcion?.id_inscripcion || inscripcion?.id || 0;
   const nombreEquipo = inscripcion?.equipo?.nombre_equipo || inscripcion?.equipo?.nombre || 'Equipo';
   const estado = inscripcion?.estado_inscripcion || inscripcion?.estado || 'pendiente';
 
   // Consulta de la plantilla del equipo
   const { data: plantillasResponse, isLoading: isLoadingPlantilla } = useQuery({
-    queryKey: ['plantillas', idEquipo],
-    queryFn: () => getPlantillas(idEquipo),
-    enabled: isOpen && !!idEquipo,
+    queryKey: ['plantillas', idEquipo, idTorneo, idCategoria],
+    queryFn: () => getPlantillas(idEquipo, 1, 50, idTorneo, idCategoria),
+    enabled: isOpen && !!idEquipo && !!idTorneo && !!idCategoria,
   });
 
   const plantillas: Plantilla[] = plantillasResponse?.data || [];

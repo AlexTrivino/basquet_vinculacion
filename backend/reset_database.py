@@ -65,9 +65,35 @@ def reset_database():
             print(f"   - Error vaciando tablas: {e}")
             sys.exit(1)
             
+        # 3. Borrar los archivos de Supabase Storage
+        try:
+            print("3. Vaciando archivos del Storage de Supabase (S3)...")
+            import os
+            import urllib.request
+            from dotenv import load_dotenv
+            load_dotenv('.env')
+            
+            bucket = os.getenv('SUPABASE_STORAGE_BUCKET', 'archivos')
+            supabase_url = os.getenv('SUPABASE_URL', '').rstrip('/')
+            service_role_key = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
+            
+            if supabase_url and service_role_key:
+                empty_url = f"{supabase_url}/storage/v1/bucket/{bucket}/empty"
+                req = urllib.request.Request(
+                    empty_url,
+                    headers={'Authorization': f'Bearer {service_role_key}'},
+                    method='POST'
+                )
+                with urllib.request.urlopen(req) as response:
+                    print("   - Cola de limpieza en Storage iniciada exitosamente (podría demorar en reflejarse completamente).")
+            else:
+                print("   - Omitido: No se encontraron las credenciales de Supabase en el entorno.")
+        except Exception as e:
+            print(f"   - Advertencia: Error vaciando Storage: {e}")
+            
         print("\nFACTORY RESET COMPLETADO!")
         print("Tu base de datos esta limpia como recien instalada.")
-        print("Nota: Si subiste archivos (logos, PDFs), recuerda vaciar el 'Storage' manualmente desde el panel web de Supabase.")
+        print("El bucket de Storage también ha sido programado para vaciarse.")
 
 if __name__ == '__main__':
     reset_database()
