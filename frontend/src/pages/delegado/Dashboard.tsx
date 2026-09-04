@@ -142,23 +142,7 @@ export default function Dashboard() {
 
   const idEquipo = inscripcionActual.equipo?.id_equipo || inscripcionActual.equipo?.id;
 
-  const actionButton = estadoActual === 'borrador' ? null : estadoActual === 'aprobado' ? (
-    <Link
-      to="/delegado/plantilla"
-      className="inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-primary-700 shadow-md"
-    >
-      Gestionar Plantilla
-    </Link>
-  ) : (
-    <button
-      type="button"
-      disabled
-      className="inline-flex items-center justify-center rounded-xl bg-gray-100 text-gray-400 border border-gray-200 px-5 py-2.5 text-sm font-bold cursor-not-allowed select-none"
-      title={estadoActual === 'pendiente' ? "La plantilla solo estará disponible una vez que la inscripción sea aprobada" : "Inscripción no aprobada"}
-    >
-      Plantilla Bloqueada ({estadoActual === 'pendiente' ? 'En Revisión' : 'Rechazada'})
-    </button>
-  );
+
 
   return (
     <div className="relative w-full">
@@ -168,7 +152,6 @@ export default function Dashboard() {
       <EquipoProfile 
         teamId={idEquipo}
         dashboardStatus={estadoActual}
-        actionButton={actionButton}
       />
     </div>
   );

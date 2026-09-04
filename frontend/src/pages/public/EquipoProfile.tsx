@@ -47,7 +47,7 @@ const MAX_LOGO_SIZE = 2 * 1024 * 1024;   // 2 MB
 const MAX_BANNER_SIZE = 5 * 1024 * 1024; // 5 MB
 const ITEMS_POR_PAGINA_PARTICIPACIONES = 3;
 
-export default function EquipoProfile({ teamId, dashboardStatus, actionButton }: { teamId?: number, dashboardStatus?: string, actionButton?: React.ReactNode }) {
+export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: number, dashboardStatus?: string }) {
   const { id } = useParams<{ id: string }>();
   const idEquipo = teamId || Number(id);
   const { isAuthenticated, userRole } = useAuth();
@@ -508,11 +508,6 @@ export default function EquipoProfile({ teamId, dashboardStatus, actionButton }:
               </button>
             )}
             
-            {actionButton && (
-              <div className="ml-0 sm:ml-2 mt-4 sm:mt-0">
-                {actionButton}
-              </div>
-            )}
           </div>
         </div>
 
