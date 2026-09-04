@@ -6,8 +6,7 @@ import { getTorneoById } from '../../features/torneos/api/torneos.api';
 import { PosicionesTable } from '../../features/torneos/components/PosicionesTable';
 import { PartidosList } from '../../features/torneos/components/PartidosList';
 import { LideresEstadisticos } from '../../features/torneos/components/LideresEstadisticos';
-import { Skeleton } from '../../components/Skeleton';
-import { ArrowLeft, Download } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 type Tab = 'calendario' | 'posiciones' | 'estadisticas';
 
