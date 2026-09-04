@@ -58,7 +58,7 @@ export function BoxScoreModal({ idPartido, equipoLocal, equipoVisitante, onClose
         <div className="bg-primary-900 px-6 py-4 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2 text-white">
             <Activity className="w-5 h-5" />
-            <h3 className="text-lg font-bold">Box Score Oficial</h3>
+            <h3 className="text-lg font-bold">Estadísticas Oficiales</h3>
           </div>
           <button onClick={onClose} className="text-primary-200 hover:text-white transition-colors">
             <X className="w-6 h-6" />

@@ -9,9 +9,10 @@ import { useState } from 'react';
 interface PartidosListProps {
   torneoId: string;
   idCategoria?: number;
+  urlCalendario?: string;
 }
 
-export function PartidosList({ torneoId, idCategoria }: PartidosListProps) {
+export function PartidosList({ torneoId, idCategoria, urlCalendario }: PartidosListProps) {
   const [selectedMatch, setSelectedMatch] = useState<any | null>(null);
 
 
@@ -38,7 +39,20 @@ export function PartidosList({ torneoId, idCategoria }: PartidosListProps) {
 
   if (partidos.length === 0) {
     return (
-      <div className="mt-6">
+      <div className="mt-6 px-2 sm:px-[8%]">
+        {urlCalendario && (
+          <div className="mb-6 flex justify-end">
+            <a
+              href={urlCalendario}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-gray-700 shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              <FileText className="h-4 w-4 text-primary-600" />
+              Ver calendario (Archivo)
+            </a>
+          </div>
+        )}
         <EmptyState
           title="Calendario no disponible"
           description="El calendario de partidos se generará próximamente."
@@ -49,7 +63,21 @@ export function PartidosList({ torneoId, idCategoria }: PartidosListProps) {
   }
 
   return (
-    <div className="mt-6 flex flex-col gap-4">
+    <div className="mt-6 px-2 sm:px-[8%]">
+      {urlCalendario && (
+        <div className="mb-6 flex justify-end">
+          <a
+            href={urlCalendario}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-gray-700 shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
+          >
+            <FileText className="h-4 w-4 text-primary-600" />
+            Ver calendario (Archivo)
+          </a>
+        </div>
+      )}
+      <div className="flex flex-col gap-4">
       {partidos.map((partido) => (
         <div key={partido.id} className="flex flex-col sm:flex-row items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
           <div className="flex-1 flex justify-end text-right">
@@ -77,7 +105,7 @@ export function PartidosList({ torneoId, idCategoria }: PartidosListProps) {
                   title="Ver Estadísticas"
                 >
                   <Activity className="w-3.5 h-3.5" />
-                  Box Score
+                  Estadísticas
                 </button>
                 {partido.url_planilla_fiba && (
                   <a
@@ -100,6 +128,7 @@ export function PartidosList({ torneoId, idCategoria }: PartidosListProps) {
           </div>
         </div>
       ))}
+      </div>
       
       {selectedMatch && (
         <BoxScoreModal

@@ -41,6 +41,13 @@ export async function getPartidosByTorneo(idTorneo: string | number, page = 1, p
   return response.data;
 }
 
+export async function getLideresEstadisticos(idTorneo: string | number, idCategoria?: number): Promise<ApiResponse<any>> {
+  const params: any = {};
+  if (idCategoria) params.id_categoria = idCategoria;
+  const response = await axiosInstance.get(`/torneos/${idTorneo}/lideres`, { params });
+  return response.data;
+}
+
 export async function createTorneo(payload: Partial<Torneo>): Promise<ApiResponse<Torneo>> {
   const response = await axiosInstance.post('/torneos', payload);
   return response.data;

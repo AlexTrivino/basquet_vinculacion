@@ -22,6 +22,7 @@ import {
   Layers,
   ChevronLeft,
   ChevronRight,
+  ShieldAlert,
 } from 'lucide-react';
 
 function calcularEdad(fechaStr?: string | null): number | null {
@@ -43,6 +44,7 @@ export default function JugadorProfile() {
   const { id } = useParams<{ id: string }>();
   const { userRole } = useAuth();
   const [torneoSeleccionado, setTorneoSeleccionado] = useState<string>('global');
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string>('');
   const [paginaActual, setPaginaActual] = useState<number>(1);
 
   const { data: response, isLoading, isError } = useQuery({
@@ -83,12 +85,49 @@ export default function JugadorProfile() {
   // Opciones únicas de torneos para el selector de estadísticas
   const torneosConEstadisticas = useMemo(() => {
     if (!jugador?.participaciones) return [];
+    
+    const torneosValidos = jugador.participaciones.filter(
+      (p: any) => p.estado_torneo !== 'programado'
+    );
+    
     return Array.from(
       new Map(
-        jugador.participaciones.map((p: any) => [String(p.id_torneo), p])
+        torneosValidos.map((p: any) => [String(p.id_torneo), p])
       ).values()
     );
   }, [jugador?.participaciones]);
+
+  const categoriasTorneoSeleccionado = useMemo(() => {
+    if (torneoSeleccionado === 'global' || !jugador?.participaciones) return [];
+    
+    const participacionesTorneo = jugador.participaciones.filter(
+      (p: any) => String(p.id_torneo) === torneoSeleccionado
+    );
+    
+    return Array.from(
+      new Map(
+        participacionesTorneo.map((p: any) => [String(p.id_categoria), p])
+      ).values()
+    );
+  }, [torneoSeleccionado, jugador?.participaciones]);
+
+  const handleTorneoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setTorneoSeleccionado(val);
+    
+    if (val === 'global') {
+      setCategoriaSeleccionada('');
+    } else {
+      const participacionesTorneo = jugador?.participaciones?.filter(
+        (p: any) => String(p.id_torneo) === val
+      ) || [];
+      if (participacionesTorneo.length > 0) {
+        setCategoriaSeleccionada(String(participacionesTorneo[0].id_categoria));
+      } else {
+        setCategoriaSeleccionada('');
+      }
+    }
+  };
 
   if (isLoading) {
     return (
@@ -166,11 +205,10 @@ export default function JugadorProfile() {
   const edad = calcularEdad(jugador.fecha_nacimiento);
   const participacionReciente = participacionesOrdenadas[0];
 
-  // Estadísticas según el selector activo
   const statsMostradas =
     torneoSeleccionado === 'global'
       ? jugador.estadisticas
-      : jugador.estadisticas_por_torneo?.[torneoSeleccionado] || {
+      : jugador.estadisticas_por_torneo?.[torneoSeleccionado]?.[categoriaSeleccionada] || {
           partidos_jugados: 0,
           puntos_totales: 0,
           promedio_puntos: 0,
@@ -277,7 +315,7 @@ export default function JugadorProfile() {
           {/* COLUMNA 2: Estadísticas de Juego */}
           <div className={`${puedeVerDatosPrivados ? 'lg:col-span-5' : 'lg:col-span-8'} bg-white rounded-3xl p-6 shadow-sm border border-gray-200 flex flex-col justify-between`}>
             <div>
-              <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-gray-100">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-gray-100">
                 <div>
                   <h2 className="text-base font-extrabold text-gray-900 flex items-center gap-2">
                     <Activity className="w-4 h-4 text-primary-600" /> Estadísticas de Juego
@@ -287,33 +325,49 @@ export default function JugadorProfile() {
                   </p>
                 </div>
 
-                {/* Selector de Torneo */}
-                {torneosConEstadisticas.length > 0 && (
-                  <select
-                    id="filtro-torneo"
-                    value={torneoSeleccionado}
-                    onChange={(e) => setTorneoSeleccionado(e.target.value)}
-                    className="rounded-xl border border-gray-300 bg-gray-50 px-2.5 py-1.5 text-xs font-bold text-gray-800 shadow-2xs focus:border-primary-500 focus:bg-white focus:outline-hidden max-w-[170px] truncate cursor-pointer"
-                  >
-                    <option value="global">Carrera Completa</option>
-                    {torneosConEstadisticas.map((t: any) => (
-                      <option key={t.id_torneo} value={String(t.id_torneo)}>
-                        {t.nombre_torneo} {t.nombre_categoria ? `(${t.nombre_categoria})` : ''}
-                      </option>
-                    ))}
-                  </select>
-                )}
+                <div className="flex items-center gap-4 self-end sm:self-auto">
+                  <div className="text-right hidden sm:block">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Partidos</p>
+                    <p className="text-xl font-black text-gray-900 leading-none">{statsMostradas.partidos_jugados}</p>
+                  </div>
+                  {/* Selectores */}
+                  <div className="flex flex-col items-end gap-2">
+                    {torneosConEstadisticas.length > 0 && (
+                      <select
+                        id="filtro-torneo"
+                        value={torneoSeleccionado}
+                        onChange={handleTorneoChange}
+                        className="rounded-xl border border-gray-300 bg-gray-50 px-2.5 py-1.5 text-xs font-bold text-gray-800 shadow-2xs focus:border-primary-500 focus:bg-white focus:outline-hidden w-full max-w-[170px] truncate cursor-pointer"
+                      >
+                        <option value="global">Carrera Completa</option>
+                        {torneosConEstadisticas.map((t: any) => (
+                          <option key={`torneo-${t.id_torneo}`} value={String(t.id_torneo)}>
+                            {t.nombre_torneo}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+
+                    {torneoSeleccionado !== 'global' && categoriasTorneoSeleccionado.length > 0 && (
+                      <select
+                        id="filtro-categoria"
+                        value={categoriaSeleccionada}
+                        onChange={(e) => setCategoriaSeleccionada(e.target.value)}
+                        className="rounded-xl border border-gray-300 bg-gray-50 px-2.5 py-1.5 text-xs font-bold text-gray-800 shadow-2xs focus:border-primary-500 focus:bg-white focus:outline-hidden w-full max-w-[170px] truncate cursor-pointer"
+                      >
+                        {categoriasTorneoSeleccionado.map((c: any) => (
+                          <option key={`cat-${c.id_categoria}`} value={String(c.id_categoria)}>
+                            {c.nombre_categoria}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* Bento Grid de 6 KPIs */}
-              <div className="grid grid-cols-3 gap-2.5 sm:gap-3 my-auto">
-                <div className="bg-gray-50 rounded-2xl p-3 border border-gray-100 flex flex-col items-center justify-center text-center transition-all hover:bg-white hover:shadow-xs">
-                  <div className="w-7 h-7 rounded-lg bg-gray-200 text-gray-700 flex items-center justify-center mb-1.5">
-                    <Target className="w-3.5 h-3.5" />
-                  </div>
-                  <p className="text-2xs font-bold text-gray-500 uppercase tracking-wider">Partidos</p>
-                  <p className="text-xl sm:text-2xl font-black text-gray-900 mt-0.5">{statsMostradas.partidos_jugados}</p>
-                </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3 my-auto">
                 <div className="bg-orange-50/60 rounded-2xl p-3 border border-orange-100 flex flex-col items-center justify-center text-center transition-all hover:bg-white hover:shadow-xs">
                   <div className="w-7 h-7 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center mb-1.5">
                     <Goal className="w-3.5 h-3.5" />
@@ -321,12 +375,10 @@ export default function JugadorProfile() {
                   <p className="text-2xs font-bold text-orange-700 uppercase tracking-wider">Puntos</p>
                   <p className="text-xl sm:text-2xl font-black text-gray-900 mt-0.5">{statsMostradas.puntos_totales}</p>
                 </div>
-                <div className="bg-red-50/60 rounded-2xl p-3 border border-red-100 flex flex-col items-center justify-center text-center transition-all hover:bg-white hover:shadow-xs">
-                  <div className="w-7 h-7 rounded-lg bg-red-100 text-red-600 flex items-center justify-center mb-1.5">
-                    <Activity className="w-3.5 h-3.5" />
-                  </div>
-                  <p className="text-2xs font-bold text-red-700 uppercase tracking-wider">PTS/PJ</p>
-                  <p className="text-xl sm:text-2xl font-black text-gray-900 mt-0.5">{statsMostradas.promedio_puntos}</p>
+                <div className="bg-purple-50/60 rounded-2xl p-3 border border-purple-100 flex flex-col items-center justify-center text-center transition-all hover:bg-white hover:shadow-xs">
+                  <div className="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center mb-1.5 font-black text-xs">3PT</div>
+                  <p className="text-2xs font-bold text-purple-700 uppercase tracking-wider">Triples</p>
+                  <p className="text-xl sm:text-2xl font-black text-gray-900 mt-0.5">{statsMostradas.triples_totales}</p>
                 </div>
                 <div className="bg-blue-50/60 rounded-2xl p-3 border border-blue-100 flex flex-col items-center justify-center text-center transition-all hover:bg-white hover:shadow-xs">
                   <div className="w-7 h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center mb-1.5">
@@ -342,20 +394,24 @@ export default function JugadorProfile() {
                   <p className="text-2xs font-bold text-green-700 uppercase tracking-wider">Asistencias</p>
                   <p className="text-xl sm:text-2xl font-black text-gray-900 mt-0.5">{statsMostradas.asistencias_totales}</p>
                 </div>
-                <div className="bg-purple-50/60 rounded-2xl p-3 border border-purple-100 flex flex-col items-center justify-center text-center transition-all hover:bg-white hover:shadow-xs">
-                  <div className="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center mb-1.5 font-black text-xs">3PT</div>
-                  <p className="text-2xs font-bold text-purple-700 uppercase tracking-wider">Triples</p>
-                  <p className="text-xl sm:text-2xl font-black text-gray-900 mt-0.5">{statsMostradas.triples_totales}</p>
+                <div className="bg-rose-50/60 rounded-2xl p-3 border border-rose-100 flex flex-col items-center justify-center text-center transition-all hover:bg-white hover:shadow-xs">
+                  <div className="w-7 h-7 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center mb-1.5">
+                    <ShieldAlert className="w-3.5 h-3.5" />
+                  </div>
+                  <p className="text-2xs font-bold text-rose-700 uppercase tracking-wider">Tapones</p>
+                  <p className="text-xl sm:text-2xl font-black text-gray-900 mt-0.5">{statsMostradas.tapones_totales}</p>
+                </div>
+                <div className="bg-cyan-50/60 rounded-2xl p-3 border border-cyan-100 flex flex-col items-center justify-center text-center transition-all hover:bg-white hover:shadow-xs">
+                  <div className="w-7 h-7 rounded-lg bg-cyan-100 text-cyan-600 flex items-center justify-center mb-1.5">
+                    <Target className="w-3.5 h-3.5" />
+                  </div>
+                  <p className="text-2xs font-bold text-cyan-700 uppercase tracking-wider">Tiros Libres</p>
+                  <p className="text-xl sm:text-2xl font-black text-gray-900 mt-0.5">{statsMostradas.tiros_libres_totales}</p>
                 </div>
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-2xs text-gray-400 font-medium">
-              <span>* Datos actualizados post-partido</span>
-              <span className="font-bold text-primary-700 bg-primary-50 px-2 py-0.5 rounded-md">
-                {statsMostradas.partidos_jugados > 0 ? 'En Actividad' : 'Sin Partidos'}
-              </span>
-            </div>
+
           </div>
 
           {/* COLUMNA 3: Ficha Técnica (Admin) */}

@@ -298,3 +298,24 @@ def tabla_de_posiciones(id_torneo):
         data=posiciones,
         message=f'Tabla de posiciones del torneo "{torneo.nombre}".',
     )
+
+
+# ── GET /api/torneos/<id>/lideres ─────────────────────────────────
+
+@torneo_bp.route('/<int:id_torneo>/lideres', methods=['GET'])
+def lideres_torneo(id_torneo):
+    """Retorna los líderes estadísticos del torneo. Acceso público."""
+    torneo = torneo_service.obtener_torneo_por_id(id_torneo)
+    if torneo is None:
+        return api_error('NOT_FOUND', 'Torneo no encontrado.', 404)
+
+    from app.services.lideres_service import obtener_lideres_estadisticos
+    cat_param = request.args.get('id_categoria')
+    id_categoria = int(cat_param) if cat_param and cat_param.isdigit() else None
+    
+    lideres = obtener_lideres_estadisticos(id_torneo, id_categoria)
+
+    return api_response(
+        data=lideres,
+        message=f'Líderes estadísticos del torneo "{torneo.nombre}".',
+    )

@@ -102,10 +102,11 @@ def obtener_perfil_publico(id_jugador: int):
         "triples_totales": int(stats_globales.triples_totales or 0),
     }
 
-    # 3. Calcular Estadísticas desglosadas por Torneo
+    # 3. Calcular Estadísticas desglosadas por Torneo y Categoría
     stats_por_torneo_raw = (
         db.session.query(
             Partido.id_torneo,
+            Partido.id_categoria,
             func.count(func.distinct(Estadistica.id_partido)).label('partidos'),
             func.sum(Estadistica.puntos_anotados + (Estadistica.triples_anotados * 3)).label('puntos_totales'),
             func.sum(Estadistica.rebotes).label('rebotes_totales'),
@@ -114,7 +115,7 @@ def obtener_perfil_publico(id_jugador: int):
         )
         .join(Partido, Estadistica.id_partido == Partido.id_partido)
         .filter(Estadistica.id_jugador == id_jugador)
-        .group_by(Partido.id_torneo)
+        .group_by(Partido.id_torneo, Partido.id_categoria)
         .all()
     )
 
@@ -123,7 +124,14 @@ def obtener_perfil_publico(id_jugador: int):
         pj = st.partidos or 0
         pts = int(st.puntos_totales or 0)
         prom = round(pts / pj, 1) if pj > 0 else 0.0
-        estadisticas_por_torneo[str(st.id_torneo)] = {
+        
+        id_t = str(st.id_torneo)
+        id_c = str(st.id_categoria)
+        
+        if id_t not in estadisticas_por_torneo:
+            estadisticas_por_torneo[id_t] = {}
+            
+        estadisticas_por_torneo[id_t][id_c] = {
             "partidos_jugados": pj,
             "puntos_totales": pts,
             "promedio_puntos": prom,

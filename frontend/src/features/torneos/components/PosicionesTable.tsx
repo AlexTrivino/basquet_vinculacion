@@ -41,25 +41,31 @@ export function PosicionesTable({ torneoId, idCategoria }: PosicionesTableProps)
         </Link>
       )
     },
-    { key: 'PJ', header: 'PJ' },
-    { key: 'PG', header: 'PG' },
-    { key: 'PP', header: 'PP' },
+    { key: 'PJ', header: 'Partidos Jugados', headerClassName: 'text-center', cellClassName: 'text-center' },
+    { key: 'PG', header: 'Partidos Ganados', headerClassName: 'text-center', cellClassName: 'text-center' },
+    { key: 'PP', header: 'Partidos Perdidos', headerClassName: 'text-center', cellClassName: 'text-center' },
     {
       key: 'puntos',
-      header: 'Pts',
+      header: 'Puntos FIBA',
+      headerClassName: 'text-center',
+      cellClassName: 'text-center',
       render: (row) => <span className="font-bold text-gray-900">{row.puntos}</span>
     },
     {
       key: 'acciones',
       header: 'Acciones',
+      headerClassName: 'text-center',
+      cellClassName: 'text-center',
       render: (row) => (
-        <button
-          onClick={() => setSelectedPosicion(row)}
-          className="text-primary-600 hover:text-primary-800 transition-colors p-1 flex items-center gap-1 text-sm font-medium"
-        >
-          <Info className="w-4 h-4" />
-          <span className="hidden sm:inline">Detalles</span>
-        </button>
+        <div className="flex justify-center w-full">
+          <button
+            onClick={() => setSelectedPosicion(row)}
+            className="text-primary-700 bg-primary-50 hover:bg-primary-100 transition-colors px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-sm font-bold border border-primary-100"
+          >
+            <Info className="w-4 h-4" />
+            <span className="hidden sm:inline">Ver Equipo</span>
+          </button>
+        </div>
       )
     }
   ];
@@ -79,7 +85,7 @@ export function PosicionesTable({ torneoId, idCategoria }: PosicionesTableProps)
   }
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 px-2 sm:px-[5%]">
       <DataGridTable
         columns={columns}
         data={posiciones}
@@ -88,53 +94,78 @@ export function PosicionesTable({ torneoId, idCategoria }: PosicionesTableProps)
       />
       
       {selectedPosicion && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden relative">
-            <div className="bg-primary-900 px-6 py-4 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-white">Detalles del Equipo</h3>
-              <button onClick={() => setSelectedPosicion(null)} className="text-primary-200 hover:text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden relative ring-1 ring-black/5 animate-in zoom-in-95 duration-200">
+            {/* Header del Modal */}
+            <div className="bg-gradient-to-br from-primary-950 via-primary-900 to-primary-800 px-6 py-5 flex items-center justify-between relative overflow-hidden">
+              <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/5 rounded-full blur-2xl pointer-events-none"></div>
+              
+              <div className="flex items-center gap-3 relative z-10">
+                <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20 shrink-0">
+                  {selectedPosicion.url_logo ? (
+                    <img src={selectedPosicion.url_logo} alt={selectedPosicion.nombre_equipo} className="w-8 h-8 rounded-full object-cover" />
+                  ) : (
+                    <Trophy className="w-5 h-5 text-amber-400" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-white tracking-tight leading-none">{selectedPosicion.nombre_equipo}</h3>
+                  <p className="text-xs text-primary-200 mt-1 font-medium">Estadísticas Oficiales del Torneo</p>
+                </div>
+              </div>
+              <button onClick={() => setSelectedPosicion(null)} className="relative z-10 text-primary-200 hover:text-white transition-colors bg-white/10 rounded-full p-1.5 hover:bg-white/20">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="p-6">
-              <h4 className="text-xl font-black text-gray-900 mb-4">{selectedPosicion.nombre_equipo}</h4>
+            
+            {/* Cuerpo del Modal */}
+            <div className="p-6 bg-gray-50/50">
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                  <p className="text-xs text-gray-500 font-medium mb-1">Partidos Jugados</p>
-                  <p className="text-lg font-semibold text-gray-900">{selectedPosicion.PJ}</p>
+                <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                  <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Partidos Jugados</p>
+                  <p className="text-2xl font-black text-gray-900">{selectedPosicion.PJ}</p>
                 </div>
-                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                  <p className="text-xs text-gray-500 font-medium mb-1">Victorias / Derrotas</p>
-                  <p className="text-lg font-semibold text-gray-900">{selectedPosicion.PG} - {selectedPosicion.PP}</p>
+                <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                  <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Victorias - Derrotas</p>
+                  <p className="text-2xl font-black text-gray-900">{selectedPosicion.PG} - {selectedPosicion.PP}</p>
                 </div>
-                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                  <p className="text-xs text-gray-500 font-medium mb-1">Puntos a Favor</p>
-                  <p className="text-lg font-semibold text-green-600">{selectedPosicion.PF}</p>
+                <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-2 opacity-10"><span className="text-4xl text-green-600 font-black">+</span></div>
+                  <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1 relative z-10">Puntos a Favor</p>
+                  <p className="text-2xl font-black text-green-600 relative z-10">{selectedPosicion.PF}</p>
                 </div>
-                <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                  <p className="text-xs text-gray-500 font-medium mb-1">Puntos en Contra</p>
-                  <p className="text-lg font-semibold text-red-600">{selectedPosicion.PC}</p>
+                <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-2 opacity-10"><span className="text-4xl text-red-600 font-black">-</span></div>
+                  <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1 relative z-10">Puntos en Contra</p>
+                  <p className="text-2xl font-black text-red-600 relative z-10">{selectedPosicion.PC}</p>
                 </div>
-                <div className="col-span-2 bg-gray-50 p-3 rounded-lg border border-gray-100 flex justify-between items-center">
-                  <div>
-                    <p className="text-xs text-gray-500 font-medium mb-1">Diferencia de Puntos</p>
-                    <p className={`text-xl font-bold ${selectedPosicion.DIF > 0 ? 'text-green-600' : selectedPosicion.DIF < 0 ? 'text-red-600' : 'text-gray-900'}`}>
+                
+                <div className="col-span-2 bg-gradient-to-r from-gray-900 to-gray-800 p-5 rounded-xl border border-gray-700 shadow-lg flex justify-between items-center text-white mt-2 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 mix-blend-overlay pointer-events-none"></div>
+                  <div className="relative z-10">
+                    <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Diferencia (DIF)</p>
+                    <p className={`text-3xl font-black ${selectedPosicion.DIF > 0 ? 'text-green-400' : selectedPosicion.DIF < 0 ? 'text-red-400' : 'text-gray-100'}`}>
                       {selectedPosicion.DIF > 0 ? '+' : ''}{selectedPosicion.DIF}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-500 font-medium mb-1">Puntos FIBA</p>
-                    <p className="text-2xl font-black text-primary-700">{selectedPosicion.puntos}</p>
+                  <div className="text-right relative z-10">
+                    <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Puntos FIBA</p>
+                    <div className="flex items-end gap-1 justify-end">
+                      <p className="text-4xl font-black text-amber-400 leading-none">{selectedPosicion.puntos}</p>
+                      <span className="text-sm font-bold text-gray-400 mb-1">PTS</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="bg-gray-50 px-6 py-4 flex justify-end">
+            
+            {/* Footer del Modal */}
+            <div className="bg-white px-6 py-4 flex justify-end border-t border-gray-100">
               <button 
                 onClick={() => setSelectedPosicion(null)}
-                className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition-colors"
+                className="bg-gray-100 text-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-200 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-200"
               >
-                Cerrar
+                Cerrar Detalles
               </button>
             </div>
           </div>

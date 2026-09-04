@@ -77,7 +77,7 @@ export function BannerNuevosTorneos({ inscripciones, idEquipo }: BannerNuevosTor
           </p>
           <div className="flex flex-col gap-3">
             <Link
-              to="/delegado/plantilla"
+              to="/delegado/inscripcion"
               className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-yellow-600 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-yellow-700 shadow-md hover:shadow-lg hover:-translate-y-0.5"
             >
               Reanudar Solicitud <ArrowRight className="w-4 h-4" />
