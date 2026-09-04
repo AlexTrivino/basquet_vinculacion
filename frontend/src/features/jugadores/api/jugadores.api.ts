@@ -5,6 +5,7 @@ export interface JugadorAdminFilterParams {
   search?: string;
   id_torneo?: number;
   id_equipo?: number;
+  id_categoria?: number;
   genero?: string;
   estado?: string;
   page?: number;
@@ -31,6 +32,7 @@ export const getJugadoresAdmin = async (params: JugadorAdminFilterParams = {}) =
   if (params.search?.trim()) cleanParams.search = params.search.trim();
   if (params.id_torneo) cleanParams.id_torneo = params.id_torneo;
   if (params.id_equipo) cleanParams.id_equipo = params.id_equipo;
+  if (params.id_categoria) cleanParams.id_categoria = params.id_categoria;
   if (params.genero && params.genero !== 'todos') cleanParams.genero = params.genero;
   if (params.estado && params.estado !== 'todos') cleanParams.estado = params.estado;
   if (params.page) cleanParams.page = params.page;

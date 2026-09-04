@@ -44,6 +44,7 @@ def _base_query_con_relaciones():
     """
     return Partido.query.options(
         joinedload(Partido.torneo),
+        joinedload(Partido.categoria),
         joinedload(Partido.equipo_local),
         joinedload(Partido.equipo_visitante),
     )
@@ -51,28 +52,40 @@ def _base_query_con_relaciones():
 
 # ── Funciones de servicio ─────────────────────────────────────────
 
-def listar_partidos(id_torneo=None, estado=None, id_equipo=None, id_categoria=None, pendientes_stats=None):
+def listar_partidos(id_torneo=None, estados=None, id_equipo=None, id_categoria=None, pendientes_stats=None, search=None, sort_order='asc'):
     """Retorna la query de partidos con filtros opcionales para paginación.
 
     Args:
         id_torneo: Filtra por torneo.
-        estado: Filtra por estado del partido.
+        estados: Lista de estados para filtrar.
         id_equipo: Filtra partidos donde el equipo sea local o visitante.
         id_categoria: Filtra por categoría.
         pendientes_stats: Filtra partidos finalizados sin estadísticas procesadas.
+        search: Busca por nombre de torneo o equipos.
+        sort_order: 'asc' o 'desc' por fecha y hora.
 
     Returns:
         Query de SQLAlchemy lista para ``paginate_query()``.
     """
-    query = _base_query_con_relaciones().order_by(
-        Partido.fecha, Partido.hora
-    )
+    from sqlalchemy import desc
+    from app.models.equipo import Equipo
+    from app.models.torneo import Torneo
+
+    query = _base_query_con_relaciones()
+
+    if sort_order == 'desc':
+        query = query.order_by(desc(Partido.fecha), desc(Partido.hora))
+    else:
+        query = query.order_by(Partido.fecha, Partido.hora)
 
     if id_torneo is not None:
         query = query.filter(Partido.id_torneo == id_torneo)
 
-    if estado in ('programado', 'en_curso', 'finalizado', 'suspendido'):
-        query = query.filter(Partido.estado == estado)
+    if estados:
+        query = query.filter(Partido.estado.in_(estados))
+    else:
+        # Excluir 'anulado' por defecto
+        query = query.filter(Partido.estado != 'anulado')
 
     if id_equipo is not None:
         query = query.filter(or_(Partido.id_equipo_local == id_equipo, Partido.id_equipo_visitante == id_equipo))
@@ -85,6 +98,25 @@ def listar_partidos(id_torneo=None, estado=None, id_equipo=None, id_categoria=No
             Partido.estado == 'finalizado',
             or_(Partido.stats_local_procesadas == False, Partido.stats_visitante_procesadas == False)
         )
+
+    if search:
+        search_term = f"%{search}%"
+        # Usamos los alias de joinedload si es necesario, o hacemos outerjoin aquí si se necesita para filtrar.
+        # Ya que joinedload no permite filtrar directamente en la DB en SQLAlchemy 2.0 sin explicit JOIN, 
+        # necesitamos agregar un join explícito para la búsqueda, o usar las relaciones.
+        # Para evitar problemas con el alias de _base_query_con_relaciones, hacemos joins adicionales:
+        el = db.aliased(Equipo)
+        ev = db.aliased(Equipo)
+        query = query.outerjoin(Torneo, Partido.id_torneo == Torneo.id_torneo)\
+                     .outerjoin(el, Partido.id_equipo_local == el.id_equipo)\
+                     .outerjoin(ev, Partido.id_equipo_visitante == ev.id_equipo)\
+                     .filter(
+                         or_(
+                             Torneo.nombre_torneo.ilike(search_term),
+                             el.nombre_equipo.ilike(search_term),
+                             ev.nombre_equipo.ilike(search_term)
+                         )
+                     )
 
     return query
 
@@ -231,6 +263,8 @@ def obtener_box_score(partido):
                 'faltas_cometidas': stat.faltas_cometidas if stat else 0,
                 'rebotes': stat.rebotes if stat else 0,
                 'asistencias': stat.asistencias if stat else 0,
+                'tapones': stat.tapones if stat else 0,
+                'tiros_libres_anotados': stat.tiros_libres_anotados if stat else 0,
                 'sancion_activa': True if jug.id_jugador in sanciones_by_jugador else False
             })
         # Order by points descending
@@ -249,8 +283,36 @@ def eliminar_partido(id_partido):
         raise ValueError("El partido no existe.")
         
     if partido.url_planilla_fiba or partido.stats_local_procesadas or partido.stats_visitante_procesadas:
-        raise ValueError("Este partido contiene información histórica (estadísticas o actas). Por seguridad, cámbiale el estado a 'Suspendido' en lugar de eliminarlo físicamente.")
+        raise ValueError("Este partido contiene información histórica (estadísticas o actas). Por seguridad, cámbiale el estado a 'Suspendido' o elimínalo lógicamente (anular).")
         
     db.session.delete(partido)
     db.session.commit()
     return True
+
+
+def anular_partido(id_partido):
+    """Realiza un soft-delete (cambia el estado a 'anulado')."""
+    partido = db.session.get(Partido, id_partido)
+    if not partido:
+        raise ValueError("El partido no existe.")
+        
+    partido.estado = 'anulado'
+    db.session.commit()
+    
+    # Si estaba finalizado, recalcular tabla para quitarle sus puntos a los equipos
+    from app.services.standings import recalcular_tabla
+    recalcular_tabla(partido.id_torneo)
+    
+    return partido
+
+
+def restaurar_partido(id_partido):
+    """Restaura un partido anulado pasándolo a 'programado'."""
+    partido = db.session.get(Partido, id_partido)
+    if not partido:
+        raise ValueError("El partido no existe.")
+        
+    partido.estado = 'programado'
+    db.session.commit()
+    
+    return partido

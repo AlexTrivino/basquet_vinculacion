@@ -64,12 +64,14 @@ def listar_jugadores():
     search = request.args.get('search') or request.args.get('q')
     id_torneo = request.args.get('id_torneo', type=int)
     id_equipo = request.args.get('id_equipo', type=int)
+    id_categoria = request.args.get('id_categoria', type=int)
     estado = request.args.get('estado')
 
     query = jugador_service.listar_jugadores_admin(
         search=search,
         id_torneo=id_torneo,
         id_equipo=id_equipo,
+        id_categoria=id_categoria,
         genero=genero,
         estado=estado,
     )
@@ -81,6 +83,7 @@ def listar_jugadores():
         or search is not None
         or id_torneo is not None
         or id_equipo is not None
+        or id_categoria is not None
     )
     schema = _admin_many if admin_mode else _public_many
     return api_response(data=schema.dump(items), pagination=pagination)

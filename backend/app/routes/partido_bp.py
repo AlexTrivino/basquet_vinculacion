@@ -33,19 +33,25 @@ _update_schema = PartidoUpdateSchema()
 def listar_partidos():
     """Lista partidos con paginación y filtros opcionales.
 
-    Query params: ``id_torneo``, ``estado``, ``id_equipo``, ``id_categoria``, ``pendientes_stats``.
+    Query params: ``id_torneo``, ``estados``, ``id_equipo``, ``id_categoria``, ``pendientes_stats``, ``search``, ``sort_order``.
     """
     id_torneo = request.args.get('id_torneo', type=int)
-    estado = request.args.get('estado')
+    estados_str = request.args.get('estados')
+    estados = estados_str.split(',') if estados_str else None
     id_equipo = request.args.get('id_equipo', type=int)
     id_categoria = request.args.get('id_categoria', type=int)
     pendientes_stats = request.args.get('pendientes_stats', type=lambda v: v.lower() == 'true')
+    search = request.args.get('search')
+    sort_order = request.args.get('sort_order', 'asc')
+    
     query = partido_service.listar_partidos(
         id_torneo=id_torneo, 
-        estado=estado, 
+        estados=estados, 
         id_equipo=id_equipo, 
         id_categoria=id_categoria,
-        pendientes_stats=pendientes_stats
+        pendientes_stats=pendientes_stats,
+        search=search,
+        sort_order=sort_order
     )
     items, pagination = paginate_query(query)
     return api_response(data=_public_many.dump(items), pagination=pagination)
@@ -181,6 +187,13 @@ def actualizar_partido(id_partido):
     if not data:
         return api_error('VALIDATION_ERROR', 'No se proporcionaron campos para actualizar.', 422)
 
+    # Validar que si no está programado, no se editen los equipos
+    if partido.estado != 'programado':
+        if 'id_equipo_local' in data and data['id_equipo_local'] != partido.id_equipo_local:
+            return api_error('VALIDATION_ERROR', 'No se puede cambiar el equipo local de un partido que ya no está programado.', 422)
+        if 'id_equipo_visitante' in data and data['id_equipo_visitante'] != partido.id_equipo_visitante:
+            return api_error('VALIDATION_ERROR', 'No se puede cambiar el equipo visitante de un partido que ya no está programado.', 422)
+
     partido = partido_service.actualizar_partido(partido, data)
     return api_response(
         data=_admin_schema.dump(partido),
@@ -190,14 +203,27 @@ def actualizar_partido(id_partido):
 
 @partido_bp.route('/<int:id_partido>', methods=['DELETE'])
 @token_required(allowed_roles=['super_admin'])
-def eliminar_partido(id_partido):
-    """Elimina un partido permanentemente si no contiene datos históricos."""
+def anular_partido(id_partido):
+    """Anula un partido (soft-delete). Cambia estado a 'anulado'."""
     try:
-        partido_service.eliminar_partido(id_partido)
-        return api_response(None, message='Partido eliminado exitosamente.')
+        partido_service.anular_partido(id_partido)
+        return api_response(None, message='Partido anulado exitosamente.')
     except ValueError as e:
-        if "Este partido contiene información histórica" in str(e):
-            return api_error('CONFLICT', str(e), 409)
+        return api_error('NOT_FOUND' if 'no existe' in str(e) else 'VALIDATION_ERROR', str(e), 404 if 'no existe' in str(e) else 422)
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.exception(f'Error en partido: {e}')
+        return api_error('SERVER_ERROR', 'Error interno al procesar la operación.', 500)
+
+
+@partido_bp.route('/<int:id_partido>/restaurar', methods=['POST'])
+@token_required(allowed_roles=['super_admin'])
+def restaurar_partido(id_partido):
+    """Restaura un partido anulado pasándolo a 'programado'."""
+    try:
+        partido_service.restaurar_partido(id_partido)
+        return api_response(None, message='Partido restaurado exitosamente.')
+    except ValueError as e:
         return api_error('NOT_FOUND' if 'no existe' in str(e) else 'VALIDATION_ERROR', str(e), 404 if 'no existe' in str(e) else 422)
     except Exception as e:
         db.session.rollback()

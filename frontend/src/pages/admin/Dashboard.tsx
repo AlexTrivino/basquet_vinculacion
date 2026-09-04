@@ -24,12 +24,25 @@ export default function Dashboard() {
 
   const { data: partidosResponse, isLoading: isLoadingPartidos } = useQuery({
     queryKey: ['partidos', 'pendientes_stats'],
-    queryFn: () => getPartidos({ pendientes_stats: true, limit: 5 }),
+    queryFn: () => getPartidos({ pendientes_stats: true, per_page: 5 }),
+  });
+
+  const { data: programadosRes, isLoading: isLoadingProgramados } = useQuery({
+    queryKey: ['partidos', 'programados'],
+    queryFn: () => getPartidos({ estados: 'programado', per_page: 50 }),
   });
 
   const stats = statsResponse?.data;
   const actividades = actividadResponse?.data || [];
-  const partidosPendientes = partidosResponse?.data || [];
+  const partidosSinStats = partidosResponse?.data || [];
+  
+  const partidosPendientesFinalizar = (programadosRes?.data || []).filter(p => {
+    if (!p.fecha || !p.hora) return false;
+    const date = new Date(`${p.fecha}T${p.hora}`);
+    return Date.now() > date.getTime() + 3 * 60 * 60 * 1000;
+  });
+
+  const totalPendientes = partidosSinStats.length + partidosPendientesFinalizar.length;
 
   const cards = [
     { 
@@ -109,31 +122,60 @@ export default function Dashboard() {
             <div className="px-6 py-5 border-b border-gray-200 flex justify-between items-center bg-gray-50">
               <h3 className="text-lg font-medium text-gray-900 flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-gray-500" />
-                Partidos Pendientes de Estadísticas
-                {stats?.partidos_sin_estadisticas && stats.partidos_sin_estadisticas > 0 ? (
+                Atención Requerida (Partidos)
+                {totalPendientes > 0 && (
                   <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    {stats.partidos_sin_estadisticas} pendientes
+                    {totalPendientes} alertas
                   </span>
-                ) : null}
+                )}
               </h3>
             </div>
             <div className="p-0">
-              {isLoadingPartidos ? (
+              {isLoadingPartidos || isLoadingProgramados ? (
                 <div className="p-6 space-y-4">
                   {[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full" />)}
                 </div>
-              ) : partidosPendientes.length === 0 ? (
+              ) : totalPendientes === 0 ? (
                 <div className="p-8 text-center text-gray-500">
                   <Trophy className="mx-auto h-12 w-12 text-gray-300 mb-3" />
-                  <p>Todos los partidos finalizados tienen sus estadísticas al día.</p>
+                  <p>Todos los partidos están al día. No hay pendientes de finalizar ni de estadísticas.</p>
                 </div>
               ) : (
                 <ul className="divide-y divide-gray-200">
-                  {partidosPendientes.map((partido) => (
-                    <li key={partido.id_partido} className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between">
+                  {partidosPendientesFinalizar.map((partido) => (
+                    <li key={`pend_fin_${partido.id_partido}`} className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between">
                       <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 uppercase">
+                            Pasaron 3h (Pendiente Finalizar)
+                          </span>
+                        </div>
                         <p className="text-sm font-medium text-gray-900">
-                          {partido.equipo_local?.nombre} vs {partido.equipo_visitante?.nombre}
+                          {partido.equipo_local?.nombre_equipo || 'Local'} vs {partido.equipo_visitante?.nombre_equipo || 'Visitante'}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {partido.fecha && format(new Date(partido.fecha), "d 'de' MMMM, yyyy", { locale: es })}
+                          {' • '}{partido.hora} {' • '}{partido.fase}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => navigate(`/admin/partidos?id_torneo=${partido.id_torneo}&search=${partido.equipo_local?.nombre_equipo}`)}
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-amber-700 bg-amber-100 hover:bg-amber-200 focus:outline-none"
+                      >
+                        Ir al partido
+                      </button>
+                    </li>
+                  ))}
+                  {partidosSinStats.map((partido) => (
+                    <li key={`sin_stats_${partido.id_partido}`} className="p-4 hover:bg-gray-50 transition-colors flex items-center justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-800 uppercase">
+                            Finalizado Sin Estadísticas
+                          </span>
+                        </div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {partido.equipo_local?.nombre_equipo || 'Local'} vs {partido.equipo_visitante?.nombre_equipo || 'Visitante'}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
                           {partido.fecha && format(new Date(partido.fecha), "d 'de' MMMM, yyyy", { locale: es })}
@@ -141,20 +183,20 @@ export default function Dashboard() {
                         </p>
                       </div>
                       <button
-                        onClick={() => navigate(`/admin/partidos?upload_stats=${partido.id_partido}&id_torneo=${partido.id_torneo}`)}
-                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                        onClick={() => navigate(`/admin/partidos?id_torneo=${partido.id_torneo}&search=${partido.equipo_local?.nombre_equipo}`)}
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none"
                       >
-                        Cargar Estadísticas
+                        Cargar Resultados
                       </button>
                     </li>
                   ))}
                 </ul>
               )}
             </div>
-            {partidosPendientes.length > 0 && (
+            {totalPendientes > 0 && (
               <div className="bg-gray-50 px-6 py-3 border-t border-gray-200">
                 <Link to="/admin/partidos" className="text-sm font-medium text-primary-600 hover:text-primary-500">
-                  Ver todos los partidos →
+                  Ir al Gestor de Partidos →
                 </Link>
               </div>
             )}

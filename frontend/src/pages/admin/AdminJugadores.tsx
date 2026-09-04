@@ -44,6 +44,7 @@ export default function AdminJugadores() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedTorneo, setSelectedTorneo] = useState<number | undefined>(undefined);
   const [selectedEquipo, setSelectedEquipo] = useState<number | undefined>(undefined);
+  const [selectedCategoria, setSelectedCategoria] = useState<number | undefined>(undefined);
   const [selectedGenero, setSelectedGenero] = useState<string>('todos');
   const [selectedEstado, setSelectedEstado] = useState<string>('todos');
 
@@ -105,12 +106,24 @@ export default function AdminJugadores() {
     return [];
   }, [selectedTorneo, inscripcionesTorneoData, allEquiposData]);
 
-  // Handle tournament filter change (resets team if not valid for tournament)
+  // Handle tournament filter change (resets team and category if not valid for tournament)
   const handleTorneoChange = (idTorneo: number | undefined) => {
     setSelectedTorneo(idTorneo);
     setSelectedEquipo(undefined);
+    setSelectedCategoria(undefined);
     setPage(1);
   };
+
+  // Compute available categories based on selected tournament
+  const availableCategorias = useMemo(() => {
+    if (selectedTorneo && torneosData?.data) {
+      const torneo = torneosData.data.find((t: Torneo) => (t.id_torneo || t.id) === selectedTorneo);
+      if (torneo && torneo.categorias) {
+        return torneo.categorias;
+      }
+    }
+    return [];
+  }, [selectedTorneo, torneosData]);
 
   // Query: Jugadores Admin List
   const {
@@ -125,6 +138,7 @@ export default function AdminJugadores() {
       debouncedSearch,
       selectedTorneo,
       selectedEquipo,
+      selectedCategoria,
       selectedGenero,
       selectedEstado,
     ],
@@ -133,6 +147,7 @@ export default function AdminJugadores() {
         search: debouncedSearch,
         id_torneo: selectedTorneo,
         id_equipo: selectedEquipo,
+        id_categoria: selectedCategoria,
         genero: selectedGenero,
         estado: selectedEstado,
         page,
@@ -465,7 +480,7 @@ export default function AdminJugadores() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
           {/* Buscador unificado */}
           <div className="lg:col-span-2 relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
@@ -493,6 +508,29 @@ export default function AdminJugadores() {
                 return (
                   <option key={idTor} value={idTor}>
                     {t.nombre_torneo || t.nombre}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
+          {/* Categoria Selector */}
+          <div>
+            <select
+              value={selectedCategoria || ''}
+              onChange={(e) => {
+                setSelectedCategoria(e.target.value ? Number(e.target.value) : undefined);
+                setPage(1);
+              }}
+              disabled={!selectedTorneo}
+              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            >
+              <option value="">Todas las Categorías</option>
+              {availableCategorias.map((cat: any) => {
+                const idCat = cat.id_categoria || cat.id;
+                return (
+                  <option key={idCat} value={idCat}>
+                    {cat.nombre_categoria || cat.nombre}
                   </option>
                 );
               })}

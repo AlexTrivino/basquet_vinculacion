@@ -32,7 +32,7 @@ const AdminTorneos = lazy(() => import('../pages/admin/TorneosAdmin'));
 const AdminDashboard = lazy(() => import('../pages/admin/Dashboard'));
 const AdminAuditoria = lazy(() => import('../pages/admin/Auditoria'));
 const AdminEquipos = lazy(() => import('../pages/admin/AdminEquipos'));
-const AdminPartidos = lazy(() => import('../pages/admin/Partidos'));
+const AdminPartidos = lazy(() => import('../pages/admin/AdminPartidos'));
 const AdminSanciones = lazy(() => import('../pages/admin/AdminSanciones'));
 const AdminJugadores = lazy(() => import('../pages/admin/AdminJugadores'));
 const AdminPatrocinadores = lazy(() => import('../pages/admin/AdminPatrocinadores'));

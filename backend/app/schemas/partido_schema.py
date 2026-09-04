@@ -28,6 +28,14 @@ class _TorneoEnPartidoSchema(Schema):
     fecha_fin = fields.Date(allow_none=True)
 
 
+class _CategoriaEnPartidoSchema(Schema):
+    """Resumen de categoría para serialización anidada en Partido."""
+    
+    id_categoria = fields.Integer()
+    nombre_categoria = fields.String()
+    genero_categoria = fields.String()
+
+
 # ── Schemas de entrada ────────────────────────────────────────────
 
 class PartidoCreateSchema(Schema):
@@ -62,10 +70,12 @@ class PartidoUpdateSchema(Schema):
     hora = fields.Time()
     ubicacion = fields.String(validate=validate.Length(max=150))
     fase = fields.String(validate=validate.Length(min=2, max=50))
+    id_equipo_local = fields.Integer()
+    id_equipo_visitante = fields.Integer()
     estado = fields.String(
         validate=validate.OneOf(
-            ['programado', 'en_curso', 'finalizado', 'finalizado_wo', 'suspendido'],
-            error="Estado inválido. Valores: programado, en_curso, finalizado, finalizado_wo, suspendido.",
+            ['programado', 'en_curso', 'finalizado', 'finalizado_wo', 'suspendido', 'anulado'],
+            error="Estado inválido. Valores permitidos: programado, en_curso, finalizado, finalizado_wo, suspendido, anulado.",
         ),
     )
     marcador_local = fields.Integer(
@@ -100,6 +110,7 @@ class PartidoPublicSchema(Schema):
     stats_visitante_procesadas = fields.Boolean()
     # Relaciones anidadas — requieren joinedload en el servicio
     torneo = fields.Nested(_TorneoEnPartidoSchema)
+    categoria = fields.Nested(_CategoriaEnPartidoSchema)
     equipo_local = fields.Nested(_EquipoEnPartidoSchema)
     equipo_visitante = fields.Nested(_EquipoEnPartidoSchema)
 
@@ -125,6 +136,7 @@ class PartidoAdminSchema(Schema):
     id_equipo_visitante = fields.Integer()
     # Relaciones anidadas
     torneo = fields.Nested(_TorneoEnPartidoSchema)
+    categoria = fields.Nested(_CategoriaEnPartidoSchema)
     equipo_local = fields.Nested(_EquipoEnPartidoSchema)
     equipo_visitante = fields.Nested(_EquipoEnPartidoSchema)
     # Auditoría

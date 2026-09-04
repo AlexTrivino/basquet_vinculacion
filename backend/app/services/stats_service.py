@@ -149,6 +149,8 @@ def procesar_estadisticas_bulk(data: dict, usuario_id: str, usuario_rol: str) ->
             'faltas_cometidas':  entry['faltas'],
             'rebotes':           entry['rebotes'],
             'asistencias':       entry['asistencias'],
+            'tapones':           entry.get('tapones', 0),
+            'tiros_libres_anotados': entry.get('tiros_libres', 0),
         }
         for entry in jugadores_payload
     ]

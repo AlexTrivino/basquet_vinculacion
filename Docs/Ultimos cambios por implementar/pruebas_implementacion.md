@@ -141,3 +141,53 @@ El objetivo crítico de esta fase es asegurar que el principio de **"Un Equipo p
 1. En el Dashboard del Admin, revisa el componente lateral de "Actividad Reciente".
 2. **Resultado Esperado:** Deben listarse eventos reales con su fecha relativa (ej. "hace 2 horas"), incluyendo nuevas inscripciones y partidos finalizados.
 3. Para validar que funciona en vivo, ve a `/admin/partidos`, cambia un partido a "finalizado". Vuelve al Dashboard y ese evento debe aparecer primero en la lista.
+
+---
+
+## FASE 3: Reestructuración de Partidos y Estadísticas
+
+### 🧪 Prueba 3.1: Filtros Dinámicos del Gestor de Partidos
+**Objetivo:** Verificar que el estado del componente `AdminPartidos` filtre y muestre correctamente la grilla dependiendo de parámetros combinados y la URL.
+1. Inicia sesión como `Super Admin` y navega a "Partidos" (`/admin/partidos`).
+2. Selecciona un "Torneo" y luego filtra por una "Categoría" usando el `SearchableSelect`.
+3. Haz clic en los checkboxes de "Programado" y "Finalizado". 
+4. **Verificación Visual:** La tabla debe recargar inmediatamente. La URL en el navegador debe cambiar para incluir los parámetros `?id_torneo=X&estados=programado,finalizado`.
+5. Recarga la página (`F5`).
+6. **Verificación de Persistencia:** Los filtros deben mantenerse intactos tal cual los dejaste porque el componente extrae su estado inicial de los `searchParams`.
+
+### 🧪 Prueba 3.2: Creación Segura y Prevención de Partidos "Espejo"
+**Objetivo:** Comprobar las validaciones del formulario al programar un nuevo encuentro.
+1. En el Gestor de Partidos, haz clic en **Nuevo Partido**.
+2. Selecciona un Torneo y una Categoría. Se habilitarán los selectores de equipos.
+3. En "Equipo Local", escoge "Delfines BC".
+4. En "Equipo Visitante", intenta elegir también "Delfines BC".
+5. **Verificación Visual:** El selector de "Equipo Visitante" no debe mostrar a "Delfines BC" en la lista, o en su defecto, Zod debe mostrar el error rojo *"No puede jugar contra sí mismo"* al intentar guardar.
+6. Cambia el equipo visitante a uno distinto, llena la fecha/hora y guarda.
+7. **Verificación de Datos:** El partido debe aparecer en la cima de la tabla (ordenado por más recientes) con el *badge* "Programado".
+
+### 🧪 Prueba 3.3: Edición y Bloqueo de Equipos en Partidos
+**Objetivo:** Garantizar que si un partido ya sucedió, los equipos enfrentados no puedan ser adulterados por error humano.
+1. En el Gestor, localiza el partido que creaste en la prueba 3.2 (que está `programado`).
+2. Haz clic en **Editar**. Modifica la fecha/hora o los equipos. Guarda. Todo debe funcionar.
+3. Haz clic en **Resultados** (Finalizar), cambia el estado a `Finalizado` temporalmente y pon marcador 10-10. Guarda.
+4. Ahora, haz clic en **Editar** de nuevo.
+5. **Verificación Restrictiva:** El sistema debe mostrar un **banner de advertencia** indicando que el partido ya no está "Programado". Además, los `SearchableSelect` de Equipo Local y Visitante deben estar completamente **deshabilitados (gris)**. No puedes cambiar los equipos, pero sí la ubicación o fecha.
+
+### 🧪 Prueba 3.4: Balance Matemático del Box Score y Acta FIBA
+**Objetivo:** Verificar el correcto funcionamiento del nuevo Panel Unificado y la matemática interna de las estadísticas.
+1. Haz clic en **Resultados** de un partido finalizado.
+2. Sube un PDF válido de menos de 5MB en el campo Acta FIBA.
+3. Ve a la columna del Equipo Local. En el "Marcador Oficial" arriba pon **45**.
+4. En la tabla del equipo local (abajo), asígnale a un jugador: **10 Puntos (PTS)** y **2 Triples (3P)**.
+5. **Verificación Analítica:** El balance inferior debe sumar `(10 PTS) + (2 Triples * 3) = 16 Puntos`.
+6. **Verificación de Prevención:** Intenta hacer clic en "Guardar y Finalizar". El botón debe estar **gris (deshabilitado)** y debe haber un texto en rojo indicando que el balance *no coincide con 45*.
+7. Iguala el Box Score repartiendo puntos entre los jugadores para que la suma total dé exactamente **45**. Haz lo mismo con el equipo visitante (ponle 0 si es necesario para empatar su marcador).
+8. **Verificación de Éxito:** El botón de "Guardar" debe habilitarse en color azul. Haz clic y verifica que se guarden sin errores 500 del backend.
+
+### 🧪 Prueba 3.5: Detección Automática en Dashboard
+**Objetivo:** Validar que el sistema actúe como un "asistente" notificando partidos olvidados.
+1. Programa un partido nuevo para el día de *Ayer* (o a una hora que ya superó las 3 horas desde el momento actual). Déjalo en estado `Programado`.
+2. Dirígete a `/admin/dashboard`.
+3. **Verificación Funcional:** En la sección "Atención Requerida (Partidos)", debe aparecer un *badge* con el número de alertas, y en la lista debe mostrarse el partido que creaste con la etiqueta ámbar **"PASARON 3H (PENDIENTE FINALIZAR)"**.
+4. Ahora ve y finalízalo, pero **sin poner estadísticas**.
+5. Regresa al Dashboard. El partido ahora debe tener la etiqueta roja **"FINALIZADO SIN ESTADÍSTICAS"**.

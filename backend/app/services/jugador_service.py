@@ -35,7 +35,7 @@ def listar_jugadores_activos(genero=None):
     return query
 
 
-def listar_jugadores_admin(search=None, id_torneo=None, id_equipo=None, genero=None, estado=None):
+def listar_jugadores_admin(search=None, id_torneo=None, id_equipo=None, id_categoria=None, genero=None, estado=None):
     """Retorna la query de jugadores para el panel de administración con filtros avanzados.
 
     Args:
@@ -67,12 +67,14 @@ def listar_jugadores_admin(search=None, id_torneo=None, id_equipo=None, genero=N
             )
         )
 
-    if id_torneo or id_equipo:
+    if id_torneo or id_equipo or id_categoria:
         plantilla_filters = [Plantilla.estado == 'activo']
         if id_torneo:
             plantilla_filters.append(Plantilla.id_torneo == id_torneo)
         if id_equipo:
             plantilla_filters.append(Plantilla.id_equipo == id_equipo)
+        if id_categoria:
+            plantilla_filters.append(Plantilla.id_categoria == id_categoria)
 
         stmt = db.select(Plantilla.id_jugador).filter(*plantilla_filters)
         query = query.filter(Jugador.id_jugador.in_(stmt))
