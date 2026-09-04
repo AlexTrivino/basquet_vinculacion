@@ -290,23 +290,32 @@ def eliminar_de_plantilla(id_plantilla):
     return plantilla
 
 
-def verificar_jugador_en_torneo(id_jugador: int, id_torneo: int) -> dict:
+def verificar_jugador_en_torneo(id_jugador: int, id_torneo: int, id_categoria: int = None) -> dict:
     """Verifica si un jugador ya está registrado en alguna plantilla activa del torneo.
+
+    Si se proporciona ``id_categoria``, solo verifica duplicidad dentro de esa
+    categoría específica (un jugador puede estar en distintas categorías).
 
     Args:
         id_jugador: PK del jugador a consultar.
         id_torneo: PK del torneo a consultar.
+        id_categoria: PK de la categoría (opcional). Si se proporciona, solo
+            bloquea al jugador si ya tiene plantilla activa en esa categoría.
 
     Returns:
         Dict con ``ya_en_torneo`` (bool), ``equipo_torneo`` (str o None), e ``id_equipo`` (int o None).
     """
+    filtros = [
+        Plantilla.id_jugador == id_jugador,
+        Plantilla.id_torneo == id_torneo,
+    ]
+    if id_categoria:
+        filtros.append(Plantilla.id_categoria == id_categoria)
+
     entrada = (
         Plantilla.activos()
         .options(joinedload(Plantilla.equipo))
-        .filter(
-            Plantilla.id_jugador == id_jugador,
-            Plantilla.id_torneo == id_torneo,
-        )
+        .filter(*filtros)
         .first()
     )
 

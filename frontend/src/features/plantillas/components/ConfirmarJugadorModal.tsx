@@ -39,14 +39,14 @@ export function ConfirmarJugadorModal({
           )}
           
           <h2 className="text-xl font-extrabold text-gray-900 mb-2">
-            {yaEnTorneo ? 'Jugador ya inscrito en este torneo' : 'Jugador Registrado'}
+            {yaEnTorneo ? 'Jugador ya inscrito en esta categoría' : 'Jugador Registrado'}
           </h2>
           
           {yaEnTorneo ? (
             <div className="text-sm text-gray-700 mb-5 font-medium leading-relaxed bg-amber-50/70 p-4 rounded-xl border border-amber-200 text-left">
-              El jugador <strong>{jugador.nombre}</strong> (Cédula: <strong>{jugador.documento_identificacion}</strong>) ya se encuentra registrado en el equipo <strong>{equipoTorneo || 'otro equipo'}</strong> dentro de este torneo.
+              El jugador <strong>{jugador.nombre}</strong> (Cédula: <strong>{jugador.documento_identificacion}</strong>) ya se encuentra registrado en el equipo <strong>{equipoTorneo || 'otro equipo'}</strong> dentro de esta categoría.
               <br /><br />
-              <span className="text-amber-900 font-semibold">No es posible inscribir al mismo jugador en dos equipos diferentes durante el mismo torneo.</span>
+              <span className="text-amber-900 font-semibold">Un jugador no puede estar en dos equipos dentro de la misma categoría.</span>
             </div>
           ) : (
             <div className="text-sm text-gray-600 mb-5 font-medium leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-200 text-left">

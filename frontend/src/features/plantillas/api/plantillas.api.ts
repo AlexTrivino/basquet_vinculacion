@@ -46,10 +46,13 @@ export async function updateNumeroCamiseta(idPlantilla: number, numeroCamiseta: 
   return response.data;
 }
 
-export async function buscarJugadorPorCedula(cedula: string, idTorneo?: number): Promise<ApiResponse<Jugador | null>> {
+export async function buscarJugadorPorCedula(cedula: string, idTorneo?: number, idCategoria?: number): Promise<ApiResponse<Jugador | null>> {
   const params: Record<string, any> = { cedula };
   if (idTorneo) {
     params.id_torneo = idTorneo;
+  }
+  if (idCategoria) {
+    params.id_categoria = idCategoria;
   }
   const response = await axiosInstance.get('/jugadores/buscar', { params });
   return response.data;

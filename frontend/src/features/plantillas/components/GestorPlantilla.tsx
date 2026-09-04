@@ -314,7 +314,7 @@ export function GestorPlantilla({
     try {
       setIsCheckingCedula(true);
       setLastCheckedCedula(cedula);
-      const res = await buscarJugadorPorCedula(cedula, idTorneo);
+      const res = await buscarJugadorPorCedula(cedula, idTorneo, categoriaActiva?.id_categoria || categoriaActiva?.id);
       if (res.data) {
         setDetectedPlayer(res.data);
         setYaEnTorneo(!!res.data.ya_en_torneo);

@@ -110,12 +110,15 @@ def buscar_jugador():
     jugador_data = _admin_schema.dump(jugador)
 
     id_torneo = request.args.get('id_torneo')
+    id_categoria_param = request.args.get('id_categoria')
     if id_torneo is not None and id_torneo.strip() != '':
         try:
             id_torneo_int = int(id_torneo)
+            id_categoria_int = int(id_categoria_param) if id_categoria_param else None
             info_torneo = plantilla_service.verificar_jugador_en_torneo(
                 id_jugador=jugador.id_jugador,
                 id_torneo=id_torneo_int,
+                id_categoria=id_categoria_int,
             )
             jugador_data.update(info_torneo)
         except (ValueError, TypeError):
