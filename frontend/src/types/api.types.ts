@@ -124,13 +124,15 @@ export interface Partido {
   id_partido?: number;
   id_torneo?: number;
   id_categoria?: number;
+  id_equipo_local?: number;
+  id_equipo_visitante?: number;
   fecha_hora?: string;
   url_planilla_fiba?: string;
   fecha?: string;
   hora?: string;
   fase?: string;
   ubicacion?: string;
-  estado: 'programado' | 'en_curso' | 'finalizado' | 'finalizado_wo' | 'suspendido';
+  estado: 'programado' | 'en_curso' | 'finalizado' | 'finalizado_wo' | 'suspendido' | 'anulado';
   marcador_local: number;
   marcador_visitante: number;
   stats_local_procesadas?: boolean;

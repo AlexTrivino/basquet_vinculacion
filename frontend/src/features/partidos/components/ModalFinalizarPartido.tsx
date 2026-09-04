@@ -51,7 +51,7 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
     enabled: !!partido.id_partido
   });
 
-  const { register, control, handleSubmit, watch, reset, formState: { errors } } = useForm<FinalizarValues>({
+  const { register, control, handleSubmit, watch } = useForm<FinalizarValues>({
     resolver: zodResolver(finalizarSchema),
     defaultValues: {
       estado: partido.estado === 'programado' ? 'finalizado' : partido.estado,
@@ -166,7 +166,7 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
     }
   };
 
-  const STAT_COLS = ['puntos', 'triples', 'rebotes', 'asistencias', 'tapones', 'tiros_libres_anotados'] as const;
+
   
   const handleLimpiarLocal = () => replaceLocal(watchStatsLocal.map(r => ({ ...r, puntos: 0, triples: 0, rebotes: 0, asistencias: 0, tapones: 0, tiros_libres_anotados: 0 })));
   const handleLimpiarVisitante = () => replaceVisitante(watchStatsVisitante.map(r => ({ ...r, puntos: 0, triples: 0, rebotes: 0, asistencias: 0, tapones: 0, tiros_libres_anotados: 0 })));

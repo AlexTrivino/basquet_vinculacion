@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Calendar, Plus, Filter, Search, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
@@ -14,11 +14,10 @@ import { EmptyState } from '../../components/EmptyState';
 import { ModalCrearPartido } from '../../features/partidos/components/ModalCrearPartido';
 import { ModalEditarPartido } from '../../features/partidos/components/ModalEditarPartido';
 import { ModalFinalizarPartido } from '../../features/partidos/components/ModalFinalizarPartido';
-import type { Partido, Torneo } from '../../types/api.types';
+import type { Partido } from '../../types/api.types';
 
 export default function AdminPartidos() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   // Estados de Filtros
@@ -60,15 +59,15 @@ export default function AdminPartidos() {
 
   // Opciones de Selectores
   const torneoOptions: Option[] = useMemo(() => 
-    torneos.map(t => ({ value: t.id_torneo || t.id, label: t.nombre || t.nombre_torneo })),
+    torneos.map(t => ({ value: (t.id_torneo || t.id) as number, label: (t.nombre || t.nombre_torneo) as string })),
   [torneos]);
 
   const categoriaOptions: Option[] = useMemo(() => {
     if (!selectedTorneo) return [];
     const torneo = torneos.find(t => (t.id_torneo || t.id) === selectedTorneo);
     if (!torneo?.categorias) return [];
-    return torneo.categorias.map(c => ({
-      value: c.id_categoria,
+    return torneo.categorias.map((c: any) => ({
+      value: c.id_categoria as number,
       label: `${c.nombre_categoria} (${c.genero_categoria})`
     }));
   }, [torneos, selectedTorneo]);
@@ -131,7 +130,7 @@ export default function AdminPartidos() {
       search: searchTerm || undefined,
       sort_order: sortOrder
     }),
-    keepPreviousData: true
+    placeholderData: (prev: any) => prev
   });
 
   const partidos = partidosRes?.data || [];
@@ -218,7 +217,7 @@ export default function AdminPartidos() {
               row.estado === 'finalizado_wo' ? 'Finalizado W.O.' : 
               row.estado === 'anulado' ? 'Rechazado' : 'Suspendido' // Reusing rechzado color for anulado
             }
-            customText={row.estado === 'anulado' ? 'Anulado' : undefined}
+            textOverride={row.estado === 'anulado' ? 'Anulado' : undefined}
           />
           {isPendienteFinalizar(row) && (
             <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded flex items-center gap-1">
@@ -406,17 +405,38 @@ export default function AdminPartidos() {
             icon={<Calendar className="mx-auto h-12 w-12 text-gray-400" />}
           />
         ) : (
-          <DataGridTable 
-            columns={columns} 
-            data={partidos} 
-            ariaLabel="Tabla de Partidos" 
-            pagination={{
-              currentPage: pagination?.page || 1,
-              totalPages: pagination?.pages || 1,
-              totalItems: pagination?.total || 0,
-              onPageChange: (p) => setPage(p)
-            }}
-          />
+          <>
+            <DataGridTable 
+              columns={columns} 
+              data={partidos} 
+              ariaLabel="Tabla de Partidos" 
+            />
+            {pagination && pagination.pages > 1 && (
+              <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-4 py-3 sm:px-6 rounded-b-xl">
+                <div className="text-sm text-gray-500">
+                  Página <span className="font-bold text-gray-900">{pagination.page}</span> de <span className="font-bold text-gray-900">{pagination.pages}</span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={pagination.page === 1}
+                    className="px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    Anterior
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
+                    disabled={pagination.page === pagination.pages}
+                    className="px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                  >
+                    Siguiente
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 

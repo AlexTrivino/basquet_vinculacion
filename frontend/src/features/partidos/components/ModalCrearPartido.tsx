@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -58,7 +58,7 @@ export function ModalCrearPartido({ onClose, defaultTorneo = '' }: ModalCrearPar
 
   // Torneo Options
   const torneoOptions: Option[] = useMemo(() => 
-    torneos.map(t => ({ value: t.id_torneo || t.id, label: t.nombre || t.nombre_torneo })),
+    torneos.map(t => ({ value: (t.id_torneo || t.id) as number, label: (t.nombre || t.nombre_torneo) as string })),
   [torneos]);
 
   // Categorías Options
@@ -66,8 +66,8 @@ export function ModalCrearPartido({ onClose, defaultTorneo = '' }: ModalCrearPar
     if (!watchTorneo) return [];
     const torneo = torneos.find(t => (t.id_torneo || t.id) === watchTorneo);
     if (!torneo?.categorias) return [];
-    return torneo.categorias.map(c => ({
-      value: c.id_categoria,
+    return torneo.categorias.map((c: any) => ({
+      value: c.id_categoria as number,
       label: `${c.nombre_categoria} (${c.genero_categoria})`
     }));
   }, [torneos, watchTorneo]);
@@ -132,7 +132,7 @@ export function ModalCrearPartido({ onClose, defaultTorneo = '' }: ModalCrearPar
                 }}
                 disabled={loadingTorneos}
               />
-              {errors.id_torneo && <p className="mt-1 text-xs text-red-600">{errors.id_torneo.message as str}</p>}
+              {errors.id_torneo && <p className="mt-1 text-xs text-red-600">{errors.id_torneo.message as string}</p>}
             </div>
 
             {/* Categoría */}
@@ -148,7 +148,7 @@ export function ModalCrearPartido({ onClose, defaultTorneo = '' }: ModalCrearPar
                 }}
                 disabled={!watchTorneo || categoriaOptions.length === 0}
               />
-              {errors.id_categoria && <p className="mt-1 text-xs text-red-600">{errors.id_categoria.message as str}</p>}
+              {errors.id_categoria && <p className="mt-1 text-xs text-red-600">{errors.id_categoria.message as string}</p>}
             </div>
 
             {/* Equipo Local */}
@@ -160,7 +160,7 @@ export function ModalCrearPartido({ onClose, defaultTorneo = '' }: ModalCrearPar
                 onChange={(v) => setValue('id_equipo_local', v as number)}
                 disabled={!watchCategoria || loadingInscripciones}
               />
-              {errors.id_equipo_local && <p className="mt-1 text-xs text-red-600">{errors.id_equipo_local.message as str}</p>}
+              {errors.id_equipo_local && <p className="mt-1 text-xs text-red-600">{errors.id_equipo_local.message as string}</p>}
             </div>
 
             {/* Equipo Visitante */}
@@ -172,31 +172,31 @@ export function ModalCrearPartido({ onClose, defaultTorneo = '' }: ModalCrearPar
                 onChange={(v) => setValue('id_equipo_visitante', v as number)}
                 disabled={!watchCategoria || loadingInscripciones}
               />
-              {errors.id_equipo_visitante && <p className="mt-1 text-xs text-red-600">{errors.id_equipo_visitante.message as str}</p>}
+              {errors.id_equipo_visitante && <p className="mt-1 text-xs text-red-600">{errors.id_equipo_visitante.message as string}</p>}
             </div>
 
             {/* Fecha y Hora */}
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Fecha</label>
               <input type="date" {...register('fecha')} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
-              {errors.fecha && <p className="mt-1 text-xs text-red-600">{errors.fecha.message as str}</p>}
+              {errors.fecha && <p className="mt-1 text-xs text-red-600">{errors.fecha.message as string}</p>}
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Hora</label>
               <input type="time" {...register('hora')} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
-              {errors.hora && <p className="mt-1 text-xs text-red-600">{errors.hora.message as str}</p>}
+              {errors.hora && <p className="mt-1 text-xs text-red-600">{errors.hora.message as string}</p>}
             </div>
 
             {/* Fase y Ubicación */}
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Fase</label>
               <input type="text" placeholder="Ej: Grupos" {...register('fase')} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
-              {errors.fase && <p className="mt-1 text-xs text-red-600">{errors.fase.message as str}</p>}
+              {errors.fase && <p className="mt-1 text-xs text-red-600">{errors.fase.message as string}</p>}
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-gray-700">Ubicación</label>
               <input type="text" {...register('ubicacion')} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
-              {errors.ubicacion && <p className="mt-1 text-xs text-red-600">{errors.ubicacion.message as str}</p>}
+              {errors.ubicacion && <p className="mt-1 text-xs text-red-600">{errors.ubicacion.message as string}</p>}
             </div>
           </div>
 

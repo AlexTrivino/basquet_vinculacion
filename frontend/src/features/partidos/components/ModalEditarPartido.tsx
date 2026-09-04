@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -67,8 +67,8 @@ export function ModalEditarPartido({ partido, onClose }: ModalEditarPartidoProps
     if (!isProgramado) {
       // Si no está programado, solo mostramos los equipos actuales como opciones para el select (disabled anyway)
       return [
-        { value: partido.id_equipo_local, label: partido.equipo_local?.nombre_equipo || 'Local' },
-        { value: partido.id_equipo_visitante, label: partido.equipo_visitante?.nombre_equipo || 'Visitante' }
+        { value: partido.id_equipo_local as number, label: partido.equipo_local?.nombre_equipo || 'Local' },
+        { value: partido.id_equipo_visitante as number, label: partido.equipo_visitante?.nombre_equipo || 'Visitante' }
       ];
     }
     const inscripciones = inscripcionesRes?.data || [];
@@ -94,8 +94,8 @@ export function ModalEditarPartido({ partido, onClose }: ModalEditarPartidoProps
     try {
       // Si no es programado, restauramos los IDs originales por seguridad (el backend los rechazaría si cambian)
       if (!isProgramado) {
-        data.id_equipo_local = partido.id_equipo_local;
-        data.id_equipo_visitante = partido.id_equipo_visitante;
+        data.id_equipo_local = partido.id_equipo_local as number;
+        data.id_equipo_visitante = partido.id_equipo_visitante as number;
       }
       
       await actualizarPartido(partido.id_partido!, data);
