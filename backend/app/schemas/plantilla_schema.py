@@ -69,6 +69,7 @@ class PlantillaPublicSchema(Schema):
     estado = fields.String()
     id_equipo = fields.Integer()
     id_torneo = fields.Integer()
+    id_categoria = fields.Integer()
     # Relación anidada — requiere joinedload en el servicio
     jugador = fields.Nested(_JugadorEnPlantillaSchema)
 

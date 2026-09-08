@@ -86,7 +86,9 @@ def obtener_perfil_publico(id_jugador: int):
         func.sum(Estadistica.puntos_anotados + (Estadistica.triples_anotados * 3)).label('puntos_totales'),
         func.sum(Estadistica.rebotes).label('rebotes_totales'),
         func.sum(Estadistica.asistencias).label('asistencias_totales'),
-        func.sum(Estadistica.triples_anotados).label('triples_totales')
+        func.sum(Estadistica.triples_anotados).label('triples_totales'),
+        func.sum(Estadistica.tapones).label('tapones_totales'),
+        func.sum(Estadistica.tiros_libres_anotados).label('tiros_libres_totales')
     ).filter(Estadistica.id_jugador == id_jugador).first()
 
     partidos_totales = stats_globales.partidos if stats_globales and stats_globales.partidos else 0
@@ -100,6 +102,8 @@ def obtener_perfil_publico(id_jugador: int):
         "rebotes_totales": int(stats_globales.rebotes_totales or 0),
         "asistencias_totales": int(stats_globales.asistencias_totales or 0),
         "triples_totales": int(stats_globales.triples_totales or 0),
+        "tapones_totales": int(stats_globales.tapones_totales or 0),
+        "tiros_libres_totales": int(stats_globales.tiros_libres_totales or 0),
     }
 
     # 3. Calcular Estadísticas desglosadas por Torneo y Categoría
@@ -111,7 +115,9 @@ def obtener_perfil_publico(id_jugador: int):
             func.sum(Estadistica.puntos_anotados + (Estadistica.triples_anotados * 3)).label('puntos_totales'),
             func.sum(Estadistica.rebotes).label('rebotes_totales'),
             func.sum(Estadistica.asistencias).label('asistencias_totales'),
-            func.sum(Estadistica.triples_anotados).label('triples_totales')
+            func.sum(Estadistica.triples_anotados).label('triples_totales'),
+            func.sum(Estadistica.tapones).label('tapones_totales'),
+            func.sum(Estadistica.tiros_libres_anotados).label('tiros_libres_totales')
         )
         .join(Partido, Estadistica.id_partido == Partido.id_partido)
         .filter(Estadistica.id_jugador == id_jugador)
@@ -138,6 +144,8 @@ def obtener_perfil_publico(id_jugador: int):
             "rebotes_totales": int(st.rebotes_totales or 0),
             "asistencias_totales": int(st.asistencias_totales or 0),
             "triples_totales": int(st.triples_totales or 0),
+            "tapones_totales": int(st.tapones_totales or 0),
+            "tiros_libres_totales": int(st.tiros_libres_totales or 0),
         }
 
     return {

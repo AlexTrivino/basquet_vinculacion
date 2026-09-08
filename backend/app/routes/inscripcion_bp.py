@@ -62,6 +62,7 @@ def listar_inscripciones():
     Filtros disponibles via query params:
         - ``id_torneo`` (int): filtra por torneo.
         - ``estado`` (str): filtra por estado_inscripcion.
+        - ``id_equipo`` (int): filtra por equipo.
 
     Comportamiento por rol:
         - ``super_admin``: ve todas las inscripciones del sistema.
@@ -71,11 +72,16 @@ def listar_inscripciones():
     id_torneo = request.args.get('id_torneo', type=int)
     estado = request.args.get('estado')
     id_categoria = request.args.get('id_categoria', type=int)
+    id_equipo = request.args.get('id_equipo', type=int)
 
     es_delegado = g.usuario_rol == 'delegado'
     query = inscripcion_service.listar_inscripciones(
         id_torneo=id_torneo, estado=estado, id_categoria=id_categoria, incluir_borradores=es_delegado
     )
+
+    if id_equipo:
+        from app.models.inscripcion import Inscripcion
+        query = query.filter(Inscripcion.id_equipo == id_equipo)
 
     # ── Filtro de propietario para delegados ──────────────────────
     # Un delegado solo ve inscripciones de sus propios equipos.

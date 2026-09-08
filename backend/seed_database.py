@@ -20,6 +20,8 @@ from app.models.plantilla import Plantilla
 from app.models.partido import Partido
 from app.models.estadistica import Estadistica
 from app.models.sancion import Sancion
+from app.models.patrocinador import Patrocinador
+from app.models.patrocinador_torneo import PatrocinadorTorneo
 
 # IDs fijos para los usuarios
 ADMIN_ID = "659ec13b-2d07-4b57-8841-35acd54d1017"
@@ -139,6 +141,8 @@ def seed_tablas():
     except Exception:
         db.session.rollback()
 
+    db.session.execute(text("DELETE FROM patrocinadores_torneos;"))
+    db.session.execute(text("DELETE FROM patrocinadores;"))
     db.session.execute(text("DELETE FROM estadisticas;"))
     db.session.execute(text("DELETE FROM sanciones;"))
     db.session.execute(text("DELETE FROM partidos;"))
@@ -157,6 +161,7 @@ def seed_tablas():
     del3 = Usuario.query.filter_by(correo="delegado3@test.com").first()
     del4 = Usuario.query.filter_by(correo="delegado4@test.com").first()
     del5 = Usuario.query.filter_by(correo="delegado5@test.com").first()
+    del6 = Usuario.query.filter_by(correo="delegado6@test.com").first()
     
     if not del1 or not del2 or not del3 or not del5:
         print("Error: No se encontraron los usuarios delegados en la BD. Ejecuta la Opción 1 primero.", flush=True)
@@ -197,99 +202,26 @@ def seed_tablas():
     db.session.add_all([torneo1, torneo2, torneo3, torneo4, torneo5])
     db.session.flush()
 
-    # Categorías Torneo 5 (2026)
-    cat_t5_libre = Categoria(
-        nombre_categoria="Senior Libre",
-        genero_categoria="masculino",
-        edad_minima=18,
-        id_torneo=torneo5.id_torneo
-    )
-    cat_t5_maxi = Categoria(
-        nombre_categoria="Maxibasquet +35",
-        genero_categoria="masculino",
-        edad_minima=35,
-        id_torneo=torneo5.id_torneo
-    )
+    # Generar las 4 categorías estándar para los 5 torneos (total 20 categorías)
+    categorias_todas = []
     
-    # Categorías Torneo 1 (2026)
-    cat_t1_libre = Categoria(
-        nombre_categoria="Senior Libre",
-        genero_categoria="masculino",
-        edad_minima=18,
-        edad_maxima=35,
-        id_torneo=torneo1.id_torneo
-    )
-    cat_t1_maxi = Categoria(
-        nombre_categoria="Maxibasquet +35",
-        genero_categoria="masculino",
-        edad_minima=35,
-        id_torneo=torneo1.id_torneo
-    )
-    cat_t1_fem = Categoria(
-        nombre_categoria="Femenino Abierto",
-        genero_categoria="femenino",
-        edad_minima=16,
-        id_torneo=torneo1.id_torneo
-    )
-    
-    # Categorías Torneo 2 (2024)
-    cat_t2_libre = Categoria(
-        nombre_categoria="Senior Libre",
-        genero_categoria="masculino",
-        edad_minima=18,
-        id_torneo=torneo2.id_torneo
-    )
-    cat_t2_sub21 = Categoria(
-        nombre_categoria="Sub-21 Promesas",
-        genero_categoria="masculino",
-        edad_minima=15,
-        edad_maxima=21,
-        id_torneo=torneo2.id_torneo
-    )
-    cat_t2_maxi = Categoria(
-        nombre_categoria="Maxibasquet +35",
-        genero_categoria="masculino",
-        edad_minima=35,
-        id_torneo=torneo2.id_torneo
-    )
-
-    # Categorías Torneo 3 (2023)
-    cat_t3_libre = Categoria(
-        nombre_categoria="Senior Libre",
-        genero_categoria="masculino",
-        edad_minima=18,
-        id_torneo=torneo3.id_torneo
-    )
-    cat_t3_maxi = Categoria(
-        nombre_categoria="Maxibasquet +40",
-        genero_categoria="masculino",
-        edad_minima=40,
-        id_torneo=torneo3.id_torneo
-    )
-
-    # Categorías Torneo 4 (2022)
-    cat_t4_libre = Categoria(
-        nombre_categoria="Senior Libre",
-        genero_categoria="masculino",
-        edad_minima=18,
-        id_torneo=torneo4.id_torneo
-    )
-    cat_t4_maxi = Categoria(
-        nombre_categoria="Maxibasquet +35",
-        genero_categoria="masculino",
-        edad_minima=35,
-        id_torneo=torneo4.id_torneo
-    )
-    
-    db.session.add_all([
-        cat_t1_libre, cat_t1_maxi, cat_t1_fem,
-        cat_t2_libre, cat_t2_sub21, cat_t2_maxi,
-        cat_t3_libre, cat_t3_maxi,
-        cat_t4_libre, cat_t4_maxi,
-        cat_t5_libre, cat_t5_maxi
-    ])
+    for t in [torneo1, torneo2, torneo3, torneo4, torneo5]:
+        c_libre = Categoria(nombre_categoria="Senior Libre", genero_categoria="masculino", edad_minima=18, edad_maxima=35, id_torneo=t.id_torneo)
+        c_sub21 = Categoria(nombre_categoria="Sub-21 Promesas", genero_categoria="masculino", edad_minima=15, edad_maxima=21, id_torneo=t.id_torneo)
+        c_maxi = Categoria(nombre_categoria="Maxibasquet +35", genero_categoria="masculino", edad_minima=35, id_torneo=t.id_torneo)
+        c_fem = Categoria(nombre_categoria="Femenino Abierto", genero_categoria="femenino", edad_minima=16, id_torneo=t.id_torneo)
+        categorias_todas.extend([c_libre, c_sub21, c_maxi, c_fem])
+        
+    db.session.add_all(categorias_todas)
     db.session.commit()
-    print(f"- 5 Torneos creados con sus Categorías.", flush=True)
+    print("- 5 Torneos creados con 4 Categorías cada uno (Total 20).", flush=True)
+
+    # Variables de compatibilidad para el resto del seeder manual
+    cat_t1_libre, _, cat_t1_maxi, _ = categorias_todas[0:4]
+    cat_t2_libre, cat_t2_sub21, cat_t2_maxi, _ = categorias_todas[4:8]
+    cat_t3_libre, _, cat_t3_maxi, _ = categorias_todas[8:12]
+    cat_t4_libre, _, cat_t4_maxi, _ = categorias_todas[12:16]
+    cat_t5_libre, _, cat_t5_maxi, _ = categorias_todas[16:20]
 
     # 3. Equipos Base
     equipos_raw = [
@@ -298,6 +230,7 @@ def seed_tablas():
         ("Manta Bulls", del3.id_usuario, "https://images.unsplash.com/photo-1519766304817-4f37bda74a29?auto=format&fit=crop&w=200&q=80"),
         ("Portoviejo Stars", del4.id_usuario, "https://images.unsplash.com/photo-1518063319789-7217e6706b04?auto=format&fit=crop&w=200&q=80"),
         ("Halcones del Mar", del5.id_usuario, "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=200&q=80"),
+        ("Mega Equipo", del6.id_usuario, "https://images.unsplash.com/photo-1518063319789-7217e6706b04?auto=format&fit=crop&w=200&q=80"),
     ]
 
     equipos_map = {}
@@ -343,6 +276,11 @@ def seed_tablas():
         ("Halcones del Mar", torneo4, cat_t4_libre, "aprobado", DOC_PDF_DEMO),
     ]
 
+    # Inscribir "Mega Equipo" en absolutamente TODAS las 20 categorías
+    torneos_list = [torneo1, torneo2, torneo3, torneo4, torneo5]
+    for idx, cat in enumerate(categorias_todas):
+        torneo_actual = torneos_list[idx // 4]
+        inscripciones_config.append(("Mega Equipo", torneo_actual, cat, "aprobado", DOC_PDF_DEMO))
 
     for eq_nom, tor, cat, est, comp in inscripciones_config:
         eq_obj = equipos_map[eq_nom]
@@ -841,6 +779,43 @@ def seed_tablas():
     print(f"- {len(partidos_todos)} Partidos creados (Finalizados con marcadores y Programados).", flush=True)
     print(f"- {len(estadisticas_generadas)} Estadísticas individuales FIBA generadas con boxscore consistente.", flush=True)
     print("- 3 Sanciones disciplinarias registradas.", flush=True)
+
+    # 8. Creación de Patrocinadores Artificiales
+    patrocinadores_nombres = ["Nike Ecuador", "Gatorade Sports", "Red Bull Energía", "Puma Basket", "KFC Manta"]
+    patrocinadores_logos = [
+        "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg",
+        "https://upload.wikimedia.org/wikipedia/commons/2/27/Gatorade_logo.svg",
+        "https://upload.wikimedia.org/wikipedia/en/f/f5/RedBullEnergyDrink.svg",
+        "https://upload.wikimedia.org/wikipedia/commons/8/88/Puma_Logo.svg",
+        "https://upload.wikimedia.org/wikipedia/en/b/bf/KFC_logo.svg"
+    ]
+    
+    nuevos_patrocinadores = []
+    for idx, nombre in enumerate(patrocinadores_nombres):
+        patroc = Patrocinador(
+            nombre_patrocinador=nombre,
+            url_logo_patrocinador=patrocinadores_logos[idx],
+            url_imagen_promocional="https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1200&q=80"
+        )
+        nuevos_patrocinadores.append(patroc)
+    
+    db.session.add_all(nuevos_patrocinadores)
+    db.session.flush()
+
+    patrocinadores_torneos = []
+    # Vincular todos los patrocinadores a todos los torneos para tener data en los endpoints
+    for patroc in nuevos_patrocinadores:
+        for t in torneos_list:
+            pt = PatrocinadorTorneo(
+                id_patrocinador=patroc.id_patrocinador,
+                id_torneo=t.id_torneo
+            )
+            patrocinadores_torneos.append(pt)
+            
+    db.session.add_all(patrocinadores_torneos)
+    db.session.commit()
+    print(f"- {len(nuevos_patrocinadores)} Patrocinadores creados y vinculados a todos los torneos.", flush=True)
+
     print("\n========================================", flush=True)
     print(" SIMULACIÓN DE TORNEO REAL COMPLETADA ", flush=True)
     print("========================================", flush=True)

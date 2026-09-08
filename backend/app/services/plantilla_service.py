@@ -269,13 +269,14 @@ def crear_plantilla(data, usuario_rol=None):
     return obtener_entrada_plantilla(plantilla.id_plantilla)
 
 
-def eliminar_de_plantilla(id_plantilla):
+def eliminar_plantilla(id_plantilla, usuario_rol=None):
     """Soft delete: marca la entrada de plantilla como inactiva.
     El perfil del jugador se mantiene intacto (incluyendo su foto) 
     para poder ser reusado en otros equipos.
 
     Args:
         id_plantilla: PK de la entrada a desactivar.
+        usuario_rol: Rol del usuario que realiza la acción.
 
     Returns:
         Instancia de ``Plantilla`` desactivada, o ``None`` si no existe.
@@ -333,7 +334,7 @@ def verificar_jugador_en_torneo(id_jugador: int, id_torneo: int, id_categoria: i
     }
 
 
-def actualizar_numero_camiseta(id_plantilla: int, numero_camiseta: int):
+def actualizar_numero_camiseta(id_plantilla: int, numero_camiseta: int, usuario_rol=None):
     """Actualiza el número de camiseta de un jugador en la plantilla.
 
     Verifica que el número no esté ya en uso por otro jugador del mismo
@@ -342,6 +343,7 @@ def actualizar_numero_camiseta(id_plantilla: int, numero_camiseta: int):
     Args:
         id_plantilla: PK de la entrada de plantilla a actualizar.
         numero_camiseta: Nuevo número de camiseta (0-99).
+        usuario_rol: Rol del usuario que realiza la acción.
 
     Returns:
         Instancia de ``Plantilla`` actualizada con jugador cargado,
