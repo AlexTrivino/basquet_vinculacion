@@ -240,8 +240,8 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
 
         mapa.set(clave, {
           ...ins,
-          id_torneo: tId,
-          id_categoria: cId,
+          id_torneo: tId!,
+          id_categoria: cId!,
           anio: anio > 0 ? anio : undefined,
         });
       }
@@ -277,7 +277,7 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
     participacionesOrdenadas.forEach((p) => {
       const tId = p.id_torneo || p.torneo?.id_torneo;
       if (tId && (p.torneo?.nombre || p.torneo?.nombre_torneo)) {
-        torneosMap.set(tId, p.torneo.nombre || p.torneo.nombre_torneo);
+        torneosMap.set(tId, p.torneo.nombre || p.torneo.nombre_torneo || 'Torneo');
       }
     });
     return Array.from(torneosMap.entries()).map(([id, nombre]) => ({ id, nombre }));
@@ -291,7 +291,7 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
       const tId = p.id_torneo || p.torneo?.id_torneo;
       const cId = p.id_categoria || p.categoria?.id_categoria;
       if (String(tId) === String(torneoRosterFiltro) && cId && (p.categoria?.nombre_categoria || p.categoria?.nombre)) {
-        categoriasMap.set(cId, p.categoria.nombre_categoria || p.categoria.nombre);
+        categoriasMap.set(cId, p.categoria.nombre_categoria || p.categoria.nombre || 'Categoría');
       }
     });
     return Array.from(categoriasMap.entries()).map(([id, nombre]) => ({ id, nombre }));
@@ -301,11 +301,11 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
   const plantillasFiltradas = useMemo(() => {
     let list = plantillas;
     if (torneoRosterFiltro !== 'todos') {
-      list = list.filter((p) => String(p.id_torneo || p.torneo?.id_torneo) === String(torneoRosterFiltro));
+      list = list.filter((p: any) => String(p.id_torneo || p.torneo?.id_torneo) === String(torneoRosterFiltro));
     }
     
     if (categoriaRosterFiltro !== 'todas') {
-      list = list.filter((p) => String(p.id_categoria || p.categoria?.id_categoria) === String(categoriaRosterFiltro));
+      list = list.filter((p: any) => String(p.id_categoria || p.categoria?.id_categoria) === String(categoriaRosterFiltro));
     }
 
     // Deduplicar jugadores si está en 'todos'
