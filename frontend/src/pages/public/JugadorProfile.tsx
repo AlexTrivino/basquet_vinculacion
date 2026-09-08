@@ -215,6 +215,8 @@ export default function JugadorProfile() {
           rebotes_totales: 0,
           asistencias_totales: 0,
           triples_totales: 0,
+          tapones_totales: 0,
+          tiros_libres_totales: 0,
         };
 
   return (
@@ -335,6 +337,7 @@ export default function JugadorProfile() {
                     {torneosConEstadisticas.length > 0 && (
                       <select
                         id="filtro-torneo"
+                        aria-label="Filtro de torneo"
                         value={torneoSeleccionado}
                         onChange={handleTorneoChange}
                         className="rounded-xl border border-gray-300 bg-gray-50 px-2.5 py-1.5 text-xs font-bold text-gray-800 shadow-2xs focus:border-primary-500 focus:bg-white focus:outline-hidden w-full max-w-[170px] truncate cursor-pointer"
@@ -351,6 +354,7 @@ export default function JugadorProfile() {
                     {torneoSeleccionado !== 'global' && categoriasTorneoSeleccionado.length > 0 && (
                       <select
                         id="filtro-categoria"
+                        aria-label="Filtro de categoría"
                         value={categoriaSeleccionada}
                         onChange={(e) => setCategoriaSeleccionada(e.target.value)}
                         className="rounded-xl border border-gray-300 bg-gray-50 px-2.5 py-1.5 text-xs font-bold text-gray-800 shadow-2xs focus:border-primary-500 focus:bg-white focus:outline-hidden w-full max-w-[170px] truncate cursor-pointer"

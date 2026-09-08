@@ -31,7 +31,7 @@ export function StatusBadge({ status, textOverride, title }: StatusBadgeProps) {
       textColor = 'text-amber-800';
       break;
     case 'pendiente':
-    case 'en curso':
+    case 'en_curso':
       bgColor = 'bg-yellow-100';
       textColor = 'text-yellow-800';
       if (!defaultTitle && status.toLowerCase() === 'pendiente') {
@@ -44,9 +44,11 @@ export function StatusBadge({ status, textOverride, title }: StatusBadgeProps) {
       break;
   }
 
+  const displayStatus = (textOverride || status).replace(/_/g, ' ');
+
   return (
     <span title={defaultTitle} className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider ${bgColor} ${textColor} cursor-default`}>
-      {textOverride || status}
+      {displayStatus}
     </span>
   );
 }

@@ -4,16 +4,16 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { Shield, X, Edit, Trash2, Search, Filter, RefreshCw, Eye, Users } from 'lucide-react';
+import { Shield, X, Edit, Trash2, Search, Filter, RefreshCw, Users } from 'lucide-react';
 
 import { getEquiposAdmin, updateEquipo, uploadLogoEquipo, uploadBannerEquipo, deleteLogoEquipo, deleteBannerEquipo, reactivarEquipo } from '../../features/equipos/api/equipos.api';
 import { getTorneos } from '../../features/torneos/api/torneos.api';
 import { getCategorias } from '../../features/categorias/api/categorias.api';
-import { getPlantillas } from '../../features/plantillas/api/plantillas.api';
 import { DataGridTable, type Column } from '../../components/DataGridTable';
 import { AsyncButton } from '../../components/AsyncButton';
 import { FileUploadButton } from '../../components/FileUploadButton';
 import { DesactivarEquipoModal } from '../../features/equipos/components/DesactivarEquipoModal';
+import { ModalGestionarPlantillasAdmin } from '../../features/equipos/components/ModalGestionarPlantillasAdmin';
 import type { Equipo } from '../../types/api.types';
 
 const equipoSchema = z.object({
@@ -35,7 +35,7 @@ export default function AdminEquipos() {
   // Modals state
   const [equipoToDeactivate, setEquipoToDeactivate] = useState<number | null>(null);
   const [editingEquipo, setEditingEquipo] = useState<Equipo | null>(null);
-  const [viewingPlantilla, setViewingPlantilla] = useState<Equipo | null>(null);
+  const [managingPlantillasEquipo, setManagingPlantillasEquipo] = useState<Equipo | null>(null);
 
   // Filtros de Torneos
   const { data: torneosRes } = useQuery({
@@ -238,10 +238,21 @@ export default function AdminEquipos() {
     {
       key: 'inscripciones',
       header: 'Inscripciones (Categorías)',
+      cellClassName: 'max-w-[250px] whitespace-normal',
       render: (row) => {
-        const cats = row.inscripciones?.map((i: any) => i.categoria ? `${i.categoria.nombre_categoria} (${i.categoria.genero_categoria})` : null).filter(Boolean);
+        const cats = row.inscripciones?.map((i: any) => i.categoria ? i.categoria.nombre_categoria : null).filter(Boolean);
         if (!cats || cats.length === 0) return <span className="text-slate-400 text-xs italic">Ninguna</span>;
-        return <span className="text-xs text-slate-600 capitalize">{Array.from(new Set(cats)).join(', ')}</span>;
+        
+        const uniqueCats = Array.from(new Set(cats));
+        return (
+          <div className="flex flex-wrap gap-1">
+            {uniqueCats.map((cat, i) => (
+              <span key={i} className="inline-flex bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-semibold border border-slate-200">
+                {cat as string}
+              </span>
+            ))}
+          </div>
+        );
       }
     },
     {
@@ -266,19 +277,21 @@ export default function AdminEquipos() {
       render: (row) => (
         <div className="flex items-center gap-1.5">
           <button
-            onClick={() => setViewingPlantilla(row)}
-            className="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold flex items-center gap-1 border border-indigo-200 transition-colors"
-            title="Ver Plantilla Rápida"
+            onClick={() => setManagingPlantillasEquipo(row)}
+            className="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-indigo-200 transition-colors"
+            title="Gestionar Plantillas"
           >
-            <Eye className="w-3.5 h-3.5" />
+            <Users className="w-3.5 h-3.5" />
+            <span>Plantillas</span>
           </button>
 
           <button
             onClick={() => openEditModal(row)}
-            className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold flex items-center gap-1 border border-blue-200 transition-colors"
+            className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-blue-200 transition-colors"
             title="Editar Equipo"
           >
             <Edit className="w-3.5 h-3.5" />
+            <span>Editar</span>
           </button>
           
           {row.estado === 'activo' ? (
@@ -546,126 +559,12 @@ export default function AdminEquipos() {
         </div>
       )}
 
-      {/* Modal Plantilla Rápida */}
-      {viewingPlantilla && (
-        <PlantillaRapidaModal 
-          equipo={viewingPlantilla} 
-          onClose={() => setViewingPlantilla(null)} 
-        />
-      )}
-    </div>
-  );
-}
-
-function PlantillaRapidaModal({ equipo, onClose }: { equipo: Equipo, onClose: () => void }) {
-  const [page, setPage] = useState(1);
-  const { data: res, isLoading } = useQuery({
-    queryKey: ['plantillas-rapidas', equipo.id_equipo || equipo.id, page],
-    queryFn: () => getPlantillas(equipo.id_equipo || equipo.id as number, page, 10),
-  });
-
-  const plantillas = res?.data || [];
-  const pagination = res?.pagination;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="w-full max-w-3xl rounded-2xl bg-white shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 bg-slate-50">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
-              <Users className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-slate-900">Plantilla Inscrita</h2>
-              <p className="text-xs text-slate-500 font-medium">{equipo.nombre_equipo}</p>
-            </div>
-          </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors bg-slate-200/50 hover:bg-slate-200 p-1.5 rounded-full">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        
-        <div className="px-6 py-3 bg-blue-50 border-b border-blue-100 flex items-start gap-2">
-          <div className="text-blue-600 mt-0.5"><Shield className="w-4 h-4" /></div>
-          <p className="text-xs text-blue-800 font-medium leading-relaxed">
-            Aquí se muestran todos los jugadores que en algún momento han sido inscritos por este equipo. Si deseas alterar la información de algún jugador, debes hacerlo en la sección de <strong>Gestión de Jugadores</strong>.
-          </p>
-        </div>
-
-        <div className="p-0 overflow-auto flex-1 bg-slate-50/50">
-          {isLoading ? (
-            <div className="flex justify-center py-12">
-              <RefreshCw className="w-8 h-8 animate-spin text-slate-300" />
-            </div>
-          ) : plantillas.length === 0 ? (
-            <div className="text-center py-12 px-6">
-              <Users className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <h3 className="text-sm font-bold text-slate-900">Sin Jugadores</h3>
-              <p className="text-sm text-slate-500 mt-1">Este equipo no tiene jugadores registrados en ninguna plantilla todavía.</p>
-            </div>
-          ) : (
-            <table className="w-full text-left border-collapse">
-              <thead className="bg-slate-100 border-b border-slate-200 sticky top-0">
-                <tr>
-                  <th className="px-6 py-3 text-xs font-bold text-slate-500 uppercase">Jugador</th>
-                  <th className="px-6 py-3 text-xs font-bold text-slate-500 uppercase text-center">Camiseta</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 bg-white">
-                {plantillas.map((p: any) => (
-                  <tr key={p.id_plantilla} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-6 py-3">
-                      <div className="flex items-center gap-3">
-                        {p.jugador?.url_foto ? (
-                          <img src={p.jugador.url_foto} alt="" className="w-8 h-8 rounded-full object-cover border border-slate-200" />
-                        ) : (
-                          <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center font-bold text-xs uppercase">
-                            {p.jugador?.nombre?.substring(0, 2)}
-                          </div>
-                        )}
-                        <div>
-                          <p className="text-sm font-bold text-slate-900">{p.jugador?.nombre}</p>
-                          <p className="text-xs text-slate-500 font-medium">{p.jugador?.documento_identificacion}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-3 text-center">
-                      <span className="inline-flex items-center justify-center w-7 h-7 rounded bg-slate-100 text-slate-700 font-bold text-sm border border-slate-200">
-                        {p.numero_camiseta || '-'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-        
-        {/* Paginación */}
-        {pagination && pagination.pages > 1 && (
-          <div className="flex items-center justify-between border-t border-slate-200 bg-white px-6 py-4">
-            <span className="text-sm text-slate-500">
-              Mostrando página <span className="font-medium text-slate-900">{pagination.page}</span> de <span className="font-medium text-slate-900">{pagination.pages}</span>
-            </span>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={pagination.page === 1}
-                className="px-3 py-1 text-sm font-medium rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Anterior
-              </button>
-              <button
-                onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
-                disabled={pagination.page === pagination.pages}
-                className="px-3 py-1 text-sm font-medium rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Siguiente
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Modal Gestionar Plantillas */}
+      <ModalGestionarPlantillasAdmin 
+        isOpen={managingPlantillasEquipo !== null}
+        onClose={() => setManagingPlantillasEquipo(null)}
+        equipo={managingPlantillasEquipo}
+      />
     </div>
   );
 }

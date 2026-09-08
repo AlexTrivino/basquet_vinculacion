@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -71,7 +71,7 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
       const mapStats = (players: any[]) => players.map(p => ({
         id_jugador: p.id_jugador,
         nombre: [p.nombre_jugador || p.nombre, p.apellido_jugador].filter(Boolean).join(' ').trim(),
-        dorsal: p.numero_camiseta || 0,
+        dorsal: p.dorsal !== undefined ? p.dorsal : (p.numero_camiseta || 0),
         puntos: p.puntos_anotados || 0,
         triples: p.triples_anotados || 0,
         rebotes: p.rebotes || 0,
@@ -85,17 +85,18 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
     }
   }, [boxScoreRes, replaceLocal, replaceVisitante]);
 
-  const watchStatsLocal = watch('stats_local');
-  const watchStatsVisitante = watch('stats_visitante');
-  const watchMarcadorLocal = watch('marcador_local');
-  const watchMarcadorVisitante = watch('marcador_visitante');
+  // Observar los campos de forma explícita con useWatch para garantizar la reactividad al tipear en arreglos anidados
+  const watchStatsLocal = useWatch({ control, name: 'stats_local' }) || [];
+  const watchStatsVisitante = useWatch({ control, name: 'stats_visitante' }) || [];
+  const watchMarcadorLocal = watch('marcador_local') || 0;
+  const watchMarcadorVisitante = watch('marcador_visitante') || 0;
 
-  // Cálculos de balance
-  const totalPuntosLocal = useMemo(() => watchStatsLocal.reduce((sum, r) => sum + (r.puntos || 0) + ((r.triples || 0) * 3), 0), [watchStatsLocal]);
-  const totalPuntosVisitante = useMemo(() => watchStatsVisitante.reduce((sum, r) => sum + (r.puntos || 0) + ((r.triples || 0) * 3), 0), [watchStatsVisitante]);
+  // Cálculos de balance (Según requerimiento: Puntos Normales + Triples * 3 deben coincidir con el marcador)
+  const totalPuntosLocal = useMemo(() => watchStatsLocal.reduce((sum, r) => sum + (Number(r.puntos) || 0) + ((Number(r.triples) || 0) * 3), 0), [watchStatsLocal]);
+  const totalPuntosVisitante = useMemo(() => watchStatsVisitante.reduce((sum, r) => sum + (Number(r.puntos) || 0) + ((Number(r.triples) || 0) * 3), 0), [watchStatsVisitante]);
   
-  const isBalancedLocal = totalPuntosLocal === (watchMarcadorLocal || 0);
-  const isBalancedVisitante = totalPuntosVisitante === (watchMarcadorVisitante || 0);
+  const isBalancedLocal = totalPuntosLocal === watchMarcadorLocal;
+  const isBalancedVisitante = totalPuntosVisitante === watchMarcadorVisitante;
 
   const onSubmit = async (data: FinalizarValues) => {
     if (showStats) {
@@ -126,7 +127,7 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
       if (showStats && data.stats_local.length > 0) {
         await postEstadisticasBulk({
           id_partido: partido.id_partido!,
-          id_equipo: partido.id_equipo_local!,
+          id_equipo: partido.id_equipo_local || partido.equipo_local?.id_equipo!,
           estadisticas_jugadores: data.stats_local.map(r => ({
             id_jugador: r.id_jugador,
             puntos: r.puntos,
@@ -135,7 +136,7 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
             rebotes: r.rebotes,
             asistencias: r.asistencias,
             tapones: r.tapones,
-            tiros_libres_anotados: r.tiros_libres_anotados,
+            tiros_libres: r.tiros_libres_anotados,
           }))
         });
       }
@@ -144,7 +145,7 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
       if (showStats && data.stats_visitante.length > 0) {
         await postEstadisticasBulk({
           id_partido: partido.id_partido!,
-          id_equipo: partido.id_equipo_visitante!,
+          id_equipo: partido.id_equipo_visitante || partido.equipo_visitante?.id_equipo!,
           estadisticas_jugadores: data.stats_visitante.map(r => ({
             id_jugador: r.id_jugador,
             puntos: r.puntos,
@@ -153,16 +154,23 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
             rebotes: r.rebotes,
             asistencias: r.asistencias,
             tapones: r.tapones,
-            tiros_libres_anotados: r.tiros_libres_anotados,
+            tiros_libres: r.tiros_libres_anotados,
           }))
         });
       }
 
       toast.success('Partido finalizado y estadísticas guardadas');
       queryClient.invalidateQueries({ queryKey: ['partidos'] });
+      queryClient.invalidateQueries({ queryKey: ['partido-stats', partido.id_partido] });
+      queryClient.invalidateQueries({ queryKey: ['partido', partido.id_partido, 'box-score'] }); // Para el modal público
+      queryClient.invalidateQueries({ queryKey: ['torneos'] }); // Invalidate torneos to update public standings and calendar
       onClose();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Error al procesar la finalización del partido');
+      const apiMsg = error.response?.data?.message;
+      const errorMsg = typeof apiMsg === 'object' && apiMsg !== null 
+        ? JSON.stringify(apiMsg) 
+        : apiMsg || 'Error al procesar la finalización del partido';
+      toast.error(errorMsg);
     }
   };
 
@@ -269,6 +277,16 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
                     </div>
                     <button type="button" onClick={handleLimpiarLocal} className="text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded transition-colors">Limpiar</button>
                   </div>
+
+                  {/* Balance Local (Movido arriba) */}
+                  <div className={`px-4 py-2 border-b flex items-center justify-between text-sm ${isBalancedLocal ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
+                    <span className="font-medium">Total puntos + Triples: <strong>{totalPuntosLocal}</strong></span>
+                    {isBalancedLocal ? (
+                      <span className="font-bold flex items-center gap-1">¡Balance Correcto!</span>
+                    ) : (
+                      <span className="font-bold flex items-center gap-1"><AlertTriangle className="w-4 h-4"/> No coincide con {watchMarcadorLocal}</span>
+                    )}
+                  </div>
                   
                   <div className="overflow-x-auto p-0">
                     {fieldsLocal.length === 0 ? (
@@ -292,26 +310,16 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
                             <tr key={field.id} className="hover:bg-gray-50 transition-colors">
                               <td className="px-3 py-1.5 font-medium text-gray-500">{field.dorsal}</td>
                               <td className="px-3 py-1.5 font-semibold text-gray-800 truncate max-w-[120px]" title={field.nombre}>{field.nombre}</td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.puntos`, { valueAsNumber: true })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.triples`, { valueAsNumber: true })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.tiros_libres_anotados`, { valueAsNumber: true })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.rebotes`, { valueAsNumber: true })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.asistencias`, { valueAsNumber: true })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.tapones`, { valueAsNumber: true })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.puntos`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.triples`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.tiros_libres_anotados`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.rebotes`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.asistencias`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.tapones`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
-                    )}
-                  </div>
-                  
-                  {/* Balance Local */}
-                  <div className={`p-3 border-t flex items-center justify-between text-sm ${isBalancedLocal ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
-                    <span className="font-medium">Total PTS + Triples: <strong>{totalPuntosLocal}</strong></span>
-                    {isBalancedLocal ? (
-                      <span className="font-bold flex items-center gap-1">¡Balance Correcto!</span>
-                    ) : (
-                      <span className="font-bold flex items-center gap-1"><AlertTriangle className="w-4 h-4"/> No coincide con {watchMarcadorLocal || 0}</span>
                     )}
                   </div>
                 </div>
@@ -324,6 +332,16 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
                       <h4 className="font-bold text-amber-900">{partido.equipo_visitante?.nombre_equipo} (Visitante)</h4>
                     </div>
                     <button type="button" onClick={handleLimpiarVisitante} className="text-xs font-semibold text-amber-600 hover:text-amber-800 bg-amber-100 hover:bg-amber-200 px-2 py-1 rounded transition-colors">Limpiar</button>
+                  </div>
+
+                  {/* Balance Visitante (Movido arriba) */}
+                  <div className={`px-4 py-2 border-b flex items-center justify-between text-sm ${isBalancedVisitante ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
+                    <span className="font-medium">Total puntos + Triples: <strong>{totalPuntosVisitante}</strong></span>
+                    {isBalancedVisitante ? (
+                      <span className="font-bold flex items-center gap-1">¡Balance Correcto!</span>
+                    ) : (
+                      <span className="font-bold flex items-center gap-1"><AlertTriangle className="w-4 h-4"/> No coincide con {watchMarcadorVisitante}</span>
+                    )}
                   </div>
                   
                   <div className="overflow-x-auto p-0">
@@ -348,26 +366,16 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
                             <tr key={field.id} className="hover:bg-gray-50 transition-colors">
                               <td className="px-3 py-1.5 font-medium text-gray-500">{field.dorsal}</td>
                               <td className="px-3 py-1.5 font-semibold text-gray-800 truncate max-w-[120px]" title={field.nombre}>{field.nombre}</td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.puntos`, { valueAsNumber: true })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 font-medium bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.triples`, { valueAsNumber: true })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.tiros_libres_anotados`, { valueAsNumber: true })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.rebotes`, { valueAsNumber: true })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.asistencias`, { valueAsNumber: true })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.tapones`, { valueAsNumber: true })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.puntos`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 font-medium bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.triples`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.tiros_libres_anotados`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.rebotes`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.asistencias`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.tapones`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
-                    )}
-                  </div>
-                  
-                  {/* Balance Visitante */}
-                  <div className={`p-3 border-t flex items-center justify-between text-sm ${isBalancedVisitante ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
-                    <span className="font-medium">Total PTS + Triples: <strong>{totalPuntosVisitante}</strong></span>
-                    {isBalancedVisitante ? (
-                      <span className="font-bold flex items-center gap-1">¡Balance Correcto!</span>
-                    ) : (
-                      <span className="font-bold flex items-center gap-1"><AlertTriangle className="w-4 h-4"/> No coincide con {watchMarcadorVisitante || 0}</span>
                     )}
                   </div>
                 </div>

@@ -193,6 +193,8 @@ export interface MetricasEstadisticasJugador {
   rebotes_totales: number;
   asistencias_totales: number;
   triples_totales: number;
+  tapones_totales: number;
+  tiros_libres_totales: number;
 }
 
 export interface JugadorPerfilResponse {

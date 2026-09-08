@@ -57,6 +57,7 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
   const [torneoRosterFiltro, setTorneoRosterFiltro] = useState<string>('todos');
+  const [categoriaRosterFiltro, setCategoriaRosterFiltro] = useState<string>('todas');
   const [paginaParticipaciones, setPaginaParticipaciones] = useState<number>(1);
 
   // Queries
@@ -69,7 +70,7 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
 
   const { data: plantillasRes, isLoading: loadingPlantilla } = useQuery({
     queryKey: ['plantillas', idEquipo],
-    queryFn: () => getPlantillas(idEquipo, 1, 100),
+    queryFn: () => getPlantillas(idEquipo, 1, 1000),
     enabled: !!idEquipo,
   });
   const plantillas = plantillasRes?.data || [];
@@ -224,7 +225,9 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
       const estado = ins.estado_inscripcion || ins.estado;
       if (estado !== 'aprobado') return;
 
-      const clave = `${ins.id_torneo}-${ins.id_categoria}`;
+      const tId = ins.id_torneo || ins.torneo?.id_torneo;
+      const cId = ins.id_categoria || ins.categoria?.id_categoria;
+      const clave = `${tId}-${cId}`;
       if (!mapa.has(clave)) {
         let anio = 0;
         if (ins.torneo?.fecha_inicio) {
@@ -237,6 +240,8 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
 
         mapa.set(clave, {
           ...ins,
+          id_torneo: tId,
+          id_categoria: cId,
           anio: anio > 0 ? anio : undefined,
         });
       }
@@ -246,7 +251,7 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
       const yearA = a.anio || 0;
       const yearB = b.anio || 0;
       if (yearB !== yearA) return yearB - yearA;
-      return (b.id_torneo || 0) - (a.id_torneo || 0);
+      return (b.id_torneo || b.torneo?.id_torneo || 0) - (a.id_torneo || a.torneo?.id_torneo || 0);
     });
   }, [inscripciones]);
 
@@ -266,27 +271,41 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
     indiceInicioParticipaciones + ITEMS_POR_PAGINA_PARTICIPACIONES
   );
 
-  // ── Opciones de Torneo para Filtro de Roster ────────────────────
+  // ── Opciones de Torneo y Categoría para Filtro de Roster ────────────────────
   const torneosDisponiblesRoster = useMemo(() => {
     const torneosMap = new Map<number, string>();
-    plantillas.forEach((p) => {
-      if (p.id_torneo) {
-        torneosMap.set(p.id_torneo, `Torneo #${p.id_torneo}`);
-      }
-    });
-    inscripciones.forEach((i) => {
-      if (i.id_torneo && i.torneo?.nombre) {
-        torneosMap.set(i.id_torneo, i.torneo.nombre);
+    participacionesOrdenadas.forEach((p) => {
+      const tId = p.id_torneo || p.torneo?.id_torneo;
+      if (tId && (p.torneo?.nombre || p.torneo?.nombre_torneo)) {
+        torneosMap.set(tId, p.torneo.nombre || p.torneo.nombre_torneo);
       }
     });
     return Array.from(torneosMap.entries()).map(([id, nombre]) => ({ id, nombre }));
-  }, [plantillas, inscripciones]);
+  }, [participacionesOrdenadas]);
+
+  const categoriasDisponiblesRoster = useMemo(() => {
+    if (torneoRosterFiltro === 'todos') return [];
+    
+    const categoriasMap = new Map<number, string>();
+    participacionesOrdenadas.forEach((p) => {
+      const tId = p.id_torneo || p.torneo?.id_torneo;
+      const cId = p.id_categoria || p.categoria?.id_categoria;
+      if (String(tId) === String(torneoRosterFiltro) && cId && (p.categoria?.nombre_categoria || p.categoria?.nombre)) {
+        categoriasMap.set(cId, p.categoria.nombre_categoria || p.categoria.nombre);
+      }
+    });
+    return Array.from(categoriasMap.entries()).map(([id, nombre]) => ({ id, nombre }));
+  }, [participacionesOrdenadas, torneoRosterFiltro]);
 
   // ── Plantillas filtradas para Roster ────────────────────────────
   const plantillasFiltradas = useMemo(() => {
     let list = plantillas;
     if (torneoRosterFiltro !== 'todos') {
-      list = list.filter((p) => String(p.id_torneo) === String(torneoRosterFiltro));
+      list = list.filter((p) => String(p.id_torneo || p.torneo?.id_torneo) === String(torneoRosterFiltro));
+    }
+    
+    if (categoriaRosterFiltro !== 'todas') {
+      list = list.filter((p) => String(p.id_categoria || p.categoria?.id_categoria) === String(categoriaRosterFiltro));
     }
 
     // Deduplicar jugadores si está en 'todos'
@@ -294,20 +313,38 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
     return list.filter((p) => {
       const jId = p.jugador?.id_jugador || p.id_jugador;
       if (!jId) return true;
-      if (torneoRosterFiltro === 'todos') {
+      if (torneoRosterFiltro === 'todos' || categoriaRosterFiltro === 'todas') {
         if (vistos.has(jId)) return false;
         vistos.add(jId);
       }
       return true;
     });
-  }, [plantillas, torneoRosterFiltro]);
+  }, [plantillas, torneoRosterFiltro, categoriaRosterFiltro]);
 
-  // ── Torneos Activos ───────────────────────────────────────────────
-  const torneosActivos = useMemo(() => {
-    return participacionesOrdenadas.filter((p) => {
+  // ── Torneos Activos Agrupados ───────────────────────────────────────────────
+  const torneosActivosAgrupados = useMemo(() => {
+    const torneosMap = new Map<number, any>();
+    
+    participacionesOrdenadas.forEach((p) => {
       const estadoTorneo = p.torneo?.estado;
-      return estadoTorneo === 'programado' || estadoTorneo === 'en_curso';
+      if (estadoTorneo === 'programado' || estadoTorneo === 'en_curso') {
+        const tId = p.id_torneo;
+        if (!torneosMap.has(tId)) {
+          torneosMap.set(tId, {
+            id_torneo: tId,
+            torneo: p.torneo,
+            estado: estadoTorneo,
+            categorias: []
+          });
+        }
+        const catNombre = p.categoria?.nombre_categoria || p.categoria?.nombre;
+        if (catNombre && !torneosMap.get(tId).categorias.includes(catNombre)) {
+          torneosMap.get(tId).categorias.push(catNombre);
+        }
+      }
     });
+    
+    return Array.from(torneosMap.values());
   }, [participacionesOrdenadas]);
 
   if (loadingEquipo) {
@@ -495,7 +532,7 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
                 {plantillas.length}
               </span>
               <span className="text-2xs sm:text-xs font-bold text-gray-500 uppercase tracking-wider mt-0.5 block">
-                Roster
+                Plantilla
               </span>
             </div>
 
@@ -523,7 +560,7 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
           <div className="lg:col-span-5 flex flex-col gap-8">
             
             {/* Tarjeta de Torneos Activos */}
-            {torneosActivos.length > 0 && (
+            {torneosActivosAgrupados.length > 0 && (
               <div className="flex flex-col">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-black text-gray-900 uppercase tracking-wide flex items-center gap-2">
@@ -531,18 +568,24 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
                   </h2>
                 </div>
                 <div className="bg-white rounded-3xl border border-gray-200 shadow-2xs p-5 space-y-3">
-                  {torneosActivos.map((participacion) => (
-                    <div key={participacion.id_inscripcion} className="flex flex-wrap items-center justify-between p-3 rounded-2xl bg-gray-50 border border-gray-100 hover:border-primary-200 transition-colors gap-3">
-                      <div className="flex items-center gap-3">
+                  {torneosActivosAgrupados.map((grupo) => (
+                    <div key={grupo.id_torneo} className="flex flex-wrap items-center justify-between p-3 rounded-2xl bg-gray-50 border border-gray-100 hover:border-primary-200 transition-colors gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
                         <div className="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center shrink-0">
                           <Trophy className="w-5 h-5" />
                         </div>
-                        <div>
-                          <p className="font-bold text-gray-900 leading-tight">{participacion.torneo?.nombre || participacion.torneo?.nombre_torneo}</p>
-                          <p className="text-xs text-gray-500 font-medium">Categoría: {participacion.categoria?.nombre_categoria || participacion.categoria?.nombre}</p>
+                        <div className="min-w-0">
+                          <p className="font-bold text-gray-900 leading-tight truncate">{grupo.torneo?.nombre || grupo.torneo?.nombre_torneo}</p>
+                          <div className="flex flex-wrap gap-1 mt-1.5">
+                            {grupo.categorias.map((cat: string, i: number) => (
+                              <span key={i} className="inline-flex bg-white text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold border border-slate-200 shadow-sm">
+                                {cat}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                      <StatusBadge status={participacion.torneo?.estado || 'programado'} />
+                      <StatusBadge status={grupo.estado} />
                     </div>
                   ))}
                 </div>
@@ -766,36 +809,58 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
           </div>
         </div>
 
-        {/* ── SECCIÓN 3: ROSTER OFICIAL (CON FILTRO) ──────────────────────── */}
+        {/* ── SECCIÓN 3: PLANTILLA OFICIAL (CON FILTRO) ──────────────────────── */}
         <div className="mt-14">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
               <h2 className="text-xl font-black text-gray-900 uppercase tracking-wide flex items-center gap-2">
-                <Users className="w-5 h-5 text-primary-600" /> Roster Oficial
+                <Users className="w-5 h-5 text-primary-600" /> Plantilla Oficial
               </h2>
-              <p className="text-xs font-semibold text-gray-500 mt-0.5">
-                Plantilla deportiva y nómina de jugadores habilitados.
+              <p className="text-xs font-medium text-gray-500 max-w-xl">
+                Plantilla deportiva de jugadores habilitados.
               </p>
             </div>
 
-            {/* Selector de Torneo / Edición */}
-            {torneosDisponiblesRoster.length > 1 && (
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-gray-400" />
-                <select
-                  value={torneoRosterFiltro}
-                  onChange={(e) => setTorneoRosterFiltro(e.target.value)}
-                  className="bg-white border border-gray-200 text-gray-800 text-xs font-bold rounded-xl px-3 py-2 shadow-2xs focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer"
-                >
-                  <option value="todos">Todos los Torneos (Histórico)</option>
-                  {torneosDisponiblesRoster.map((t) => (
-                    <option key={t.id} value={String(t.id)}>
-                      {t.nombre}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+            {/* Selector de Torneo y Categoría / Edición */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {torneosDisponiblesRoster.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-gray-400" />
+                  <select
+                    value={torneoRosterFiltro}
+                    onChange={(e) => {
+                      setTorneoRosterFiltro(e.target.value);
+                      setCategoriaRosterFiltro('todas');
+                    }}
+                    className="bg-white border border-gray-200 text-gray-800 text-xs font-bold rounded-xl px-3 py-2 shadow-2xs focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer"
+                  >
+                    <option value="todos">Todos los Torneos (Histórico)</option>
+                    {torneosDisponiblesRoster.map((t) => (
+                      <option key={t.id} value={String(t.id)}>
+                        {t.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {torneoRosterFiltro !== 'todos' && categoriasDisponiblesRoster.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <select
+                    value={categoriaRosterFiltro}
+                    onChange={(e) => setCategoriaRosterFiltro(e.target.value)}
+                    className="bg-white border border-gray-200 text-gray-800 text-xs font-bold rounded-xl px-3 py-2 shadow-2xs focus:outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer"
+                  >
+                    <option value="todas">Todas las Categorías</option>
+                    {categoriasDisponiblesRoster.map((c) => (
+                      <option key={c.id} value={String(c.id)}>
+                        {c.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
           </div>
 
           {loadingPlantilla ? (
@@ -837,7 +902,7 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
                           {j?.nombre || 'Jugador Registrado'}
                         </span>
                         <span className="text-2xs font-semibold text-gray-400 mt-0.5 block truncate">
-                          Habilitado en nómina
+                          Activo
                         </span>
                       </div>
                     </div>

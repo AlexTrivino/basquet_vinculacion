@@ -25,11 +25,12 @@ export async function updateEquipo(id: number, data: Partial<Equipo>): Promise<A
 }
 
 
-export async function getInscripciones(page = 1, perPage = 50, idTorneo?: number, estado?: string, idCategoria?: number): Promise<ApiResponse<Inscripcion[]>> {
+export async function getInscripciones(page = 1, perPage = 50, idTorneo?: number, estado?: string, idCategoria?: number, idEquipo?: number): Promise<ApiResponse<Inscripcion[]>> {
   const params: any = { page, per_page: perPage };
   if (idTorneo) params.id_torneo = idTorneo;
   if (estado) params.estado_inscripcion = estado;
   if (idCategoria) params.id_categoria = idCategoria;
+  if (idEquipo) params.id_equipo = idEquipo;
   
   const response = await axiosInstance.get('/inscripciones', { params });
   return response.data;

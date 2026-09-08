@@ -41,16 +41,20 @@ export function PosicionesTable({ torneoId, idCategoria }: PosicionesTableProps)
         </Link>
       )
     },
-    { key: 'PJ', header: 'Partidos Jugados', headerClassName: 'text-center', cellClassName: 'text-center' },
-    { key: 'PG', header: 'Partidos Ganados', headerClassName: 'text-center', cellClassName: 'text-center' },
-    { key: 'PP', header: 'Partidos Perdidos', headerClassName: 'text-center', cellClassName: 'text-center' },
     {
       key: 'puntos',
       header: 'Puntos FIBA',
-      headerClassName: 'text-center',
-      cellClassName: 'text-center',
-      render: (row) => <span className="font-bold text-gray-900">{row.puntos}</span>
+      headerClassName: 'text-center font-black text-primary-700 tracking-wider pr-8 sm:pr-16',
+      cellClassName: 'text-center pr-8 sm:pr-16',
+      render: (row) => (
+        <span className="text-2xl font-black text-primary-600">
+          {row.puntos}
+        </span>
+      )
     },
+    { key: 'PJ', header: 'Partidos Jugados', headerClassName: 'text-center', cellClassName: 'text-center' },
+    { key: 'PG', header: 'Partidos Ganados', headerClassName: 'text-center', cellClassName: 'text-center' },
+    { key: 'PP', header: 'Partidos Perdidos', headerClassName: 'text-center', cellClassName: 'text-center' },
     {
       key: 'acciones',
       header: 'Acciones',

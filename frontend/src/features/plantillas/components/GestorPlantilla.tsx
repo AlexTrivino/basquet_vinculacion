@@ -122,6 +122,10 @@ export interface GestorPlantillaProps {
   nombreTorneo?: string;
   /** Nombre de la categoria para mostrar en el banner del wizard */
   nombreCategoria?: string;
+  /** Modo administrador: bypassea validaciones de delegado */
+  isAdmin?: boolean;
+  /** Modo solo lectura: oculta todos los controles de edición */
+  readOnly?: boolean;
 }
 
 export function GestorPlantilla({
@@ -134,6 +138,8 @@ export function GestorPlantilla({
   nombreEquipo: _nombreEquipo,
   nombreTorneo: _nombreTorneo,
   nombreCategoria: _nombreCategoria,
+  isAdmin = false,
+  readOnly = false,
 }: GestorPlantillaProps = {}) {
   const [showForm, setShowForm] = useState(false);
   const [fotoFile, setFotoFile] = useState<File | null>(null);
@@ -174,7 +180,7 @@ export function GestorPlantilla({
     queryKey: ['inscripciones', 'delegado'],
     queryFn: () => getInscripciones(1, 50),
     // En modo wizard el idEquipoOverride ya es conocido, pero igual cargamos para contexto
-    enabled: !idEquipoOverride,
+    enabled: !idEquipoOverride && !isAdmin,
   });
   
   const inscripciones = inscripcionesRes?.data || [];
@@ -595,15 +601,21 @@ export function GestorPlantilla({
       headerClassName: 'text-center w-16 xl:w-20',
       cellClassName: 'text-center',
       render: (row) => (
-        <button
-          type="button"
-          onClick={() => handleOpenEditarCamiseta(row)}
-          className="inline-flex items-center justify-center gap-1 rounded-lg bg-gray-100 hover:bg-primary-50 hover:border-primary-300 hover:text-primary-700 px-2 py-0.5 text-xs font-bold text-gray-800 border border-gray-200 transition-all cursor-pointer group"
-          title="Clic para modificar número de camiseta"
-        >
-          <span>#{row.numero_camiseta ?? '-'}</span>
-          <Pencil className="w-3 h-3 text-gray-400 group-hover:text-primary-600 transition-colors" />
-        </button>
+        readOnly ? (
+          <span className="inline-flex items-center justify-center font-bold text-gray-800">
+            #{row.numero_camiseta ?? '-'}
+          </span>
+        ) : (
+          <button
+            type="button"
+            onClick={() => handleOpenEditarCamiseta(row)}
+            className="inline-flex items-center justify-center gap-1 rounded-lg bg-gray-100 hover:bg-primary-50 hover:border-primary-300 hover:text-primary-700 px-2 py-0.5 text-xs font-bold text-gray-800 border border-gray-200 transition-all cursor-pointer group"
+            title="Clic para modificar número de camiseta"
+          >
+            <span>#{row.numero_camiseta ?? '-'}</span>
+            <Pencil className="w-3 h-3 text-gray-400 group-hover:text-primary-600 transition-colors" />
+          </button>
+        )
       )
     },
     {
@@ -713,9 +725,10 @@ export function GestorPlantilla({
     {
       key: 'acciones',
       header: 'Acciones',
-      headerClassName: 'text-right w-20 xl:w-24',
-      cellClassName: 'text-right',
+      headerClassName: `text-right w-20 xl:w-24 ${readOnly ? 'hidden' : ''}`,
+      cellClassName: `text-right ${readOnly ? 'hidden' : ''}`,
       render: (row) => {
+        if (readOnly) return null;
         const idJugador = row.jugador?.id_jugador || row.jugador?.id || row.id_jugador;
         return (
           <div className="flex items-center justify-end gap-0.5">
@@ -736,7 +749,7 @@ export function GestorPlantilla({
             <button
               onClick={() => handleOpenEliminarModal(row)}
               className="text-gray-400 hover:text-red-600 transition-colors p-1.5 rounded-lg hover:bg-red-50"
-              title="Quitar del Roster"
+              title="Quitar de la Plantilla"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -746,14 +759,14 @@ export function GestorPlantilla({
     }
   ];
 
-  const isLoading = isLoadingInscripciones || isLoadingPlantilla;
   const totalJugadores = plantilla.length;
   const isMaxReached = totalJugadores >= MAX_JUGADORES;
   const isMinReached = totalJugadores >= MIN_JUGADORES;
   const faltantesMinimo = Math.max(0, MIN_JUGADORES - totalJugadores);
   const porcentajeCapacidad = Math.min(100, Math.round((totalJugadores / MAX_JUGADORES) * 100));
+  const isLoading = (!isAdmin && isLoadingInscripciones) || isLoadingPlantilla;
 
-  if (!isWizardMode) {
+  if (!isWizardMode && !isAdmin) {
     if (isLoadingInscripciones) {
       return (
         <div className="max-w-4xl mx-auto px-4 py-8">
@@ -833,9 +846,9 @@ export function GestorPlantilla({
 
   const isTorneoEnCurso = inscripcion?.torneo?.estado === 'en_curso';
   const isDelegado = userRole === 'delegado';
-  const isEditDisabled = isDelegado && isTorneoEnCurso;
+  const isEditDisabled = (isDelegado && isTorneoEnCurso && !isAdmin) || readOnly;
 
-  if (isEditDisabled) {
+  if (isEditDisabled && !readOnly) {
     return (
       <div className="max-w-md mx-auto my-12 p-8 bg-white rounded-2xl border border-blue-200 bg-blue-50/40 text-center shadow-sm flex flex-col items-center">
         <div className="p-3 bg-blue-100 text-blue-700 rounded-2xl mb-4">
@@ -872,7 +885,7 @@ export function GestorPlantilla({
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Gestión de Jugadores</h1>
           <p className="text-xs text-gray-500">
-            Visualiza tu roster y registra nuevos perfiles para evaluación técnica.
+            Visualiza tu plantilla y registra nuevos perfiles para evaluación técnica.
           </p>
         </div>
       )}
@@ -901,7 +914,7 @@ export function GestorPlantilla({
                   </span>
                 ) : isMinReached ? (
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Roster Habilitado
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Plantilla Habilitada
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
@@ -915,7 +928,7 @@ export function GestorPlantilla({
             </div>
           </div>
 
-          {!showForm && (
+          {!showForm && !readOnly && (
             <button
               onClick={() => setShowForm(true)}
               disabled={!idEquipo || isMaxReached}
@@ -964,10 +977,10 @@ export function GestorPlantilla({
         )}
       </div>
 
-      {/* Header Superior del Roster */}
-      <div className={`flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between ${!showForm ? 'max-w-4xl w-full mx-auto' : 'w-full'}`}>
+      {/* Header Superior de la Plantilla */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
-          <h2 className="text-lg font-bold text-gray-900">Roster del Equipo</h2>
+          <h2 className="text-lg font-bold text-gray-900">Plantilla del Equipo</h2>
           <p className="text-xs text-gray-500">Administra y registra a los jugadores oficiales en la plantilla de tu equipo.</p>
         </div>
       </div>
@@ -976,7 +989,7 @@ export function GestorPlantilla({
       <div className={`w-full ${showForm ? 'grid grid-cols-1 lg:grid-cols-12 gap-4 xl:gap-6 items-start' : ''}`}>
         
         {/* Columna Izquierda: Formulario Equilibrado */}
-        {showForm && (
+        {showForm && !readOnly && (
           <div className="lg:col-span-5 xl:col-span-4 2xl:col-span-4 bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 shadow-sm relative animate-fade-in">
             {/* Botones de acción superior: Limpiar y Cerrar */}
             <div className="absolute top-4 right-4 flex items-center gap-1">
@@ -1355,7 +1368,7 @@ export function GestorPlantilla({
           ) : plantilla.length === 0 ? (
             <EmptyState
               title="Plantilla Vacía"
-              description="Aún no tienes jugadores inscritos en tu roster oficial."
+              description="Aún no tienes jugadores inscritos en tu plantilla oficial."
               icon={<UserPlus className="mx-auto h-12 w-12 text-gray-400" />}
             />
           ) : (
