@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   Users,
   Trophy,
+  UserPlus,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -31,6 +32,7 @@ import { DataGridTable, type Column } from '../../components/DataGridTable';
 import { StatusBadge } from '../../components/StatusBadge';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 import { ModalEditarJugadorAdmin } from '../../features/jugadores/components/ModalEditarJugadorAdmin';
+import { ModalCrearJugador } from '../../features/jugadores/components/ModalCrearJugador';
 
 export default function AdminJugadores() {
   const queryClient = useQueryClient();
@@ -55,6 +57,7 @@ export default function AdminJugadores() {
     nombre: string;
     nuevoEstado: 'activo' | 'inactivo';
   } | null>(null);
+  const [isCrearModalOpen, setIsCrearModalOpen] = useState(false);
 
   // Debounce search input
   useEffect(() => {
@@ -452,14 +455,23 @@ export default function AdminJugadores() {
           </div>
         </div>
 
-        <button
-          onClick={() => refetch()}
-          disabled={isFetching}
-          className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-colors self-start sm:self-center disabled:opacity-50"
-        >
-          <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin text-orange-600' : ''}`} />
-          <span>Actualizar</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="flex items-center justify-center p-2.5 text-slate-600 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors disabled:opacity-50"
+            title="Refrescar datos"
+          >
+            <RefreshCw className={`w-5 h-5 ${isFetching ? 'animate-spin' : ''}`} />
+          </button>
+          <button
+            onClick={() => setIsCrearModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold rounded-xl transition-colors shadow-sm"
+          >
+            <UserPlus className="w-5 h-5" />
+            <span>Agregar Jugador</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter Bar */}
@@ -622,6 +634,12 @@ export default function AdminJugadores() {
         onJugadorUpdated={() => {
           queryClient.invalidateQueries({ queryKey: ['admin-jugadores'] });
         }}
+      />
+
+      {/* Create Modal */}
+      <ModalCrearJugador
+        isOpen={isCrearModalOpen}
+        onClose={() => setIsCrearModalOpen(false)}
       />
 
       {/* Confirmation Modal for Toggle Status */}

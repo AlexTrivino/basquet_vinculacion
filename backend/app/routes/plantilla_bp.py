@@ -41,7 +41,7 @@ def listar_plantilla():
     id_torneo = request.args.get('id_torneo', type=int)
     id_categoria = request.args.get('id_categoria', type=int)
     query = plantilla_service.listar_plantilla(id_equipo=id_equipo, id_torneo=id_torneo, id_categoria=id_categoria)
-    items, pagination = paginate_query(query)
+    items, pagination = paginate_query(query, max_per_page=200)
     return api_response(data=_public_many.dump(items), pagination=pagination)
 
 

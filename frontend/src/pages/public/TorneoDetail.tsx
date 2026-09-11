@@ -1,19 +1,29 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-
 import { getTorneoById } from '../../features/torneos/api/torneos.api';
 import { PosicionesTable } from '../../features/torneos/components/PosicionesTable';
 import { PartidosList } from '../../features/torneos/components/PartidosList';
 import { LideresEstadisticos } from '../../features/torneos/components/LideresEstadisticos';
 import { ArrowLeft } from 'lucide-react';
 
+const CATEGORY_COLORS = [
+  { dot: 'bg-red-300', bg: 'bg-red-100', border: 'border-red-200', text: 'text-red-700' },
+  { dot: 'bg-emerald-300', bg: 'bg-emerald-100', border: 'border-emerald-200', text: 'text-emerald-700' },
+  { dot: 'bg-blue-300', bg: 'bg-blue-100', border: 'border-blue-200', text: 'text-blue-700' },
+  { dot: 'bg-amber-300', bg: 'bg-amber-100', border: 'border-amber-200', text: 'text-amber-700' },
+  { dot: 'bg-purple-300', bg: 'bg-purple-100', border: 'border-purple-200', text: 'text-purple-700' },
+  { dot: 'bg-pink-300', bg: 'bg-pink-100', border: 'border-pink-200', text: 'text-pink-700' },
+  { dot: 'bg-cyan-300', bg: 'bg-cyan-100', border: 'border-cyan-200', text: 'text-cyan-700' },
+  { dot: 'bg-orange-300', bg: 'bg-orange-100', border: 'border-orange-200', text: 'text-orange-700' },
+];
+
 type Tab = 'calendario' | 'posiciones' | 'estadisticas';
 
 export default function TorneoDetail() {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<Tab>('calendario');
-  const [activeCategoriaId, setActiveCategoriaId] = useState<number | undefined>(undefined);
+  const [activeCategoriaId, setActiveCategoriaId] = useState<number | 'todas' | undefined>(undefined);
 
   const { data: response, isLoading, isError } = useQuery({
     queryKey: ['torneos', id],
@@ -34,9 +44,13 @@ export default function TorneoDetail() {
     );
   }
 
-  // Set the first category as active by default if none is selected
-  if (torneo?.categorias?.length && activeCategoriaId === undefined) {
-    setActiveCategoriaId(torneo.categorias[0].id_categoria);
+  // Set default category
+  if (torneo?.categorias?.length) {
+    if (activeCategoriaId === undefined) {
+      setActiveCategoriaId(activeTab === 'calendario' ? 'todas' : torneo.categorias[0].id_categoria);
+    } else if (activeCategoriaId === 'todas' && activeTab !== 'calendario') {
+      setActiveCategoriaId(torneo.categorias[0].id_categoria);
+    }
   }
 
   return (
@@ -117,25 +131,41 @@ export default function TorneoDetail() {
             </nav>
           </div>
 
-          {/* Tabs de Categorías */}
+          {/* Fila de Categorías o Leyenda */}
           {torneo?.categorias && torneo.categorias.length > 0 && (
             <div className="border-b border-gray-100 bg-white">
-              <nav className="flex space-x-1 px-4 py-3 overflow-x-auto scrollbar-hide" aria-label="Categorías">
-                {torneo.categorias.map((cat) => ( 
-                  <button
-                    key={cat.id_categoria}
-                    onClick={() => setActiveCategoriaId(cat.id_categoria)}
-                    className={`whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2 ${
-                      activeCategoriaId === cat.id_categoria
-                        ? 'bg-primary-50 text-primary-700 border border-primary-200'
-                        : 'text-gray-500 hover:bg-gray-50 border border-transparent hover:text-gray-700'
-                    }`}
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70"></span>
-                    {cat.nombre_categoria} <span className="opacity-75 font-medium">({cat.genero_categoria})</span>
-                  </button>
-                ))}
-              </nav>
+              <div className="flex space-x-2 px-4 py-3 overflow-x-auto scrollbar-hide items-center">
+                {torneo.categorias.map((cat, index) => {
+                  const color = CATEGORY_COLORS[index % CATEGORY_COLORS.length];
+                  
+                  if (activeTab === 'calendario') {
+                    // Modo Leyenda (No clickeable, horizontal plana sin fondo)
+                    return (
+                      <div key={cat.id_categoria} className="whitespace-nowrap px-2 py-1.5 text-sm font-semibold flex items-center gap-2 text-gray-700">
+                        <span className={`w-2.5 h-2.5 rounded-full ${color.dot} shadow-sm border border-black/5`}></span>
+                        {cat.nombre_categoria} <span className="opacity-60 text-xs font-medium">({cat.genero_categoria})</span>
+                      </div>
+                    );
+                  }
+
+                  // Modo Filtro (Clickeable, para posiciones/estadisticas)
+                  const isSelected = activeCategoriaId === cat.id_categoria;
+                  return (
+                    <button
+                      key={cat.id_categoria}
+                      onClick={() => setActiveCategoriaId(cat.id_categoria)}
+                      className={`whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2 ${
+                        isSelected
+                          ? 'bg-primary-50 text-primary-700 border border-primary-200'
+                          : 'text-gray-500 hover:bg-gray-50 border border-transparent hover:text-gray-700'
+                      }`}
+                    >
+                      <span className={`w-2 h-2 rounded-full ${color.dot} ${isSelected ? 'opacity-100 shadow-sm' : 'opacity-40'}`}></span>
+                      {cat.nombre_categoria} <span className="opacity-75 font-medium">({cat.genero_categoria})</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
 
@@ -150,12 +180,17 @@ export default function TorneoDetail() {
         )}
         
         {id && activeCategoriaId && activeTab === 'calendario' && (
-          <PartidosList torneoId={id} idCategoria={activeCategoriaId} urlCalendario={torneo?.url_calendario_excel} />
+          <PartidosList 
+            torneoId={id} 
+            idCategoria={activeCategoriaId === 'todas' ? undefined : activeCategoriaId} 
+            urlCalendario={torneo?.url_calendario_excel} 
+            categorias={torneo?.categorias || []}
+          />
         )}
-        {id && activeCategoriaId && activeTab === 'posiciones' && (
+        {id && activeCategoriaId && activeCategoriaId !== 'todas' && activeTab === 'posiciones' && (
           <PosicionesTable torneoId={id} idCategoria={activeCategoriaId} />
         )}
-        {id && activeCategoriaId && activeTab === 'estadisticas' && (
+        {id && activeCategoriaId && activeCategoriaId !== 'todas' && activeTab === 'estadisticas' && (
           <LideresEstadisticos torneoId={id} idCategoria={activeCategoriaId} />
         )}
         </div>

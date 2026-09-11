@@ -421,3 +421,59 @@ def purgar_inscripciones_expiradas(dias=30):
         'equipos_eliminados': equipos_eliminados,
         'dias_umbral': dias,
     }
+def editar_inscripcion_admin(id_inscripcion: int, id_torneo_nuevo: int, id_categoria_nueva: int):
+    from app.models.torneo import Torneo
+    from app.models.categoria import Categoria
+    from app.models.plantilla import Plantilla
+
+    inscripcion = Inscripcion.query.options(
+        joinedload(Inscripcion.torneo),
+        joinedload(Inscripcion.equipo).joinedload(Equipo.usuario),
+        joinedload(Inscripcion.categoria),
+    ).get(id_inscripcion)
+
+    if not inscripcion:
+        raise ValueError('Inscripción no encontrada.')
+
+    if inscripcion.torneo.estado in ['en_curso', 'finalizado']:
+        raise ValueError('No se puede editar una inscripción de un torneo que está en curso o finalizado.')
+
+    nuevo_torneo = Torneo.query.get(id_torneo_nuevo)
+    if not nuevo_torneo:
+        raise ValueError('El nuevo torneo no existe.')
+    if nuevo_torneo.estado != 'programado':
+        raise ValueError('Solo se puede cambiar la inscripción a un torneo en estado programado.')
+
+    nueva_categoria = Categoria.query.get(id_categoria_nueva)
+    if not nueva_categoria:
+        raise ValueError('La nueva categoría no existe.')
+
+    # Verificar duplicado
+    duplicado = Inscripcion.query.filter_by(
+        id_torneo=id_torneo_nuevo,
+        id_equipo=inscripcion.id_equipo,
+        id_categoria=id_categoria_nueva
+    ).first()
+
+    if duplicado and duplicado.id_inscripcion != id_inscripcion:
+        raise ValueError('El equipo ya está inscrito en el torneo y categoría seleccionados.')
+
+    old_id_torneo = inscripcion.id_torneo
+    old_id_categoria = inscripcion.id_categoria
+
+    inscripcion.id_torneo = id_torneo_nuevo
+    inscripcion.id_categoria = id_categoria_nueva
+
+    # Reasignar plantillas
+    Plantilla.query.filter_by(
+        id_equipo=inscripcion.id_equipo,
+        id_torneo=old_id_torneo,
+        id_categoria=old_id_categoria
+    ).update({
+        'id_torneo': id_torneo_nuevo,
+        'id_categoria': id_categoria_nueva
+    }, synchronize_session=False)
+
+    db.session.commit()
+    return inscripcion
+

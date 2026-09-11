@@ -91,9 +91,9 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
   const watchMarcadorLocal = watch('marcador_local') || 0;
   const watchMarcadorVisitante = watch('marcador_visitante') || 0;
 
-  // Cálculos de balance (Según requerimiento: Puntos Normales + Triples * 3 deben coincidir con el marcador)
-  const totalPuntosLocal = useMemo(() => watchStatsLocal.reduce((sum, r) => sum + (Number(r.puntos) || 0) + ((Number(r.triples) || 0) * 3), 0), [watchStatsLocal]);
-  const totalPuntosVisitante = useMemo(() => watchStatsVisitante.reduce((sum, r) => sum + (Number(r.puntos) || 0) + ((Number(r.triples) || 0) * 3), 0), [watchStatsVisitante]);
+  // Cálculos de balance (Según requerimiento: Total Puntos deben coincidir con el marcador)
+  const totalPuntosLocal = useMemo(() => watchStatsLocal.reduce((sum, r) => sum + (Number(r.puntos) || 0), 0), [watchStatsLocal]);
+  const totalPuntosVisitante = useMemo(() => watchStatsVisitante.reduce((sum, r) => sum + (Number(r.puntos) || 0), 0), [watchStatsVisitante]);
   
   const isBalancedLocal = totalPuntosLocal === watchMarcadorLocal;
   const isBalancedVisitante = totalPuntosVisitante === watchMarcadorVisitante;
@@ -280,7 +280,7 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
 
                   {/* Balance Local (Movido arriba) */}
                   <div className={`px-4 py-2 border-b flex items-center justify-between text-sm ${isBalancedLocal ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
-                    <span className="font-medium">Total puntos + Triples: <strong>{totalPuntosLocal}</strong></span>
+                    <span className="font-medium">Total puntos: <strong>{totalPuntosLocal}</strong></span>
                     {isBalancedLocal ? (
                       <span className="font-bold flex items-center gap-1">¡Balance Correcto!</span>
                     ) : (
@@ -297,7 +297,7 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
                           <tr>
                             <th className="px-3 py-2 font-semibold">#</th>
                             <th className="px-3 py-2 font-semibold">Jugador</th>
-                            <th className="px-2 py-2 text-center" title="Puntos (Dobles/Libres)">Puntos</th>
+                            <th className="px-2 py-2 text-center" title="Puntos Totales">Puntos</th>
                             <th className="px-2 py-2 text-center" title="Triples">Triples</th>
                             <th className="px-2 py-2 text-center" title="Tiros Libres Anotados">Tiros Libres</th>
                             <th className="px-2 py-2 text-center" title="Rebotes">Rebotes</th>
@@ -336,7 +336,7 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
 
                   {/* Balance Visitante (Movido arriba) */}
                   <div className={`px-4 py-2 border-b flex items-center justify-between text-sm ${isBalancedVisitante ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
-                    <span className="font-medium">Total puntos + Triples: <strong>{totalPuntosVisitante}</strong></span>
+                    <span className="font-medium">Total puntos: <strong>{totalPuntosVisitante}</strong></span>
                     {isBalancedVisitante ? (
                       <span className="font-bold flex items-center gap-1">¡Balance Correcto!</span>
                     ) : (
@@ -353,7 +353,7 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
                           <tr>
                             <th className="px-3 py-2 font-semibold">#</th>
                             <th className="px-3 py-2 font-semibold">Jugador</th>
-                            <th className="px-2 py-2 text-center" title="Puntos (Dobles/Libres)">Puntos</th>
+                            <th className="px-2 py-2 text-center" title="Puntos Totales">Puntos</th>
                             <th className="px-2 py-2 text-center" title="Triples">Triples</th>
                             <th className="px-2 py-2 text-center" title="Tiros Libres Anotados">Tiros Libres</th>
                             <th className="px-2 py-2 text-center" title="Rebotes">Rebotes</th>

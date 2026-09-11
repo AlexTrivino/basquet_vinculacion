@@ -61,6 +61,14 @@ export const updateJugador = async (id: number, data: UpdateJugadorPayload) => {
 };
 
 /**
+ * Crea un nuevo jugador de forma independiente.
+ */
+export const createJugador = async (data: UpdateJugadorPayload) => {
+  const response = await api.post<ApiResponse<Jugador>>('/jugadores', data);
+  return response.data;
+};
+
+/**
  * Sube la foto de perfil de un jugador.
  */
 export const uploadFotoJugador = async (id: number, file: File) => {

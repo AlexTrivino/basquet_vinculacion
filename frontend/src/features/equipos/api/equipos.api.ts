@@ -51,6 +51,11 @@ export async function updateInscripcionEstado(id: number, estado: 'aprobado' | '
   return response.data;
 }
 
+export async function editarInscripcion(id: number, data: { id_torneo: number; id_categoria: number }): Promise<ApiResponse<Inscripcion>> {
+  const response = await axiosInstance.patch(`/inscripciones/${id}/editar`, data);
+  return response.data;
+}
+
 export async function retirarEquipo(id: number): Promise<ApiResponse<Inscripcion>> {
   const response = await axiosInstance.put(`/inscripciones/${id}/retirar`);
   return response.data;

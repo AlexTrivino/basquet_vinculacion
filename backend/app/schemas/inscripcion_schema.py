@@ -74,6 +74,12 @@ class InscripcionEstadoSchema(Schema):
     )
 
 
+class InscripcionEditarSchema(Schema):
+    """Validación para la edición de torneo y categoría por parte del Admin (PATCH)."""
+    id_torneo = fields.Integer(required=True)
+    id_categoria = fields.Integer(required=True)
+
+
 # ── Schemas de salida (DTO) ───────────────────────────────────────
 
 class InscripcionPublicSchema(Schema):

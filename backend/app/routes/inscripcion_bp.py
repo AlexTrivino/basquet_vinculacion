@@ -16,6 +16,7 @@ from app.schemas.inscripcion_schema import (
     InscripcionEstadoSchema,
     InscripcionPublicSchema,
     InscripcionReinscribirSchema,
+    InscripcionEditarSchema,
 )
 from app.services import inscripcion_service
 from app.utils.auth_middleware import token_required
@@ -35,6 +36,7 @@ _admin_many = InscripcionAdminSchema(many=True)
 _create_schema = InscripcionCreateSchema()
 _reinscribir_schema = InscripcionReinscribirSchema()
 _estado_schema = InscripcionEstadoSchema()
+_editar_schema = InscripcionEditarSchema()
 
 
 # ── GET /api/inscripciones/publicas ───────────────────────────────
@@ -221,6 +223,39 @@ def cambiar_estado(id_inscripcion):
         data=_admin_schema.dump(inscripcion),
         message=f"Estado actualizado a '{data['estado_inscripcion']}' exitosamente.",
     )
+
+
+# ── PATCH /api/inscripciones/<id>/editar ─────────────────────────
+
+@inscripcion_bp.route('/<int:id_inscripcion>/editar', methods=['PATCH'])
+@token_required(allowed_roles=['super_admin'])
+def editar_inscripcion(id_inscripcion):
+    """Permite al admin editar el torneo y categoría de una inscripción.
+    Reasigna automáticamente las plantillas al nuevo torneo/categoría.
+    Solo permitido si el torneo actual y el nuevo no están en curso/finalizados.
+    """
+    json_data = request.get_json(silent=True)
+    if json_data is None:
+        return api_error('BAD_REQUEST', 'El cuerpo de la solicitud debe ser JSON válido.', 400)
+
+    try:
+        data = _editar_schema.load(json_data)
+    except ValidationError as err:
+        return api_error('VALIDATION_ERROR', err.messages, 422)
+
+    try:
+        inscripcion = inscripcion_service.editar_inscripcion_admin(
+            id_inscripcion, data['id_torneo'], data['id_categoria']
+        )
+        return api_response(
+            data=_admin_schema.dump(inscripcion),
+            message='Inscripción y plantillas actualizadas exitosamente.',
+        )
+    except ValueError as e:
+        return api_error('VALIDATION_ERROR', str(e), 400)
+    except Exception as e:
+        current_app.logger.exception(f"Error al editar inscripción {id_inscripcion}: {e}")
+        return api_error('SERVER_ERROR', 'Ocurrió un error inesperado al editar la inscripción.', 500)
 
 
 # ── DELETE /api/inscripciones/<id> ───────────────────────────────

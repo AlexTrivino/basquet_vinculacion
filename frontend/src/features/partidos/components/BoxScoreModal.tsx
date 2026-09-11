@@ -24,23 +24,45 @@ const columns: Column<any>[] = [
   },
   {
     key: 'puntos_anotados',
-    header: 'Pts',
+    header: 'Puntos',
+    headerClassName: 'text-center',
+    cellClassName: 'text-center',
     render: (row) => <span className="font-bold text-gray-900">{row.puntos_anotados}</span>
   },
   {
     key: 'triples_anotados',
-    header: '3P',
+    header: 'Triples',
+    headerClassName: 'text-center',
+    cellClassName: 'text-center',
     render: (row) => <span className="text-gray-700">{row.triples_anotados}</span>
   },
   {
+    key: 'tiros_libres_anotados',
+    header: 'Tiros Libres',
+    headerClassName: 'text-center',
+    cellClassName: 'text-center',
+    render: (row) => <span className="text-gray-700">{row.tiros_libres_anotados}</span>
+  },
+  {
+    key: 'rebotes',
+    header: 'Rebotes',
+    headerClassName: 'text-center',
+    cellClassName: 'text-center',
+    render: (row) => <span className="text-gray-700">{row.rebotes}</span>
+  },
+  {
     key: 'asistencias',
-    header: 'Ast',
+    header: 'Asistencias',
+    headerClassName: 'text-center',
+    cellClassName: 'text-center',
     render: (row) => <span className="text-gray-700">{row.asistencias}</span>
   },
   {
-    key: 'faltas_cometidas',
-    header: 'Faltas',
-    render: (row) => <span className="text-gray-700">{row.faltas_cometidas}</span>
+    key: 'tapones',
+    header: 'Tapones',
+    headerClassName: 'text-center',
+    cellClassName: 'text-center',
+    render: (row) => <span className="text-gray-700">{row.tapones}</span>
   }
 ];
 
@@ -54,7 +76,7 @@ export function BoxScoreModal({ idPartido, equipoLocal, equipoVisitante, onClose
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden relative">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-[95vw] max-h-[90vh] flex flex-col overflow-hidden relative">
         <div className="bg-primary-900 px-6 py-4 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2 text-white">
             <Activity className="w-5 h-5" />
@@ -80,7 +102,7 @@ export function BoxScoreModal({ idPartido, equipoLocal, equipoVisitante, onClose
               <Skeleton className="h-48 w-full rounded-xl" />
             </div>
           ) : (
-            <div className="flex flex-col gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Local */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="bg-gray-100 px-4 py-3 border-b border-gray-200">

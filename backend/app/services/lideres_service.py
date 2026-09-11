@@ -24,7 +24,7 @@ def obtener_lideres_estadisticos(id_torneo: int, id_categoria: int = None, limit
             Jugador.url_foto.label('url_foto_jugador'),
             Equipo.nombre_equipo,
             func.count(func.distinct(Partido.id_partido)).label('partidos_jugados'),
-            func.sum(Estadistica.puntos_anotados + (Estadistica.triples_anotados * 3)).label('puntos_totales'),
+            func.sum(Estadistica.puntos_anotados).label('puntos_totales'),
             func.sum(Estadistica.triples_anotados).label('triples_totales'),
             func.sum(Estadistica.rebotes).label('rebotes_totales'),
             func.sum(Estadistica.asistencias).label('asistencias_totales'),

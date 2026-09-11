@@ -108,7 +108,7 @@ export function LideresEstadisticos({ torneoId, idCategoria }: LideresEstadistic
                         </div>
                         <div>
                           <Link 
-                            to={`/jugador/${jugador.id_jugador}`} 
+                            to={`/jugadores/${jugador.id_jugador}`} 
                             className="font-bold text-primary-700 hover:text-primary-800 uppercase flex items-center gap-1 group/link transition-colors"
                           >
                             {jugador.nombre}

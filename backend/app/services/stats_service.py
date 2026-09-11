@@ -85,7 +85,7 @@ def procesar_estadisticas_bulk(data: dict, usuario_id: str, usuario_rol: str) ->
         )
 
     # ── Validación 4: Verificación matemática del marcador ────────
-    total_puntos_payload = sum(entry['puntos'] + (entry.get('triples', 0) * 3) for entry in jugadores_payload)
+    total_puntos_payload = sum(entry['puntos'] for entry in jugadores_payload)
     if id_equipo == partido.id_equipo_local:
         marcador_oficial = partido.marcador_local
     else:

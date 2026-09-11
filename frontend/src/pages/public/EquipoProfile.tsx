@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from 'react';
+import { useRef, useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { StatusBadge } from '../../components/StatusBadge';
@@ -58,6 +58,7 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
   const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
   const [torneoRosterFiltro, setTorneoRosterFiltro] = useState<string>('todos');
   const [categoriaRosterFiltro, setCategoriaRosterFiltro] = useState<string>('todas');
+  const [hasSetDefaultRoster, setHasSetDefaultRoster] = useState<boolean>(false);
   const [paginaParticipaciones, setPaginaParticipaciones] = useState<number>(1);
 
   // Queries
@@ -69,9 +70,15 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
   const equipo = equipoRes?.data;
 
   const { data: plantillasRes, isLoading: loadingPlantilla } = useQuery({
-    queryKey: ['plantillas', idEquipo],
-    queryFn: () => getPlantillas(idEquipo, 1, 1000),
-    enabled: !!idEquipo,
+    queryKey: ['plantillas', idEquipo, torneoRosterFiltro, categoriaRosterFiltro],
+    queryFn: () => getPlantillas(
+      idEquipo, 
+      1, 
+      200, 
+      torneoRosterFiltro !== 'todos' ? Number(torneoRosterFiltro) : undefined, 
+      categoriaRosterFiltro !== 'todas' ? Number(categoriaRosterFiltro) : undefined
+    ),
+    enabled: !!idEquipo && hasSetDefaultRoster,
   });
   const plantillas = plantillasRes?.data || [];
 
@@ -255,6 +262,31 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
     });
   }, [inscripciones]);
 
+  // ── Auto-seleccionar torneo más reciente y categoría alfabética ──
+  useEffect(() => {
+    if (participacionesOrdenadas.length > 0 && !hasSetDefaultRoster) {
+      const mostRecent = participacionesOrdenadas[0];
+      const tId = mostRecent.id_torneo || mostRecent.torneo?.id_torneo;
+      
+      if (tId) {
+        setTorneoRosterFiltro(String(tId));
+        
+        const categoriasParaTorneo = participacionesOrdenadas
+          .filter(p => String(p.id_torneo || p.torneo?.id_torneo) === String(tId))
+          .map(p => ({
+            id: p.id_categoria || p.categoria?.id_categoria,
+            nombre: p.categoria?.nombre_categoria || p.categoria?.nombre || ''
+          }))
+          .sort((a, b) => a.nombre.localeCompare(b.nombre));
+          
+        if (categoriasParaTorneo.length > 0 && categoriasParaTorneo[0].id) {
+          setCategoriaRosterFiltro(String(categoriasParaTorneo[0].id));
+        }
+      }
+      setHasSetDefaultRoster(true);
+    }
+  }, [participacionesOrdenadas, hasSetDefaultRoster]);
+
   // ── Paginación de Participaciones ───────────────────────────────
   const totalPaginasParticipaciones = Math.max(
     1,
@@ -299,18 +331,9 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
 
   // ── Plantillas filtradas para Roster ────────────────────────────
   const plantillasFiltradas = useMemo(() => {
-    let list = plantillas;
-    if (torneoRosterFiltro !== 'todos') {
-      list = list.filter((p: any) => String(p.id_torneo || p.torneo?.id_torneo) === String(torneoRosterFiltro));
-    }
-    
-    if (categoriaRosterFiltro !== 'todas') {
-      list = list.filter((p: any) => String(p.id_categoria || p.categoria?.id_categoria) === String(categoriaRosterFiltro));
-    }
-
-    // Deduplicar jugadores si está en 'todos'
+    // Ya vienen filtradas desde el servidor. Solo aplicamos deduplicación si estamos en vista global "histórica"
     const vistos = new Set<number>();
-    return list.filter((p) => {
+    return plantillas.filter((p) => {
       const jId = p.jugador?.id_jugador || p.id_jugador;
       if (!jId) return true;
       if (torneoRosterFiltro === 'todos' || categoriaRosterFiltro === 'todas') {
@@ -370,7 +393,7 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
             El equipo solicitado no existe o ha sido deshabilitado del sistema.
           </p>
           <Link
-            to="/directorio-equipos"
+            to="/equipos"
             className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-bold text-sm shadow-sm transition-all"
           >
             Volver al Directorio

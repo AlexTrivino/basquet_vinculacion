@@ -14,12 +14,14 @@ import {
   Check,
   Ban,
   Maximize2,
+  Edit2,
 } from 'lucide-react';
 import type { Inscripcion, Plantilla } from '../../../types/api.types';
 import { getPlantillas } from '../../plantillas/api/plantillas.api';
 import { StatusBadge } from '../../../components/StatusBadge';
 import { AsyncButton } from '../../../components/AsyncButton';
 import { ModalRechazarInscripcion } from './ModalRechazarInscripcion';
+import { ModalEditarInscripcion } from './ModalEditarInscripcion';
 
 interface ModalExpedienteInscripcionProps {
   isOpen: boolean;
@@ -59,6 +61,7 @@ export function ModalExpedienteInscripcion({
   isUpdating = false,
 }: ModalExpedienteInscripcionProps) {
   const [modalRechazarOpen, setModalRechazarOpen] = useState(false);
+  const [modalEditarOpen, setModalEditarOpen] = useState(false);
 
   const idEquipo = inscripcion?.equipo?.id_equipo || inscripcion?.equipo?.id || inscripcion?.id_equipo;
   const idTorneo = inscripcion?.torneo?.id_torneo || inscripcion?.torneo?.id || inscripcion?.id_torneo;
@@ -145,10 +148,22 @@ export function ModalExpedienteInscripcion({
             <div className="lg:col-span-4 space-y-6">
               {/* Tarjeta de Información General */}
               <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-5">
-                <h3 className="text-xs font-extrabold uppercase tracking-wider text-gray-500 flex items-center gap-2">
-                  <User className="w-4 h-4 text-primary-600" />
-                  Datos de la Solicitud
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-gray-500 flex items-center gap-2">
+                    <User className="w-4 h-4 text-primary-600" />
+                    Datos de la Solicitud
+                  </h3>
+                  {inscripcion.torneo?.estado !== 'en_curso' && inscripcion.torneo?.estado !== 'finalizado' && (
+                    <button
+                      onClick={() => setModalEditarOpen(true)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-primary-700 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors"
+                      title="Editar torneo y categoría"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                      Editar
+                    </button>
+                  )}
+                </div>
 
                 <div className="space-y-3.5 text-sm">
                   <div className="flex items-start justify-between border-b border-gray-100 pb-3">
@@ -485,6 +500,12 @@ export function ModalExpedienteInscripcion({
         onConfirm={handleConfirmRechazar}
         nombreEquipo={nombreEquipo}
         isLoading={isUpdating}
+      />
+
+      <ModalEditarInscripcion
+        isOpen={modalEditarOpen}
+        onClose={() => setModalEditarOpen(false)}
+        inscripcion={inscripcion}
       />
     </>
   );

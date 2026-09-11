@@ -83,7 +83,7 @@ def obtener_perfil_publico(id_jugador: int):
     # 2. Calcular Estadísticas Globales (toda la carrera)
     stats_globales = db.session.query(
         func.count(func.distinct(Estadistica.id_partido)).label('partidos'),
-        func.sum(Estadistica.puntos_anotados + (Estadistica.triples_anotados * 3)).label('puntos_totales'),
+        func.sum(Estadistica.puntos_anotados).label('puntos_totales'),
         func.sum(Estadistica.rebotes).label('rebotes_totales'),
         func.sum(Estadistica.asistencias).label('asistencias_totales'),
         func.sum(Estadistica.triples_anotados).label('triples_totales'),
@@ -112,7 +112,7 @@ def obtener_perfil_publico(id_jugador: int):
             Partido.id_torneo,
             Partido.id_categoria,
             func.count(func.distinct(Estadistica.id_partido)).label('partidos'),
-            func.sum(Estadistica.puntos_anotados + (Estadistica.triples_anotados * 3)).label('puntos_totales'),
+            func.sum(Estadistica.puntos_anotados).label('puntos_totales'),
             func.sum(Estadistica.rebotes).label('rebotes_totales'),
             func.sum(Estadistica.asistencias).label('asistencias_totales'),
             func.sum(Estadistica.triples_anotados).label('triples_totales'),
