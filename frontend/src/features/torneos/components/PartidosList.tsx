@@ -61,10 +61,11 @@ export function PartidosList({ torneoId, idCategoria, urlCalendario, categorias 
   const partidosGrouped = useMemo(() => {
     const groups: Record<string, any[]> = {};
     partidosSorted.forEach(p => {
-      if (!groups[p.fecha]) {
-        groups[p.fecha] = [];
+      const fecha = p.fecha || 'Sin fecha';
+      if (!groups[fecha]) {
+        groups[fecha] = [];
       }
-      groups[p.fecha].push(p);
+      groups[fecha].push(p);
     });
     return groups;
   }, [partidosSorted]);

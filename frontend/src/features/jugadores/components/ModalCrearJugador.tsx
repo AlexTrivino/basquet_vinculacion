@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,7 +21,7 @@ const crearJugadorSchema = z.object({
     const date = new Date(dateStr);
     return date < new Date();
   }, 'La fecha de nacimiento debe ser en el pasado'),
-  genero: z.enum(['masculino', 'femenino'], { required_error: 'Debe seleccionar un género' }),
+  genero: z.enum(['masculino', 'femenino'], { errorMap: () => ({ message: 'Debe seleccionar un género' }) }),
   correo: z.string().email('Debe ser un correo electrónico válido').or(z.literal('')),
   telefono: z.string().regex(/^\d{10}$/, 'El teléfono debe contener exactamente 10 dígitos numéricos').or(z.literal('')),
 });
@@ -73,6 +73,9 @@ export function ModalCrearJugador({ isOpen, onClose }: ModalCrearJugadorProps) {
       };
       const res = await createJugador(payload);
       const nuevoJugador = res.data;
+      if (!nuevoJugador) {
+        throw new Error("No se devolvieron datos del jugador creado");
+      }
       const idJugador = nuevoJugador.id_jugador || nuevoJugador.id;
 
       if (!idJugador) {
