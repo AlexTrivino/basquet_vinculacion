@@ -21,7 +21,7 @@ const crearJugadorSchema = z.object({
     const date = new Date(dateStr);
     return date < new Date();
   }, 'La fecha de nacimiento debe ser en el pasado'),
-  genero: z.enum(['masculino', 'femenino'], { errorMap: () => ({ message: 'Debe seleccionar un género' }) }),
+  genero: z.enum(['masculino', 'femenino'], { message: 'Debe seleccionar un género' }),
   correo: z.string().email('Debe ser un correo electrónico válido').or(z.literal('')),
   telefono: z.string().regex(/^\d{10}$/, 'El teléfono debe contener exactamente 10 dígitos numéricos').or(z.literal('')),
 });

@@ -319,4 +319,21 @@ Durante cualquier proceso de conexión entre el Frontend (React) y el Backend (F
    - Pruebas de integridad transaccional (rollback en fallo, prevención de duplicados vía `UniqueConstraint`).
    - Pruebas de reglas de negocio (límite de 3 equipos por delegado, rango de 10-18 jugadores por plantilla, deshabilitación de equipos).
 
+---
+
+## Prevención de Errores Comunes de Compilación (TypeScript / Zod)
+
+> [!WARNING]
+> **El CI/CD y Vite son estrictos en Producción.** Cualquier error de TypeScript hará fallar el comando `vite build` durante el despliegue (`deploy.sh`). Considera lo siguiente antes de dar por terminado un componente:
+
+1. **Variables y propiedades opcionales / `undefined`:**
+   - **Índices de diccionarios:** No uses propiedades de objetos que puedan ser `undefined` como llaves directas de diccionarios sin un fallback. (ej. **Error:** `groups[p.fecha] = []`. **Solución:** `const fecha = p.fecha || 'Sin fecha'; groups[fecha] = [];`).
+   - **Acceso a datos de API (`res.data`):** Valida que el dato exista antes de acceder a sus propiedades internas. (ej. `const obj = res.data; if (!obj) throw new Error(...); const id = obj.id;`).
+2. **Importaciones sin usar:**
+   - Limpia todos los imports no utilizados (como `import React` si no se usa para crear Refs o Contextos, Vite lanza `error TS6133`).
+3. **Sintaxis Correcta de Zod (`z.enum`):**
+   - El método `z.enum()` NO acepta `{ required_error: '...' }` como segundo argumento en versiones recientes.
+   - **Error:** `z.enum(['a', 'b'], { required_error: 'Error' })` o `z.enum(['a', 'b'], { errorMap: () => ({ message: 'Error' }) })`
+   - **Solución Correcta:** `z.enum(['a', 'b'], { message: 'Error' })` o `{ error: 'Error' }`
+
 
