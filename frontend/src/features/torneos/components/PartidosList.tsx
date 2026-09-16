@@ -267,7 +267,7 @@ export function PartidosList({ torneoId, idCategoria, urlCalendario, categorias 
                               
                               {partido.categoria?.nombre_categoria && (
                                 <span className={`text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${catColor.bg} ${catColor.border} ${catColor.text}`}>
-                                  {partido.categoria.nombre_categoria}
+                                  {partido.categoria.nombre_categoria} {partido.categoria.genero_categoria ? `(${partido.categoria.genero_categoria})` : ''}
                                 </span>
                               )}
 
