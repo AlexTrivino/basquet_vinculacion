@@ -111,7 +111,7 @@ export async function deleteBannerEquipo(id: number): Promise<ApiResponse<null>>
 }
 
 export async function getInscripcionesPublicas(idTorneo?: number, idEquipo?: number): Promise<ApiResponse<Inscripcion[]>> {
-  const params: any = {};
+  const params: any = { per_page: 200 };
   if (idTorneo) params.id_torneo = idTorneo;
   if (idEquipo) params.id_equipo = idEquipo;
   const response = await axiosInstance.get('/inscripciones/publicas', { params });

@@ -284,8 +284,10 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
         }
       }
       setHasSetDefaultRoster(true);
+    } else if (!loadingInscripciones && participacionesOrdenadas.length === 0 && !hasSetDefaultRoster) {
+      setHasSetDefaultRoster(true);
     }
-  }, [participacionesOrdenadas, hasSetDefaultRoster]);
+  }, [participacionesOrdenadas, hasSetDefaultRoster, loadingInscripciones]);
 
   // ── Paginación de Participaciones ───────────────────────────────
   const totalPaginasParticipaciones = Math.max(
@@ -552,7 +554,7 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
 
             <div className="bg-white px-4 py-2.5 rounded-2xl border border-gray-200 shadow-2xs text-center min-w-[90px]">
               <span className="block text-2xl font-black text-gray-900 leading-none">
-                {plantillas.length}
+                {plantillasFiltradas.length}
               </span>
               <span className="text-2xs sm:text-xs font-bold text-gray-500 uppercase tracking-wider mt-0.5 block">
                 Plantilla

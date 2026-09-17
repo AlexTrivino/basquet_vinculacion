@@ -188,7 +188,7 @@ npm test -- --run
 
 | Rol | Alcance y Vistas |
 |---|---|
-| **Público** | Landing page, explorador de torneos, tablas de posiciones en vivo, calendario de partidos, líderes de anotación y carrusel de auspiciantes. |
+| **Público** | Landing page, explorador de torneos y equipos (con filtros por categorías), tablas de posiciones en vivo, calendario de partidos, líderes de anotación y carrusel de auspiciantes. |
 | **Delegado** | Dashboard de control de equipos, wizard de inscripción con subida de comprobantes, gestor integral de plantilla con asignación de dorsales y documentos. |
 | **Super Admin** | Panel de administración global, auditoría dual con visor de comprobantes (Aprobar/Rechazar), fixture y programación de partidos, registro de estadísticas en acta digital. |
 

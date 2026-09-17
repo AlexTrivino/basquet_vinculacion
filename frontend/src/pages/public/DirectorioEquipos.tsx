@@ -8,6 +8,7 @@ import { Trophy } from 'lucide-react';
 
 export default function DirectorioEquipos() {
   const [selectedTorneo, setSelectedTorneo] = useState<number | ''>('');
+  const [selectedCategoria, setSelectedCategoria] = useState<number | 'todas'>('todas');
 
   const { data: torneosRes, isLoading: loadingTorneos } = useQuery({
     queryKey: ['torneos', 'public'],
@@ -30,12 +31,34 @@ export default function DirectorioEquipos() {
     }
   }, [torneos, selectedTorneo]);
 
+  useEffect(() => {
+    setSelectedCategoria('todas');
+  }, [selectedTorneo]);
+
   const { data: inscripcionesRes, isLoading: loadingInscripciones } = useQuery({
     queryKey: ['inscripciones-publicas', selectedTorneo],
     queryFn: () => getInscripcionesPublicas(Number(selectedTorneo)),
     enabled: selectedTorneo !== '',
   });
-  const inscripciones = (inscripcionesRes?.data || []).filter(ins => ins.estado_inscripcion === 'aprobado');
+
+  const categoriasDisponibles = useMemo(() => {
+    if (!inscripcionesRes?.data) return [];
+    const cats = new Map();
+    inscripcionesRes.data.forEach(ins => {
+      if (ins.estado_inscripcion === 'aprobado' && ins.categoria) {
+        cats.set(ins.categoria.id_categoria, ins.categoria);
+      }
+    });
+    return Array.from(cats.values()).sort((a, b) => a.nombre_categoria.localeCompare(b.nombre_categoria));
+  }, [inscripcionesRes?.data]);
+
+  const inscripciones = useMemo(() => {
+    const aprobadas = (inscripcionesRes?.data || []).filter(ins => ins.estado_inscripcion === 'aprobado');
+    if (selectedCategoria !== 'todas') {
+      return aprobadas.filter(ins => ins.categoria?.id_categoria === selectedCategoria);
+    }
+    return aprobadas;
+  }, [inscripcionesRes?.data, selectedCategoria]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -51,8 +74,8 @@ export default function DirectorioEquipos() {
         </div>
 
         {/* Filters */}
-        <div className="flex justify-center mb-10">
-          <div className="w-full max-w-md">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-10 max-w-3xl mx-auto">
+          <div className="w-full sm:w-1/2">
             {loadingTorneos ? (
               <Skeleton className="h-12 w-full rounded-xl" />
             ) : (
@@ -66,6 +89,33 @@ export default function DirectorioEquipos() {
                   {torneos.map((t) => (
                     <option key={t.id_torneo} value={t.id_torneo}>
                       {t.nombre} {t.estado === 'en_curso' ? '🔥 (En Curso)' : t.estado === 'programado' ? '⏳ (Próximo)' : '🏆 (Finalizado)'}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="w-full sm:w-1/2">
+            {loadingTorneos ? (
+              <Skeleton className="h-12 w-full rounded-xl" />
+            ) : (
+              <div className="relative">
+                <select
+                  value={selectedCategoria}
+                  onChange={(e) => setSelectedCategoria(e.target.value === 'todas' ? 'todas' : Number(e.target.value))}
+                  disabled={selectedTorneo === ''}
+                  className="block w-full pl-4 pr-10 py-3 text-base font-semibold text-gray-800 border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-xl shadow-sm appearance-none bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50"
+                >
+                  <option value="todas">Todas las categorías</option>
+                  {categoriasDisponibles.map((c) => (
+                    <option key={c.id_categoria} value={c.id_categoria}>
+                      {c.nombre_categoria} ({c.genero_categoria})
                     </option>
                   ))}
                 </select>
