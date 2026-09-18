@@ -14,8 +14,8 @@ El proyecto utiliza una **arquitectura desacoplada y feature-driven** con tres c
 ┌─────────────────────────┐       JWT        ┌─────────────────────────┐     SQLAlchemy     ┌─────────────────────────┐
 │                         │  ─────────────►  │                         │  ───────────────►  │                         │
 │   React 18 + TypeScript │                  │   Flask 3.1 REST API    │                    │   Supabase              │
-│   Vite + Tailwind CSS   │  ◄─────────────  │   (Python 3.11+)        │  ◄───────────────  │   PostgreSQL            │
-│   (Vercel)              │     JSON Resp    │   (Render)              │     Query Results  │   Auth · Storage (S3)   │
+│   Vite + Tailwind CSS   │  ◄─────────────  │   (Python 3.12)         │  ◄───────────────  │   PostgreSQL            │
+│   (Nginx — estáticos)   │     JSON Resp    │   (Gunicorn + SystemD)  │     Query Results  │   Auth · Storage (S3)   │
 └────────────┬────────────┘                  └─────────────────────────┘                    └─────────────────────────┘
              │                                                                                          ▲
              │                    Supabase Auth (Login, Sesión, Recuperación)                           │
@@ -24,8 +24,8 @@ El proyecto utiliza una **arquitectura desacoplada y feature-driven** con tres c
 
 | Capa | Tecnología | Responsabilidad | Despliegue |
 |------|-----------|-----------------|------------|
-| **Frontend** | React 18 + TypeScript + Vite + Tailwind CSS | UI/UX responsiva, gestión de estado con React Query y Context API, formularios con React Hook Form + Zod | Vercel |
-| **Backend** | Python 3.11+ / Flask 3.1 + SQLAlchemy 2.0 | API REST, lógica de negocio, validación JWT (JWKS + HS256), motor estadístico FIBA, control de accesos RBAC y almacenamiento en S3 | Render (Gunicorn) |
+| **Frontend** | React 18 + TypeScript + Vite + Tailwind CSS | UI/UX responsiva, gestión de estado con React Query y Context API, formularios con React Hook Form + Zod | Ubuntu Server (Nginx — archivos estáticos) |
+| **Backend** | Python 3.12 / Flask 3.1 + SQLAlchemy 2.0 | API REST, lógica de negocio, validación JWT (JWKS + HS256), motor estadístico FIBA, control de accesos RBAC y almacenamiento en S3 | Ubuntu Server (Gunicorn + SystemD) |
 | **BaaS** | Supabase | PostgreSQL, GoTrue Auth (email/password), Storage S3 (vía boto3 sin tocar disco) | Supabase Cloud |
 
 ### Flujo de Datos y Seguridad

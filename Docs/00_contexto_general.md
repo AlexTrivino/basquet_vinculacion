@@ -1,15 +1,27 @@
 # Contexto General del Proyecto
 
 ## Propósito
-Plataforma Integral para la Gestión de Torneos de Baloncesto. El sistema permite a fanáticos ver resultados públicos, a delegados inscribir equipos y gestionar plantillas, y a super administradores controlar la auditoría de inscripciones, programación de partidos y carga de estadísticas.
+Plataforma integral para la gestión de torneos de baloncesto del Campeonato Intercolegial Exalumnos Salesianos de Manta. El sistema permite a:
+- **Fanáticos/Público:** Ver resultados, posiciones, calendario y estadísticas de los torneos en tiempo real.
+- **Delegados:** Inscribir equipos, gestionar plantillas de jugadores y subir documentación.
+- **Super Administradores:** Auditar inscripciones, programar partidos, registrar estadísticas y generar reportes FIBA.
 
-## Rol del Agente Ejecutor (AGY CLI)
-El agente ejecutor asume el rol de **Tech Lead & Senior Full-Stack Developer**. Toda acción debe ser atómica, funcional y respetar la base del proyecto sin crear regresiones.
+## Proyecto de Vinculación
+Desarrollado como parte del programa de vinculación con la comunidad de la Universidad Laica Eloy Alfaro de Manabí (ULEAM).
 
-## Reglas Estrictas de Desarrollo (Obligatorias)
+---
 
-1. **Principio YAGNI y SOLID:** Prohibida la sobre-ingeniería. No se escriben abstracciones ni código "por si acaso". Todo código debe responder a un requerimiento funcional actual.
-2. **Arquitectura Feature-Driven (Frontend):** Todo el dominio de negocio debe encapsularse en `src/features/<dominio>/`. Prohibido el uso de estructuras planas o almacenar lógica de negocio pesada en `src/pages`.
-3. **Validaciones en Espejo:** El frontend (Zod + React Hook Form) debe tener esquemas de validación **idénticos** a los del backend (Marshmallow) para evitar round-trips innecesarios a la API.
-4. **Tailwind CSS Estricto:** Uso de clases utilitarias de Tailwind. Variables CSS inyectadas dinámicamente solo para la paleta de colores de cada torneo.
-5. **No asunciones de datos:** Nunca asumir la forma de un JSON en el frontend. Siempre contrastar con `backend/app/schemas/`.
+## Principios de Desarrollo
+
+1. **YAGNI y SOLID:** Prohibida la sobre-ingeniería. Todo código responde a un requerimiento funcional real.
+2. **Feature-Driven (Frontend):** El dominio de negocio se encapsula en `src/features/<dominio>/`. Prohibido almacenar lógica pesada en `src/pages/`.
+3. **Validaciones en Espejo:** Los esquemas de validación del frontend (Zod) deben ser idénticos a los del backend (Marshmallow).
+4. **No Asumir Datos:** Nunca asumir la forma de un JSON. Siempre contrastar con `backend/app/schemas/` antes de escribir código frontend.
+5. **Cero Cambios Destructivos:** El backend tiene protecciones activas contra operaciones destructivas en la base de datos de producción.
+
+## Para Empezar
+
+1. Leer [`02_estado_proyecto.md`](02_estado_proyecto.md) para entender dónde está el proyecto.
+2. Leer [`01_arquitectura.md`](01_arquitectura.md) para entender el stack y la autenticación.
+3. Revisar la [Referencia de la API](05_Historial_y_Academia/Backend_docs/api_referencia.md) para conocer los endpoints.
+4. Consultar el [`README.md`](../README.md) en la raíz para instrucciones de instalación local.
