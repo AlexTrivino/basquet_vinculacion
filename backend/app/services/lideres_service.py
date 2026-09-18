@@ -33,7 +33,7 @@ def obtener_lideres_estadisticos(id_torneo: int, id_categoria: int = None, limit
         )
         .join(Partido, Estadistica.id_partido == Partido.id_partido)
         .join(Jugador, Estadistica.id_jugador == Jugador.id_jugador)
-        .join(Plantilla, (Plantilla.id_jugador == Jugador.id_jugador) & (Plantilla.id_torneo == Partido.id_torneo))
+        .join(Plantilla, (Plantilla.id_jugador == Jugador.id_jugador) & (Plantilla.id_torneo == Partido.id_torneo) & (Plantilla.id_categoria == Partido.id_categoria))
         .join(Equipo, Plantilla.id_equipo == Equipo.id_equipo)
         .filter(Partido.id_torneo == id_torneo)
         .filter(Partido.estado.in_(['finalizado', 'finalizado_wo']))

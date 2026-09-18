@@ -78,7 +78,7 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
         asistencias: p.asistencias || 0,
         tapones: p.tapones || 0,
         tiros_libres_anotados: p.tiros_libres_anotados || 0,
-      }));
+      })).sort((a, b) => a.dorsal - b.dorsal);
 
       replaceLocal(mapStats(boxScoreRes.data.local || []));
       replaceVisitante(mapStats(boxScoreRes.data.visitante || []));

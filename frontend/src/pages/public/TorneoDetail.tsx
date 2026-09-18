@@ -179,10 +179,10 @@ export default function TorneoDetail() {
             </div>
         )}
         
-        {id && activeCategoriaId && activeTab === 'calendario' && (
+        {id && activeTab === 'calendario' && (
           <PartidosList 
             torneoId={id} 
-            idCategoria={activeCategoriaId === 'todas' ? undefined : activeCategoriaId} 
+            idCategoria={undefined} 
             urlCalendario={torneo?.url_calendario_excel} 
             categorias={torneo?.categorias || []}
           />
