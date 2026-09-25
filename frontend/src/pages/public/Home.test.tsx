@@ -1,205 +1,99 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Home from './Home';
-import * as torneosApi from '../../features/torneos/api/torneos.api';
-import axiosInstance from '../../api/axios.config';
+import { getTorneos } from '../../features/torneos/api/torneos.api';
+import { getPartidos } from '../../features/partidos/api/partidos.api';
+import { getEquipos } from '../../features/equipos/api/equipos.api';
+import { getPatrocinadores } from '../../features/patrocinadores/api/patrocinadores.api';
 
 vi.mock('../../features/torneos/api/torneos.api');
-vi.mock('../../api/axios.config');
+vi.mock('../../features/partidos/api/partidos.api');
+vi.mock('../../features/equipos/api/equipos.api');
+vi.mock('../../features/patrocinadores/api/patrocinadores.api');
+vi.mock('@google/model-viewer', () => ({}));
+vi.mock('../../context/AuthContext', () => ({ useAuth: () => ({ userRole: null }) }));
 
-const mockTorneos = [
-  {
-    id_torneo: 1,
-    nombre: 'Copa Verano Manta 2026',
-    fecha_inicio: '2026-06-01',
-    fecha_fin: '2026-08-30',
-    estado: 'en_curso',
-    categorias: [
-      { id_categoria: 10, nombre_categoria: 'Senior Libre' },
-      { id_categoria: 11, nombre_categoria: 'Maxibasquet +35' },
-    ],
-  },
-  {
-    id_torneo: 2,
-    nombre: 'Liga Provincial 2026',
-    fecha_inicio: '2026-04-15',
-    fecha_fin: '2026-09-01',
-    estado: 'inscripcion',
-    categorias: [
-      { id_categoria: 12, nombre_categoria: 'Sub-21 Promesas' },
-    ],
-  },
-  {
-    id_torneo: 3,
-    nombre: 'Torneo Interclubes Costa 2025',
-    fecha_inicio: '2025-10-01',
-    fecha_fin: '2025-12-15',
-    estado: 'finalizado',
-    categorias: [
-      { id_categoria: 13, nombre_categoria: 'Abierta Masculino' },
-    ],
-  },
+const torneos = [
+  { id_torneo: 1, nombre: 'Copa Verano Manta 2026', fecha_inicio: '2026-06-01', fecha_fin: '2026-08-30', estado: 'en_curso', categorias: [{ id_categoria: 10, nombre_categoria: 'Senior Libre' }] },
+  { id_torneo: 2, nombre: 'Liga Provincial 2024', fecha_inicio: '2024-04-15', fecha_fin: '2024-09-01', estado: 'finalizado', categorias: [] },
 ];
 
-const mockPartidos = [
-  {
-    id_partido: 101,
-    id_torneo: 1,
-    fase: 'Jornada 1',
-    estado: 'finalizado',
-    marcador_local: 88,
-    marcador_visitante: 82,
-    fecha: '2026-06-10',
-    ubicacion: 'Coliseo Manta',
-    equipo_local: { id_equipo: 1, nombre_equipo: 'Delfines BC' },
-    equipo_visitante: { id_equipo: 2, nombre_equipo: 'Portoviejo Stars' },
-  },
-];
+const partidoFinalizado = {
+  id_partido: 101, estado: 'finalizado', marcador_local: 70, marcador_visitante: 82, fase: 'Final', fecha: '2024-08-30',
+  torneo: { id_torneo: 2 }, categoria: { nombre_categoria: 'Senior Libre' },
+  equipo_local: { id_equipo: 1, nombre_equipo: 'Delfines BC' },
+  equipo_visitante: { id_equipo: 2, nombre_equipo: 'Portoviejo Stars' },
+};
 
-function renderWithProviders(ui: React.ReactElement) {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  });
+const partidoProgramado = {
+  id_partido: 102, estado: 'programado', marcador_local: 0, marcador_visitante: 0, fase: 'Jornada 1', fecha: '2099-01-10', hora: '19:00:00',
+  torneo: { id_torneo: 1 }, equipo_local: { id_equipo: 3, nombre_equipo: 'Manta Bulls' }, equipo_visitante: { id_equipo: 4, nombre_equipo: 'Tiburones de Manta' },
+};
 
+function renderHome() {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>{ui}</BrowserRouter>
+      <BrowserRouter>
+        <Home />
+      </BrowserRouter>
     </QueryClientProvider>
   );
 }
 
-describe('Home Page', () => {
+describe('Home (página de inicio)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(torneosApi.getTorneos).mockResolvedValue({
-      success: true,
-      message: 'Torneos obtenidos',
-      data: mockTorneos as any,
-    });
-
-    vi.mocked(axiosInstance.get).mockResolvedValue({
-      data: {
-        success: true,
-        data: mockPartidos,
-      },
+    vi.mocked(getTorneos).mockResolvedValue({ success: true, message: '', data: torneos, pagination: { page: 1, per_page: 50, total: 2, pages: 1 } } as never);
+    vi.mocked(getEquipos).mockResolvedValue({ success: true, message: '', data: [], pagination: { page: 1, per_page: 1, total: 7, pages: 7 } } as never);
+    vi.mocked(getPatrocinadores).mockResolvedValue([{ id_patrocinador: 1, nombre_patrocinador: 'Nike Ecuador', url_logo_patrocinador: '/n.png' }] as never);
+    vi.mocked(getPartidos).mockImplementation(async (params) => {
+      if (params?.estados === 'programado') return { success: true, message: '', data: [partidoProgramado] } as never;
+      return { success: true, message: '', data: [partidoFinalizado], pagination: { page: 1, per_page: 1, total: 12, pages: 12 } } as never;
     });
   });
 
-  it('renderiza el título principal y el badge de torneo activo', async () => {
-    renderWithProviders(<Home />);
+  it('arma las secciones en el orden pedido', async () => {
+    const { container } = renderHome();
 
-    expect(
-      screen.getByRole('heading', { name: /Torneos Baloncesto Manta/i, level: 1 })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /Torneos Baloncesto Manta/i })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Nuestros auspiciantes' })).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(screen.getByText(/En Juego:/i)).toBeInTheDocument();
-    });
+    const orden = [...container.querySelectorAll('main > section[id], main > footer[id]')].map((el) => el.id);
+    expect(orden).toEqual(['inicio', 'auspiciantes', 'conocenos', 'partidos', 'unete', 'contacto']);
+    expect(screen.getByRole('link', { name: '+593 98 962 9870' })).toHaveAttribute('href', 'tel:+593989629870');
   });
 
-  it('autogenera las pestañas para los 2 años más recientes (2026 y 2025)', async () => {
-    renderWithProviders(<Home />);
+  it('el carrusel del hero pasa al siguiente torneo al completar los 10 s', async () => {
+    renderHome();
 
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /Torneos 2026/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Torneos 2025/i })).toBeInTheDocument();
-    });
-
-    // Por defecto muestra los del año más reciente (2026) en las tarjetas
-    expect(
-      screen.getByRole('heading', { name: 'Copa Verano Manta 2026', level: 3 })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { name: 'Liga Provincial 2026', level: 3 })
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('heading', { name: 'Torneo Interclubes Costa 2025', level: 3 })
-    ).not.toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 2, name: 'Copa Verano Manta 2026' })).toBeInTheDocument();
+    // jsdom no define AnimationEvent, así que React escucha la variante con prefijo webkit
+    fireEvent(screen.getByTestId('progreso-carrusel'), new Event('webkitAnimationEnd', { bubbles: true }));
+    expect(await screen.findByRole('heading', { level: 2, name: 'Liga Provincial 2024' })).toBeInTheDocument();
   });
 
-  it('cambia reactivamente de año al hacer clic en la pestaña 2025', async () => {
-    renderWithProviders(<Home />);
+  it('muestra juntos los próximos partidos y los resultados, con el ganador marcado', async () => {
+    renderHome();
 
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /Torneos 2025/i })).toBeInTheDocument();
-    });
-
-    const tab2025 = screen.getByRole('button', { name: /Torneos 2025/i });
-    fireEvent.click(tab2025);
-
-    // Ahora debe mostrar la tarjeta de 2025 y ocultar las de 2026
-    await waitFor(() => {
-      expect(
-        screen.getByRole('heading', { name: 'Torneo Interclubes Costa 2025', level: 3 })
-      ).toBeInTheDocument();
-    });
-    expect(
-      screen.queryByRole('heading', { name: 'Copa Verano Manta 2026', level: 3 })
-    ).not.toBeInTheDocument();
+    const seccion = document.getElementById('partidos') as HTMLElement;
+    expect(await within(seccion).findByText('Manta Bulls')).toBeInTheDocument();
+    expect(await within(seccion).findByText('70')).toBeInTheDocument();
+    expect(within(seccion).getByText('82')).toBeInTheDocument();
+    // La cinta GANADOR va sobre el visitante, que ganó 82-70
+    const cinta = within(seccion)
+      .getAllByText('GANADOR')
+      .find((el) => el.tagName === 'SPAN' && el.getAttribute('aria-hidden') !== 'true');
+    expect(cinta?.parentElement).toHaveTextContent('Portoviejo Stars');
   });
 
-  it('muestra el tooltip para delegados al interactuar con inscripciones abiertas', async () => {
-    renderWithProviders(<Home />);
+  it('el CTA lleva al login cuando no hay sesión y muestra las cifras reales', async () => {
+    renderHome();
 
-    await waitFor(() => {
-      expect(screen.getByText(/INSCRIPCIONES ABIERTAS/i)).toBeInTheDocument();
-    });
-
-    const badgeInscripcion = screen.getByText(/INSCRIPCIONES ABIERTAS/i);
-    fireEvent.mouseEnter(badgeInscripcion);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(/Debes crear una cuenta o iniciar sesión como/i)
-      ).toBeInTheDocument();
-    });
-  });
-
-  it('muestra un mensaje de error accesible cuando falla la carga de torneos', async () => {
-    vi.mocked(torneosApi.getTorneos).mockRejectedValue(new Error('Network error'));
-
-    renderWithProviders(<Home />);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(/Error al cargar los torneos/i)
-      ).toBeInTheDocument();
-    });
-  });
-
-  it('muestra un EmptyState cuando la base de datos no contiene torneos', async () => {
-    vi.mocked(torneosApi.getTorneos).mockResolvedValue({
-      success: true,
-      message: 'Sin torneos',
-      data: [],
-    });
-
-    renderWithProviders(<Home />);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(/Sin torneos registrados/i)
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(/No hay torneos registrados para el año/i)
-      ).toBeInTheDocument();
-    });
-  });
-
-  it('renderiza el botón deshabilitado de archivo histórico con badge "Próximamente"', async () => {
-    renderWithProviders(<Home />);
-
-    await waitFor(() => {
-      const btnHistorico = screen.getByRole('button', { name: /Ver torneos anteriores/i });
-      expect(btnHistorico).toBeDisabled();
-      expect(screen.getByText(/Próximamente/i)).toBeInTheDocument();
-    });
+    expect(screen.getByRole('link', { name: 'Inscribir a mi equipo' })).toHaveAttribute('href', '/auth/login');
+    expect(await screen.findByText('7')).toBeInTheDocument();
+    expect(await screen.findByText('12')).toBeInTheDocument();
   });
 });
-

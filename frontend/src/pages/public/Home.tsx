@@ -1,18 +1,15 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { Trophy, History, CalendarDays } from 'lucide-react';
-import { getTorneos } from '../../features/torneos/api/torneos.api';
-import { agruparTorneosPorAniosRecientes } from '../../features/torneos/utils/torneoGrouping';
-import { ActiveTournamentBadge } from '../../features/torneos/components/ActiveTournamentBadge';
-import { TorneoCardHome } from '../../features/torneos/components/TorneoCardHome';
-import { PartidosRecientesSection } from '../../features/torneos/components/PartidosRecientesSection';
-import { Skeleton } from '../../components/Skeleton';
-import { EmptyState } from '../../components/EmptyState';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { SponsorsCarousel } from '../../components/SponsorsCarousel';
+import { Footer } from '../../components/Footer';
+import { HeroTorneos } from '../../features/landing/HeroTorneos';
+import { SeccionConocenos } from '../../features/landing/SeccionConocenos';
+import { Esquinas, SeccionPartidos } from '../../features/landing/SeccionPartidos';
 
 export default function Home() {
   const navigate = useNavigate();
+  const { userRole } = useAuth();
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -22,186 +19,74 @@ export default function Home() {
     }
   }, [navigate]);
 
-  const { data: response, isLoading, isError } = useQuery({
-    queryKey: ['torneos', 'public', 'todos'],
-    queryFn: () => getTorneos(1, 50),
-  });
-
-  const torneos = response?.data || [];
-
-  const [showAllYears, setShowAllYears] = useState(false);
-
-  const { aniosMostrados, torneosPorAnio, torneosActivos } = useMemo(() => {
-    return agruparTorneosPorAniosRecientes(torneos, showAllYears ? 100 : 2);
-  }, [torneos, showAllYears]);
-
-  const [selectedYear, setSelectedYear] = useState<number | null>(null);
-
-  // Determinar el año activo de forma reactiva (por defecto el año más reciente con torneos)
-  const activeYear =
-    selectedYear !== null && aniosMostrados.includes(selectedYear)
-      ? selectedYear
-      : aniosMostrados[0] ?? null;
-
-  const torneosDelAnioActivo = activeYear ? torneosPorAnio[activeYear] || [] : [];
+  const enlaceInscripcion = userRole === 'delegado' ? '/delegado/inscripcion' : '/auth/login';
 
   return (
-    <main className="min-h-screen bg-gray-50/50 pb-20">
-      {/* ═══════════════════════════════════════════════════════════════════
-          HERO SECTION: Banner Deportivo Enriquecido
-         ═══════════════════════════════════════════════════════════════════ */}
-      <section className="relative bg-gradient-to-br from-primary-950 via-primary-900 to-primary-800 text-white px-4 pt-16 pb-20 sm:px-6 lg:px-8 overflow-hidden shadow-md">
-        {/* Patrón de Cancha de Básquet Decorativo */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="home-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#home-grid)" />
-          </svg>
-        </div>
+    <main className="pagina-inicio relative isolate overflow-x-clip bg-marino text-slate-100">
+      <div aria-hidden="true" className="fondo-logo" />
 
-        {/* Glow deportivo sutil */}
-        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <HeroTorneos />
 
-        <div className="relative z-10 max-w-5xl mx-auto flex flex-col items-center text-center">
-          {/* Badge Intercalado de Torneo Activo */}
-          <div className="mb-6">
-            <ActiveTournamentBadge torneosActivos={torneosActivos} />
+      {/* ─── Auspiciantes: texto 30% · carrusel infinito 70% ─── */}
+      <section id="auspiciantes" className="relative z-10 scroll-mt-16 px-4 py-20 sm:px-6 lg:px-8">
+        {/* minmax(0, …): el carrusel es más ancho que la pantalla y no debe estirar la columna */}
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)]">
+          <div>
+            <h2 className="text-balance font-display text-3xl font-bold leading-tight text-crema">Nuestros auspiciantes</h2>
+            <p className="mt-4 leading-relaxed text-slate-300">
+              Empresas y marcas que respaldan el baloncesto de Manta y hacen posible cada temporada.
+            </p>
           </div>
+          <SponsorsCarousel className="rounded-2xl bg-white py-6 shadow-2xl shadow-black/30" />
+        </div>
+      </section>
 
-          {/* Logo y Títulos */}
-          <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 mb-6">
-            <img
-              src="/logo.png"
-              alt="Torneos Baloncesto Manta Logo"
-              className="h-40 w-40 sm:h-56 sm:w-56 object-contain hover:scale-105 transition-transform duration-300 drop-shadow-2xl"
-            />
-            <div className="text-center sm:text-left">
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">
-                Torneos Baloncesto Manta
-              </h1>
-              <p className="mt-2 text-base sm:text-xl font-medium text-primary-200 max-w-xl">
-                Desde el 2019 reactivando el baloncesto de la ciudad de Manta
+      <SeccionConocenos />
+
+      <SeccionPartidos />
+
+      {/* ─── CTA ─── */}
+      <section id="unete" className="relative z-10 scroll-mt-16 px-4 py-24 sm:px-6 lg:px-8">
+        {/* Mismo cartel que las tarjetas de partido: campo marino, filete y esquinas en oro */}
+        <div className="relative mx-auto max-w-6xl rounded-xl border border-oro/30 bg-marino-claro p-10 shadow-xl shadow-black/30 sm:p-14">
+          <Esquinas />
+          <div className="relative grid items-center gap-10 lg:grid-cols-[1.5fr_1fr]">
+            <div>
+              <h2 className="text-balance font-display text-3xl font-bold leading-tight text-crema sm:text-4xl">
+                ¿Tu equipo quiere jugar el próximo torneo?
+              </h2>
+              <p className="mt-4 max-w-xl leading-relaxed text-slate-300">
+                Inicia sesión como delegado para inscribir a tu equipo, cargar la nómina y seguir el estado de tu
+                inscripción. Y si quieres saber quién impulsa cada temporada, conoce a nuestros auspiciantes.
               </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════════════
-          SECCIÓN PRINCIPAL: Pestañas de Años Dinámicos y Grid de Torneos
-         ═══════════════════════════════════════════════════════════════════ */}
-      <section id="torneos-section" className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 -mt-6 relative z-20">
-        {/* Cabecera con Selector de Años (Tabs) */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-gray-200/80 shadow-sm">
-          {/* Tabs de los 2 años más recientes */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-400 mr-1 hidden md:inline-flex items-center gap-1">
-              <CalendarDays className="w-4 h-4" /> Temporada:
-            </span>
-
-            {isLoading ? (
-              <div className="flex gap-2">
-                <Skeleton className="w-28 h-10 rounded-xl" />
-                <Skeleton className="w-28 h-10 rounded-xl" />
-              </div>
-            ) : aniosMostrados.length > 0 ? (
-              aniosMostrados.map((anio, idx) => {
-                const esActivo = anio === activeYear;
-                const cantTorneos = torneosPorAnio[anio]?.length || 0;
-                return (
-                  <button
-                    key={anio}
-                    type="button"
-                    onClick={() => setSelectedYear(anio)}
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-black transition-all duration-200 shadow-sm ${
-                      esActivo
-                        ? 'bg-primary-600 text-white shadow-md shadow-primary-600/20 scale-[1.02]'
-                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100 hover:text-gray-900 border border-gray-200/70'
-                    }`}
-                  >
-                    <span>Torneos {anio}</span>
-                    {idx === 0 && (
-                      <span
-                        className={`text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-md ${
-                          esActivo ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800'
-                        }`}
-                      >
-                        Reciente
-                      </span>
-                    )}
-                    <span
-                      className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                        esActivo ? 'bg-primary-700 text-white' : 'bg-gray-200 text-gray-700'
-                      }`}
-                    >
-                      {cantTorneos}
-                    </span>
-                  </button>
-                );
-              })
-            ) : (
-              <span className="text-sm font-bold text-gray-500">Sin torneos registrados</span>
-            )}
-          </div>
-
-          {/* Botón Maquetado de Años Anteriores (Histórico) */}
-          {!showAllYears && (
-            <div className="shrink-0">
-              <button
-                type="button"
-                onClick={() => setShowAllYears(true)}
-                title="Consulta el archivo histórico de ediciones pasadas"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors shadow-sm"
+            <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
+              <Link
+                to={enlaceInscripcion}
+                className="rounded-lg bg-celeste px-6 py-3.5 text-center text-sm font-semibold text-marino transition-colors hover:bg-white"
               >
-                <History className="w-3.5 h-3.5 text-gray-500" />
-                <span>Ver torneos anteriores</span>
-              </button>
+                Inscribir a mi equipo
+              </Link>
+              <a
+                href="#auspiciantes"
+                className="rounded-lg border border-white/25 px-6 py-3.5 text-center text-sm font-semibold text-white transition-colors hover:bg-white/10"
+              >
+                Ver auspiciantes
+              </a>
+              {!userRole && (
+                <p className="text-center text-sm text-slate-400">
+                  ¿Aún no tienes cuenta?{' '}
+                  <Link to="/auth/registro" className="font-semibold text-celeste hover:text-white">
+                    Regístrate
+                  </Link>
+                </p>
+              )}
             </div>
-          )}
+          </div>
         </div>
-
-        {/* Listado de Tarjetas del Año Seleccionado */}
-        {isLoading ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-64 w-full rounded-2xl" />
-            ))}
-          </div>
-        ) : isError ? (
-          <div className="text-center bg-white p-8 rounded-2xl border border-red-200 text-red-600 font-semibold">
-            Error al cargar los torneos. Por favor, intenta nuevamente más tarde.
-          </div>
-        ) : torneosDelAnioActivo.length === 0 ? (
-          <EmptyState
-            title={`No hay torneos registrados para el año ${activeYear || ''}`}
-            description="En este momento no hay competiciones disponibles para esta temporada."
-            icon={<Trophy className="h-12 w-12 text-gray-400" />}
-          />
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
-            {torneosDelAnioActivo.map((torneo) => (
-              <TorneoCardHome
-                key={torneo.id_torneo || torneo.id}
-                torneo={torneo}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* ═══════════════════════════════════════════════════════════════════
-            SECCIÓN DE PARTIDOS RECIENTES Y RESULTADOS
-           ═══════════════════════════════════════════════════════════════════ */}
-        <PartidosRecientesSection />
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════════
-          CARRUSEL DE AUSPICIANTES FIJO AL INFERIOR
-         ═══════════════════════════════════════════════════════════════════ */}
-      <SponsorsCarousel />
+      <Footer />
     </main>
   );
 }

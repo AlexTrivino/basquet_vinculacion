@@ -13,6 +13,14 @@
 @theme {
   /* ── Tipografía ──────────────────────────────────────────────── */
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cinzel", ui-serif, Georgia, serif;
+
+  /* ── Página de inicio: colores del logo + dorado para logros ─── */
+  --color-marino: #081226;
+  --color-marino-claro: #0E1D3D;
+  --color-celeste: #29A9E1;
+  --color-oro: #D6B36A;
+  --color-crema: #F1E7D0;
 
   /* ── Paleta neutra institucional (Shell) ─────────────────────── */
   --color-primary-50: #EFF6FF;
@@ -66,6 +74,108 @@
   animation: marquee 45s linear infinite;
   display: flex;
   width: max-content;
+}
+
+/*
+ * ─── Página de inicio ────────────────────────────────────────────
+ */
+
+/* Logo de fondo fijo con blur. Donde el navegador soporta animaciones
+   ligadas al scroll, se desplaza más lento que la página (parallax). */
+.fondo-logo {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url('/img/logo-recortado.webp') center / auto 80vh no-repeat;
+  filter: blur(10px);
+  opacity: 0.26;
+}
+
+@keyframes fondo-parallax {
+  from { transform: translate3d(0, 12vh, 0); }
+  to   { transform: translate3d(0, -12vh, 0); }
+}
+
+@supports (animation-timeline: scroll()) {
+  .fondo-logo {
+    animation: fondo-parallax linear both;
+    animation-timeline: scroll(root);
+  }
+}
+
+@keyframes hero-zoom {
+  from { transform: scale(1.05); }
+  to   { transform: scale(1.18); }
+}
+
+.hero-zoom {
+  animation: hero-zoom 28s ease-in-out infinite alternate;
+}
+
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.aparecer {
+  animation: aparecer 0.7s ease-out both;
+}
+
+@keyframes progreso-slide {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* Rebote: sube desacelerando y cae acelerando, como un balón real */
+@keyframes balon-rebote {
+  0%, 100% { transform: translateY(0); animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+  50%      { transform: translateY(-30%); animation-timing-function: cubic-bezier(0.32, 0, 0.67, 0); }
+}
+
+@keyframes sombra-rebote {
+  0%, 100% { transform: scaleX(1); opacity: 0.55; animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+  50%      { transform: scaleX(0.5); opacity: 0.15; animation-timing-function: cubic-bezier(0.32, 0, 0.67, 0); }
+}
+
+.balon-rebote { animation: balon-rebote 1.6s infinite; }
+.sombra-rebote { animation: sombra-rebote 1.6s infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fondo-logo,
+  .hero-zoom,
+  .aparecer,
+  .balon-rebote,
+  .sombra-rebote,
+  .animate-marquee {
+    animation: none;
+  }
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Superficies del navegador en la página de inicio (selección, foco, scrollbar) */
+html:has(.pagina-inicio) {
+  background-color: var(--color-marino);
+  scrollbar-color: color-mix(in srgb, var(--color-celeste) 45%, var(--color-marino)) var(--color-marino);
+}
+html:has(.pagina-inicio) ::selection {
+  background-color: var(--color-oro);
+  color: var(--color-marino);
+}
+.pagina-inicio {
+  caret-color: var(--color-celeste);
+  accent-color: var(--color-celeste);
+}
+/* html:has(): el navbar vive fuera de <main>, pero en la portada también lleva el foco celeste */
+html:has(.pagina-inicio) :focus-visible {
+  outline: 2px solid var(--color-celeste);
+  outline-offset: 3px;
+}
+.pagina-inicio a {
+  text-underline-offset: 4px;
 }
 
 html {
