@@ -30,7 +30,7 @@ import {
 
 // ── Tipos estrictos ──────────────────────────────────────────────
 
-export type UserRole = 'super_admin' | 'delegado' | null;
+export type UserRole = 'super_admin' | 'delegado' | 'visor' | null;
 
 interface AuthState {
   isAuthenticated: boolean;

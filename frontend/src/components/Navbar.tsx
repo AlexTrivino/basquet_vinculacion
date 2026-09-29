@@ -35,6 +35,13 @@ const NAV_LINKS = {
   public_admin: [
     { name: 'Inicio', path: '/' },
     { name: 'Directorio', path: '/equipos' },
+    { name: 'Buscador', path: '/visor' },
+  ],
+  // Visor: solo lectura, buscar jugadores y ver sus fichas
+  visor: [
+    { name: 'Jugadores', path: '/visor' },
+    { name: 'Inicio', path: '/' },
+    { name: 'Equipos', path: '/equipos' },
   ],
 };
 
@@ -47,7 +54,7 @@ export function Navbar() {
   const navigate = useNavigate();
   // En la portada, el directorio de equipos y la vista de torneo el navbar toma los colores de la página (marino, crema y oro)
   const { pathname } = useLocation();
-  const enInicio = pathname === '/' || pathname === '/equipos' || pathname.startsWith('/torneos/');
+  const enInicio = pathname === '/' || pathname === '/equipos' || pathname.startsWith('/torneos/') || pathname === '/visor';
   const claseEnlace = (isActive: boolean, inactivo: string) =>
     `text-sm font-medium ${
       enInicio
@@ -63,7 +70,7 @@ export function Navbar() {
     staleTime: 1000 * 60 * 5,
   });
 
-  const nombreUsuario = perfilRes?.data?.nombre || userName || (userRole === 'super_admin' ? 'Administrador' : 'Delegado');
+  const nombreUsuario = perfilRes?.data?.nombre || userName || (userRole === 'super_admin' ? 'Administrador' : userRole === 'visor' ? 'Visor' : 'Delegado');
   const userInitial = nombreUsuario ? nombreUsuario.trim().charAt(0).toUpperCase() : 'U';
 
   const { data: response } = useQuery({
@@ -92,7 +99,8 @@ export function Navbar() {
   };
 
   const links = userRole === 'super_admin' ? NAV_LINKS.super_admin :
-                userRole === 'delegado' ? NAV_LINKS.delegado : NAV_LINKS.public;
+                userRole === 'delegado' ? NAV_LINKS.delegado :
+                userRole === 'visor' ? NAV_LINKS.visor : NAV_LINKS.public;
 
   const userLinks = userRole === 'super_admin' ? NAV_LINKS.public_admin :
                     userRole === 'delegado' ? NAV_LINKS.public_delegado : [];
@@ -229,7 +237,7 @@ export function Navbar() {
                       {nombreUsuario}
                     </span>
                     <span className={`text-[10px] font-medium capitalize leading-tight ${enInicio ? 'text-slate-400' : 'text-gray-500'}`}>
-                      {userRole === 'super_admin' ? 'Super Admin' : 'Delegado'}
+                      {userRole === 'super_admin' ? 'Super Admin' : userRole === 'visor' ? 'Visor' : 'Delegado'}
                     </span>
                   </div>
                   <ChevronDown className={`h-3.5 w-3.5 text-gray-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
@@ -245,7 +253,7 @@ export function Navbar() {
                         <p className="text-xs text-gray-500 font-medium">Conectado como</p>
                         <p className="text-sm font-bold text-gray-900 truncate mt-0.5">{nombreUsuario}</p>
                         <span className="inline-block mt-1.5 px-2 py-0.5 text-[10px] font-semibold rounded-md bg-primary-50 text-primary-700">
-                          {userRole === 'super_admin' ? 'Super Administrador' : 'Delegado'}
+                          {userRole === 'super_admin' ? 'Super Administrador' : userRole === 'visor' ? 'Visor' : 'Delegado'}
                         </span>
                       </div>
                       <div className="py-1">

@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getJugadorPerfil } from '../../features/jugadores/api/jugadores.api';
 import { useAuth } from '../../context/AuthContext';
 import { Skeleton } from '../../components/Skeleton';
+import { PartidosJugador } from '../../features/visor/components/PartidosJugador';
 import {
   Shield,
   Trophy,
@@ -560,6 +561,9 @@ export default function JugadorProfile() {
             </div>
           )}
         </section>
+
+        {/* Visor y admin: partidos jugados con la línea estadística de cada uno */}
+        {id && (userRole === 'visor' || userRole === 'super_admin') && <PartidosJugador idJugador={id} />}
       </main>
     </div>
   );

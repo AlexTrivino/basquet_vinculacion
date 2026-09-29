@@ -1,4 +1,4 @@
-"""Modelo de Usuario — delegados y administradores del sistema."""
+"""Modelo de Usuario — delegados, administradores y visores (solo lectura de jugadores)."""
 from app import db
 
 
@@ -27,7 +27,7 @@ class Usuario(db.Model):
 
     # ── Restricciones ──────────────────────────────────────────────
     __table_args__ = (
-        db.CheckConstraint("rol IN ('super_admin', 'delegado')", name='ck_usuarios_rol'),
+        db.CheckConstraint("rol IN ('super_admin', 'delegado', 'visor')", name='ck_usuarios_rol'),
         db.CheckConstraint("estado IN ('activo', 'inactivo')", name='ck_usuarios_estado'),
     )
 

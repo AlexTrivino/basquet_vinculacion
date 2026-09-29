@@ -20,6 +20,7 @@ const Registro = lazy(() => import('../pages/auth/Registro'));
 const RecuperarPassword = lazy(() => import('../pages/auth/RecuperarPassword'));
 const ResetPassword = lazy(() => import('../pages/auth/ResetPassword'));
 const MiPerfil = lazy(() => import('../pages/auth/MiPerfil'));
+const BuscadorJugadores = lazy(() => import('../pages/visor/BuscadorJugadores'));
 
 // Delegado
 const DelegadoDashboard = lazy(() => import('../pages/delegado/Dashboard'));
@@ -77,8 +78,13 @@ export const router = createBrowserRouter([
         element: withSuspense(JugadorProfile),
       },
       {
+        path: '/visor',
+        element: <ProtectedRoute allowedRoles={['visor', 'super_admin']} />,
+        children: [{ index: true, element: withSuspense(BuscadorJugadores) }],
+      },
+      {
         path: '/perfil',
-        element: <ProtectedRoute allowedRoles={['super_admin', 'delegado']} />,
+        element: <ProtectedRoute allowedRoles={['super_admin', 'delegado', 'visor']} />,
         children: [
           { index: true, element: withSuspense(MiPerfil) },
         ],

@@ -57,6 +57,8 @@ export function LoginForm() {
       
       if (role === 'super_admin') {
         navigate('/admin/dashboard');
+      } else if (role === 'visor') {
+        navigate('/visor');
       } else {
         navigate('/delegado/dashboard');
       }
