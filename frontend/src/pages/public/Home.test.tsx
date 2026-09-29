@@ -70,7 +70,10 @@ describe('Home (página de inicio)', () => {
 
     const orden = [...container.querySelectorAll('main > section[id], main > footer[id]')].map((el) => el.id);
     expect(orden).toEqual(['inicio', 'auspiciantes', 'conocenos', 'partidos', 'unete', 'contacto']);
-    expect(screen.getByRole('link', { name: '+593 98 962 9870' })).toHaveAttribute('href', 'tel:+593989629870');
+    // Sin teléfonos en pantalla: solo redes sociales en el footer
+    expect(screen.queryByText(/\+593/)).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Instagram/ })).toHaveAttribute('href', 'https://www.instagram.com/baloncestomanta');
+    expect(screen.getByRole('link', { name: /Facebook/ })).toHaveAttribute('href', 'https://www.facebook.com/share/1bVVgbesHJ/');
   });
 
   it('el carrusel del hero pasa al siguiente torneo al completar los 10 s', async () => {

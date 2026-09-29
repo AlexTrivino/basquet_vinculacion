@@ -150,7 +150,28 @@
   animation: brillo-oro 2.8s ease-in-out infinite;
 }
 
+/* CTA: los botones se abren de adentro hacia afuera al llegar a la sección y luego brillan sin parar.
+   El recorte solo vive durante la entrada (fill backwards), si no cortaría el resplandor. */
+@keyframes adentro-afuera {
+  from { clip-path: inset(50% 50% round 0.5rem); transform: scale(0.8); opacity: 0; }
+  60%  { opacity: 1; }
+  to   { clip-path: inset(0 0 round 0.5rem); transform: none; opacity: 1; }
+}
+@keyframes brillo-boton {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  50%      { box-shadow: 0 0 24px 2px var(--brillo); }
+}
+.cta-boton { opacity: 0; }
+[data-visible] .cta-boton {
+  opacity: 1;
+  animation:
+    adentro-afuera 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) var(--retraso, 0ms) backwards,
+    brillo-boton 2.4s ease-in-out calc(0.7s + var(--retraso, 0ms)) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .cta-boton,
+  [data-visible] .cta-boton { opacity: 1; animation: none; }
   .cifra-brillo,
   .fondo-logo,
   .hero-zoom,

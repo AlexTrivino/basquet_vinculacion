@@ -328,7 +328,10 @@ Es el mismo cartel que el del partido, en sólido: marino claro, borde oro al 30
 Fondo carbón, texto `slate-300` a 0.875rem, contenedor de 72rem y 64 px de relleno vertical. Cuatro columnas: marca (logo de 96 px de alto, línea oro y un párrafo), Torneos (hasta seis, del API), Navegación y Contacto. Cada título de columna lleva debajo una barra oro de 32 × 2 px. Los íconos de contacto van en anillos de 28 px con borde oro al 40 %. Los enlaces pasan a blanco al pasar el cursor. Una línea blanca al 10 % separa la franja legal, en `slate-400` a 0.75rem.
 
 ### Botón flotante de WhatsApp
-Círculo de 56 px fijo a 24 px de la esquina inferior derecha, en verde WhatsApp con ícono blanco de 28 px y sombra de medallón. Crece a 1.05 al pasar el cursor. Es la marca del servicio: su verde no se extiende a otros controles.
+Círculo de 56 px fijo a 24 px de la esquina inferior derecha, en verde WhatsApp con el logo oficial blanco de 28 px (Simple Icons) y sombra de medallón. Crece a 1.05 al pasar el cursor. Vive en MainLayout: es el único contacto en todo el sitio (se oculta para super_admin) y ningún número se imprime en pantalla. Es la marca del servicio: su verde no se extiende a otros controles.
+
+### Redes sociales del footer
+Columna "Síguenos": Instagram y Facebook como círculos de 44 px con borde oro al 40 % y logo oficial en oro; al pasar el cursor se rellenan de oro con el logo en marino. Debajo, la dirección del coliseo.
 
 ### Atmósfera: fondo y hero
 - **Marca de agua** (`.fondo-logo`): el logo recortado, fijo detrás de todo, a 80vh de alto, desenfocado 10 px y con opacidad 0.26. Si el navegador admite animaciones ligadas al scroll, se desplaza de +12vh a −12vh a lo largo de la página (parallax); si no, queda fijo.

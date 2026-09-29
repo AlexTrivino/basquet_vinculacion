@@ -1,16 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useId, useState, type ReactNode } from 'react';
-import { ChevronDown, MapPin, MessageCircle, Phone, type LucideIcon } from 'lucide-react';
+import { ChevronDown, MapPin } from 'lucide-react';
 import { getTorneos } from '../features/torneos/api/torneos.api';
+import { IconoMarca, REDES } from './Contacto';
 
-// ponytail: sin correo ni redes sociales todavía; se agregan aquí cuando existan
-const CONTACTO = {
-  direccion: 'Coliseo Pablo Delgado Álava, Manta, Ecuador',
-  telefono: '+593 98 962 9870',
-  whatsapp: '593989629870', // solo dígitos con código de país
-};
-const ENLACE_WHATSAPP = `https://wa.me/${CONTACTO.whatsapp}?text=${encodeURIComponent('Hola, quiero información sobre los torneos.')}`;
+// Sin teléfono ni correo en pantalla: el único contacto es el botón flotante de WhatsApp (MainLayout)
+const DIRECCION = 'Coliseo Pablo Delgado Álava, Manta, Ecuador';
 
 // Los enlaces con '#' son anclas de la página de inicio (el footer solo vive ahí)
 const NAVEGACION = [
@@ -50,17 +46,6 @@ function Columna({ titulo, children }: { titulo: string; children: ReactNode }) 
         {children}
       </div>
     </div>
-  );
-}
-
-function FilaContacto({ icono: Icono, children }: { icono: LucideIcon; children: ReactNode }) {
-  return (
-    <li className="flex items-start justify-center gap-3 lg:justify-start">
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-oro/40 text-oro">
-        <Icono className="h-3.5 w-3.5" aria-hidden="true" />
-      </span>
-      <span className="pt-0.5 text-left">{children}</span>
-    </li>
   );
 }
 
@@ -115,54 +100,33 @@ export function Footer() {
         </nav>
 
         <div className="border-b border-white/10 lg:border-0">
-          <Columna titulo="Contacto">
-            <ul className="space-y-4 text-sm">
-              <FilaContacto icono={MapPin}>{CONTACTO.direccion}</FilaContacto>
-              <FilaContacto icono={Phone}>
-                <a
-                  href={`tel:${CONTACTO.telefono.replace(/\s/g, '')}`}
-                  className="tabular-nums transition-colors hover:text-white"
-                >
-                  {CONTACTO.telefono}
-                </a>
-              </FilaContacto>
-              <FilaContacto icono={MessageCircle}>
-                <a
-                  href={ENLACE_WHATSAPP}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="transition-colors hover:text-white"
-                >
-                  Escríbenos por WhatsApp
-                </a>
-              </FilaContacto>
+          <Columna titulo="Síguenos">
+            <ul className="flex justify-center gap-3 lg:justify-start">
+              {REDES.map((red) => (
+                <li key={red.nombre}>
+                  <a
+                    href={red.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${red.texto} de Torneos Baloncesto Manta`}
+                    className="flex h-11 w-11 items-center justify-center rounded-full border border-oro/40 text-oro transition-colors hover:border-oro hover:bg-oro hover:text-marino"
+                  >
+                    <IconoMarca nombre={red.nombre} className="h-5 w-5" />
+                  </a>
+                </li>
+              ))}
             </ul>
+            <p className="mt-6 flex items-start justify-center gap-2 text-sm lg:justify-start">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-oro" aria-hidden="true" />
+              <span className="text-left">{DIRECCION}</span>
+            </p>
           </Columna>
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl border-t border-white/10 px-4 py-6 text-center text-xs text-slate-400 sm:px-6 lg:px-8 lg:text-left">
-        <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
-          <p>© {anio} Torneos Baloncesto Manta. Todos los derechos reservados.</p>
-        </div>
-        <p className="mt-4 flex flex-col gap-1 lg:flex-row lg:gap-0">
-          <span>{CONTACTO.direccion}</span>
-          <span aria-hidden="true" className="hidden lg:inline">
-            &nbsp;·&nbsp;
-          </span>
-          <span className="whitespace-nowrap tabular-nums">{CONTACTO.telefono}</span>
-        </p>
+      <div className="mx-auto max-w-6xl border-t border-white/10 px-4 pb-28 pt-6 text-center text-xs lg:pb-6 text-slate-400 sm:px-6 lg:px-8 lg:text-left">
+        <p>© {anio} Torneos Baloncesto Manta. Todos los derechos reservados.</p>
       </div>
-
-      <a
-        href={ENLACE_WHATSAPP}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Escríbenos por WhatsApp"
-        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/40 transition-transform hover:scale-105"
-      >
-        <MessageCircle className="h-7 w-7" aria-hidden="true" />
-      </a>
     </footer>
   );
 }

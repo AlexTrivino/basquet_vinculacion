@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { Navbar } from './Navbar';
+import { BotonWhatsApp } from './Contacto';
 
 export function MainLayout() {
   return (
@@ -8,6 +9,7 @@ export function MainLayout() {
       <div className="flex-1">
         <Outlet />
       </div>
+      <BotonWhatsApp />
     </div>
   );
 }

@@ -8,11 +8,6 @@ import { getTorneos } from '../torneos/api/torneos.api';
 import type { Torneo } from '../../types/api.types';
 
 const MAX_TORNEOS = 8;
-const ESTADOS: Record<string, string> = {
-  en_curso: 'En curso',
-  programado: 'Próximamente',
-  finalizado: 'Finalizado',
-};
 // Diagonal de la card (paralelogramo); en móvil el ticket usa una diagonal más corta
 const DIAGONAL = '[clip-path:polygon(6%_0,100%_0,94%_100%,0_100%)]';
 const DIAGONAL_TICKET = '[clip-path:polygon(4%_0,100%_0,96%_100%,0_100%)]';
@@ -30,12 +25,7 @@ function SlideTorneo({ torneo }: { torneo: Torneo }) {
 
   return (
     <article className="aparecer">
-      {/* Cinta dorada del cartel, igual que la fecha de las tarjetas de partido */}
-      <span className="inline-block rounded bg-oro px-2 py-0.5 font-display text-xs font-bold uppercase text-marino">
-        {ESTADOS[torneo.estado] ?? torneo.estado}
-      </span>
-
-      <h2 className="mt-6 text-balance font-display text-3xl font-bold leading-tight text-crema sm:text-4xl">
+      <h2 className="text-balance font-display text-3xl font-bold leading-tight text-crema sm:text-4xl">
         {torneo.nombre || torneo.nombre_torneo}
       </h2>
       <p className="mt-4 flex items-center gap-2 tabular-nums text-slate-300">
@@ -74,11 +64,8 @@ function TicketTorneo({ torneo, indice }: { torneo: Torneo; indice: number }) {
       data-ticket={indice}
       className={`${DIAGONAL_TICKET} flex w-[84%] shrink-0 snap-center bg-oro/55 p-px`}
     >
-      <div className={`${DIAGONAL_TICKET} flex min-h-[9.5rem] w-full flex-col bg-marino-claro px-7 py-4`}>
-        <span className="self-start rounded bg-oro px-2 py-0.5 font-display text-[11px] font-bold uppercase text-marino">
-          {ESTADOS[torneo.estado] ?? torneo.estado}
-        </span>
-        <p className="mt-2.5 line-clamp-2 font-display text-xl font-bold leading-tight text-crema">
+      <div className={`${DIAGONAL_TICKET} flex min-h-[8.5rem] w-full flex-col bg-marino-claro px-7 py-4`}>
+        <p className="line-clamp-2 font-display text-xl font-bold leading-tight text-crema">
           {torneo.nombre || torneo.nombre_torneo}
         </p>
         <div className="mt-auto flex items-center justify-between gap-3 pt-3 text-[13px]">

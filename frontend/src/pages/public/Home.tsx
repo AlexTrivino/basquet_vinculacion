@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { SponsorsCarousel } from '../../components/SponsorsCarousel';
@@ -18,6 +18,22 @@ export default function Home() {
       navigate('/auth/reset-password' + hash, { replace: true });
     }
   }, [navigate]);
+
+  // Los botones del CTA se abren desde el centro al entrar en pantalla (una sola vez) y luego brillan
+  const cta = useRef<HTMLElement>(null);
+  const [ctaVisible, setCtaVisible] = useState(false);
+  useEffect(() => {
+    const el = cta.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return setCtaVisible(true);
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        setCtaVisible(true);
+        obs.disconnect();
+      }
+    }, { threshold: 0.4 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   const enlaceInscripcion = userRole === 'delegado' ? '/delegado/inscripcion' : '/auth/login';
 
@@ -46,7 +62,7 @@ export default function Home() {
       <SeccionPartidos />
 
       {/* ─── CTA ─── */}
-      <section id="unete" className="relative z-10 scroll-mt-16 px-4 py-24 sm:px-6 lg:px-8">
+      <section ref={cta} id="unete" data-visible={ctaVisible || undefined} className="relative z-10 scroll-mt-16 px-4 py-24 sm:px-6 lg:px-8">
         {/* Mismo cartel que las tarjetas de partido: campo marino, filete y esquinas en oro */}
         <div className="relative mx-auto max-w-6xl rounded-xl border border-oro/30 bg-marino-claro p-10 shadow-xl shadow-black/30 sm:p-14">
           <Esquinas />
@@ -63,13 +79,13 @@ export default function Home() {
             <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
               <Link
                 to={enlaceInscripcion}
-                className="rounded-lg bg-celeste px-6 py-3.5 text-center text-sm font-semibold text-marino transition-colors hover:bg-white"
+                className="cta-boton [--brillo:rgb(41_169_225/0.7)] rounded-lg bg-celeste px-6 py-3.5 text-center text-sm font-semibold text-marino transition-colors hover:bg-white"
               >
                 Inscribir a mi equipo
               </Link>
               <a
                 href="#auspiciantes"
-                className="rounded-lg border border-white/25 px-6 py-3.5 text-center text-sm font-semibold text-white transition-colors hover:bg-white/10"
+                className="cta-boton [--brillo:rgb(241_231_208/0.35)] [--retraso:150ms] rounded-lg border border-white/25 px-6 py-3.5 text-center text-sm font-semibold text-white transition-colors hover:bg-white/10"
               >
                 Ver auspiciantes
               </a>

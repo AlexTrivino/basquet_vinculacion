@@ -25,7 +25,7 @@ Una comunidad de baloncesto nacida en Manta que reúne a exalumnos de todo Manab
 - Partidos en el Coliseo Pablo Delgado Álava, Manta, Ecuador.
 - Competencias por categorías de edad y género; tabla de posiciones con puntuación FIBA.
 - Los delegados inscriben equipos después de iniciar sesión; el registro de cuenta es público.
-- Contacto: teléfono y WhatsApp +593 98 962 9870.
+- Contacto: el botón flotante de WhatsApp es el único canal de contacto del sitio; ningún número se muestra en pantalla. Redes: Instagram (instagram.com/baloncestomanta) y Facebook, como íconos en el footer.
 - La plataforma está en producción con datos reales (Supabase).
 
 ## Capabilities and Constraints
@@ -47,7 +47,7 @@ Una comunidad de baloncesto nacida en Manta que reúne a exalumnos de todo Manab
 - Datos reales en producción: torneos, categorías, equipos con logo, partidos con marcador y auspiciantes con logo.
 - Foto del coliseo aportada por el usuario: `frontend/public/img/hero-coliseo.jpg`.
 - Balón de baloncesto 3D aportado por el usuario (GLB generado con Tripo), optimizado en `frontend/public/models/balon.glb`.
-- Ausencias que no se deben inventar: no hay redes sociales ni correo de contacto; no hay testimonios, prensa ni cifras de asistencia.
+- Ausencias que no se deben inventar: no hay correo de contacto ni teléfono visible; no hay testimonios, prensa ni cifras de asistencia.
 
 ## Product Principles
 
