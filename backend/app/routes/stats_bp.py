@@ -19,6 +19,25 @@ stats_bp = Blueprint('estadisticas', __name__, url_prefix='/api/estadisticas')
 
 _bulk_schema = EstadisticasBulkSchema()
 
+@stats_bp.route('/publicas', methods=['GET'])
+def estadisticas_publicas():
+    """Totales públicos para la portada (sin autenticación).
+
+    ``puntos_totales`` suma los marcadores de todos los partidos finalizados.
+    Los ganados por W.O. no cuentan: su marcador es administrativo, no puntos anotados.
+    """
+    from app import db
+    from app.models import Partido
+    from sqlalchemy import func
+
+    puntos = (
+        db.session.query(func.coalesce(func.sum(Partido.marcador_local + Partido.marcador_visitante), 0))
+        .filter(Partido.estado == 'finalizado')
+        .scalar()
+    )
+    return api_response({'puntos_totales': int(puntos)})
+
+
 @stats_bp.route('/dashboard', methods=['GET'])
 @token_required(allowed_roles=['super_admin'])
 def dashboard_stats():

@@ -7,11 +7,13 @@ import { getTorneos } from '../../features/torneos/api/torneos.api';
 import { getPartidos } from '../../features/partidos/api/partidos.api';
 import { getEquipos } from '../../features/equipos/api/equipos.api';
 import { getPatrocinadores } from '../../features/patrocinadores/api/patrocinadores.api';
+import { getEstadisticasPublicas } from '../../features/estadisticas/api/estadisticas.api';
 
 vi.mock('../../features/torneos/api/torneos.api');
 vi.mock('../../features/partidos/api/partidos.api');
 vi.mock('../../features/equipos/api/equipos.api');
 vi.mock('../../features/patrocinadores/api/patrocinadores.api');
+vi.mock('../../features/estadisticas/api/estadisticas.api');
 vi.mock('@google/model-viewer', () => ({}));
 vi.mock('../../context/AuthContext', () => ({ useAuth: () => ({ userRole: null }) }));
 
@@ -47,6 +49,7 @@ describe('Home (página de inicio)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     Element.prototype.scrollIntoView = vi.fn(); // jsdom no lo implementa
+    vi.mocked(getEstadisticasPublicas).mockResolvedValue({ success: true, message: '', data: { puntos_totales: 15230 } } as never);
     vi.mocked(getTorneos).mockResolvedValue({ success: true, message: '', data: torneos, pagination: { page: 1, per_page: 50, total: 2, pages: 1 } } as never);
     vi.mocked(getEquipos).mockResolvedValue({ success: true, message: '', data: [], pagination: { page: 1, per_page: 1, total: 7, pages: 7 } } as never);
     vi.mocked(getPatrocinadores).mockResolvedValue([{ id_patrocinador: 1, nombre_patrocinador: 'Nike Ecuador', url_logo_patrocinador: '/n.png' }] as never);
@@ -119,5 +122,6 @@ describe('Home (página de inicio)', () => {
     expect(screen.getByRole('link', { name: 'Inscribir a mi equipo' })).toHaveAttribute('href', '/auth/login');
     expect(await screen.findByText('7')).toBeInTheDocument();
     expect(await screen.findByText('12')).toBeInTheDocument();
+    expect(await screen.findByText('15.230 puntos anotados hasta ahora')).toBeInTheDocument();
   });
 });

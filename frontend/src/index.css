@@ -141,7 +141,17 @@
 .balon-rebote { animation: balon-rebote 1.6s infinite; }
 .sombra-rebote { animation: sombra-rebote 1.6s infinite; }
 
+/* Cifras de la portada: brillo dorado que respira sin parar (drop shadow infinito) */
+@keyframes brillo-oro {
+  0%, 100% { text-shadow: 0 0 2px rgb(214 179 106 / 0.15); }
+  50%      { text-shadow: 0 0 16px rgb(214 179 106 / 0.65), 0 2px 4px rgb(0 0 0 / 0.4); }
+}
+.cifra-brillo {
+  animation: brillo-oro 2.8s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .cifra-brillo,
   .fondo-logo,
   .hero-zoom,
   .aparecer,
