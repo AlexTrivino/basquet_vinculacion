@@ -18,7 +18,7 @@ Plataforma oficial de los torneos de baloncesto que organizan los Exalumnos Sale
 
 ## Positioning
 
-Los torneos que, desde 2019, reactivaron el baloncesto de la ciudad de Manta, organizados por Exalumnos Salesianos de Manta y jugados en el Coliseo Pablo Delgado Álava. La plataforma se desarrolló junto a la ULEAM como proyecto de vinculación. Todo lo que muestra (calendario, marcadores, posiciones, equipos) son datos reales de esos torneos.
+Una comunidad de baloncesto nacida en Manta que reúne a exalumnos de todo Manabí para convivir y conectar a través de una misma pasión. Sus torneos, organizados desde 2019 por Exalumnos Salesianos de Manta y jugados en el Coliseo Pablo Delgado Álava, reactivaron el baloncesto de la ciudad. Todo lo que muestra el sitio (calendario, marcadores, posiciones, equipos) son datos reales de esos torneos.
 
 ## Operating Context
 
@@ -40,6 +40,7 @@ Los torneos que, desde 2019, reactivaron el baloncesto de la ciudad de Manta, or
 - Nombre: **Torneos Baloncesto Manta**. Organizador: **Exalumnos Salesianos de Manta**.
 - Logo oficial: `logo_baloncestoManta.png` (recorte web en `frontend/public/img/logo-recortado.webp`).
 - Lo que el usuario rechaza: que el sitio parezca una plantilla genérica.
+- El sitio no incluye créditos académicos ni institucionales del desarrollo de la plataforma (pedido del usuario).
 
 ## Evidence on Hand
 

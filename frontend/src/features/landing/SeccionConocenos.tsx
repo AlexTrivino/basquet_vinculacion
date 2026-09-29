@@ -59,15 +59,16 @@ export function SeccionConocenos() {
 
         <div>
           <h2 className="text-balance font-display text-3xl font-bold leading-tight text-crema sm:text-5xl">
-            Exalumnos Salesianos de Manta
+            Llevando el deporte en la sangre
           </h2>
           <p className="mt-6 text-lg leading-relaxed text-slate-300">
-            Desde 2019 organizamos los torneos que reactivaron el baloncesto en Manta. Reunimos a clubes, exalumnos y
-            nuevas generaciones en competencias por categorías de edad y género.
+            Somos una comunidad de baloncesto nacida en Manta con un objetivo: reunir a exalumnos de todo Manabí para
+            convivir y conectar a través de una misma pasión.
           </p>
           <p className="mt-4 leading-relaxed text-slate-400">
-            Cada temporada tiene calendario oficial, tabla de posiciones con el sistema de puntuación FIBA y estadísticas
-            de cada jugador, todo en esta plataforma desarrollada junto a la ULEAM como proyecto de vinculación.
+            Cada torneo es un punto de encuentro: compañeros de colegio que vuelven a verse, rivales que terminan siendo
+            amigos y nuevas generaciones que se suman al juego. Aquí sigues el calendario, las posiciones y las
+            estadísticas de cada temporada.
           </p>
           {totalTorneos !== undefined && totalEquipos !== undefined && totalPartidos !== undefined && (
             <p className="mt-6 leading-relaxed text-slate-300">

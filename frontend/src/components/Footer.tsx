@@ -111,7 +111,7 @@ export function Footer() {
       <div className="mx-auto max-w-6xl border-t border-white/10 px-4 py-6 text-xs text-slate-400 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p>© {anio} Torneos Baloncesto Manta. Todos los derechos reservados.</p>
-          <p>Exalumnos Salesianos de Manta · Proyecto de vinculación ULEAM</p>
+          <p>Exalumnos Salesianos de Manta</p>
         </div>
         <p className="mt-4 flex flex-col gap-1 sm:flex-row sm:gap-0">
           <span>{CONTACTO.direccion}</span>
