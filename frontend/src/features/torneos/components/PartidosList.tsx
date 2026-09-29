@@ -1,12 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { getPartidosByTorneo } from '../api/torneos.api';
-import { Skeleton } from '../../../components/Skeleton';
-import { EmptyState } from '../../../components/EmptyState';
-import { Calendar as CalendarIcon, FileText, Activity, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar as CalendarIcon, FileText, Activity, ChevronLeft, ChevronRight, MapPin, Shield } from 'lucide-react';
 import { BoxScoreModal } from '../../partidos/components/BoxScoreModal';
 import { useState, useMemo } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, isToday } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, isToday, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 interface PartidosListProps {
@@ -16,20 +14,49 @@ interface PartidosListProps {
   categorias?: any[];
 }
 
-const CATEGORY_COLORS = [
-  { dot: 'bg-red-300', bg: 'bg-red-100', border: 'border-red-200', text: 'text-red-700' },
-  { dot: 'bg-emerald-300', bg: 'bg-emerald-100', border: 'border-emerald-200', text: 'text-emerald-700' },
-  { dot: 'bg-blue-300', bg: 'bg-blue-100', border: 'border-blue-200', text: 'text-blue-700' },
-  { dot: 'bg-amber-300', bg: 'bg-amber-100', border: 'border-amber-200', text: 'text-amber-700' },
-  { dot: 'bg-purple-300', bg: 'bg-purple-100', border: 'border-purple-200', text: 'text-purple-700' },
-  { dot: 'bg-pink-300', bg: 'bg-pink-100', border: 'border-pink-200', text: 'text-pink-700' },
-  { dot: 'bg-cyan-300', bg: 'bg-cyan-100', border: 'border-cyan-200', text: 'text-cyan-700' },
-  { dot: 'bg-orange-300', bg: 'bg-orange-100', border: 'border-orange-200', text: 'text-orange-700' },
-];
+// Colores de categoría: puntos del calendario y su leyenda. Tonos claros que se leen sobre marino.
+const COLORES = ['bg-red-300', 'bg-emerald-300', 'bg-sky-300', 'bg-amber-300', 'bg-purple-300', 'bg-pink-300', 'bg-cyan-300', 'bg-orange-300'];
+export const colorCategoria = (indice: number) => ({ punto: COLORES[indice % COLORES.length] });
+
+// Paralelogramo del cartel: boletos de partido
+const DIAGONAL = '[clip-path:polygon(2.5%_0,100%_0,97.5%_100%,0_100%)]';
+const nombre = (e: any, defecto: string) => e?.nombre || e?.nombre_equipo || defecto;
+
+// Medallón claro para los escudos (los logos en silueta negra se leen sobre marino)
+export function Escudo({ url, className = 'h-12 w-12' }: { url?: string | null; className?: string }) {
+  return (
+    <span className={`flex shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-white to-slate-200 shadow-md shadow-black/40 ring-2 ring-oro/40 ${className}`}>
+      {url ? (
+        <img src={url} alt="" loading="lazy" className="h-[76%] w-[76%] object-contain" />
+      ) : (
+        <Shield className="h-1/2 w-1/2 text-slate-400" aria-hidden="true" />
+      )}
+    </span>
+  );
+}
+
+function Equipo({ equipo, defecto, lado, atenuado }: { equipo: any; defecto: string; lado: 'local' | 'visitante'; atenuado: boolean }) {
+  const posicion =
+    lado === 'local'
+      ? 'col-start-1 row-start-1 sm:justify-end sm:text-right'
+      : 'col-start-1 row-start-2 sm:col-start-3 sm:row-start-1 sm:flex-row-reverse sm:justify-end sm:text-left';
+  return (
+    <Link to={`/equipos/${equipo?.id_equipo}`} className={`group flex min-w-0 items-center gap-3 ${posicion}`}>
+      <Escudo url={equipo?.url_logo} className={`h-10 w-10 transition-transform duration-200 group-hover:scale-110 sm:h-12 sm:w-12 ${lado === 'local' ? 'sm:order-2' : ''}`} />
+      <span
+        className={`line-clamp-2 min-w-0 text-sm font-bold uppercase leading-snug transition-colors group-hover:text-white sm:text-base ${
+          atenuado ? 'text-slate-400' : 'text-crema'
+        }`}
+      >
+        {nombre(equipo, defecto)}
+      </span>
+    </Link>
+  );
+}
 
 export function PartidosList({ torneoId, idCategoria, urlCalendario, categorias = [] }: PartidosListProps) {
   const [selectedMatch, setSelectedMatch] = useState<any | null>(null);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentMonth, setCurrentMonth] = useState<Date | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const { data: response, isLoading, isError } = useQuery({
@@ -39,56 +66,63 @@ export function PartidosList({ torneoId, idCategoria, urlCalendario, categorias 
 
   const rawPartidos = response?.data || [];
 
-  // Mapear categorías a colores
-  const catColorMap = useMemo(() => {
-    const map = new Map<number, any>();
-    categorias.forEach((cat, index) => {
-      map.set(cat.id_categoria || cat.id, CATEGORY_COLORS[index % CATEGORY_COLORS.length]);
-    });
+  const indiceCategoria = useMemo(() => {
+    const map = new Map<number, number>();
+    categorias.forEach((cat, i) => map.set(cat.id_categoria || cat.id, i));
     return map;
   }, [categorias]);
 
-  // Sort matches by date ascending
-  const partidosSorted = useMemo(() => {
-    return [...rawPartidos].sort((a: any, b: any) => {
-      const dateA = new Date(`${a.fecha}T${a.hora || '00:00'}`).getTime();
-      const dateB = new Date(`${b.fecha}T${b.hora || '00:00'}`).getTime();
-      return dateA - dateB;
-    });
-  }, [rawPartidos]);
+  const partidosSorted = useMemo(
+    () =>
+      [...rawPartidos].sort(
+        (a: any, b: any) => new Date(`${a.fecha}T${a.hora || '00:00'}`).getTime() - new Date(`${b.fecha}T${b.hora || '00:00'}`).getTime()
+      ),
+    [rawPartidos]
+  );
 
-  // Group by date
   const partidosGrouped = useMemo(() => {
     const groups: Record<string, any[]> = {};
-    partidosSorted.forEach(p => {
-      const fecha = p.fecha || 'Sin fecha';
-      if (!groups[fecha]) {
-        groups[fecha] = [];
-      }
-      groups[fecha].push(p);
-    });
+    partidosSorted.forEach((p) => (groups[p.fecha || 'Sin fecha'] ??= []).push(p));
     return groups;
   }, [partidosSorted]);
 
-  // Calendar logic
-  const daysInMonth = useMemo(() => {
-    const start = startOfMonth(currentMonth);
-    const end = endOfMonth(currentMonth);
-    return eachDayOfInterval({ start, end });
-  }, [currentMonth]);
+  // El próximo partido por jugar se destaca en oro
+  const idProximo = useMemo(() => {
+    const hoy = format(new Date(), 'yyyy-MM-dd');
+    const p = partidosSorted.find((x: any) => (x.estado === 'programado' || x.estado === 'en_curso') && (x.fecha ?? '') >= hoy);
+    return p ? p.id_partido || p.id : null;
+  }, [partidosSorted]);
 
-  const handlePrevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
-  const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
+  // El calendario abre en el mes del próximo partido (o del último jugado), no en un mes vacío
+  const mesInicial = useMemo(() => {
+    const ref = partidosSorted.find((x: any) => (x.id_partido || x.id) === idProximo) ?? partidosSorted.at(-1);
+    return ref?.fecha ? parseISO(ref.fecha) : new Date();
+  }, [partidosSorted, idProximo]);
+  const mes = currentMonth ?? mesInicial;
+
+  const daysInMonth = useMemo(() => eachDayOfInterval({ start: startOfMonth(mes), end: endOfMonth(mes) }), [mes]);
+
+  const enlaceCalendario = urlCalendario && (
+    <a
+      href={urlCalendario}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-2 rounded-lg border border-oro/50 px-4 py-2.5 text-sm font-semibold text-oro transition-colors hover:bg-oro hover:text-marino"
+    >
+      <FileText className="h-4 w-4" aria-hidden="true" />
+      Ver calendario (archivo)
+    </a>
+  );
 
   if (isError) {
-    return <div className="text-center text-red-500 py-8">Error al cargar el calendario de partidos.</div>;
+    return <p className="py-8 text-center text-red-300">No pudimos cargar el calendario de partidos.</p>;
   }
 
   if (isLoading) {
     return (
-      <div className="mt-6 flex flex-col gap-4">
+      <div className="flex flex-col gap-4">
         {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-24 w-full rounded-xl" />
+          <div key={i} className="h-28 w-full rounded-xl bg-white/10 motion-safe:animate-pulse" />
         ))}
       </div>
     );
@@ -96,251 +130,189 @@ export function PartidosList({ torneoId, idCategoria, urlCalendario, categorias 
 
   if (rawPartidos.length === 0) {
     return (
-      <div className="mt-6 px-2">
-        {urlCalendario && (
-          <div className="mb-6 flex justify-end">
-            <a
-              href={urlCalendario}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-gray-700 shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
-            >
-              <FileText className="h-4 w-4 text-primary-600" />
-              Ver calendario (Archivo)
-            </a>
-          </div>
-        )}
-        <EmptyState
-          title="Calendario no disponible"
-          description="El calendario de partidos se generará próximamente."
-          icon={<CalendarIcon className="mx-auto h-12 w-12 text-gray-400" />}
-        />
+      <div>
+        {enlaceCalendario && <div className="mb-6 flex justify-end">{enlaceCalendario}</div>}
+        <div className="rounded-xl border border-dashed border-oro/30 px-6 py-16 text-center">
+          <CalendarIcon className="mx-auto mb-3 h-10 w-10 text-oro/70" aria-hidden="true" />
+          <h3 className="font-display text-xl font-bold text-crema">Calendario no disponible</h3>
+          <p className="mt-2 text-slate-400">El calendario de partidos se publicará próximamente.</p>
+        </div>
       </div>
     );
   }
 
-  // Filter groups if a date is selected
-  const filteredGroups = selectedDate 
-    ? { [format(selectedDate, 'yyyy-MM-dd')]: partidosGrouped[format(selectedDate, 'yyyy-MM-dd')] || [] }
-    : partidosGrouped;
-
-  const datesToRender = Object.keys(filteredGroups).filter(date => filteredGroups[date].length > 0);
+  const claveSeleccion = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : null;
+  const datesToRender = claveSeleccion ? (partidosGrouped[claveSeleccion] ? [claveSeleccion] : []) : Object.keys(partidosGrouped);
 
   return (
-    <div className="mt-4">
-      {urlCalendario && (
-        <div className="mb-6 flex justify-end">
-          <a
-            href={urlCalendario}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-gray-700 shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
-          >
-            <FileText className="h-4 w-4 text-primary-600" />
-            Ver calendario (Archivo)
-          </a>
-        </div>
-      )}
+    <div>
+      {enlaceCalendario && <div className="mb-6 flex justify-end">{enlaceCalendario}</div>}
 
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 lg:gap-8 items-start">
-        {/* Lado Izquierdo: Calendario */}
-        <div className="xl:col-span-5 bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-5 sticky top-24">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-base sm:text-lg font-black text-gray-900 capitalize">
-              {format(currentMonth, 'MMMM yyyy', { locale: es })}
-            </h3>
+      <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] xl:gap-10">
+        {/* ─── Calendario del mes (obligatorio): a la derecha en escritorio, arriba en móvil ─── */}
+        <aside className="rounded-xl border border-oro/30 bg-marino-claro/80 p-4 shadow-xl shadow-black/30 backdrop-blur-sm sm:p-5 xl:sticky xl:top-40 xl:order-2">
+          <div className="mb-5 flex items-center justify-between">
+            <h3 className="font-display text-lg font-bold capitalize text-crema">{format(mes, 'MMMM yyyy', { locale: es })}</h3>
             <div className="flex gap-1">
-              <button onClick={handlePrevMonth} className="p-1 sm:p-1.5 hover:bg-gray-100 rounded-lg text-gray-600 transition-colors">
-                <ChevronLeft className="w-5 h-5" />
+              <button
+                type="button"
+                aria-label="Mes anterior"
+                onClick={() => setCurrentMonth(subMonths(mes, 1))}
+                className="rounded-lg p-1.5 text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
               </button>
-              <button onClick={handleNextMonth} className="p-1 sm:p-1.5 hover:bg-gray-100 rounded-lg text-gray-600 transition-colors">
-                <ChevronRight className="w-5 h-5" />
+              <button
+                type="button"
+                aria-label="Mes siguiente"
+                onClick={() => setCurrentMonth(addMonths(mes, 1))}
+                className="rounded-lg p-1.5 text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                <ChevronRight className="h-5 w-5" aria-hidden="true" />
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(day => (
-              <div key={day} className="text-center text-[10px] sm:text-xs font-bold text-gray-400 py-1">
-                {day}
+          <div className="mb-2 grid grid-cols-7 gap-1">
+            {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((d) => (
+              <div key={d} className="py-1 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                {d}
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-1 sm:gap-2">
-            {Array.from({ length: startOfMonth(currentMonth).getDay() }).map((_, i) => (
-              <div key={`empty-${i}`} className="h-14 sm:h-20"></div>
+          <div className="grid grid-cols-7 gap-1">
+            {Array.from({ length: startOfMonth(mes).getDay() }).map((_, i) => (
+              <div key={`vacio-${i}`} className="h-12 sm:h-14" />
             ))}
-            
-            {daysInMonth.map(day => {
+            {daysInMonth.map((day) => {
               const dateStr = format(day, 'yyyy-MM-dd');
               const dayMatches = partidosGrouped[dateStr] || [];
-              const isSelected = selectedDate && isSameDay(day, selectedDate);
-              const isCurrentDay = isToday(day);
-              
-              const dayCategories = Array.from(new Set(dayMatches.map(m => m.id_categoria || m.categoria?.id_categoria))).filter(Boolean);
+              const isSelected = !!selectedDate && isSameDay(day, selectedDate);
+              const hoy = isToday(day);
+              const dayCategories = Array.from(new Set(dayMatches.map((m) => m.id_categoria || m.categoria?.id_categoria))).filter(Boolean);
 
               return (
                 <button
-                  key={day.toISOString()}
+                  key={dateStr}
+                  type="button"
+                  aria-pressed={isSelected}
+                  aria-label={`${format(day, "d 'de' MMMM", { locale: es })}${dayMatches.length ? `, ${dayMatches.length} partidos` : ''}`}
                   onClick={() => setSelectedDate(isSelected ? null : day)}
-                  className={`
-                    h-14 sm:h-20 flex flex-col items-center justify-start pt-2 sm:pt-3 rounded-xl transition-all relative
-                    ${isSelected ? 'bg-primary-600 text-white shadow-md' : 'hover:bg-gray-50 text-gray-700'}
-                    ${isCurrentDay && !isSelected ? 'text-primary-600 font-bold bg-primary-50/50' : ''}
-                  `}
+                  className={`flex h-12 flex-col items-center justify-start rounded-lg pt-1.5 text-sm tabular-nums transition-colors sm:h-14 sm:pt-2 ${
+                    isSelected
+                      ? 'bg-oro font-bold text-marino'
+                      : dayMatches.length
+                        ? 'font-semibold text-crema hover:bg-white/10'
+                        : 'text-slate-500 hover:bg-white/5'
+                  } ${hoy && !isSelected ? 'ring-1 ring-inset ring-celeste' : ''}`}
                 >
-                  <span className={`text-xs sm:text-sm ${isSelected ? 'font-bold' : 'font-medium'}`}>
-                    {format(day, 'd')}
+                  {format(day, 'd')}
+                  <span className="mt-1 flex flex-wrap justify-center gap-0.5 px-0.5">
+                    {dayCategories.slice(0, 4).map((catId) => (
+                      <span
+                        key={catId as number}
+                        className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-marino' : colorCategoria(indiceCategoria.get(catId as number) ?? 0).punto}`}
+                      />
+                    ))}
+                    {dayCategories.length > 4 && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-marino' : 'bg-slate-400'}`} />}
                   </span>
-                  
-                  {/* Dots */}
-                  <div className="flex flex-wrap justify-center gap-1 mt-1.5 sm:mt-2 px-1 w-full max-w-full">
-                    {dayCategories.slice(0, 4).map(catId => {
-                      const color = catColorMap.get(catId as number) || { dot: 'bg-gray-400' };
-                      return (
-                        <div key={catId as number} className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${isSelected ? 'bg-white' : color.dot}`} />
-                      )
-                    })}
-                    {dayCategories.length > 4 && (
-                      <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${isSelected ? 'bg-white' : 'bg-gray-300'}`} />
-                    )}
-                  </div>
                 </button>
               );
             })}
           </div>
-          
+
           {selectedDate && (
-            <button 
+            <button
+              type="button"
               onClick={() => setSelectedDate(null)}
-              className="mt-6 w-full py-2.5 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm font-bold rounded-xl transition-colors border border-gray-200"
+              className="mt-5 w-full rounded-lg border border-white/15 py-2.5 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/10"
             >
               Ver todos los partidos
             </button>
           )}
+        </aside>
 
-        </div>
-
-        {/* Lado Derecho: Lista de Partidos */}
-        <div className="xl:col-span-7 flex flex-col gap-6 sm:gap-8">
+        {/* ─── Partidos agrupados por día, como boletos del cartel ─── */}
+        <div className="flex flex-col gap-10">
           {datesToRender.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-2xl border border-gray-200 shadow-sm">
-              <CalendarIcon className="mx-auto h-12 w-12 text-gray-300 mb-3" />
-              <p className="text-gray-500 font-medium px-4">No hay partidos programados para esta fecha.</p>
+            <div className="rounded-xl border border-dashed border-oro/30 px-6 py-12 text-center">
+              <CalendarIcon className="mx-auto mb-3 h-10 w-10 text-oro/70" aria-hidden="true" />
+              <p className="text-slate-400">No hay partidos programados para esta fecha.</p>
             </div>
           ) : (
-            datesToRender.map(dateStr => {
-              const dayPartidos = filteredGroups[dateStr];
-              const dateObj = new Date(`${dateStr}T12:00:00`); 
-              
-              return (
-                <div key={dateStr} className="flex flex-col gap-3 sm:gap-4">
-                  <div className="sticky top-0 z-20 bg-gray-50/90 backdrop-blur-md py-2 px-1 border-b border-gray-200/50 shadow-sm rounded-lg sm:rounded-none sm:shadow-none sm:border-none sm:bg-transparent">
-                    <h4 className="text-base sm:text-lg font-black text-gray-900 capitalize flex items-center gap-2">
-                      <CalendarIcon className="w-4 h-4 sm:w-5 sm:h-5 text-primary-500" />
-                      {format(dateObj, "EEEE, d 'de' MMMM", { locale: es })}
-                    </h4>
-                  </div>
-                  
-                  <div className="flex flex-col gap-3 sm:gap-4">
-                    {dayPartidos.map((partido) => {
-                      const isFinalizado = partido.estado.includes('finalizado');
-                      const catId = partido.id_categoria || partido.categoria?.id_categoria;
-                      const catColor = catColorMap.get(catId) || { bg: 'bg-gray-100', border: 'border-gray-200', text: 'text-gray-700' };
-                      
-                      return (
-                        <div
-                          key={partido.id_partido || partido.id}
-                          className={`flex flex-col rounded-2xl border bg-white overflow-hidden transition-all duration-300 ${
-                            isFinalizado 
-                              ? 'border-gray-200 shadow-sm hover:shadow-md' 
-                              : 'border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:shadow-[0_0_25px_rgba(16,185,129,0.25)] ring-1 ring-emerald-50 relative'
-                          }`}
-                        >
-                          {/* Encabezado */}
-                          <div className={`flex flex-col sm:flex-row sm:items-center justify-between px-4 py-3 sm:py-2.5 gap-2 sm:gap-0 ${isFinalizado ? 'bg-gray-50 border-b border-gray-100' : 'bg-emerald-50/50 border-b border-emerald-100'}`}>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest ${isFinalizado ? 'text-gray-500' : 'text-emerald-700'}`}>
-                                {partido.fase || 'Fase Regular'}
-                              </span>
-                              
-                              {partido.categoria?.nombre_categoria && (
-                                <span className={`text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${catColor.bg} ${catColor.border} ${catColor.text}`}>
-                                  {partido.categoria.nombre_categoria} {partido.categoria.genero_categoria ? `(${partido.categoria.genero_categoria})` : ''}
-                                </span>
-                              )}
+            datesToRender.map((dateStr) => (
+              <div key={dateStr}>
+                <h4 className="mb-4 flex items-baseline gap-3">
+                  <span className="font-display text-xl font-bold text-crema first-letter:uppercase">
+                    {dateStr === 'Sin fecha' ? 'Sin fecha' : format(new Date(`${dateStr}T12:00:00`), "EEEE d 'de' MMMM", { locale: es })}
+                  </span>
+                  <span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-oro/60 to-transparent" />
+                </h4>
 
-                              {partido.ubicacion && (
-                                <>
-                                  <span className={isFinalizado ? 'text-gray-300 hidden sm:inline' : 'text-emerald-200 hidden sm:inline'}>•</span>
-                                  <span className={`text-[10px] sm:text-xs font-medium truncate max-w-[150px] sm:max-w-none ${isFinalizado ? 'text-gray-500' : 'text-emerald-600'}`}>
-                                    📍 {partido.ubicacion}
-                                  </span>
-                                </>
-                              )}
-                            </div>
-                            <div className={`self-start sm:self-auto flex items-center gap-1.5 text-[10px] sm:text-xs font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full shrink-0 ${
-                              isFinalizado ? 'bg-gray-200 text-gray-700' : 'bg-emerald-500 text-white shadow-sm'
-                            }`}>
-                              {!isFinalizado && (
-                                <span className="relative flex h-2 w-2">
-                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-100 opacity-75"></span>
-                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-                                </span>
-                              )}
-                              {partido.estado.replace('_', ' ')}
-                            </div>
+                <div className="flex flex-col gap-3">
+                  {partidosGrouped[dateStr].map((partido) => {
+                    const idPartido = partido.id_partido || partido.id;
+                    const finalizado = partido.estado.includes('finalizado');
+                    const wo = partido.estado === 'finalizado_wo';
+                    const proximo = idPartido === idProximo;
+                    const ml = partido.marcador_local ?? 0;
+                    const mv = partido.marcador_visitante ?? 0;
+                    const catId = partido.id_categoria || partido.categoria?.id_categoria;
+                    const hora = partido.fecha_hora
+                      ? new Date(partido.fecha_hora).toLocaleTimeString('es-EC', { hour: '2-digit', minute: '2-digit' })
+                      : partido.hora?.slice(0, 5);
+
+                    return (
+                      <article
+                        key={idPartido}
+                        className={`${DIAGONAL} p-px ${proximo ? 'bg-oro shadow-[0_0_28px_rgb(214_179_106/0.25)]' : 'bg-oro/40'}`}
+                      >
+                        <div className={`${DIAGONAL} bg-marino-claro px-7 py-4 sm:px-10 sm:py-5`}>
+                          {/* Encabezado: fase, categoría, lugar y estado */}
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
+                            {proximo && <span className="font-bold uppercase tracking-[0.18em] text-oro">Próximo partido</span>}
+                            <span className="font-semibold uppercase tracking-widest">{partido.fase || 'Fase regular'}</span>
+                            {partido.categoria?.nombre_categoria && (
+                              <span className="inline-flex items-center gap-1.5 text-slate-300">
+                                <span aria-hidden="true" className={`h-2 w-2 rounded-full ${colorCategoria(indiceCategoria.get(catId) ?? 0).punto}`} />
+                                {partido.categoria.nombre_categoria}
+                                {partido.categoria.genero_categoria ? ` (${partido.categoria.genero_categoria})` : ''}
+                              </span>
+                            )}
+                            {partido.ubicacion && (
+                              <span className="hidden items-center gap-1 sm:inline-flex">
+                                <MapPin className="h-3.5 w-3.5 text-oro" aria-hidden="true" />
+                                {partido.ubicacion}
+                              </span>
+                            )}
+                            <span className={`ml-auto font-semibold uppercase tracking-wider ${finalizado ? 'text-slate-500' : 'text-celeste'}`}>
+                              {wo ? 'Ganado por W.O.' : partido.estado.replace('_', ' ')}
+                            </span>
                           </div>
 
-                          {/* Cuerpo */}
-                          <div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-5 gap-4">
-                            
-                            {/* Equipo Local (Logo Izquierda, Nombre Derecha) */}
-                            <Link 
-                              to={`/equipos/${partido.equipo_local?.id_equipo}`}
-                              className="group flex-1 flex flex-row items-center justify-start sm:justify-end w-full gap-3 text-left sm:text-right"
-                            >
-                              <div className="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-110">
-                                {partido.equipo_local?.url_logo ? (
-                                  <img src={partido.equipo_local.url_logo} alt="Logo Local" className="w-full h-full object-contain" />
-                                ) : (
-                                  <div className="w-full h-full bg-primary-50 text-primary-700 flex items-center justify-center font-black text-xs sm:text-sm uppercase rounded-full">
-                                    {(partido.equipo_local?.nombre || partido.equipo_local?.nombre_equipo || 'L').substring(0, 2)}
-                                  </div>
-                                )}
-                              </div>
-                              <span className="font-extrabold text-gray-900 group-hover:text-primary-700 transition-colors duration-200 text-base sm:text-xl line-clamp-2 flex-1 sm:flex-none">
-                                {partido.equipo_local?.nombre || partido.equipo_local?.nombre_equipo || 'Equipo Local'}
-                              </span>
-                            </Link>
+                          {/* Cuerpo: en móvil equipos en dos filas y marcador a la derecha; desde sm, local · marcador · visitante */}
+                          <div className="mt-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:gap-x-6">
+                            <Equipo equipo={partido.equipo_local} defecto="Equipo local" lado="local" atenuado={finalizado && ml < mv} />
 
-                            {/* Centro: Marcador o Hora */}
-                            <div className="flex flex-col items-center justify-center shrink-0 w-full sm:w-auto z-10 mx-0 sm:mx-2 my-2 sm:my-0">
-                              <div className={`flex flex-col items-center justify-center px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl min-w-[100px] sm:min-w-[120px] transition-transform ${
-                                isFinalizado ? 'bg-gray-50 border border-gray-200' : 'bg-white border border-emerald-200 shadow-md transform hover:scale-105'
-                              }`}>
-                                {isFinalizado ? (
-                                  <span className="text-2xl sm:text-4xl font-black text-gray-900 tracking-tighter">
-                                    {partido.marcador_local} <span className="text-gray-300 font-light px-1">-</span> {partido.marcador_visitante}
-                                  </span>
-                                ) : (
-                                  <div className="flex flex-col items-center">
-                                    <span className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider">Hora</span>
-                                    <span className="text-xl sm:text-2xl font-black text-emerald-600 mt-0.5">
-                                      {partido.fecha_hora ? new Date(partido.fecha_hora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : partido.hora?.slice(0, 5)}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                              
-                              {isFinalizado && (partido.id_partido || partido.id) && (
-                                <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mt-2 sm:mt-3">
+                            <div className="col-start-2 row-span-2 row-start-1 flex flex-col items-center sm:row-span-1">
+                              {finalizado ? (
+                                <p className="flex flex-col items-center font-display text-2xl font-black leading-tight tabular-nums sm:flex-row sm:gap-3 sm:text-3xl">
+                                  <span className={ml >= mv ? 'text-crema' : 'text-slate-500'}>{ml}</span>
+                                  <span aria-hidden="true" className="hidden text-slate-600 sm:inline">-</span>
+                                  <span className={mv >= ml ? 'text-crema' : 'text-slate-500'}>{mv}</span>
+                                </p>
+                              ) : (
+                                <p className="font-display text-2xl font-black tabular-nums text-celeste sm:text-3xl">{hora || 'Por definir'}</p>
+                              )}
+                              {finalizado && idPartido && (
+                                <div className="mt-2 flex flex-wrap justify-center gap-1.5">
                                   <button
+                                    type="button"
                                     onClick={() => setSelectedMatch(partido)}
-                                    className="flex items-center gap-1 sm:gap-1.5 text-2xs sm:text-xs font-bold text-primary-700 hover:text-white transition-colors bg-primary-50 hover:bg-primary-600 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-primary-100 hover:border-primary-600"
+                                    className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold text-celeste transition-colors hover:bg-white/10 hover:text-white"
                                   >
-                                    <Activity className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                                    <Activity className="h-3.5 w-3.5" aria-hidden="true" />
                                     Estadísticas
                                   </button>
                                   {partido.url_planilla_fiba && (
@@ -348,9 +320,9 @@ export function PartidosList({ torneoId, idCategoria, urlCalendario, categorias 
                                       href={partido.url_planilla_fiba}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="flex items-center gap-1 sm:gap-1.5 text-2xs sm:text-xs font-bold text-gray-600 hover:text-white transition-colors bg-gray-50 hover:bg-gray-800 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-gray-200 hover:border-gray-800"
+                                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
                                     >
-                                      <FileText className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                                      <FileText className="h-3.5 w-3.5" aria-hidden="true" />
                                       Acta
                                     </a>
                                   )}
@@ -358,42 +330,24 @@ export function PartidosList({ torneoId, idCategoria, urlCalendario, categorias 
                               )}
                             </div>
 
-                            {/* Equipo Visitante (Nombre Izquierda, Logo Derecha) */}
-                            <Link 
-                              to={`/equipos/${partido.equipo_visitante?.id_equipo}`}
-                              className="group flex-1 flex flex-row items-center justify-start w-full gap-3 text-left"
-                            >
-                              <span className="font-extrabold text-gray-900 group-hover:text-primary-700 transition-colors duration-200 text-base sm:text-xl line-clamp-2 flex-1 sm:flex-none">
-                                {partido.equipo_visitante?.nombre || partido.equipo_visitante?.nombre_equipo || 'Equipo Visitante'}
-                              </span>
-                              <div className="w-10 h-10 sm:w-14 sm:h-14 flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-110">
-                                {partido.equipo_visitante?.url_logo ? (
-                                  <img src={partido.equipo_visitante.url_logo} alt="Logo Visitante" className="w-full h-full object-contain" />
-                                ) : (
-                                  <div className="w-full h-full bg-primary-50 text-primary-700 flex items-center justify-center font-black text-xs sm:text-sm uppercase rounded-full">
-                                    {(partido.equipo_visitante?.nombre || partido.equipo_visitante?.nombre_equipo || 'V').substring(0, 2)}
-                                  </div>
-                                )}
-                              </div>
-                            </Link>
-
+                            <Equipo equipo={partido.equipo_visitante} defecto="Equipo visitante" lado="visitante" atenuado={finalizado && mv < ml} />
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
+                      </article>
+                    );
+                  })}
                 </div>
-              );
-            })
+              </div>
+            ))
           )}
         </div>
       </div>
-      
+
       {selectedMatch && (
         <BoxScoreModal
           idPartido={(selectedMatch.id_partido || selectedMatch.id) as number}
-          equipoLocal={selectedMatch.equipo_local?.nombre || selectedMatch.equipo_local?.nombre_equipo || 'Local'}
-          equipoVisitante={selectedMatch.equipo_visitante?.nombre || selectedMatch.equipo_visitante?.nombre_equipo || 'Visitante'}
+          equipoLocal={nombre(selectedMatch.equipo_local, 'Local')}
+          equipoVisitante={nombre(selectedMatch.equipo_visitante, 'Visitante')}
           onClose={() => setSelectedMatch(null)}
         />
       )}

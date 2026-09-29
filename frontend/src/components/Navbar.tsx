@@ -45,8 +45,9 @@ export function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  // En la portada y el directorio de equipos el navbar toma los colores de la página (marino, crema y oro)
-  const enInicio = ['/', '/equipos'].includes(useLocation().pathname);
+  // En la portada, el directorio de equipos y la vista de torneo el navbar toma los colores de la página (marino, crema y oro)
+  const { pathname } = useLocation();
+  const enInicio = pathname === '/' || pathname === '/equipos' || pathname.startsWith('/torneos/');
   const claseEnlace = (isActive: boolean, inactivo: string) =>
     `text-sm font-medium ${
       enInicio

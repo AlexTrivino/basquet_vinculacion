@@ -1,96 +1,109 @@
-
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { DataGridTable, type Column } from '../../../components/DataGridTable';
-import { getPosicionesByTorneo } from '../api/torneos.api';
-import type { PosicionFIBA } from '../../../types/api.types';
-import { EmptyState } from '../../../components/EmptyState';
 import { Trophy } from 'lucide-react';
+import { getPosicionesByTorneo } from '../api/torneos.api';
+import { Escudo } from './PartidosList';
 
 interface PosicionesTableProps {
   torneoId: string;
   idCategoria?: number;
 }
 
-export function PosicionesTable({ torneoId, idCategoria }: PosicionesTableProps) {
+const DIAGONAL = '[clip-path:polygon(1.5%_0,100%_0,98.5%_100%,0_100%)]';
 
+// Escalera de posiciones: un peldaño por equipo, el líder más alto y en oro
+export function PosicionesTable({ torneoId, idCategoria }: PosicionesTableProps) {
   const { data: response, isLoading, isError } = useQuery({
     queryKey: ['torneos', torneoId, 'posiciones', idCategoria],
     queryFn: () => getPosicionesByTorneo(torneoId, idCategoria),
   });
-
   const posiciones = response?.data || [];
 
-  const columns: Column<PosicionFIBA>[] = [
-    {
-      key: 'nombre_equipo',
-      header: 'Equipo',
-      render: (row) => (
-        <Link to={`/equipos/${row.id_equipo}`} className="group flex items-center gap-3 transition-all duration-200 w-max">
-          <div className="w-8 h-8 rounded-full shadow-sm bg-white border border-gray-100 overflow-hidden flex items-center justify-center flex-shrink-0">
-            {row.url_logo ? (
-              <img src={row.url_logo} alt={row.nombre_equipo} className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-xs font-bold text-gray-400">{row.nombre_equipo.substring(0, 2).toUpperCase()}</span>
-            )}
-          </div>
-          <span className="font-bold text-gray-900 group-hover:text-primary-700 transition-colors">
-            {row.nombre_equipo}
-          </span>
-        </Link>
-      )
-    },
-    { key: 'PJ', header: 'PJ', headerClassName: 'text-center', cellClassName: 'text-center font-medium' },
-    { key: 'PG', header: 'PG', headerClassName: 'text-center', cellClassName: 'text-center font-medium text-green-700' },
-    { key: 'PP', header: 'PP', headerClassName: 'text-center', cellClassName: 'text-center font-medium text-red-700' },
-    { key: 'PF', header: 'GF', headerClassName: 'text-center', cellClassName: 'text-center text-gray-600' },
-    { key: 'PC', header: 'GC', headerClassName: 'text-center', cellClassName: 'text-center text-gray-600' },
-    {
-      key: 'puntos',
-      header: 'Puntos',
-      headerClassName: 'text-center font-black text-primary-700 tracking-wider pr-4 sm:pr-8',
-      cellClassName: 'text-center pr-4 sm:pr-8',
-      render: (row) => (
-        <span className="text-2xl font-black text-primary-600">
-          {row.puntos}
-        </span>
-      )
-    },
-    { 
-      key: 'DIF', 
-      header: 'DIF', 
-      headerClassName: 'text-center', 
-      cellClassName: 'text-center font-bold',
-      render: (row) => (
-        <span className={row.DIF > 0 ? 'text-green-600' : row.DIF < 0 ? 'text-red-600' : 'text-gray-900'}>
-          {row.DIF > 0 ? '+' : ''}{row.DIF}
-        </span>
-      )
-    }
-  ];
+  if (isError) return <p className="py-8 text-center text-red-300">No pudimos cargar la tabla de posiciones.</p>;
 
-  if (isError) {
-    return <div className="text-center text-red-500 py-8">Error al cargar la tabla de posiciones.</div>;
+  if (isLoading) {
+    return (
+      <div className="mx-auto flex max-w-4xl flex-col gap-2.5">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-20 rounded-xl bg-white/10 motion-safe:animate-pulse" />
+        ))}
+      </div>
+    );
   }
 
-  if (!isLoading && posiciones.length === 0) {
+  if (posiciones.length === 0) {
     return (
-      <EmptyState
-        title="Sin estadísticas"
-        description="Aún no hay posiciones calculadas para este torneo."
-        icon={<Trophy className="mx-auto h-12 w-12 text-gray-400" />}
-      />
+      <div className="rounded-xl border border-dashed border-oro/30 px-6 py-16 text-center">
+        <Trophy className="mx-auto mb-3 h-10 w-10 text-oro/70" aria-hidden="true" />
+        <h3 className="font-display text-xl font-bold text-crema">Sin posiciones todavía</h3>
+        <p className="mt-2 text-slate-400">La tabla aparece cuando se juegue el primer partido de esta categoría.</p>
+      </div>
     );
   }
 
   return (
-    <div className="mt-6 px-2 sm:px-[5%]">
-      <DataGridTable
-        columns={columns}
-        data={posiciones}
-        isLoading={isLoading}
-        ariaLabel="Tabla de Posiciones FIBA"
-      />
+    <div className="mx-auto max-w-4xl">
+      {/* Encabezado de columnas, solo donde hay espacio para ellas */}
+      <div className="hidden grid-cols-[3.5rem_3rem_minmax(0,1fr)_repeat(5,3rem)_4.5rem] gap-3 px-5 pb-2 text-[11px] font-semibold uppercase tracking-widest text-slate-500 md:grid">
+        <span className="col-span-3">Equipo</span>
+        <span className="text-center">PJ</span>
+        <span className="text-center">PG</span>
+        <span className="text-center">PP</span>
+        <span className="text-center">PF</span>
+        <span className="text-center">PC</span>
+        <span className="text-right">Pts</span>
+      </div>
+
+      <ol className="flex flex-col gap-2.5" aria-label="Tabla de posiciones">
+        {posiciones.map((fila, i) => {
+          const lider = i === 0;
+          const dif = `${fila.DIF > 0 ? '+' : ''}${fila.DIF}`;
+          return (
+            <li key={fila.id_equipo} className={`${DIAGONAL} p-px ${lider ? 'bg-oro/70' : 'bg-white/10'}`}>
+              <Link
+                to={`/equipos/${fila.id_equipo}`}
+                className={`${DIAGONAL} group grid grid-cols-[2.75rem_2.75rem_minmax(0,1fr)_auto] items-center gap-3 px-5 transition-colors md:grid-cols-[3.5rem_3rem_minmax(0,1fr)_repeat(5,3rem)_4.5rem] ${
+                  lider
+                    ? 'bg-marino-claro bg-gradient-to-r from-oro/20 to-transparent to-60% py-5'
+                    : 'bg-marino-claro/85 py-3.5 hover:bg-marino-claro'
+                }`}
+              >
+                <span
+                  className={`text-center font-display font-black leading-none ${
+                    lider ? 'text-5xl text-oro' : 'text-4xl text-transparent [-webkit-text-stroke:1.2px_rgb(214_179_106/0.8)]'
+                  }`}
+                >
+                  {i + 1}
+                </span>
+                <Escudo url={fila.url_logo} className={lider ? 'h-12 w-12' : 'h-11 w-11'} />
+                <span className="min-w-0">
+                  <span className="line-clamp-2 font-bold uppercase leading-snug text-crema transition-colors group-hover:text-white">
+                    {fila.nombre_equipo}
+                  </span>
+                  {/* En móvil las columnas se resumen en una línea */}
+                  <span className="mt-1 block text-xs tabular-nums text-slate-400 md:hidden">
+                    {fila.PJ} PJ, {fila.PG} G, {fila.PP} P, {dif}
+                  </span>
+                  <span className="mt-1 hidden text-xs tabular-nums text-slate-400 md:block">Diferencia {dif}</span>
+                </span>
+                {[fila.PJ, fila.PG, fila.PP, fila.PF, fila.PC].map((v, k) => (
+                  <span key={k} className="hidden text-center tabular-nums text-slate-300 md:block">
+                    {v}
+                  </span>
+                ))}
+                <span
+                  className={`text-right font-display font-black leading-none tabular-nums text-oro ${
+                    lider ? 'cifra-brillo text-4xl' : 'text-3xl'
+                  }`}
+                >
+                  {fila.puntos}
+                  <span className="sr-only"> puntos</span>
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }
