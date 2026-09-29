@@ -1,11 +1,11 @@
-**Proyecto:** Plataforma de Gestión de Torneos - Exalumnos Salesianos de Manta  
+**Proyecto:** Plataforma de Gestión de Torneos - Torneos Baloncesto Manta  
 **Versión:** 1.0  
 **Arquitectura:** Híbrida Desacoplada (React + Flask + Supabase)
 # Requisitos funcionales (DRF)
 ---
 
 ## 1. Información General del Proyecto
-El objetivo del sistema es la reforma integral visual y funcional de la gestión de torneos de baloncesto organizados por los Exalumnos Salesianos de Manta. La plataforma automatizará el registro de equipos, la validación de documentos, y el cálculo de estadísticas y tablas de posiciones, reemplazando el uso de formularios manuales de Google.
+El objetivo del sistema es la reforma integral visual y funcional de la gestión de torneos de baloncesto de la comunidad Torneos Baloncesto Manta. La plataforma automatizará el registro de equipos, la validación de documentos, y el cálculo de estadísticas y tablas de posiciones, reemplazando el uso de formularios manuales de Google.
 
 **Alcance de Volumen:** El torneo principal albergará un máximo de 35 equipos y más de 400 jugadores.
 

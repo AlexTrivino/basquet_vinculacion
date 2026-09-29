@@ -1,7 +1,11 @@
 #!/bin/bash
 # Script de Actualización Automática para Producción
 # Uso: ./deploy.sh
-# Permisos requeridos: chmod +x deploy.sh
+# Permisos requeridos: chmod +x deploy.sh (o ejecutar con: bash deploy.sh)
+
+# Si cualquier paso falla, el despliegue se detiene y no reinicia los servicios
+set -eo pipefail
+trap 'echo ""; echo "❌ Despliegue detenido: falló el paso anterior. Los servicios NO se reiniciaron."' ERR
 
 echo "========================================"
 echo "🚀 INICIANDO DESPLIEGUE EN PRODUCCIÓN 🚀"
@@ -9,7 +13,8 @@ echo "========================================"
 
 echo ""
 echo "1. Descargando últimos cambios de GitHub..."
-git pull origin main
+# --ff-only: si la rama del servidor divergió de GitHub, falla en vez de mezclar
+git pull --ff-only origin main
 
 echo ""
 echo "2. Compilando el Frontend (React)..."

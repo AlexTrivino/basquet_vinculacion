@@ -45,7 +45,7 @@ def recalcular_tabla(id_torneo: int, id_categoria: int = None) -> list[dict]:
             {
                 "posicion": 1,
                 "id_equipo": 42,
-                "nombre_equipo": "Salesianos FC",
+                "nombre_equipo": "Delfines BC",
                 "url_logo": "https://...",
                 "PJ": 5, "PG": 4, "PP": 1,
                 "PF": 320, "PC": 280,

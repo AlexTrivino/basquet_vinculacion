@@ -1,4 +1,4 @@
-# Planificación y Diseño del Frontend: Plataforma Torneos Salesianos
+# Planificación y Diseño del Frontend: Plataforma Torneos Baloncesto Manta
 
 **Enfoque:** Arquitectura Orientada a Componentes (React + Vite + TailwindCSS)
 

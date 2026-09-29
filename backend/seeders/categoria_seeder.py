@@ -20,8 +20,7 @@ from app.models.categoria import Categoria
 
 # ── Definición de categorías del torneo ──────────────────────────
 #
-# Categorías validadas con el comité organizador de
-# Exalumnos Salesianos de Manta:
+# Categorías validadas con el comité organizador:
 #   - Juvenil: menores de 18 años
 #   - Abierta: sin límite de edad
 #   - +30, +40, +50: mayores de la edad indicada

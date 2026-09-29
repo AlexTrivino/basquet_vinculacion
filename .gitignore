@@ -1,6 +1,9 @@
 # Claude Code: ajustes y hooks locales de cada desarrollador
 .claude/settings.local.json
 
+# Archivos que la app de Claude guarda al enviar imágenes o documentos al chat
+Claude outputs/
+
 # impeccable-ignore-start
 # Ephemeral output, runtime state, and per-dev overrides.
 # The **/ prefix covers .impeccable at the repo root or in a nested workspace.

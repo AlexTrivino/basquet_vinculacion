@@ -260,7 +260,7 @@ def generar_planilla_partido(id_partido: int) -> BytesIO:
         topMargin=1.5*cm,
         bottomMargin=1.5*cm,
         title=f'Planilla Partido {id_partido}',
-        author='Sistema de Torneos Salesianos',
+        author='Torneos Baloncesto Manta',
     )
 
     estilos = _estilos()
@@ -322,7 +322,7 @@ def generar_planilla_partido(id_partido: int) -> BytesIO:
     # ── BLOQUE 5: Footer ──────────────────────────────────────────
     from datetime import datetime
     elementos.append(Paragraph(
-        f'Documento generado automáticamente · Sistema de Torneos Salesianos Manta · '
+        f'Documento generado automáticamente · Torneos Baloncesto Manta · '
         f'{datetime.now().strftime("%d/%m/%Y %H:%M")}',
         estilos['footer'],
     ))

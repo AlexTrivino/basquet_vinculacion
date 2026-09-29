@@ -1,7 +1,7 @@
 # Contexto General del Proyecto
 
 ## Propósito
-Plataforma integral para la gestión de torneos de baloncesto del Campeonato Intercolegial Exalumnos Salesianos de Manta. El sistema permite a:
+Plataforma integral para la gestión de torneos de baloncesto del campeonato de exalumnos de Manabí (Torneos Baloncesto Manta). El sistema permite a:
 - **Fanáticos/Público:** Ver resultados, posiciones, calendario y estadísticas de los torneos en tiempo real.
 - **Delegados:** Inscribir equipos, gestionar plantillas de jugadores y subir documentación.
 - **Super Administradores:** Auditar inscripciones, programar partidos, registrar estadísticas y generar reportes FIBA.

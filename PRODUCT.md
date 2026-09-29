@@ -14,11 +14,11 @@ web
 
 ## Product Purpose
 
-Plataforma oficial de los torneos de baloncesto que organizan los Exalumnos Salesianos de Manta. Del lado público muestra torneos, calendario, resultados, tabla de posiciones, estadísticas y auspiciantes; del lado privado gestiona inscripciones (wizard), validación de documentos y nóminas, partidos, estadísticas FIBA y sanciones. Éxito: que el aficionado encuentre su próximo partido o el último resultado en segundos, y que un delegado sepa cómo inscribir a su equipo.
+Plataforma oficial de los torneos de Torneos Baloncesto Manta, una comunidad de baloncesto de exalumnos de todo Manabí. Del lado público muestra torneos, calendario, resultados, tabla de posiciones, estadísticas y auspiciantes; del lado privado gestiona inscripciones (wizard), validación de documentos y nóminas, partidos, estadísticas FIBA y sanciones. Éxito: que el aficionado encuentre su próximo partido o el último resultado en segundos, y que un delegado sepa cómo inscribir a su equipo.
 
 ## Positioning
 
-Una comunidad de baloncesto nacida en Manta que reúne a exalumnos de todo Manabí para convivir y conectar a través de una misma pasión. Sus torneos, organizados desde 2019 por Exalumnos Salesianos de Manta y jugados en el Coliseo Pablo Delgado Álava, reactivaron el baloncesto de la ciudad. Todo lo que muestra el sitio (calendario, marcadores, posiciones, equipos) son datos reales de esos torneos.
+Una comunidad de baloncesto nacida en Manta que reúne a exalumnos de todo Manabí para convivir y conectar a través de una misma pasión. Sus torneos, organizados desde 2019 y jugados en el Coliseo Pablo Delgado Álava, reactivaron el baloncesto de la ciudad. Todo lo que muestra el sitio (calendario, marcadores, posiciones, equipos) son datos reales de esos torneos.
 
 ## Operating Context
 
@@ -37,10 +37,10 @@ Una comunidad de baloncesto nacida en Manta que reúne a exalumnos de todo Manab
 
 ## Brand Commitments
 
-- Nombre: **Torneos Baloncesto Manta**. Organizador: **Exalumnos Salesianos de Manta**.
+- Nombre: **Torneos Baloncesto Manta**.
 - Logo oficial: `logo_baloncestoManta.png` (recorte web en `frontend/public/img/logo-recortado.webp`).
 - Lo que el usuario rechaza: que el sitio parezca una plantilla genérica.
-- El sitio no incluye créditos académicos ni institucionales del desarrollo de la plataforma (pedido del usuario).
+- El sitio no incluye créditos académicos ni institucionales, ni nombra a instituciones educativas u organizaciones externas (pedido del usuario).
 
 ## Evidence on Hand
 

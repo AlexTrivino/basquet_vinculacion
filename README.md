@@ -1,4 +1,4 @@
-# 🏀 Plataforma de Gestión de Torneos — Exalumnos Salesianos de Manta
+# 🏀 Plataforma de Gestión de Torneos — Torneos Baloncesto Manta
 
 Plataforma deportiva moderna para la gestión integral de torneos de baloncesto: inscripción de equipos con flujo de wizard, validación de documentos y nóminas, calendario de partidos, estadísticas individuales FIBA y tablas de posiciones automáticas en tiempo real.
 

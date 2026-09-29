@@ -1,6 +1,6 @@
 # Casos de uso y modelo de datos
 
-Plataforma de Gestión de Torneos — Exalumnos Salesianos de Manta.
+Plataforma de Gestión de Torneos — Torneos Baloncesto Manta.
 
 Todo sale del código (`backend/app/models`, `services`, `routes`) en el commit `4e9f0f9`, no de la documentación previa. Donde ambos difieren, manda el código; las diferencias están en la sección 4.
 
