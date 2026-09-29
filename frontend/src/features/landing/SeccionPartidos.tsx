@@ -1,12 +1,16 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Shield, Trophy } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Shield, Trophy } from 'lucide-react';
 import { getPartidos } from '../partidos/api/partidos.api';
 import type { Equipo, Partido } from '../../types/api.types';
 
-const TOTAL_TARJETAS = 4;
+const INICIALES = 4; // tarjetas visibles antes de "Ver más"
+const PASO = 4; // cuántas agrega cada "Ver más"
+const POR_PAGINA = 50; // máximo que acepta el API
+const MAX_PUNTOS = 8; // con más tarjetas, el carrusel móvil muestra "3 de 12" en vez de puntos
 const COLUMNAS = 'grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-x-3';
 
 function nombreEquipo(equipo?: Equipo): string {
@@ -89,7 +93,7 @@ function TarjetaPartido({ partido }: { partido: Partido }) {
             <p className="flex items-center gap-2 font-display font-bold leading-none tabular-nums">
               <span className={tanteo(ganaLocal)}>{partido.marcador_local}</span>
               <span aria-hidden="true" className="text-2xl text-crema/40 sm:text-3xl">
-                –
+                -
               </span>
               <span className={tanteo(!ganaLocal)}>{partido.marcador_visitante}</span>
             </p>
@@ -133,29 +137,90 @@ function TarjetaPartido({ partido }: { partido: Partido }) {
   );
 }
 
+function usePartidos(estados: string, sort_order: 'asc' | 'desc') {
+  return useInfiniteQuery({
+    queryKey: ['landing', 'partidos', estados, sort_order],
+    queryFn: ({ pageParam }) => getPartidos({ estados, sort_order, per_page: POR_PAGINA, page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (ultima) => {
+      const p = ultima.pagination;
+      return p && p.page < p.pages ? p.page + 1 : undefined;
+    },
+  });
+}
+
+const reducirMovimiento = () =>
+  typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 export function SeccionPartidos() {
-  const proximos = useQuery({
-    queryKey: ['landing', 'partidos', 'proximos'],
-    queryFn: () => getPartidos({ estados: 'programado', sort_order: 'asc', per_page: 20 }),
-  });
-  const resultados = useQuery({
-    queryKey: ['landing', 'partidos', 'resultados'],
-    queryFn: () => getPartidos({ estados: 'finalizado,finalizado_wo', sort_order: 'desc', per_page: TOTAL_TARJETAS }),
-  });
+  const proximos = usePartidos('programado', 'asc');
+  const resultados = usePartidos('finalizado,finalizado_wo', 'desc');
+  const [visibles, setVisibles] = useState(INICIALES);
+  const [activa, setActiva] = useState(0);
+  const pista = useRef<HTMLDivElement>(null);
 
   // ponytail: el API no filtra por fecha; los programados ya pasados se descartan aquí
   const hoy = format(new Date(), 'yyyy-MM-dd');
-  const listaProximos = (proximos.data?.data ?? []).filter((p) => (p.fecha ?? '') >= hoy);
-  const listaResultados = resultados.data?.data ?? [];
-  // Dos próximos y dos resultados; si un lado no alcanza, el otro completa las cuatro tarjetas
-  const cuantosProximos = Math.min(listaProximos.length, Math.max(2, TOTAL_TARJETAS - listaResultados.length));
-  const lista = [
-    ...listaProximos.slice(0, cuantosProximos),
-    ...listaResultados.slice(0, TOTAL_TARJETAS - cuantosProximos),
+  const listaProximos = (proximos.data?.pages ?? []).flatMap((p) => p.data ?? []).filter((p) => (p.fecha ?? '') >= hoy);
+  const listaResultados = (resultados.data?.pages ?? []).flatMap((p) => p.data ?? []);
+
+  // Primero 2 próximos y 2 resultados (si un lado no alcanza, el otro completa); luego el resto de
+  // próximos y el resto de resultados. Así las 4 primeras tarjetas no cambian al pulsar "Ver más".
+  // ponytail: si hay más de 50 próximos, las páginas siguientes se piden a demanda y se insertan antes
+  // de los resultados restantes; paginar el orden combinado en el API si algún torneo llega a eso.
+  const nProx = Math.min(listaProximos.length, Math.max(2, INICIALES - listaResultados.length));
+  const nRes = Math.min(listaResultados.length, INICIALES - nProx);
+  const todos = [
+    ...listaProximos.slice(0, nProx),
+    ...listaResultados.slice(0, nRes),
+    ...listaProximos.slice(nProx),
+    ...listaResultados.slice(nRes),
   ];
+  const lista = todos.slice(0, visibles);
+  const quedanEnServidor = proximos.hasNextPage || resultados.hasNextPage;
+  const hayMas = visibles < todos.length || quedanEnServidor;
+  const cargandoMas = proximos.isFetchingNextPage || resultados.isFetchingNextPage;
 
   const cargando = proximos.isLoading || resultados.isLoading;
-  const fallo = (proximos.isError || resultados.isError) && lista.length === 0;
+  const fallo = (proximos.isError || resultados.isError) && todos.length === 0;
+
+  const verMas = () => {
+    const siguiente = visibles + PASO;
+    setVisibles(siguiente);
+    if (siguiente > todos.length) {
+      if (proximos.hasNextPage) void proximos.fetchNextPage();
+      if (resultados.hasNextPage) void resultados.fetchNextPage();
+    }
+  };
+
+  const verMenos = () => {
+    setVisibles(INICIALES);
+    setActiva(0);
+    if (pista.current) pista.current.scrollLeft = 0;
+    document.getElementById('partidos')?.scrollIntoView({ behavior: reducirMovimiento() ? 'auto' : 'smooth' });
+  };
+
+  // Carrusel móvil: la tarjeta que ocupa la vista marca el punto activo (en escritorio es una grilla)
+  useEffect(() => {
+    const el = pista.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const obs = new IntersectionObserver(
+      (entradas) => {
+        for (const e of entradas) if (e.isIntersecting) setActiva(Number((e.target as HTMLElement).dataset.indice));
+      },
+      { root: el, threshold: 0.6 }
+    );
+    el.querySelectorAll('[data-indice]').forEach((n) => obs.observe(n));
+    return () => obs.disconnect();
+  }, [lista.length]);
+
+  const irA = (i: number) => {
+    const destino = pista.current?.querySelector<HTMLElement>(`[data-indice="${i}"]`);
+    destino?.scrollIntoView({ behavior: reducirMovimiento() ? 'auto' : 'smooth', block: 'nearest', inline: 'center' });
+  };
+
+  const flecha =
+    'flex h-10 w-10 items-center justify-center rounded-full border border-oro/40 text-oro transition-colors hover:bg-oro/10 active:scale-95 disabled:opacity-30';
 
   return (
     <section id="partidos" className="relative z-10 scroll-mt-16 px-4 py-24 sm:px-6 lg:px-8">
@@ -188,16 +253,93 @@ export function SeccionPartidos() {
                 Reintentar
               </button>
             </div>
-          ) : lista.length === 0 ? (
+          ) : todos.length === 0 ? (
             <p className="rounded-xl border border-white/10 bg-white/5 p-10 text-center text-slate-300">
               Todavía no hay partidos programados ni resultados publicados.
             </p>
           ) : (
-            <div className="grid gap-6 md:grid-cols-2">
-              {lista.map((partido, i) => (
-                <TarjetaPartido key={partido.id_partido ?? partido.id ?? i} partido={partido} />
-              ))}
-            </div>
+            <>
+              {/* Móvil: carrusel horizontal con snap (deslizar o tocar puntos/flechas). md+: grilla de 2 columnas. */}
+              <div
+                ref={pista}
+                role="region"
+                aria-roledescription="carrusel"
+                aria-label="Partidos"
+                className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-4 px-4 pb-2 [scrollbar-width:none] md:mx-0 md:grid md:snap-none md:grid-cols-2 md:gap-6 md:overflow-visible md:px-0 md:pb-0 [&::-webkit-scrollbar]:hidden"
+              >
+                {lista.map((partido, i) => (
+                  <div
+                    key={partido.id_partido ?? partido.id ?? i}
+                    data-indice={i}
+                    aria-label={`Partido ${i + 1} de ${lista.length}`}
+                    className="flex w-[86%] shrink-0 snap-center md:w-auto [&>a]:w-full"
+                  >
+                    <TarjetaPartido partido={partido} />
+                  </div>
+                ))}
+              </div>
+
+              {lista.length > 1 && (
+                <div className="mt-6 flex items-center justify-center gap-4 md:hidden">
+                  <button type="button" onClick={() => irA(Math.max(0, activa - 1))} disabled={activa === 0} aria-label="Partido anterior" className={flecha}>
+                    <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                  {lista.length <= MAX_PUNTOS ? (
+                    <div className="flex">
+                      {lista.map((_, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => irA(i)}
+                          aria-label={`Ver partido ${i + 1}`}
+                          aria-current={i === activa}
+                          className="flex h-6 items-center px-1"
+                        >
+                          <span className={`block h-2 rounded-full transition-all ${i === activa ? 'w-6 bg-oro' : 'w-2 bg-white/30'}`} />
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="min-w-16 text-center text-sm tabular-nums text-slate-300" aria-live="polite">
+                      {activa + 1} de {lista.length}
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => irA(Math.min(lista.length - 1, activa + 1))}
+                    disabled={activa === lista.length - 1}
+                    aria-label="Partido siguiente"
+                    className={flecha}
+                  >
+                    <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                </div>
+              )}
+
+              {(hayMas || visibles > INICIALES) && (
+                <div className="mt-10 flex flex-wrap justify-center gap-3">
+                  {hayMas && (
+                    <button
+                      type="button"
+                      onClick={verMas}
+                      disabled={cargandoMas}
+                      className="rounded-lg bg-celeste px-6 py-3 text-sm font-semibold text-marino transition-colors hover:bg-white active:scale-[0.98] disabled:opacity-60"
+                    >
+                      {cargandoMas ? 'Cargando…' : 'Ver más partidos'}
+                    </button>
+                  )}
+                  {visibles > INICIALES && (
+                    <button
+                      type="button"
+                      onClick={verMenos}
+                      className="rounded-lg border border-white/25 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 active:scale-[0.98]"
+                    >
+                      Ver menos
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

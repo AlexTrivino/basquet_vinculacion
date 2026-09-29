@@ -46,12 +46,16 @@ function renderHome() {
 describe('Home (página de inicio)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    Element.prototype.scrollIntoView = vi.fn(); // jsdom no lo implementa
     vi.mocked(getTorneos).mockResolvedValue({ success: true, message: '', data: torneos, pagination: { page: 1, per_page: 50, total: 2, pages: 1 } } as never);
     vi.mocked(getEquipos).mockResolvedValue({ success: true, message: '', data: [], pagination: { page: 1, per_page: 1, total: 7, pages: 7 } } as never);
     vi.mocked(getPatrocinadores).mockResolvedValue([{ id_patrocinador: 1, nombre_patrocinador: 'Nike Ecuador', url_logo_patrocinador: '/n.png' }] as never);
     vi.mocked(getPartidos).mockImplementation(async (params) => {
       if (params?.estados === 'programado') return { success: true, message: '', data: [partidoProgramado] } as never;
-      return { success: true, message: '', data: [partidoFinalizado], pagination: { page: 1, per_page: 1, total: 12, pages: 12 } } as never;
+      // per_page 1 es el conteo de "Conócenos"; la sección de partidos pide páginas de 50
+      if (params?.per_page === 1)
+        return { success: true, message: '', data: [partidoFinalizado], pagination: { page: 1, per_page: 1, total: 12, pages: 12 } } as never;
+      return { success: true, message: '', data: [partidoFinalizado], pagination: { page: 1, per_page: 50, total: 1, pages: 1 } } as never;
     });
   });
 
@@ -87,6 +91,26 @@ describe('Home (página de inicio)', () => {
       .getAllByText('GANADOR')
       .find((el) => el.tagName === 'SPAN' && el.getAttribute('aria-hidden') !== 'true');
     expect(cinta?.parentElement).toHaveTextContent('Portoviejo Stars');
+  });
+
+  it('muestra 4 partidos y despliega el resto con "Ver más partidos" y "Ver menos"', async () => {
+    const programados = Array.from({ length: 6 }, (_, i) => ({ ...partidoProgramado, id_partido: 200 + i }));
+    vi.mocked(getPartidos).mockImplementation(async (params) => {
+      if (params?.estados === 'programado') return { success: true, message: '', data: programados } as never;
+      return { success: true, message: '', data: [partidoFinalizado], pagination: { page: 1, per_page: 50, total: 1, pages: 1 } } as never;
+    });
+    renderHome();
+
+    const seccion = document.getElementById('partidos') as HTMLElement;
+    await within(seccion).findByRole('button', { name: 'Ver más partidos' });
+    expect(seccion.querySelectorAll('[data-indice]')).toHaveLength(4);
+
+    fireEvent.click(within(seccion).getByRole('button', { name: 'Ver más partidos' }));
+    expect(seccion.querySelectorAll('[data-indice]')).toHaveLength(7);
+    expect(within(seccion).queryByRole('button', { name: 'Ver más partidos' })).not.toBeInTheDocument();
+
+    fireEvent.click(within(seccion).getByRole('button', { name: 'Ver menos' }));
+    expect(seccion.querySelectorAll('[data-indice]')).toHaveLength(4);
   });
 
   it('el CTA lleva al login cuando no hay sesión y muestra las cifras reales', async () => {

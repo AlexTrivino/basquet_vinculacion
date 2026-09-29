@@ -165,7 +165,7 @@ La cara pública de Torneos Baloncesto Manta se viste como el cartel de una noch
 
 La densidad es baja y el ritmo amplio: secciones con 80 a 96 px de aire vertical, contenedores de 72 a 80 rem y pares de texto y objeto en columnas asimétricas. La profundidad no viene de tarjetas flotando sobre gris, sino de capas tonales (marino, marino claro y una franja negra) y de atmósfera: la foto del coliseo con un zoom lento, el logo desenfocado como marca de agua con parallax y una luz radial tenue dentro de cada cartel de partido. El movimiento es ambiental y lento, y se apaga por completo con movimiento reducido.
 
-Este sistema rechaza la plantilla genérica: no hay hero centrado, ni tarjetas de beneficios, ni fila de métricas. Vive en la portada pública (`/`, contenedor `.pagina-inicio`). El resto del producto, es decir, las pantallas de administrador y de delegado, la autenticación y las páginas públicas internas, sigue en el shell operativo «institucional neutro» del mismo `@theme`. Ese shell se ubica al final de Colors y queda fuera de estas reglas.
+Este sistema rechaza la plantilla genérica: no hay hero centrado, ni tarjetas de beneficios, ni fila de métricas. Vive en la portada pública (`/`) y en el directorio de equipos (`/equipos`), dentro del contenedor `.tema-cartel`. El resto del producto, es decir, las pantallas de administrador y de delegado, la autenticación y las páginas públicas internas, sigue en el shell operativo «institucional neutro» del mismo `@theme`. Ese shell se ubica al final de Colors y queda fuera de estas reglas.
 
 **Rasgos clave:**
 - Noche marino continua de borde a borde; el blanco solo sostiene marcas ajenas.
@@ -279,7 +279,7 @@ Sobrios y claros: la acción la dice el color, no la forma.
 - **Primario:** relleno celeste con texto marino, Inter 600 a 0.875rem y relleno de 12 × 20 px (14 × 24 px en el CTA). Al pasar el cursor, el fondo pasa a blanco con una transición de color de 150 ms.
 - **Secundario:** contorno blanco de 1 px al 25 % y texto blanco; al pasar el cursor, una veladura blanca al 10 %. «Reintentar» usa este estilo en tamaño compacto (8 × 16 px).
 - **Enlace de acción:** texto celeste en Inter 600, con flecha de 16 px; blanco al pasar el cursor («Ver torneo», «Regístrate»).
-- **Foco:** anillo celeste de 2 px, separado 3 px, en toda la portada (`html:has(.pagina-inicio)`), navbar incluido.
+- **Foco:** anillo celeste de 2 px, separado 3 px, en toda la portada y en el directorio de equipos (`html:has(.tema-cartel)`), navbar incluido.
 - **Acceso:** «Ingresar», en la barra. Contorno oro al 70 %, texto oro e Inter 500; al pasar el cursor se llena de oro con texto marino. Conserva el radio de 0.75rem del `Navbar` compartido.
 
 ### Chips
@@ -337,7 +337,7 @@ Círculo de 56 px fijo a 24 px de la esquina inferior derecha, en verde WhatsApp
 - **Entradas:** solo la diapositiva del torneo entra (`.aparecer`: 0.7 s, `ease-out`, desde 14 px más abajo y con opacidad 0). Las secciones no animan su entrada.
 
 ### Superficies del navegador
-En la portada (`html:has(.pagina-inicio)`), el lienzo es marino. La barra de desplazamiento lleva el pulgar celeste, mezclado al 45 % con marino, sobre un carril marino. La selección de texto es oro con texto marino. El cursor de texto y `accent-color` son celestes. El foco es un anillo celeste de 2 px con 3 px de separación. Los enlaces subrayados separan el subrayado 4 px.
+En la portada y el directorio de equipos (`html:has(.tema-cartel)`), el lienzo es marino. La barra de desplazamiento lleva el pulgar celeste, mezclado al 45 % con marino, sobre un carril marino. La selección de texto es oro con texto marino. El cursor de texto y `accent-color` son celestes. El foco es un anillo celeste de 2 px con 3 px de separación. Los enlaces subrayados separan el subrayado 4 px.
 
 ### Movimiento reducido
 Con `prefers-reduced-motion: reduce` se apagan el parallax, el zoom del hero, la entrada de las diapositivas, el rebote del balón y de su sombra, y la marquesina. El carrusel de torneos arranca en pausa (el botón permite reanudarlo) y el balón no gira.

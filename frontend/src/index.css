@@ -157,24 +157,25 @@
 }
 
 /* Superficies del navegador en la página de inicio (selección, foco, scrollbar) */
-html:has(.pagina-inicio) {
+html:has(.tema-cartel) {
+  color-scheme: dark; /* selects, scrollbars y controles nativos en oscuro */
   background-color: var(--color-marino);
   scrollbar-color: color-mix(in srgb, var(--color-celeste) 45%, var(--color-marino)) var(--color-marino);
 }
-html:has(.pagina-inicio) ::selection {
+html:has(.tema-cartel) ::selection {
   background-color: var(--color-oro);
   color: var(--color-marino);
 }
-.pagina-inicio {
+.tema-cartel {
   caret-color: var(--color-celeste);
   accent-color: var(--color-celeste);
 }
 /* html:has(): el navbar vive fuera de <main>, pero en la portada también lleva el foco celeste */
-html:has(.pagina-inicio) :focus-visible {
+html:has(.tema-cartel) :focus-visible {
   outline: 2px solid var(--color-celeste);
   outline-offset: 3px;
 }
-.pagina-inicio a {
+.tema-cartel a {
   text-underline-offset: 4px;
 }
 

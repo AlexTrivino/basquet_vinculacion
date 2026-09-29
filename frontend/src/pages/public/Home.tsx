@@ -22,7 +22,7 @@ export default function Home() {
   const enlaceInscripcion = userRole === 'delegado' ? '/delegado/inscripcion' : '/auth/login';
 
   return (
-    <main className="pagina-inicio relative isolate overflow-x-clip bg-marino text-slate-100">
+    <main className="tema-cartel relative isolate overflow-x-clip bg-marino text-slate-100">
       <div aria-hidden="true" className="fondo-logo" />
 
       <HeroTorneos />

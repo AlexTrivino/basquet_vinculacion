@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getTorneos } from '../../features/torneos/api/torneos.api';
 import { getInscripcionesPublicas } from '../../features/equipos/api/equipos.api';
-import { Skeleton } from '../../components/Skeleton';
-import { Trophy } from 'lucide-react';
+import { ChevronDown, Users } from 'lucide-react';
 
 export default function DirectorioEquipos() {
   const [selectedTorneo, setSelectedTorneo] = useState<number | ''>('');
@@ -60,57 +59,64 @@ export default function DirectorioEquipos() {
     return aprobadas;
   }, [inscripcionesRes?.data, selectedCategoria]);
 
+  const ESTADO_TORNEO: Record<string, string> = { en_curso: 'En curso', programado: 'Próximo', finalizado: 'Finalizado' };
+  const selectCls =
+    'block w-full cursor-pointer appearance-none rounded-lg border border-white/15 bg-marino-claro py-3 pl-4 pr-10 text-sm font-semibold text-crema transition-colors hover:border-oro/50 disabled:cursor-not-allowed disabled:opacity-50';
+  const bloque = 'motion-safe:animate-pulse rounded bg-white/10';
+
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4 flex items-center justify-center gap-3">
-            <Trophy className="w-8 h-8 text-primary-600" />
-            Directorio de Equipos
-          </h1>
-          <p className="text-gray-500 max-w-2xl mx-auto text-lg">
+    // tema-cartel: misma paleta que la portada (marino, oro, crema; celeste solo para foco)
+    <div className="tema-cartel min-h-[100dvh] bg-marino px-4 py-16 text-slate-100 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <header className="mb-12 text-center">
+          <h1 className="font-display text-4xl font-bold tracking-wide text-crema sm:text-5xl">Directorio de Equipos</h1>
+          <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-slate-300">
             Explora los equipos registrados en nuestros torneos, conoce sus plantillas y sigue su progreso en la competición.
           </p>
-        </div>
+        </header>
 
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-10 max-w-3xl mx-auto">
-          <div className="w-full sm:w-1/2">
+        {/* Filtros */}
+        <div className="mx-auto mb-12 grid max-w-3xl gap-4 sm:grid-cols-2">
+          <div className="grid gap-2">
+            <label htmlFor="filtro-torneo" className="text-xs font-semibold uppercase tracking-widest text-slate-400">
+              Torneo
+            </label>
             {loadingTorneos ? (
-              <Skeleton className="h-12 w-full rounded-xl" />
+              <div className={`h-12 w-full ${bloque}`} />
             ) : (
               <div className="relative">
                 <select
+                  id="filtro-torneo"
                   value={selectedTorneo}
                   onChange={(e) => setSelectedTorneo(Number(e.target.value))}
-                  className="block w-full pl-4 pr-10 py-3 text-base font-semibold text-gray-800 border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-xl shadow-sm appearance-none bg-white cursor-pointer"
+                  className={selectCls}
                 >
-                  <option value="" disabled>Seleccione un torneo...</option>
+                  <option value="" disabled>Selecciona un torneo</option>
                   {torneos.map((t) => (
                     <option key={t.id_torneo} value={t.id_torneo}>
-                      {t.nombre} {t.estado === 'en_curso' ? '🔥 (En Curso)' : t.estado === 'programado' ? '⏳ (Próximo)' : '🏆 (Finalizado)'}
+                      {t.nombre} ({ESTADO_TORNEO[t.estado] ?? t.estado})
                     </option>
                   ))}
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
+                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-oro" aria-hidden="true" />
               </div>
             )}
           </div>
 
-          <div className="w-full sm:w-1/2">
+          <div className="grid gap-2">
+            <label htmlFor="filtro-categoria" className="text-xs font-semibold uppercase tracking-widest text-slate-400">
+              Categoría
+            </label>
             {loadingTorneos ? (
-              <Skeleton className="h-12 w-full rounded-xl" />
+              <div className={`h-12 w-full ${bloque}`} />
             ) : (
               <div className="relative">
                 <select
+                  id="filtro-categoria"
                   value={selectedCategoria}
                   onChange={(e) => setSelectedCategoria(e.target.value === 'todas' ? 'todas' : Number(e.target.value))}
                   disabled={selectedTorneo === ''}
-                  className="block w-full pl-4 pr-10 py-3 text-base font-semibold text-gray-800 border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-xl shadow-sm appearance-none bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50"
+                  className={selectCls}
                 >
                   <option value="todas">Todas las categorías</option>
                   {categoriasDisponibles.map((c) => (
@@ -119,62 +125,58 @@ export default function DirectorioEquipos() {
                     </option>
                   ))}
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
+                <ChevronDown className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-oro" aria-hidden="true" />
               </div>
             )}
           </div>
         </div>
 
-        {/* Grid */}
-        {selectedTorneo !== '' && (
-          loadingInscripciones ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                <div key={i} className="bg-white rounded-2xl p-6 flex flex-col items-center">
-                  <Skeleton className="w-20 h-20 rounded-full mb-4" />
-                  <Skeleton className="h-5 w-3/4 mb-2" />
-                  <Skeleton className="h-4 w-1/2" />
+        {/* Grilla de equipos */}
+        {selectedTorneo !== '' &&
+          (loadingInscripciones ? (
+            <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div key={i} className="flex flex-col items-center rounded-xl border border-white/10 bg-marino-claro/50 p-6">
+                  <div className={`mb-4 h-20 w-20 rounded-full ${bloque}`} />
+                  <div className={`mb-2 h-5 w-3/4 ${bloque}`} />
+                  <div className={`h-4 w-1/2 ${bloque}`} />
                 </div>
               ))}
             </div>
           ) : inscripciones.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
               {inscripciones.map((insc) => (
                 <Link
                   key={insc.id_inscripcion}
                   to={`/equipos/${insc.equipo?.id_equipo}`}
-                  className="bg-white rounded-2xl p-6 flex flex-col items-center text-center hover:shadow-md hover:-translate-y-1 transition-all duration-200 border border-transparent hover:border-gray-100"
+                  className="group flex flex-col items-center rounded-xl border border-oro/25 bg-marino-claro/70 p-5 text-center shadow-lg shadow-black/30 transition duration-200 hover:-translate-y-1 hover:border-oro/60 active:scale-[0.98] sm:p-6"
                 >
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full shadow-sm bg-gray-100 border-2 border-white overflow-hidden mb-4 flex items-center justify-center relative">
+                  {/* Medallón claro, igual que en las tarjetas de partido: los logos en silueta se leen sobre marino */}
+                  <div className="mb-4 flex aspect-square w-full max-w-[6rem] items-center justify-center rounded-full bg-gradient-to-b from-white to-slate-200 p-[14%] shadow-lg shadow-black/40 ring-2 ring-oro/40 sm:max-w-[7rem]">
                     {insc.equipo?.url_logo ? (
-                      <img src={insc.equipo.url_logo} alt={insc.equipo.nombre_equipo} className="w-full h-full object-cover" />
+                      <img src={insc.equipo.url_logo} alt="" loading="lazy" className="h-full w-full object-contain" />
                     ) : (
-                      <span className="text-3xl font-bold text-gray-400">
+                      <span className="font-display text-2xl font-bold text-slate-500">
                         {insc.equipo?.nombre_equipo?.substring(0, 2).toUpperCase()}
                       </span>
                     )}
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 leading-tight mb-1 line-clamp-2">
+                  <h3 className="line-clamp-2 text-balance font-display text-base font-bold leading-snug text-crema sm:text-lg">
                     {insc.equipo?.nombre_equipo}
                   </h3>
-                  <p className="text-sm text-gray-500 font-medium capitalize">
+                  <p className="mt-1 text-sm font-medium capitalize text-slate-400">
                     {insc.categoria?.nombre_categoria} ({insc.categoria?.genero_categoria})
                   </p>
                 </Link>
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-gray-200">
-              <Trophy className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <h3 className="text-lg font-medium text-gray-900">Sin equipos registrados</h3>
-              <p className="text-gray-500 mt-1">Aún no hay equipos aprobados en este torneo.</p>
+            <div className="rounded-xl border border-dashed border-oro/30 bg-marino-claro/50 px-6 py-16 text-center">
+              <Users className="mx-auto mb-3 h-10 w-10 text-oro/70" aria-hidden="true" />
+              <h3 className="font-display text-xl font-bold text-crema">Sin equipos registrados</h3>
+              <p className="mt-2 text-slate-400">Aún no hay equipos aprobados en este torneo.</p>
             </div>
-          )
-        )}
+          ))}
       </div>
     </div>
   );

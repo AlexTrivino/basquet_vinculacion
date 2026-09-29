@@ -45,8 +45,8 @@ export function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  // En la portada el navbar toma los colores de la página (marino, crema y oro); el resto queda igual
-  const enInicio = useLocation().pathname === '/';
+  // En la portada y el directorio de equipos el navbar toma los colores de la página (marino, crema y oro)
+  const enInicio = ['/', '/equipos'].includes(useLocation().pathname);
   const claseEnlace = (isActive: boolean, inactivo: string) =>
     `text-sm font-medium ${
       enInicio
