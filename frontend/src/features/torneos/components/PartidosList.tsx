@@ -39,7 +39,7 @@ function Equipo({ equipo, defecto, lado, atenuado }: { equipo: any; defecto: str
   const posicion =
     lado === 'local'
       ? 'col-start-1 row-start-1 sm:justify-end sm:text-right'
-      : 'col-start-1 row-start-2 sm:col-start-3 sm:row-start-1 sm:flex-row-reverse sm:justify-end sm:text-left';
+      : 'col-start-1 row-start-2 sm:col-start-3 sm:row-start-1 sm:justify-start sm:text-left';
   return (
     <Link to={`/equipos/${equipo?.id_equipo}`} className={`group flex min-w-0 items-center gap-3 ${posicion}`}>
       <Escudo url={equipo?.url_logo} className={`h-10 w-10 transition-transform duration-200 group-hover:scale-110 sm:h-12 sm:w-12 ${lado === 'local' ? 'sm:order-2' : ''}`} />
