@@ -214,27 +214,27 @@ describe('EquipoProfile Component', () => {
     });
   });
 
-  it('renderiza la cabecera deportiva con el nombre en mayúsculas y delegado', async () => {
+  it('renderiza la portada con el nombre del equipo y su balance', async () => {
     renderComponent();
 
-    expect(await screen.findByRole('heading', { name: /delfines basketball equipo/i })).toBeInTheDocument();
-    expect(screen.getByText('Equipo Oficial')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: /delfines basketball equipo/i })).toBeInTheDocument();
+    expect(await screen.findByText(/partido jugado/)).toBeInTheDocument();
   });
 
-  it('muestra el último resultado con marcador y badge de victoria', async () => {
+  it('muestra los resultados con marcador y badge de victoria', async () => {
     renderComponent();
 
-    expect(await screen.findByText('Último Resultado')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Resultados' })).toBeInTheDocument();
     expect(screen.getByText('Victoria')).toBeInTheDocument();
     expect(screen.getByText('84')).toBeInTheDocument();
     expect(screen.getByText('76')).toBeInTheDocument();
     expect(screen.getByText(/Tiburones BBC/i)).toBeInTheDocument();
   });
 
-  it('muestra la cola de próximos partidos con hora y rival', async () => {
+  it('muestra el boleto del próximo partido con hora y rival', async () => {
     renderComponent();
 
-    expect(await screen.findByText('Próximos Encuentros')).toBeInTheDocument();
+    expect(await screen.findByRole('article', { name: 'Próximo partido' })).toBeInTheDocument();
     expect(screen.getByText(/Leones de Manta/i)).toBeInTheDocument();
     expect(screen.getByText(/20:00/i)).toBeInTheDocument();
   });
@@ -242,10 +242,28 @@ describe('EquipoProfile Component', () => {
   it('renderiza la lista del roster oficial con jugadores y números de camiseta', async () => {
     renderComponent();
 
-    expect(await screen.findByText(/Michael Jordán/i)).toBeInTheDocument();
-    expect(screen.getByText('#23')).toBeInTheDocument();
-    expect(screen.getByText(/Luka Doncic/i)).toBeInTheDocument();
-    expect(screen.getByText('#7')).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'Michael Jordán, dorsal 23' })).toHaveAttribute('href', '/jugadores/50');
+    expect(screen.getByRole('link', { name: 'Luka Doncic, dorsal 7' })).toHaveAttribute('href', '/jugadores/51');
+  });
+
+  it('parte el nombre del cromo en apellidos y nombres, salvo con partículas', async () => {
+    vi.spyOn(plantillasApi, 'getPlantillas').mockResolvedValue({
+      success: true,
+      data: [
+        { ...mockPlantillas[0], jugador: { id_jugador: 50, nombre: 'JORGE EDUARDO SALTOS BACUSOY', url_foto: null } },
+        { ...mockPlantillas[1], jugador: { id_jugador: 51, nombre: 'JUAN DE LA CRUZ', url_foto: null } },
+        { ...mockPlantillas[1], id_plantilla: 103, jugador: { id_jugador: 52, nombre: 'JORGE VÉLEZ', url_foto: null } },
+      ],
+      message: 'Plantilla obtenida',
+    });
+
+    renderComponent();
+
+    expect(await screen.findByText('SALTOS BACUSOY')).toBeInTheDocument();
+    expect(screen.getByText('jorge eduardo')).toBeInTheDocument();
+    expect(screen.getByText('JUAN DE LA CRUZ')).toBeInTheDocument();
+    expect(screen.getByText('VÉLEZ')).toBeInTheDocument();
+    expect(screen.getByText('jorge')).toBeInTheDocument();
   });
 
   it('paginación del historial de participaciones muestra máximo 3 tarjetas por vista y navega correctamente', async () => {
@@ -324,7 +342,7 @@ describe('EquipoProfile Component', () => {
     renderComponent();
 
     expect(await screen.findByText('Sin partidos finalizados')).toBeInTheDocument();
-    expect(screen.getByText('Sin compromisos programados')).toBeInTheDocument();
+    expect(screen.getByText('Sin partidos programados')).toBeInTheDocument();
     expect(screen.getByText('Aún no registra participaciones oficiales aprobadas.')).toBeInTheDocument();
   });
 

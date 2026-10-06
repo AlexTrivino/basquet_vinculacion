@@ -52,9 +52,9 @@ export function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  // En la portada, el directorio de equipos y la vista de torneo el navbar toma los colores de la página (marino, crema y oro)
+  // En las páginas públicas oscuras (y el panel del delegado, que muestra el perfil de su equipo) el navbar toma los colores de la página (marino, crema y oro)
   const { pathname } = useLocation();
-  const enInicio = pathname === '/' || pathname === '/equipos' || pathname.startsWith('/torneos/') || pathname.startsWith('/jugadores/') || pathname === '/visor';
+  const enInicio = pathname === '/' || pathname.startsWith('/equipos') || pathname.startsWith('/torneos/') || pathname.startsWith('/jugadores/') || pathname === '/visor' || pathname === '/delegado/dashboard';
   const claseEnlace = (isActive: boolean, inactivo: string) =>
     `text-sm font-medium ${
       enInicio

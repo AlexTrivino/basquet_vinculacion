@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-09-25T04:56:45Z",
+  "generatedAt": "2026-10-06T04:31:06Z",
   "title": "Sistema de diseño: Torneos Baloncesto Manta",
   "extensions": {
     "colorMeta": {
@@ -153,12 +153,57 @@
           "oklch(92.9% 0.013 255.508)",
           "oklch(96.8% 0.007 247.896)"
         ]
+      },
+      "rose-100": {
+        "role": "error",
+        "displayName": "Rosa Aviso Tinta",
+        "canonical": "oklch(94.1% 0.03 12.58)",
+        "tonalRamp": [
+          "oklch(41% 0.159 10.272)",
+          "oklch(45.5% 0.188 13.697)",
+          "oklch(51.4% 0.222 16.935)",
+          "oklch(64.5% 0.246 16.439)",
+          "oklch(71.2% 0.194 13.428)",
+          "oklch(81% 0.117 11.638)",
+          "oklch(89.2% 0.058 10.001)",
+          "oklch(94.1% 0.03 12.58)"
+        ]
+      },
+      "rose-300": {
+        "role": "error",
+        "displayName": "Rosa Aviso Contorno",
+        "canonical": "oklch(81% 0.117 11.638)",
+        "tonalRamp": [
+          "oklch(41% 0.159 10.272)",
+          "oklch(45.5% 0.188 13.697)",
+          "oklch(51.4% 0.222 16.935)",
+          "oklch(64.5% 0.246 16.439)",
+          "oklch(71.2% 0.194 13.428)",
+          "oklch(81% 0.117 11.638)",
+          "oklch(89.2% 0.058 10.001)",
+          "oklch(94.1% 0.03 12.58)"
+        ]
+      },
+      "rose-500": {
+        "role": "error",
+        "displayName": "Rosa Aviso",
+        "canonical": "oklch(64.5% 0.246 16.439)",
+        "tonalRamp": [
+          "oklch(41% 0.159 10.272)",
+          "oklch(45.5% 0.188 13.697)",
+          "oklch(51.4% 0.222 16.935)",
+          "oklch(64.5% 0.246 16.439)",
+          "oklch(71.2% 0.194 13.428)",
+          "oklch(81% 0.117 11.638)",
+          "oklch(89.2% 0.058 10.001)",
+          "oklch(94.1% 0.03 12.58)"
+        ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "El h1 de la portada; el título de la sección de partidos en caja alta."
+        "purpose": "El h1 de la portada y el nombre del equipo en su perfil (interlineado 1.05); el título de la sección de partidos en caja alta."
       },
       "headline": {
         "displayName": "Titular",
@@ -170,15 +215,19 @@
       },
       "score": {
         "displayName": "Marcador",
-        "purpose": "El tanteo de un resultado: ganador en oro, perdedor en crema al 55 %."
+        "purpose": "El tanteo de un resultado: ganador en oro, perdedor en crema al 55 %. En el perfil de equipo, el día y la hora del boleto, el tanteo de cada fila y el año de cada edición (en oro)."
+      },
+      "dorsal": {
+        "displayName": "Dorsal",
+        "purpose": "El número de camiseta del cromo: sin relleno, con un contorno oro de 1.5 px; 3rem en móvil. La única cifra contorneada del sistema."
       },
       "plaque": {
         "displayName": "Placa",
-        "purpose": "Rótulos PRÓXIMO PARTIDO y GANADOR de la franja del cartel, en caja alta; el subtítulo de sección a 0.875rem."
+        "purpose": "Rótulos PRÓXIMO PARTIDO y GANADOR de la franja del cartel y los del boleto (día de la semana, mes, PRÓXIMO PARTIDO), en caja alta; el subtítulo de sección a 0.875rem."
       },
       "ribbon": {
         "displayName": "Cinta",
-        "purpose": "Cintas de fecha y de estado en caja alta; la píldora GANADOR baja a 10 px con tracking 0.1em."
+        "purpose": "Cintas de fecha y de estado en caja alta; la píldora GANADOR y las de resultado bajan a 10 px con tracking 0.1em."
       },
       "body-lead": {
         "displayName": "Entradilla",
@@ -201,7 +250,7 @@
       {
         "name": "panel",
         "value": "0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3)",
-        "purpose": "Cartel de partido y panel CTA."
+        "purpose": "Cartel de partido, panel CTA, boleto y paneles de lista del perfil de equipo."
       },
       {
         "name": "banda",
@@ -222,6 +271,26 @@
         "name": "sombra-balon",
         "value": "elipse rgb(0 0 0 / 0.7), filter: blur(12px)",
         "purpose": "Sombra bajo el balón 3D; se comprime con el rebote."
+      },
+      {
+        "name": "escudo",
+        "value": "0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4)",
+        "purpose": "Medallón compacto (`Escudo`) de las listas de partidos, del boleto y del perfil de equipo, con el anillo oro."
+      },
+      {
+        "name": "cromo",
+        "value": "0 24px 48px -24px rgb(0 0 0 / 0.7)",
+        "purpose": "Sombra recogida bajo cada cromo; el spread negativo la concentra bajo la base."
+      },
+      {
+        "name": "cromo-hover",
+        "value": "0 32px 56px -24px rgb(0 0 0 / 0.85)",
+        "purpose": "La sombra del cromo se hunde al pasar el cursor; solo con movimiento permitido."
+      },
+      {
+        "name": "filo-luz",
+        "value": "inset 0 1px 0 rgb(255 255 255 / 0.08)",
+        "purpose": "Filo de luz en el borde superior del núcleo del cromo (doble bisel)."
       }
     ],
     "motion": [
@@ -233,7 +302,7 @@
       {
         "name": "hero-zoom",
         "value": "hero-zoom 28s ease-in-out infinite alternate; scale(1.05) → scale(1.18)",
-        "purpose": "Zoom lento infinito de la foto del hero (`.hero-zoom`)."
+        "purpose": "Zoom lento infinito de la foto del hero (`.hero-zoom`) y de la foto del coliseo cuando un equipo no tiene portada."
       },
       {
         "name": "fondo-parallax",
@@ -243,7 +312,7 @@
       {
         "name": "aparecer",
         "value": "aparecer 0.7s ease-out both; opacity 0, translateY(14px) → opacity 1, none",
-        "purpose": "Entrada de cada diapositiva del carrusel de torneos; ninguna sección anima su entrada."
+        "purpose": "Entrada de la diapositiva del carrusel de torneos, de la identidad del equipo en la portada de su perfil y de la ficha del buscador. Fuera del perfil de equipo, ninguna sección anima su entrada."
       },
       {
         "name": "progreso-slide",
@@ -271,9 +340,39 @@
         "purpose": "Marquesina de logos de auspiciantes."
       },
       {
+        "name": "curva-album",
+        "value": "cubic-bezier(0.32, 0.72, 0, 1)",
+        "purpose": "La curva del perfil de equipo: entradas de bloques y cromos, elevación del cromo, zoom del retrato y brillo de lámina."
+      },
+      {
+        "name": "revelar",
+        "value": "IntersectionObserver (umbral 0.15), una sola vez por elemento; data-revelar: '' → 'pendiente' (opacity 0) → 'visto'; --retraso escalonado cada 70ms",
+        "purpose": "Mecanismo de las entradas del perfil de equipo: el marcado nace visible y solo se oculta mientras espera; sin JavaScript, sin IntersectionObserver o con movimiento reducido no se oculta nada."
+      },
+      {
+        "name": "bloque-sube",
+        "value": "bloque-sube 0.8s cubic-bezier(0.32, 0.72, 0, 1) var(--retraso, 0ms) both; from opacity 0, translateY(1.75rem)",
+        "purpose": "El boleto y los bloques de Resultados e Historial suben una sola vez al llegar a pantalla."
+      },
+      {
+        "name": "cromo-entra",
+        "value": "cromo-entra 0.9s cubic-bezier(0.32, 0.72, 0, 1) var(--retraso, 0ms) both; from opacity 0, translateY(2.5rem) rotate(var(--giro, -3deg)) scale(0.94); --giro 2.5deg en pares, -1.5deg cada tercero",
+        "purpose": "Los cromos se reparten una sola vez al llegar a pantalla: suben y se enderezan desde un giro leve."
+      },
+      {
+        "name": "cromo-elevar",
+        "value": "500ms cubic-bezier(0.32, 0.72, 0, 1); translateY(-6px), sombra cromo-hover; retrato scale(1.04) en 700ms",
+        "purpose": "Al pasar el cursor el cromo se eleva y su retrato crece; solo con movimiento permitido."
+      },
+      {
+        "name": "brillo-lamina",
+        "value": "transform 1000ms cubic-bezier(0.32, 0.72, 0, 1); translateX(-160%) skewX(-16deg) → translateX(260%); banda crema al 30 %",
+        "purpose": "El brillo de lámina cruza el cromo al pasar el cursor; solo con movimiento permitido."
+      },
+      {
         "name": "movimiento-reducido",
-        "value": "@media (prefers-reduced-motion: reduce) { .fondo-logo, .hero-zoom, .aparecer, .balon-rebote, .sombra-rebote, .animate-marquee { animation: none } }",
-        "purpose": "Apaga todo el movimiento ambiental; además el carrusel arranca en pausa y el balón no gira."
+        "value": "@media (prefers-reduced-motion: reduce): animation: none en .fondo-logo, .hero-zoom, .aparecer, .balon-rebote, .sombra-rebote y .animate-marquee; [data-revelar] { opacity: 1 !important; animation: none !important }; pulso de esqueletos y efectos del cromo solo con motion-safe",
+        "purpose": "Apaga el movimiento ambiental y las entradas, que dejan todo visible; además el carrusel arranca en pausa y el balón no gira."
       }
     ],
     "breakpoints": [
@@ -288,6 +387,10 @@
       {
         "name": "lg",
         "value": "1024px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
       }
     ]
   },
@@ -309,10 +412,10 @@
       "css": ".ds-btns-noche { background: var(--color-marino, #081226); padding: 24px; } .ds-btns { display: inline-block; padding: 12px 20px; border: 1px solid color-mix(in oklab, #fff 25%, transparent); border-radius: 0.5rem; background: transparent; color: #fff; font-family: var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif); font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; text-decoration: none; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-btns:hover { background: color-mix(in oklab, #fff 10%, transparent); } .ds-btns:focus-visible { outline: 2px solid var(--color-celeste, #29A9E1); outline-offset: 3px; }"
     },
     {
-      "name": "Barra de navegación (portada)",
+      "name": "Barra de navegación (cartelera)",
       "kind": "nav",
       "refersTo": "nav",
-      "description": "Variante de la barra solo para `/`: marino, enlaces en pizarra, activo en crema y acceso con contorno oro.",
+      "description": "Variante oscura de la barra en las rutas de este mundo (`/`, `/equipos` y sus perfiles, `/torneos/:id`, `/jugadores/:id`, `/visor` y `/delegado/dashboard`): marino, enlaces en pizarra, activo en crema y acceso con contorno oro.",
       "html": "<nav class='ds-nav' aria-label='Principal'><a class='ds-nav-marca' href='/'>Torneos Baloncesto Manta</a><div class='ds-nav-enlaces'><a class='ds-nav-enlace ds-nav-activo' href='/' aria-current='page'>Inicio</a><a class='ds-nav-enlace' href='/equipos'>Equipos</a></div><a class='ds-nav-acceso' href='/auth/login'>Ingresar</a></nav>",
       "css": ".ds-nav { display: flex; align-items: center; justify-content: space-between; gap: 32px; height: 64px; padding: 0 32px; background: var(--color-marino, #081226); border-bottom: 1px solid color-mix(in oklab, #fff 10%, transparent); font-family: var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif); } .ds-nav-marca { color: var(--color-crema, #F1E7D0); font-size: 1.25rem; line-height: 1.75rem; font-weight: 700; text-decoration: none; } .ds-nav-enlaces { display: flex; gap: 32px; } .ds-nav-enlace { color: var(--color-slate-300, oklch(86.9% 0.022 252.894)); font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; text-decoration: none; } .ds-nav-enlace:hover { color: #fff; } .ds-nav-activo, .ds-nav-activo:hover { color: var(--color-crema, #F1E7D0); } .ds-nav-acceso { display: inline-flex; align-items: center; padding: 8px 16px; border: 1px solid color-mix(in oklab, var(--color-oro, #D6B36A) 70%, transparent); border-radius: 0.75rem; color: var(--color-oro, #D6B36A); font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; text-decoration: none; } .ds-nav-acceso:hover { background: var(--color-oro, #D6B36A); color: var(--color-marino, #081226); } .ds-nav a:focus-visible { outline: 2px solid var(--color-celeste, #29A9E1); outline-offset: 3px; }"
     },
@@ -323,6 +426,14 @@
       "description": "Categorías de un torneo: veladura blanca al 5 %, borde al 10 %, texto pizarra clara. Informativo, no filtra.",
       "html": "<div class='ds-chips-noche'><ul class='ds-chips' aria-label='Categorías'><li class='ds-chip'>Senior Libre</li><li class='ds-chip'>Maxibasquet +35</li><li class='ds-chip'>Femenino Abierto</li></ul></div>",
       "css": ".ds-chips-noche { background: var(--color-marino-claro, #0E1D3D); padding: 24px; } .ds-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; } .ds-chip { padding: 4px 10px; border: 1px solid color-mix(in oklab, #fff 10%, transparent); border-radius: 0.375rem; background: color-mix(in oklab, #fff 5%, transparent); color: var(--color-slate-200, oklch(92.9% 0.013 255.508)); font-family: var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif); font-size: 0.75rem; line-height: 1rem; }"
+    },
+    {
+      "name": "Selector",
+      "kind": "input",
+      "refersTo": "select",
+      "description": "Filtro nativo sobre la noche: contorno blanco al 15 %, texto crema en Inter 600 y contorno oro al 50 % al pasar el cursor; `color-scheme: dark` oscurece la lista desplegable.",
+      "html": "<div class='ds-selector-noche'><div class='ds-selectores'><select class='ds-selector' aria-label='Torneo de la plantilla'><option>Copa Verano Manta 2026</option><option>Todos los torneos (histórico)</option></select><select class='ds-selector' aria-label='Categoría de la plantilla'><option>Senior Libre</option><option>Todas las categorías</option></select></div></div>",
+      "css": ".ds-selector-noche { padding: 24px; background: var(--color-marino, #081226); color-scheme: dark; } .ds-selectores { display: flex; gap: 8px; } .ds-selector { width: 14rem; min-width: 0; padding: 8px 32px 8px 12px; border: 1px solid color-mix(in oklab, #fff 15%, transparent); border-radius: 0.5rem; background-color: var(--color-marino, #081226); color: var(--color-crema, #F1E7D0); font-family: var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif); font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; text-overflow: ellipsis; cursor: pointer; transition: border-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-selector:hover { border-color: color-mix(in oklab, var(--color-oro, #D6B36A) 50%, transparent); } .ds-selector:focus-visible { outline: 2px solid var(--color-celeste, #29A9E1); outline-offset: 3px; }"
     },
     {
       "name": "Cartel de partido",
@@ -339,6 +450,22 @@
       "description": "Componente firma (`HeroTorneos`): paralelogramo con filete oro, cinta de estado y carrusel de 10 s con pausa, puntos y barra de progreso.",
       "html": "<div class='ds-torneo-noche'><div class='ds-torneo-carrusel' aria-roledescription='carrusel' aria-label='Torneos'><div class='ds-torneo-filete'><div class='ds-torneo'><article class='ds-torneo-slide'><span class='ds-torneo-cinta'>En curso</span><h2 class='ds-torneo-nombre'>Copa Verano Manta 2026</h2><p class='ds-torneo-fechas'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M8 2v4'/><path d='M16 2v4'/><rect width='18' height='18' x='3' y='4' rx='2'/><path d='M3 10h18'/><path d='M8 14h.01'/><path d='M12 14h.01'/><path d='M16 14h.01'/><path d='M8 18h.01'/><path d='M12 18h.01'/><path d='M16 18h.01'/></svg>1 jun – 20 dic 2026</p><ul class='ds-torneo-chips' aria-label='Categorías'><li>Senior Libre</li><li>Maxibasquet +35</li><li>Femenino Abierto</li></ul><a class='ds-torneo-enlace' href='#'>Ver torneo <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M5 12h14'/><path d='m12 5 7 7-7 7'/></svg></a></article></div></div><div class='ds-torneo-controles'><button type='button' class='ds-torneo-pausa' aria-label='Pausar carrusel'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><rect x='14' y='3' width='5' height='18' rx='1'/><rect x='5' y='3' width='5' height='18' rx='1'/></svg></button><div class='ds-torneo-puntos'><button type='button' class='ds-torneo-punto' aria-label='Ver torneo 1'><span></span></button><button type='button' class='ds-torneo-punto ds-torneo-punto-activo' aria-label='Ver torneo 2' aria-current='true'><span></span></button><button type='button' class='ds-torneo-punto' aria-label='Ver torneo 3'><span></span></button></div><div class='ds-torneo-pista'><span class='ds-torneo-progreso'></span></div></div></div></div>",
       "css": ".ds-torneo-noche { padding: 32px; background: var(--color-marino, #081226); } .ds-torneo-carrusel { max-width: 640px; } .ds-torneo-filete, .ds-torneo { clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%); } .ds-torneo-filete { padding: 1px; background: color-mix(in oklab, var(--color-oro, #D6B36A) 55%, transparent); } .ds-torneo { box-sizing: border-box; min-height: 22rem; padding: 48px 64px; background: color-mix(in oklab, var(--color-marino-claro, #0E1D3D) 90%, transparent); } .ds-torneo-slide { animation: ds-aparecer 0.7s ease-out both; } .ds-torneo-cinta { display: inline-block; padding: 2px 8px; border-radius: 0.25rem; background: var(--color-oro, #D6B36A); color: var(--color-marino, #081226); font-family: var(--font-display, 'Cinzel', ui-serif, Georgia, serif); font-size: 0.75rem; line-height: 1rem; font-weight: 700; text-transform: uppercase; } .ds-torneo-nombre { margin: 24px 0 0; color: var(--color-crema, #F1E7D0); font-family: var(--font-display, 'Cinzel', ui-serif, Georgia, serif); font-size: 2.25rem; line-height: 1.25; font-weight: 700; text-wrap: balance; } .ds-torneo-fechas { display: flex; align-items: center; gap: 8px; margin: 16px 0 0; color: var(--color-slate-300, oklch(86.9% 0.022 252.894)); font-family: var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif); font-size: 1rem; line-height: 1.5rem; font-variant-numeric: tabular-nums; } .ds-torneo-fechas svg { width: 16px; height: 16px; color: var(--color-oro, #D6B36A); } .ds-torneo-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 0; padding: 0; list-style: none; } .ds-torneo-chips li { padding: 4px 10px; border: 1px solid color-mix(in oklab, #fff 10%, transparent); border-radius: 0.375rem; background: color-mix(in oklab, #fff 5%, transparent); color: var(--color-slate-200, oklch(92.9% 0.013 255.508)); font-family: var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif); font-size: 0.75rem; line-height: 1rem; } .ds-torneo-enlace { display: inline-flex; align-items: center; gap: 8px; margin-top: 32px; color: var(--color-celeste, #29A9E1); font-family: var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif); font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; text-decoration: none; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-torneo-enlace:hover { color: #fff; } .ds-torneo-enlace svg { width: 16px; height: 16px; } .ds-torneo-controles { display: flex; align-items: center; gap: 16px; margin-top: 24px; padding: 0 32px; } .ds-torneo-pausa { display: flex; flex-shrink: 0; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 1px solid color-mix(in oklab, #fff 20%, transparent); border-radius: 9999px; background: transparent; color: var(--color-slate-200, oklch(92.9% 0.013 255.508)); cursor: pointer; transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-torneo-pausa:hover { background: color-mix(in oklab, #fff 10%, transparent); } .ds-torneo-pausa svg { width: 14px; height: 14px; } .ds-torneo-puntos { display: flex; } .ds-torneo-punto { display: flex; align-items: center; height: 24px; padding: 0 4px; border: 0; background: none; cursor: pointer; } .ds-torneo-punto span { display: block; width: 8px; height: 8px; border-radius: 9999px; background: color-mix(in oklab, #fff 30%, transparent); transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-torneo-punto:hover span { background: color-mix(in oklab, #fff 60%, transparent); } .ds-torneo-punto-activo span, .ds-torneo-punto-activo:hover span { width: 32px; background: var(--color-celeste, #29A9E1); } .ds-torneo-pista { flex: 1; height: 2px; overflow: hidden; border-radius: 0.25rem; background: color-mix(in oklab, #fff 10%, transparent); } .ds-torneo-progreso { display: block; height: 100%; background: var(--color-celeste, #29A9E1); transform-origin: left; animation: ds-progreso 10s linear infinite; } .ds-torneo-carrusel button:focus-visible, .ds-torneo-enlace:focus-visible { outline: 2px solid var(--color-celeste, #29A9E1); outline-offset: 3px; } @keyframes ds-aparecer { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } } @keyframes ds-progreso { from { transform: scaleX(0); } to { transform: scaleX(1); } } @media (prefers-reduced-motion: reduce) { .ds-torneo-slide, .ds-torneo-progreso { animation: none; } }"
+    },
+    {
+      "name": "Cromo",
+      "kind": "card",
+      "refersTo": "player-card",
+      "description": "Componente firma (`Cromo`): bandeja de doble bisel con filete oro, retrato 3:4, dorsal contorneado en oro y apellidos en Cinzel. Al pasar el cursor se eleva y lo cruza un brillo de lámina; entra una sola vez, enderezándose desde un giro leve. Las iniciales sustituyen a las fotos de muestra.",
+      "html": "<div class='ds-album-noche'><ul class='ds-album' aria-label='Plantilla'><li><a class='ds-cromo' href='#' aria-label='Juan Carlos Mendoza Zambrano, dorsal 7'><div class='ds-cromo-nucleo'><span class='ds-cromo-iniciales' aria-hidden='true'>JM</span><span class='ds-cromo-degradado' aria-hidden='true'></span><span class='ds-cromo-dorsal' aria-hidden='true'>7</span><span class='ds-cromo-lamina' aria-hidden='true'></span></div><div class='ds-cromo-pie'><p class='ds-cromo-apellidos'>Mendoza Zambrano</p><p class='ds-cromo-nombres'>Juan Carlos</p></div></a></li><li><a class='ds-cromo' href='#' aria-label='Luis Cedeño, dorsal 23'><div class='ds-cromo-nucleo'><span class='ds-cromo-iniciales' aria-hidden='true'>LC</span><span class='ds-cromo-degradado' aria-hidden='true'></span><span class='ds-cromo-dorsal' aria-hidden='true'>23</span><span class='ds-cromo-lamina' aria-hidden='true'></span></div><div class='ds-cromo-pie'><p class='ds-cromo-apellidos'>Cedeño</p><p class='ds-cromo-nombres'>Luis</p></div></a></li><li><a class='ds-cromo' href='#' aria-label='Andrés Pinargote Vera, dorsal 11'><div class='ds-cromo-nucleo'><span class='ds-cromo-iniciales' aria-hidden='true'>AP</span><span class='ds-cromo-degradado' aria-hidden='true'></span><span class='ds-cromo-dorsal' aria-hidden='true'>11</span><span class='ds-cromo-lamina' aria-hidden='true'></span></div><div class='ds-cromo-pie'><p class='ds-cromo-apellidos'>Pinargote Vera</p><p class='ds-cromo-nombres'>Andrés</p></div></a></li></ul></div>",
+      "css": ".ds-album-noche { padding: 24px; background: var(--color-marino, #081226); } .ds-album { display: grid; grid-template-columns: repeat(3, minmax(0, 160px)); gap: 20px; margin: 0; padding: 0; list-style: none; } .ds-album li { animation: ds-cromo-entra 0.9s cubic-bezier(0.32, 0.72, 0, 1) both; } .ds-album li:nth-child(2) { --giro: 2.5deg; animation-delay: 70ms; } .ds-album li:nth-child(3) { --giro: -1.5deg; animation-delay: 140ms; } .ds-cromo { display: flex; flex-direction: column; height: 100%; padding: 6px; border-radius: 1rem; background: rgb(255 255 255 / 0.04); box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-oro, #D6B36A) 40%, transparent), 0 24px 48px -24px rgb(0 0 0 / 0.7); text-decoration: none; transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1), box-shadow 500ms cubic-bezier(0.32, 0.72, 0, 1); } .ds-cromo:hover { transform: translateY(-6px); box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-oro, #D6B36A) 70%, transparent), 0 32px 56px -24px rgb(0 0 0 / 0.85); } .ds-cromo:focus-visible { outline: 2px solid var(--color-celeste, #29A9E1); outline-offset: 3px; } .ds-cromo-nucleo { position: relative; aspect-ratio: 3 / 4; overflow: hidden; border-radius: 0.625rem; background: var(--color-marino-claro, #0E1D3D); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08); } .ds-cromo-iniciales { display: flex; height: 100%; box-sizing: border-box; align-items: center; justify-content: center; padding-bottom: 48px; color: color-mix(in oklab, var(--color-oro, #D6B36A) 30%, transparent); font-family: var(--font-display, 'Cinzel', ui-serif, Georgia, serif); font-size: 3rem; line-height: 1; font-weight: 700; } .ds-cromo-degradado { position: absolute; left: 0; right: 0; bottom: 0; height: 50%; background: linear-gradient(to top, var(--color-marino, #081226), color-mix(in oklab, var(--color-marino, #081226) 50%, transparent), transparent); } .ds-cromo-dorsal { position: absolute; left: 12px; bottom: 6px; color: transparent; -webkit-text-stroke: 1.5px var(--color-oro, #D6B36A); font-family: var(--font-display, 'Cinzel', ui-serif, Georgia, serif); font-size: 3.75rem; line-height: 1; font-weight: 700; } .ds-cromo-lamina { position: absolute; top: 0; bottom: 0; left: 0; width: 50%; pointer-events: none; transform: translateX(-160%) skewX(-16deg); background: linear-gradient(to right, transparent, color-mix(in oklab, var(--color-crema, #F1E7D0) 30%, transparent), transparent); } .ds-cromo:hover .ds-cromo-lamina { transform: translateX(260%) skewX(-16deg); transition: transform 1000ms cubic-bezier(0.32, 0.72, 0, 1); } .ds-cromo-pie { flex: 1; padding: 12px 8px 8px; } .ds-cromo-apellidos { margin: 0; color: var(--color-crema, #F1E7D0); font-family: var(--font-display, 'Cinzel', ui-serif, Georgia, serif); font-size: 0.95rem; line-height: 1.375; font-weight: 700; text-wrap: balance; overflow-wrap: break-word; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-cromo:hover .ds-cromo-apellidos { color: #fff; } .ds-cromo-nombres { margin: 4px 0 0; color: var(--color-slate-400, oklch(70.4% 0.04 256.788)); font-family: var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif); font-size: 0.75rem; line-height: 1rem; } @keyframes ds-cromo-entra { from { opacity: 0; transform: translateY(2.5rem) rotate(var(--giro, -3deg)) scale(0.94); } } @media (prefers-reduced-motion: reduce) { .ds-album li { animation: none; } .ds-cromo { transition: none; } .ds-cromo:hover { transform: none; box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-oro, #D6B36A) 70%, transparent), 0 24px 48px -24px rgb(0 0 0 / 0.7); } .ds-cromo:hover .ds-cromo-lamina { transform: translateX(-160%) skewX(-16deg); transition: none; } }"
+    },
+    {
+      "name": "Boleto del próximo partido",
+      "kind": "card",
+      "refersTo": "match-ticket",
+      "description": "Componente firma (`Boleto`): el próximo partido como una entrada, con talón perforado, campo con la luz de estadio y el rombo VS compacto, y la hora a la derecha. Vista desde 768 px.",
+      "html": "<div class='ds-boleto-noche'><article class='ds-boleto' aria-label='Próximo partido'><span class='ds-boleto-esq ds-boleto-esq-a' aria-hidden='true'></span><span class='ds-boleto-esq ds-boleto-esq-b' aria-hidden='true'></span><span class='ds-boleto-esq ds-boleto-esq-c' aria-hidden='true'></span><span class='ds-boleto-esq ds-boleto-esq-d' aria-hidden='true'></span><p class='ds-boleto-talon'><span class='ds-boleto-placa'>sáb</span><span class='ds-boleto-dia'>10</span><span class='ds-boleto-placa'>oct</span></p><div class='ds-boleto-campo'><div class='ds-boleto-cruce'><span class='ds-boleto-escudo'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'/></svg></span><span class='ds-boleto-vs' aria-hidden='true'><span>VS</span></span><span class='ds-boleto-escudo'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'/></svg></span></div><div><h2 class='ds-boleto-rival'>vs <a href='#'>Portoviejo Stars</a></h2><p class='ds-boleto-detalle'>Jornada 5 · Senior Libre</p></div></div><div class='ds-boleto-hora'><p><span class='ds-boleto-placa ds-boleto-bloque'>Próximo partido</span><span class='ds-boleto-hh'>19:00</span></p><p class='ds-boleto-lugar'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0'/><circle cx='12' cy='10' r='3'/></svg>Coliseo Pablo Delgado Álava</p><a class='ds-boleto-enlace' href='#'>Ver torneo <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M5 12h14'/><path d='m12 5 7 7-7 7'/></svg></a></div></article></div>",
+      "css": ".ds-boleto-noche { padding: 24px; background: var(--color-marino, #081226); } .ds-boleto { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; overflow: hidden; border: 1px solid color-mix(in oklab, var(--color-oro, #D6B36A) 25%, transparent); border-radius: 0.75rem; background: var(--color-marino-claro, #0E1D3D); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3); font-family: var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif); } .ds-boleto-esq { position: absolute; width: 16px; height: 16px; border: 0 solid color-mix(in oklab, var(--color-oro, #D6B36A) 40%, transparent); } .ds-boleto-esq-a { left: 12px; top: 12px; border-left-width: 1px; border-top-width: 1px; } .ds-boleto-esq-b { right: 12px; top: 12px; border-right-width: 1px; border-top-width: 1px; } .ds-boleto-esq-c { left: 12px; bottom: 12px; border-left-width: 1px; border-bottom-width: 1px; } .ds-boleto-esq-d { right: 12px; bottom: 12px; border-right-width: 1px; border-bottom-width: 1px; } .ds-boleto-talon { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0; padding: 24px 36px; border-right: 1px dashed color-mix(in oklab, var(--color-oro, #D6B36A) 30%, transparent); } .ds-boleto-placa { color: color-mix(in oklab, var(--color-oro, #D6B36A) 80%, transparent); font-family: var(--font-display, 'Cinzel', ui-serif, Georgia, serif); font-size: 0.75rem; line-height: 1rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; } .ds-boleto-dia { margin: 6px 0; color: var(--color-crema, #F1E7D0); font-family: var(--font-display, 'Cinzel', ui-serif, Georgia, serif); font-size: 3rem; line-height: 1; font-weight: 700; font-variant-numeric: tabular-nums; } .ds-boleto-campo { display: flex; min-width: 0; align-items: center; gap: 24px; padding: 20px 32px; background: radial-gradient(ellipse at 20% 30%, rgba(41, 169, 225, 0.18), transparent 55%), radial-gradient(ellipse at 80% 30%, rgba(214, 179, 106, 0.14), transparent 55%); } .ds-boleto-cruce { display: flex; flex-shrink: 0; align-items: center; gap: 12px; } .ds-boleto-escudo { display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 9999px; color: var(--color-slate-400, oklch(70.4% 0.04 256.788)); background: linear-gradient(to bottom, #fff, var(--color-slate-200, oklch(92.9% 0.013 255.508))); box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-oro, #D6B36A) 40%, transparent), 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4); } .ds-boleto-escudo svg { width: 50%; height: 50%; } .ds-boleto-vs { display: flex; flex-shrink: 0; align-items: center; justify-content: center; width: 48px; height: 48px; transform: rotate(45deg); border: 1px solid color-mix(in oklab, var(--color-oro, #D6B36A) 70%, transparent); background: var(--color-marino, #081226); } .ds-boleto-vs span { transform: rotate(-45deg); color: var(--color-oro, #D6B36A); font-family: var(--font-display, 'Cinzel', ui-serif, Georgia, serif); font-size: 0.75rem; line-height: 1rem; font-weight: 700; } .ds-boleto-rival { margin: 0; color: var(--color-crema, #F1E7D0); font-family: var(--font-display, 'Cinzel', ui-serif, Georgia, serif); font-size: 1.5rem; line-height: 1.25; font-weight: 700; text-wrap: balance; } .ds-boleto-rival a { color: inherit; text-decoration: none; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-boleto-rival a:hover { color: var(--color-celeste, #29A9E1); } .ds-boleto-detalle { margin: 4px 0 0; color: var(--color-slate-400, oklch(70.4% 0.04 256.788)); font-size: 0.875rem; line-height: 1.25rem; } .ds-boleto-hora { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 8px; padding: 28px 44px 28px 32px; border-left: 1px solid color-mix(in oklab, #fff 10%, transparent); text-align: right; } .ds-boleto-hora p { margin: 0; } .ds-boleto-bloque { display: block; } .ds-boleto-hh { display: block; margin-top: 6px; color: var(--color-crema, #F1E7D0); font-family: var(--font-display, 'Cinzel', ui-serif, Georgia, serif); font-size: 1.875rem; line-height: 1; font-weight: 700; font-variant-numeric: tabular-nums; } .ds-boleto-lugar { display: flex; align-items: center; gap: 6px; color: var(--color-slate-400, oklch(70.4% 0.04 256.788)); font-size: 0.875rem; line-height: 1.25rem; } .ds-boleto-lugar svg { width: 16px; height: 16px; flex-shrink: 0; color: color-mix(in oklab, var(--color-oro, #D6B36A) 80%, transparent); } .ds-boleto-enlace { display: inline-flex; align-items: center; gap: 6px; color: var(--color-celeste, #29A9E1); font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; text-decoration: none; transition: color 150ms cubic-bezier(0.4, 0, 0.2, 1); } .ds-boleto-enlace:hover { color: #fff; } .ds-boleto-enlace svg { width: 16px; height: 16px; } .ds-boleto a:focus-visible { outline: 2px solid var(--color-celeste, #29A9E1); outline-offset: 3px; }"
     },
     {
       "name": "Banda de auspiciantes",
@@ -367,19 +494,19 @@
   ],
   "narrative": {
     "northStar": "La cartelera de noche de partido",
-    "overview": "La cara pública de Torneos Baloncesto Manta se viste como el cartel de una noche de partido. Un marino profundo ocupa toda la página. El oro dibuja el cartel con filetes, esquinas en L, un rombo VS y cintas de fecha. Los titulares van en Cinzel color crema, con las versalitas de una placa de trofeo, y un único color de acción, el celeste del escudo, marca lo que se puede pulsar, lo que avanza y dónde está el foco. Marino y celeste salen del logo oficial; el dorado queda para los logros.\n\nLa densidad es baja y el ritmo amplio: secciones con 80 a 96 px de aire vertical, contenedores de 72 a 80 rem y pares de texto y objeto en columnas asimétricas. La profundidad no viene de tarjetas flotando sobre gris, sino de capas tonales (marino, marino claro y una franja negra) y de atmósfera: la foto del coliseo con un zoom lento, el logo desenfocado como marca de agua con parallax y una luz radial tenue dentro de cada cartel de partido. El movimiento es ambiental y lento, y se apaga por completo con movimiento reducido.\n\nEste sistema rechaza la plantilla genérica: no hay hero centrado, ni tarjetas de beneficios, ni fila de métricas. Vive en la portada pública (`/`, contenedor `.tema-cartel`). El resto del producto, es decir, las pantallas de administrador y de delegado, la autenticación y las páginas públicas internas, sigue en el shell operativo «institucional neutro» del mismo `@theme`. Ese shell se ubica al final de Colors y queda fuera de estas reglas.",
+    "overview": "La cara pública de Torneos Baloncesto Manta se viste como el cartel de una noche de partido. Un marino profundo ocupa toda la página. El oro dibuja el cartel con filetes, esquinas en L, un rombo VS y cintas de fecha. Los titulares van en Cinzel color crema, con las versalitas de una placa de trofeo, y un único color de acción, el celeste del escudo, marca lo que se puede pulsar, lo que avanza y dónde está el foco. Marino y celeste salen del logo oficial; el dorado queda para los logros.\n\nLa densidad es baja y el ritmo amplio: secciones con 80 a 96 px de aire vertical, contenedores de 72 a 80 rem y pares de texto y objeto en columnas asimétricas. La profundidad no viene de tarjetas flotando sobre gris, sino de capas tonales (marino, marino claro y una franja negra) y de atmósfera: la foto del coliseo con un zoom lento, el logo desenfocado como marca de agua con parallax y una luz radial tenue dentro de cada cartel de partido. El movimiento es ambiental y lento; en el perfil de equipo, además, los bloques y los cromos entran una sola vez al llegar a pantalla. Todo se apaga con movimiento reducido.\n\nEste sistema rechaza la plantilla genérica: no hay hero centrado, ni tarjetas de beneficios, ni fila de métricas. Vive dentro del contenedor `.tema-cartel` en la portada pública (`/`), el directorio y el perfil de equipos (`/equipos` y `/equipos/:id`), el detalle de torneo (`/torneos/:id`), el perfil de jugador (`/jugadores/:id`), el buscador de jugadores (`/visor`) y el panel del delegado (`/delegado/dashboard`), que muestra el perfil de su equipo. El resto del producto, es decir, las pantallas de administrador, las demás del delegado y la autenticación, sigue en el shell operativo «institucional neutro» del mismo `@theme`. Ese shell se ubica al final de Colors y queda fuera de estas reglas.",
     "keyCharacteristics": [
       "Noche marino continua de borde a borde; el blanco solo sostiene marcas ajenas.",
       "Oro como filete de cartel y como honor: esquinas, rombo, cintas, píldora GANADOR y marcador del ganador.",
       "Cinzel crema para lo que se anuncia; Inter para lo que se lee y se pulsa.",
       "Celeste solo para actuar, avanzar y enfocar.",
       "Cada cinta y cada cifra lleva un dato real; ninguna es un rótulo decorativo.",
-      "Movimiento ambiental y lento, apagado por completo con `prefers-reduced-motion`."
+      "Movimiento ambiental y lento, con entradas de una sola vez en el perfil de equipo; todo se apaga con `prefers-reduced-motion`."
     ],
     "rules": [
       {
         "name": "La regla del celeste útil",
-        "body": "El celeste, como tinta o como relleno, solo marca acción, progreso o foco. Su única otra aparición es la luz del cartel de partido, un radial al 18 % en el lado local, que se lee como foco de estadio y no como color. Si algo celeste no se pulsa, no avanza y no señala el foco, sobra.",
+        "body": "El celeste, como tinta o como relleno, solo marca acción, progreso o foco. Su única otra aparición es la luz del cartel de partido y del boleto, un radial al 18 % a la izquierda (el lado local en el cartel y el propio en el boleto), que se lee como foco de estadio y no como color. Si algo celeste no se pulsa, no avanza y no señala el foco, sobra.",
         "section": "colors"
       },
       {
@@ -404,12 +531,12 @@
       },
       {
         "name": "La regla de la noche continua",
-        "body": "Ninguna sección pinta un fondo propio: todas se apilan transparentes sobre el marino de la página, así la marca de agua y la luz corren sin cortes. La foto del hero se funde hacia abajo con una máscara de 10rem, y solo el pie cambia de superficie.",
+        "body": "Ninguna sección pinta un fondo propio: todas se apilan transparentes sobre el marino de la página, así la marca de agua y la luz corren sin cortes. La foto del hero se funde hacia abajo con una máscara de 10rem; la portada del perfil de equipo se cierra con un filete oro al 30 %, y solo el pie cambia de superficie.",
         "section": "layout"
       },
       {
         "name": "La regla de la sombra negra",
-        "body": "Toda sombra es negra, difusa y desplazada hacia abajo, al 30–40 %; nunca de color, nunca dura. La luz de color vive dentro del cartel de partido como radiales tenues (celeste al 18 %, oro al 14 %), nunca como halo alrededor de un objeto.",
+        "body": "Toda sombra es negra, difusa y desplazada hacia abajo, al 30–40 % (la del cromo llega al 70 %, recogida bajo su base); nunca de color, nunca dura. La luz de color vive dentro del cartel de partido y del boleto como radiales tenues (celeste al 18 %, oro al 14 %), y dentro del cromo como el brillo de lámina que lo cruza al pasar el cursor; nunca como halo alrededor de un objeto.",
         "section": "elevation"
       },
       {
@@ -421,6 +548,11 @@
         "name": "La regla del cartel afilado",
         "body": "Paralelogramo, rombo y esquinas en L tienen ángulos vivos. El redondeo es de contenedores y controles; el círculo, de medallones, píldoras y puntos.",
         "section": "shapes"
+      },
+      {
+        "name": "La regla de la entrada única",
+        "body": "Una entrada ocurre una vez y nunca esconde contenido: el marcado nace visible y solo se oculta mientras espera su turno. Sin JavaScript, sin `IntersectionObserver` o con movimiento reducido, todo está a la vista desde el principio.",
+        "section": "components"
       }
     ],
     "dos": [
@@ -429,20 +561,20 @@
       "**Haz** los titulares en Cinzel 700 crema (#F1E7D0) y en caja normal; párrafos, botones y navegación, en Inter.",
       "**Haz** que cada cinta dorada lleve un dato real (fecha o estado) y que marcadores, horas y fechas usen cifras tabulares.",
       "**Haz** que los escudos y logos ajenos se apoyen en blanco: medallón circular con anillo oro para los escudos, banda blanca para los auspiciantes.",
-      "**Haz** los estados completos sobre la noche: esqueletos y paneles de estado en veladura blanca del 5 al 10 %, el error con «Reintentar» en botón secundario y el vacío con un aviso en `slate-300`.",
+      "**Haz** los estados completos sobre la noche: esqueletos y paneles de estado en veladura blanca del 5 al 10 % (o, en el perfil de equipo, el panel de lista), el error con «Reintentar» en botón secundario y el vacío con un aviso en `slate-300` o, dentro de un panel, un título crema con su línea en `slate-400`.",
       "**Haz** que toda superficie nueva de este mundo tematice la selección, el cursor de texto, la barra de desplazamiento y el foco con la paleta.",
-      "**Haz** que cada animación nueva se apague con `prefers-reduced-motion`."
+      "**Haz** que cada animación nueva se apague con `prefers-reduced-motion` y que ninguna entrada esconda contenido si no llega a correr."
     ],
     "donts": [
       "**No** pintes secciones con fondo propio ni cortes la noche con franjas blancas.",
-      "**No** uses celeste como decoración (bordes, íconos, títulos) fuera de la luz radial del cartel de partido.",
+      "**No** uses celeste como decoración (bordes, íconos, títulos) fuera de la luz radial del cartel de partido y del boleto.",
       "**No** llenes superficies grandes de oro.",
       "**No** pongas un rótulo o una cinta encima de un titular a modo de antetítulo; la cinta de estado es un dato del torneo, no la etiqueta de una sección.",
       "**No** conviertas las cifras de conjunto en una fila de métricas.",
       "**No** uses sombras de color, sombras duras ni paneles de cristal.",
       "**No** redondees las piezas de cartel (paralelogramo, rombo, esquinas en L).",
       "**No** uses glifos ni emoji como íconos; los íconos son de lucide, de trazo uniforme.",
-      "**No** mezcles este mundo con el shell: nada de `primary-*` en la portada ni de marino u oro en las pantallas operativas."
+      "**No** mezcles este mundo con el shell: nada de `primary-*` en sus páginas ni de marino u oro en las pantallas operativas."
     ]
   }
 }

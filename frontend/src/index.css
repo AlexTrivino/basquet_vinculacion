@@ -169,7 +169,22 @@
     brillo-boton 2.4s ease-in-out calc(0.7s + var(--retraso, 0ms)) infinite;
 }
 
+/* Perfil de equipo: los cromos se reparten (suben y se enderezan) y los bloques suben, una sola vez.
+   El estado oculto solo existe mientras JS espera la entrada (data-revelar="pendiente"). */
+@keyframes cromo-entra {
+  from { opacity: 0; transform: translateY(2.5rem) rotate(var(--giro, -3deg)) scale(0.94); }
+}
+@keyframes bloque-sube {
+  from { opacity: 0; transform: translateY(1.75rem); }
+}
+[data-revelar="pendiente"] { opacity: 0; }
+.cromo[data-revelar="visto"] { animation: cromo-entra 0.9s cubic-bezier(0.32, 0.72, 0, 1) var(--retraso, 0ms) both; }
+.bloque[data-revelar="visto"] { animation: bloque-sube 0.8s cubic-bezier(0.32, 0.72, 0, 1) var(--retraso, 0ms) both; }
+.cromo:nth-child(even) { --giro: 2.5deg; }
+.cromo:nth-child(3n) { --giro: -1.5deg; }
+
 @media (prefers-reduced-motion: reduce) {
+  [data-revelar] { opacity: 1 !important; animation: none !important; }
   .cta-boton,
   [data-visible] .cta-boton { opacity: 1; animation: none; }
   .cifra-brillo,
