@@ -348,6 +348,8 @@ export function PartidosList({ torneoId, idCategoria, urlCalendario, categorias 
           idPartido={(selectedMatch.id_partido || selectedMatch.id) as number}
           equipoLocal={nombre(selectedMatch.equipo_local, 'Local')}
           equipoVisitante={nombre(selectedMatch.equipo_visitante, 'Visitante')}
+          marcadorLocal={selectedMatch.marcador_local}
+          marcadorVisitante={selectedMatch.marcador_visitante}
           onClose={() => setSelectedMatch(null)}
         />
       )}

@@ -1,3 +1,5 @@
+from datetime import date
+
 from sqlalchemy import func
 from app import db
 from app.models.jugador import Jugador
@@ -8,6 +10,13 @@ from app.models.torneo import Torneo
 from app.models.inscripcion import Inscripcion
 from app.models.categoria import Categoria
 from app.models.partido import Partido
+
+
+def _edad(nacimiento):
+    if not nacimiento:
+        return None
+    hoy = date.today()
+    return hoy.year - nacimiento.year - ((hoy.month, hoy.day) < (nacimiento.month, nacimiento.day))
 
 
 def obtener_perfil_publico(id_jugador: int):
@@ -159,6 +168,8 @@ def obtener_perfil_publico(id_jugador: int):
         "id_torneo_actual": id_torneo_actual,
         "estadisticas": estadisticas_globales,
         "estadisticas_por_torneo": estadisticas_por_torneo,
+        # Edad pública: se muestra a todos sin revelar la fecha de nacimiento
+        "edad": _edad(jugador.fecha_nacimiento),
         # Datos para verificación de permisos y panel administrativo
         "documento_identificacion": jugador.documento_identificacion,
         "fecha_nacimiento": jugador.fecha_nacimiento.isoformat() if jugador.fecha_nacimiento else None,

@@ -32,6 +32,13 @@ class _EquipoResumenSchema(Schema):
     usuario = fields.Nested(_UsuarioResumenSchema)
 
 
+class _EquipoPublicoSchema(Schema):
+    """Equipo sin el correo del delegado (dato personal)."""
+    id_equipo = fields.Integer()
+    nombre_equipo = fields.String()
+    url_logo = fields.String(allow_none=True)
+
+
 class _CategoriaResumenSchema(Schema):
     id_categoria = fields.Integer()
     nombre_categoria = fields.String()
@@ -96,7 +103,7 @@ class InscripcionPublicSchema(Schema):
     grupo = fields.String(allow_none=True)
     # Relaciones anidadas — requieren joinedload en el servicio
     torneo = fields.Nested(_TorneoResumenSchema)
-    equipo = fields.Nested(_EquipoResumenSchema)
+    equipo = fields.Nested(_EquipoPublicoSchema)
     categoria = fields.Nested(_CategoriaResumenSchema)
 
 

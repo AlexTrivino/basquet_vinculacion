@@ -1,7 +1,9 @@
 """
 Blueprint de rutas para la gestión de Jugadores.
 
-Rutas de lectura: públicas (sin autenticación).
+Rutas de lectura: públicas, pero los datos personales (cédula, fecha de
+nacimiento, correo, teléfono y documentos) solo llegan al super_admin o al
+delegado del equipo del jugador.
 Rutas de escritura: protegidas con allowed_roles=['super_admin', 'delegado'].
 """
 from flask import Blueprint, g, request
@@ -17,7 +19,7 @@ from app.schemas.jugador_schema import (
 from app.services import jugador_service
 from app.services import jugador_profile_service
 from app.services import plantilla_service
-from app.utils.auth_middleware import token_required
+from app.utils.auth_middleware import identidad_opcional, token_required
 from app.utils.pagination import paginate_query
 from app.utils.response import api_error, api_response
 
@@ -55,6 +57,40 @@ def _delegado_tiene_acceso_jugador(id_jugador: int, id_usuario: str) -> bool:
     return any(p.id_usuario == id_usuario for p in plantillas)
 
 
+# Datos que solo ven el super_admin y el delegado del equipo del jugador
+CAMPOS_PRIVADOS = (
+    'documento_identificacion', 'fecha_nacimiento', 'correo', 'telefono',
+    'url_cedula', 'url_acta_bachiller', 'delegados_autorizados',
+)
+
+
+def _delegados_del_jugador(id_jugador: int) -> set:
+    """IDs de los delegados de los equipos donde el jugador tiene plantilla activa."""
+    from app import db
+    from app.models.plantilla import Plantilla
+    from app.models.equipo import Equipo
+
+    filas = (
+        db.session.query(Equipo.id_usuario)
+        .join(Plantilla, Plantilla.id_equipo == Equipo.id_equipo)
+        .filter(Plantilla.id_jugador == id_jugador, Plantilla.estado == 'activo')
+        .all()
+    )
+    return {str(f.id_usuario) for f in filas if f.id_usuario}
+
+
+def _puede_ver_privados(id_jugador: int, delegados=None) -> bool:
+    """El super_admin siempre; un delegado solo si el jugador está en uno de sus equipos."""
+    id_usuario, rol = identidad_opcional()
+    if rol == 'super_admin':
+        return True
+    if rol != 'delegado':
+        return False
+    if delegados is None:
+        delegados = _delegados_del_jugador(id_jugador)
+    return str(id_usuario) in delegados
+
+
 @jugador_bp.route('', methods=['GET'])
 def listar_jugadores():
     """Lista jugadores con paginación y filtros opcionales.
@@ -67,25 +103,22 @@ def listar_jugadores():
     id_categoria = request.args.get('id_categoria', type=int)
     estado = request.args.get('estado')
 
+    # El listado completo (con datos personales y jugadores inactivos) es solo para el super_admin
+    _, rol = identidad_opcional()
+    es_admin = rol == 'super_admin'
+
     query = jugador_service.listar_jugadores_admin(
         search=search,
         id_torneo=id_torneo,
         id_equipo=id_equipo,
         id_categoria=id_categoria,
         genero=genero,
-        estado=estado,
+        estado=estado if es_admin else 'activo',
+        buscar_por_cedula=es_admin,
     )
     items, pagination = paginate_query(query)
 
-    admin_mode = (
-        request.args.get('admin') == 'true'
-        or estado is not None
-        or search is not None
-        or id_torneo is not None
-        or id_equipo is not None
-        or id_categoria is not None
-    )
-    schema = _admin_many if admin_mode else _public_many
+    schema = _admin_many if es_admin else _public_many
     return api_response(data=schema.dump(items), pagination=pagination)
 
 
@@ -129,11 +162,15 @@ def buscar_jugador():
 
 @jugador_bp.route('/<int:id_jugador>', methods=['GET'])
 def obtener_jugador(id_jugador):
-    """Obtiene los detalles públicos de un jugador por su ID."""
+    """Obtiene un jugador por su ID: datos completos para su delegado o el admin, públicos para el resto."""
     jugador = jugador_service.obtener_jugador_por_id(id_jugador, incluir_inactivos=True)
     if jugador is None:
         return api_error('NOT_FOUND', 'Jugador no encontrado.', 404)
-    return api_response(data=_admin_schema.dump(jugador))
+    if _puede_ver_privados(id_jugador):
+        return api_response(data=_admin_schema.dump(jugador))
+    if jugador.estado != 'activo':
+        return api_error('NOT_FOUND', 'Jugador no encontrado.', 404)
+    return api_response(data=_public_schema.dump(jugador))
 
 
 @jugador_bp.route('', methods=['POST'])
@@ -423,5 +460,7 @@ def obtener_perfil_jugador(id_jugador):
     perfil = jugador_profile_service.obtener_perfil_publico(id_jugador)
     if not perfil:
         return api_error('NOT_FOUND', 'Jugador no encontrado.', 404)
+    if not _puede_ver_privados(id_jugador, set(perfil.get('delegados_autorizados') or [])):
+        perfil = {k: v for k, v in perfil.items() if k not in CAMPOS_PRIVADOS}
     return api_response(data=perfil)
 

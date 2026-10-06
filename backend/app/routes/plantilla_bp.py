@@ -14,21 +14,35 @@ from marshmallow import ValidationError
 from app.schemas.plantilla_schema import (
     PlantillaAdminSchema,
     PlantillaCreateSchema,
+    PlantillaPrivadaSchema,
     PlantillaPublicSchema,
     PlantillaUpdateSchema,
 )
 from app.services import plantilla_service
-from app.utils.auth_middleware import token_required
+from app.utils.auth_middleware import identidad_opcional, token_required
 from app.utils.pagination import paginate_query
 from app.utils.response import api_error, api_response
 
 plantilla_bp = Blueprint('plantillas', __name__, url_prefix='/api/plantillas')
 
 _public_schema = PlantillaPublicSchema()
-_public_many = PlantillaPublicSchema(many=True)
+_privada_schema = PlantillaPrivadaSchema()
 _admin_schema = PlantillaAdminSchema()
 _create_schema = PlantillaCreateSchema()
 _update_schema = PlantillaUpdateSchema()
+
+
+def _serializar(entradas):
+    """La nómina es pública, pero los datos personales del jugador solo llegan
+    al delegado dueño del equipo o al super_admin."""
+    id_usuario, rol = identidad_opcional()
+
+    def privada(entrada):
+        if rol == 'super_admin':
+            return True
+        return rol == 'delegado' and entrada.equipo is not None and str(entrada.equipo.id_usuario) == str(id_usuario)
+
+    return [(_privada_schema if privada(e) else _public_schema).dump(e) for e in entradas]
 
 
 @plantilla_bp.route('', methods=['GET'])
@@ -42,7 +56,7 @@ def listar_plantilla():
     id_categoria = request.args.get('id_categoria', type=int)
     query = plantilla_service.listar_plantilla(id_equipo=id_equipo, id_torneo=id_torneo, id_categoria=id_categoria)
     items, pagination = paginate_query(query, max_per_page=200)
-    return api_response(data=_public_many.dump(items), pagination=pagination)
+    return api_response(data=_serializar(items), pagination=pagination)
 
 
 @plantilla_bp.route('/<int:id_plantilla>', methods=['GET'])
@@ -51,7 +65,7 @@ def obtener_entrada(id_plantilla):
     entrada = plantilla_service.obtener_entrada_plantilla(id_plantilla)
     if entrada is None:
         return api_error('NOT_FOUND', 'Entrada de plantilla no encontrada.', 404)
-    return api_response(data=_public_schema.dump(entrada))
+    return api_response(data=_serializar([entrada])[0])
 
 
 @plantilla_bp.route('', methods=['POST'])

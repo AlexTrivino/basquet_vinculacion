@@ -248,3 +248,22 @@ def token_required(fn=None, *, allowed_roles=None):
     if fn is not None:
         return decorator(fn)
     return decorator
+
+
+ROLES_VALIDOS = ['super_admin', 'delegado', 'visor']
+
+
+def identidad_opcional():
+    """Devuelve ``(id_usuario, rol)`` si la petición trae un token válido de una cuenta activa.
+
+    Para rutas públicas que muestran más datos a quien tiene permiso (por ejemplo,
+    la cédula de un jugador solo a su delegado o al admin). Nunca responde con error:
+    sin token, o con un token vencido o inválido, se trata como visitante anónimo
+    y devuelve ``(None, None)``.
+    """
+    if not request.headers.get('Authorization', '').startswith('Bearer '):
+        return None, None
+    # ponytail: reutiliza token_required para no duplicar la verificación JWKS/HS256.
+    # Si falla, token_required devuelve (respuesta, código); si pasa, devuelve la identidad.
+    resultado = token_required(allowed_roles=ROLES_VALIDOS)(lambda: (g.usuario_id, g.usuario_rol))()
+    return resultado if isinstance(resultado[0], str) else (None, None)

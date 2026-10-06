@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import JugadorProfile from './JugadorProfile';
@@ -47,22 +47,27 @@ const mockJugadorData = {
     asistencias_totales: 45,
     triples_totales: 18,
   },
+  // El backend agrupa por torneo y luego por categoría
   estadisticas_por_torneo: {
     '1': {
-      partidos_jugados: 10,
-      puntos_totales: 160,
-      promedio_puntos: 16.0,
-      rebotes_totales: 40,
-      asistencias_totales: 30,
-      triples_totales: 12,
+      '2': {
+        partidos_jugados: 10,
+        puntos_totales: 160,
+        promedio_puntos: 16.0,
+        rebotes_totales: 40,
+        asistencias_totales: 30,
+        triples_totales: 12,
+      },
     },
     '2': {
-      partidos_jugados: 5,
-      puntos_totales: 60,
-      promedio_puntos: 12.0,
-      rebotes_totales: 20,
-      asistencias_totales: 15,
-      triples_totales: 6,
+      '1': {
+        partidos_jugados: 5,
+        puntos_totales: 60,
+        promedio_puntos: 12.0,
+        rebotes_totales: 20,
+        asistencias_totales: 15,
+        triples_totales: 6,
+      },
     },
   },
   documento_identificacion: '1314151617',
@@ -121,15 +126,17 @@ describe('JugadorProfile', () => {
 
     renderWithProviders();
 
-    expect(await screen.findByText('Sharks Manta')).toBeInTheDocument();
-    expect(screen.getByText('#23')).toBeInTheDocument();
-    expect(screen.getByText('Manta Hoops')).toBeInTheDocument();
-    expect(screen.getByText('#10')).toBeInTheDocument();
-    expect(screen.getByText('Maxi 35')).toBeInTheDocument();
-    expect(screen.getByText('Libre Masculino')).toBeInTheDocument();
+    // El equipo más reciente también aparece en la portada: se revisa dentro del historial
+    const historial = await screen.findByRole('region', { name: /historial de equipos/i });
+    expect(await within(historial).findByText('Sharks Manta')).toBeInTheDocument();
+    expect(within(historial).getByText('#23')).toBeInTheDocument();
+    expect(within(historial).getByText('Manta Hoops')).toBeInTheDocument();
+    expect(within(historial).getByText('#10')).toBeInTheDocument();
+    expect(within(historial).getByText('Maxi 35')).toBeInTheDocument();
+    expect(within(historial).getByText('Libre Masculino')).toBeInTheDocument();
   });
 
-  it('pagina las participaciones mostrando un máximo de 4 a la vez y permite navegar adelante y atrás sin duplicar', async () => {
+  it('pagina las participaciones mostrando un máximo de 3 a la vez y permite navegar adelante y atrás sin duplicar', async () => {
     const jugadorConMuchasParticipaciones = {
       ...mockJugadorData,
       participaciones: [
@@ -147,31 +154,29 @@ describe('JugadorProfile', () => {
 
     renderWithProviders();
 
-    // Página 1: Muestra los 4 más recientes (2026, 2024, 2023, 2022)
-    expect(await screen.findByText('Equipo A (2026)')).toBeInTheDocument();
-    expect(screen.getByText('Equipo B (2024)')).toBeInTheDocument();
-    expect(screen.getByText('Equipo C (2023)')).toBeInTheDocument();
-    expect(screen.getByText('Equipo D (2022)')).toBeInTheDocument();
-    expect(screen.queryByText('Equipo E (2021)')).not.toBeInTheDocument();
-    expect(screen.getByText('1 / 2')).toBeInTheDocument();
+    // Página 1: muestra los 3 más recientes (2026, 2024, 2023)
+    const historial = await screen.findByRole('region', { name: /historial de equipos/i });
+    expect(await within(historial).findByText('Equipo A (2026)')).toBeInTheDocument();
+    expect(within(historial).getByText('Equipo B (2024)')).toBeInTheDocument();
+    expect(within(historial).getByText('Equipo C (2023)')).toBeInTheDocument();
+    expect(within(historial).queryByText('Equipo D (2022)')).not.toBeInTheDocument();
+    expect(within(historial).getByText('1 / 2')).toBeInTheDocument();
 
     // Navegar a la página 2
-    const btnSiguiente = screen.getByRole('button', { name: /página siguiente/i });
-    fireEvent.click(btnSiguiente);
+    fireEvent.click(within(historial).getByRole('button', { name: /página siguiente/i }));
 
-    // Página 2: Muestra el 5to equipo (2021) y oculta los de la pág 1
-    expect(await screen.findByText('Equipo E (2021)')).toBeInTheDocument();
-    expect(screen.queryByText('Equipo A (2026)')).not.toBeInTheDocument();
-    expect(screen.getByText('2 / 2')).toBeInTheDocument();
+    // Página 2: muestra 2022 y 2021 y oculta los de la página 1
+    expect(await within(historial).findByText('Equipo E (2021)')).toBeInTheDocument();
+    expect(within(historial).getByText('Equipo D (2022)')).toBeInTheDocument();
+    expect(within(historial).queryByText('Equipo A (2026)')).not.toBeInTheDocument();
+    expect(within(historial).getByText('2 / 2')).toBeInTheDocument();
 
     // Navegar de vuelta a la página 1
-    const btnAnterior = screen.getByRole('button', { name: /página anterior/i });
-    fireEvent.click(btnAnterior);
+    fireEvent.click(within(historial).getByRole('button', { name: /página anterior/i }));
 
-    // Página 1 nuevamente
-    expect(await screen.findByText('Equipo A (2026)')).toBeInTheDocument();
-    expect(screen.queryByText('Equipo E (2021)')).not.toBeInTheDocument();
-    expect(screen.getByText('1 / 2')).toBeInTheDocument();
+    expect(await within(historial).findByText('Equipo A (2026)')).toBeInTheDocument();
+    expect(within(historial).queryByText('Equipo E (2021)')).not.toBeInTheDocument();
+    expect(within(historial).getByText('1 / 2')).toBeInTheDocument();
   });
 
   it('permite cambiar el filtro de estadísticas para ver números específicos de un torneo', async () => {

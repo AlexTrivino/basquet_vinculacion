@@ -35,7 +35,8 @@ def listar_jugadores_activos(genero=None):
     return query
 
 
-def listar_jugadores_admin(search=None, id_torneo=None, id_equipo=None, id_categoria=None, genero=None, estado=None):
+def listar_jugadores_admin(search=None, id_torneo=None, id_equipo=None, id_categoria=None, genero=None, estado=None,
+                           buscar_por_cedula=True):
     """Retorna la query de jugadores para el panel de administración con filtros avanzados.
 
     Args:
@@ -60,11 +61,11 @@ def listar_jugadores_admin(search=None, id_torneo=None, id_equipo=None, id_categ
 
     if search:
         search_term = f"%{search.strip()}%"
+        por_nombre = Jugador.nombre.ilike(search_term)
+        # Solo el admin busca por cédula: para el público sería un oráculo cédula → nombre
         query = query.filter(
-            db.or_(
-                Jugador.nombre.ilike(search_term),
-                Jugador.documento_identificacion.ilike(search_term)
-            )
+            db.or_(por_nombre, Jugador.documento_identificacion.ilike(search_term))
+            if buscar_por_cedula else por_nombre
         )
 
     if id_torneo or id_equipo or id_categoria:

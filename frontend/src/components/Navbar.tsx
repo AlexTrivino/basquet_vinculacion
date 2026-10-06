@@ -54,7 +54,7 @@ export function Navbar() {
   const navigate = useNavigate();
   // En la portada, el directorio de equipos y la vista de torneo el navbar toma los colores de la página (marino, crema y oro)
   const { pathname } = useLocation();
-  const enInicio = pathname === '/' || pathname === '/equipos' || pathname.startsWith('/torneos/') || pathname === '/visor';
+  const enInicio = pathname === '/' || pathname === '/equipos' || pathname.startsWith('/torneos/') || pathname.startsWith('/jugadores/') || pathname === '/visor';
   const claseEnlace = (isActive: boolean, inactivo: string) =>
     `text-sm font-medium ${
       enInicio
@@ -134,7 +134,7 @@ export function Navbar() {
                 alt="Torneos Baloncesto Manta Logo"
                 className="h-12 w-12 object-contain"
               />
-              <span className={`text-xl font-bold hidden sm:block ${enInicio ? 'text-crema' : 'text-primary-600'}`}>Torneos Baloncesto Manta</span>
+              <span className={`whitespace-nowrap text-xl font-bold ${userRole === 'super_admin' ? 'hidden 2xl:block' : 'hidden sm:block'} ${enInicio ? 'text-crema' : 'text-primary-600'}`}>Torneos Baloncesto Manta</span>
             </Link>
           </div>
 

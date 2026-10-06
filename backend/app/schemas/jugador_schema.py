@@ -178,17 +178,14 @@ class JugadorUpdateSchema(Schema):
 class JugadorPublicSchema(Schema):
     """Serialización para vistas públicas (plantillas, estadísticas).
 
-    Excluye correo y teléfono (datos personales sensibles) y timestamps.
+    Sin datos personales: ni cédula, fecha de nacimiento, correo, teléfono
+    ni enlaces a documentos. Esos solo van en ``JugadorAdminSchema``.
     """
 
     id_jugador = fields.Integer(dump_only=True)
     nombre = fields.String()
     genero = fields.String()
-    documento_identificacion = fields.String()
-    fecha_nacimiento = fields.Date()
     url_foto = fields.String(allow_none=True)
-    url_cedula = fields.String(allow_none=True)
-    url_acta_bachiller = fields.String(allow_none=True)
     estado = fields.String()
 
 

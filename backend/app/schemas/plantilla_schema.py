@@ -9,8 +9,17 @@ from marshmallow import Schema, fields, validate
 
 # ── Schema auxiliar anidado ───────────────────────────────────────
 
+class _JugadorEnPlantillaPublicoSchema(Schema):
+    """Resumen público del jugador: sin datos personales."""
+
+    id_jugador = fields.Integer()
+    nombre = fields.String()
+    genero = fields.String()
+    url_foto = fields.String(allow_none=True)
+
+
 class _JugadorEnPlantillaSchema(Schema):
-    """Resumen del jugador para serialización anidada en Plantilla."""
+    """Resumen completo del jugador (solo para el delegado del equipo y el admin)."""
 
     id_jugador = fields.Integer()
     nombre = fields.String()
@@ -71,6 +80,15 @@ class PlantillaPublicSchema(Schema):
     id_torneo = fields.Integer()
     id_categoria = fields.Integer()
     # Relación anidada — requiere joinedload en el servicio
+    jugador = fields.Nested(_JugadorEnPlantillaPublicoSchema)
+
+
+class PlantillaPrivadaSchema(PlantillaPublicSchema):
+    """La misma nómina con los datos personales del jugador (cédula, contacto, documentos).
+
+    Solo para el delegado dueño del equipo y el super_admin.
+    """
+
     jugador = fields.Nested(_JugadorEnPlantillaSchema)
 
 
