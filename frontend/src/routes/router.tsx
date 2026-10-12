@@ -37,6 +37,7 @@ const AdminPartidos = lazy(() => import('../pages/admin/AdminPartidos'));
 const AdminSanciones = lazy(() => import('../pages/admin/AdminSanciones'));
 const AdminJugadores = lazy(() => import('../pages/admin/AdminJugadores'));
 const AdminPatrocinadores = lazy(() => import('../pages/admin/AdminPatrocinadores'));
+const AdminFaseFinal = lazy(() => import('../pages/admin/FaseFinal'));
 
 // --- Suspense Wrapper ---
 // Placeholder temporal de carga mientras se bajan los chunks.
@@ -112,6 +113,7 @@ export const router = createBrowserRouter([
           { path: 'partidos', element: withSuspense(AdminPartidos) },
           { path: 'sanciones', element: withSuspense(AdminSanciones) },
           { path: 'patrocinadores', element: withSuspense(AdminPatrocinadores) },
+          { path: 'fase-final', element: withSuspense(AdminFaseFinal) },
         ],
       },
     ],

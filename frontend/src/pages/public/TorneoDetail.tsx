@@ -8,11 +8,13 @@ import { getTorneoById, getPartidosByTorneo } from '../../features/torneos/api/t
 import { PosicionesTable } from '../../features/torneos/components/PosicionesTable';
 import { PartidosList, colorCategoria } from '../../features/torneos/components/PartidosList';
 import { LideresEstadisticos } from '../../features/torneos/components/LideresEstadisticos';
+import { CuadroLlaves } from '../../features/torneos/components/CuadroLlaves';
 
-type Tab = 'calendario' | 'posiciones' | 'estadisticas';
+type Tab = 'calendario' | 'posiciones' | 'llaves' | 'estadisticas';
 const TABS: { id: Tab; texto: string }[] = [
   { id: 'calendario', texto: 'Calendario' },
   { id: 'posiciones', texto: 'Posiciones' },
+  { id: 'llaves', texto: 'Llaves' },
   { id: 'estadisticas', texto: 'Estadísticas' },
 ];
 const ESTADO: Record<string, string> = { en_curso: 'En curso', programado: 'Programado', finalizado: 'Finalizado' };
@@ -46,6 +48,7 @@ export default function TorneoDetail() {
   const torneo = response?.data;
   const categorias = torneo?.categorias ?? [];
   const categoriaFiltro = activeCategoriaId ?? categorias[0]?.id_categoria;
+  const categoriaActiva = categorias.find((c) => c.id_categoria === categoriaFiltro);
 
   const marcador = useMemo(() => {
     const partidos = partidosRes?.data ?? [];
@@ -136,7 +139,7 @@ export default function TorneoDetail() {
       {/* ─── Barra de control: pestañas en paralelogramo y categorías ─── */}
       <div className="sticky top-16 z-30 border-b border-white/10 bg-marino/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-          <nav className="flex gap-1.5" aria-label="Secciones del torneo">
+          <nav className="-mx-4 flex gap-1.5 overflow-x-auto px-4 lg:mx-0 lg:px-0" aria-label="Secciones del torneo">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -200,7 +203,10 @@ export default function TorneoDetail() {
           <PartidosList torneoId={id} urlCalendario={torneo?.url_calendario_excel} categorias={categorias} />
         )}
         {id && categoriaFiltro && activeTab === 'posiciones' && (
-          <PosicionesTable torneoId={id} idCategoria={categoriaFiltro} />
+          <PosicionesTable torneoId={id} idCategoria={categoriaFiltro} formato={categoriaActiva?.formato} onVerLlaves={() => setActiveTab('llaves')} />
+        )}
+        {id && categoriaFiltro && activeTab === 'llaves' && (
+          <CuadroLlaves torneoId={id} idCategoria={categoriaFiltro} onVerPosiciones={() => setActiveTab('posiciones')} />
         )}
         {id && categoriaFiltro && activeTab === 'estadisticas' && (
           <LideresEstadisticos torneoId={id} idCategoria={categoriaFiltro} />

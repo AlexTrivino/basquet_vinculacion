@@ -319,3 +319,122 @@ def lideres_torneo(id_torneo):
         data=lideres,
         message=f'Líderes estadísticos del torneo "{torneo.nombre}".',
     )
+
+
+# ── Fase final: formato, grupos, llaves y recorrido ───────────────
+
+def _torneo_y_categoria(id_torneo, id_categoria):
+    """Carga torneo y categoría (de ese torneo) o devuelve el error listo para responder."""
+    from app import db
+    from app.models.categoria import Categoria
+
+    torneo = torneo_service.obtener_torneo_por_id(id_torneo)
+    if torneo is None:
+        return None, None, api_error('NOT_FOUND', 'Torneo no encontrado.', 404)
+    categoria = db.session.get(Categoria, id_categoria) if id_categoria else None
+    if categoria is None or categoria.id_torneo != id_torneo:
+        return None, None, api_error('NOT_FOUND', 'Categoría no encontrada en este torneo.', 404)
+    return torneo, categoria, None
+
+
+def _id_categoria_param():
+    valor = request.args.get('id_categoria', '')
+    return int(valor) if valor.isdigit() else None
+
+
+@torneo_bp.route('/<int:id_torneo>/fase-final', methods=['GET'])
+def fase_final_route(id_torneo):
+    """Estado del cuadro de llaves de una categoría: formato, grupos y cada llave con su partido."""
+    from app.services import llaves_service
+
+    torneo, categoria, error = _torneo_y_categoria(id_torneo, _id_categoria_param())
+    if error:
+        return error
+    return api_response(data=llaves_service.estado_fase_final(torneo, categoria))
+
+
+@torneo_bp.route('/<int:id_torneo>/recorrido', methods=['GET'])
+def recorrido_route(id_torneo):
+    """Posición de cada equipo después de cada fecha de la fase de grupos y su situación."""
+    from app.services import llaves_service
+
+    torneo, categoria, error = _torneo_y_categoria(id_torneo, _id_categoria_param())
+    if error:
+        return error
+    return api_response(data=llaves_service.recorrido(torneo, categoria))
+
+
+@torneo_bp.route('/categorias/<int:id_categoria>/formato', methods=['PUT'])
+@token_required(allowed_roles=['super_admin'])
+def formato_categoria_route(id_categoria):
+    """Guarda el formato de la fase final de la categoría (o null para quitarlo)."""
+    from app import db
+    from app.models.categoria import Categoria
+    from app.services.llaves_service import FORMATOS
+
+    categoria = db.session.get(Categoria, id_categoria)
+    if categoria is None:
+        return api_error('NOT_FOUND', 'Categoría no encontrada.', 404)
+    json_data = request.get_json(silent=True) or {}
+    formato = json_data.get('formato')
+    if formato is not None and formato not in FORMATOS:
+        return api_error('VALIDATION_ERROR', 'Formato desconocido.', 422, data={'formatos': list(FORMATOS)})
+    categoria.formato = formato
+    db.session.commit()
+    return api_response(data={'id_categoria': categoria.id_categoria, 'formato': categoria.formato}, message='Formato guardado.')
+
+
+@torneo_bp.route('/<int:id_torneo>/grupos', methods=['PUT'])
+@token_required(allowed_roles=['super_admin'])
+def grupos_route(id_torneo):
+    """Asigna el grupo de cada equipo inscrito: {"id_categoria": 3, "grupos": {"19": "A", "20": "B"}}."""
+    from app.services import llaves_service
+
+    json_data = request.get_json(silent=True) or {}
+    torneo, categoria, error = _torneo_y_categoria(id_torneo, json_data.get('id_categoria'))
+    if error:
+        return error
+    grupos = json_data.get('grupos')
+    if not isinstance(grupos, dict):
+        return api_error('VALIDATION_ERROR', 'Falta el objeto "grupos" (id_equipo → letra).', 422)
+    try:
+        asignados = llaves_service.asignar_grupos(torneo, categoria, grupos)
+    except ValueError as e:
+        return api_error('VALIDATION_ERROR', str(e), 422)
+    return api_response(data={'grupos': {str(k): v for k, v in asignados.items()}}, message='Grupos guardados.')
+
+
+@torneo_bp.route('/<int:id_torneo>/fase-final/partidos', methods=['POST'])
+@token_required(allowed_roles=['super_admin'])
+def generar_llaves_route(id_torneo):
+    """Crea los partidos de las llaves listas: {"id_categoria": 3, "partidos": [{"llave": "CF1", "fecha": "2026-10-17", "hora": "19:00"}]}."""
+    from marshmallow import Schema, fields
+
+    from app.schemas.partido_schema import PartidoPublicSchema
+    from app.services import llaves_service
+
+    class _ItemSchema(Schema):
+        llave = fields.String(required=True)
+        fecha = fields.Date(required=True)
+        hora = fields.Time(required=True)
+        ubicacion = fields.String(load_default=None)
+
+    json_data = request.get_json(silent=True) or {}
+    torneo, categoria, error = _torneo_y_categoria(id_torneo, json_data.get('id_categoria'))
+    if error:
+        return error
+    try:
+        programacion = _ItemSchema(many=True).load(json_data.get('partidos') or [])
+    except ValidationError as err:
+        return api_error('VALIDATION_ERROR', 'Datos inválidos', 422, data=err.messages)
+    if not programacion:
+        return api_error('VALIDATION_ERROR', 'No hay llaves para programar.', 422)
+    try:
+        creados = llaves_service.generar_llaves(torneo, categoria, programacion)
+    except ValueError as e:
+        return api_error('CONFLICT', str(e), 409)
+    return api_response(
+        data=PartidoPublicSchema(many=True).dump(creados),
+        message=f'{len(creados)} partido(s) de fase final creados.',
+        status=201,
+    )

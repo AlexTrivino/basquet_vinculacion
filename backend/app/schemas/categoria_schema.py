@@ -20,6 +20,7 @@ class CategoriaPublicSchema(Schema):
     genero_categoria = fields.String()
     edad_minima = fields.Integer()
     edad_maxima = fields.Integer(allow_none=True)
+    formato = fields.String(allow_none=True)
 
 
 class CategoriaCreateSchema(Schema):

@@ -28,6 +28,7 @@ const NAV_LINKS = {
     { name: 'Equipos', path: '/admin/equipos' },
     { name: 'Jugadores', path: '/admin/jugadores' },
     { name: 'Partidos', path: '/admin/partidos' },
+    { name: 'Llaves', path: '/admin/fase-final' },
     { name: 'Inscripciones', path: '/admin/auditoria' },
     { name: 'Sanciones', path: '/admin/sanciones' },
     { name: 'Auspiciantes', path: '/admin/patrocinadores' },
@@ -134,11 +135,11 @@ export function Navbar() {
                 alt="Torneos Baloncesto Manta Logo"
                 className="h-12 w-12 object-contain"
               />
-              <span className={`whitespace-nowrap text-xl font-bold ${userRole === 'super_admin' ? 'hidden 2xl:block' : 'hidden sm:block'} ${enInicio ? 'text-crema' : 'text-primary-600'}`}>Torneos Baloncesto Manta</span>
+              <span className={`whitespace-nowrap text-xl font-bold ${userRole === 'super_admin' ? 'hidden min-[1800px]:block' : 'hidden sm:block'} ${enInicio ? 'text-crema' : 'text-primary-600'}`}>Torneos Baloncesto Manta</span>
             </Link>
           </div>
 
-          <div className="hidden lg:flex flex-1 justify-center lg:items-center lg:gap-8">
+          <div className="hidden lg:flex flex-1 justify-center lg:items-center lg:gap-6 2xl:gap-8">
             {links.map((link) => {
               if (link.path === '/delegado/inscripcion' && isInscripcionDisabled) {
                 return (
@@ -186,7 +187,7 @@ export function Navbar() {
             {/* Separador de Vistas de Usuario para Super Admin */}
             {userRole === 'super_admin' && (
               <div className={`flex items-center gap-4 ml-4 pl-4 border-l-2 ${separador}`}>
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Vistas de Usuario</span>
+                <span className="hidden text-[10px] font-bold text-gray-400 uppercase tracking-widest 2xl:inline">Vistas de Usuario</span>
                 {NAV_LINKS.public_admin.map(link => (
                   <NavLink key={link.path} to={link.path} className={({ isActive }) => claseEnlace(isActive, 'text-gray-500')}>
                     {link.name}

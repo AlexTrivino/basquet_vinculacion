@@ -16,6 +16,8 @@ class Partido(db.Model):
     fase = db.Column(db.String(50), nullable=False)
     ubicacion = db.Column(db.String(150), nullable=False, default='Coliseo Pablo Delgado Álava')
     url_planilla_fiba = db.Column(db.Text, nullable=True)
+    # Código de la llave en la fase final (CF1, SF2, 3P, F, R); nulo = partido de la fase de grupos
+    llave = db.Column(db.String(10), nullable=True)
     stats_local_procesadas = db.Column(db.Boolean, nullable=False, default=False, server_default='false')
     stats_visitante_procesadas = db.Column(db.Boolean, nullable=False, default=False, server_default='false')
     id_torneo = db.Column(
@@ -72,6 +74,7 @@ class Partido(db.Model):
             'marcador_local': self.marcador_local,
             'marcador_visitante': self.marcador_visitante,
             'fase': self.fase,
+            'llave': self.llave,
             'ubicacion': self.ubicacion,
             'url_planilla_fiba': self.url_planilla_fiba,
             'stats_local_procesadas': self.stats_local_procesadas,

@@ -24,9 +24,19 @@ Reglas FIBA implementadas:
       las victorias, luego la diferencia de puntos y luego los puntos anotados.
       Si algún equipo se separa, el procedimiento vuelve a empezar con los que
       siguen empatados. Si nada los separa, diferencia y puntos de todo el torneo.
+
+Grupos: cuando la categoría tiene grupos (``inscripciones.grupo``), cada grupo
+tiene su propia tabla y solo cuentan los partidos de la fase de grupos
+(``partidos.llave`` nulo). Las filas llevan ``grupo`` y ``posicion`` dentro del grupo.
 """
 from collections import defaultdict
 from itertools import groupby
+
+from app import db
+from app.models.inscripcion import Inscripcion
+from app.models.partido import Partido
+
+ESTADOS_FINALES = ('finalizado', 'finalizado_wo')
 
 
 def _agrupar(ids, valor):
@@ -69,28 +79,124 @@ def desempatar(ids, resultados, globales):
     # ponytail: FIBA sortea; aquí queda el orden por id, estable para que la tabla no baile
     return sorted(ids)
 
-from app import db
-from app.models.partido import Partido
+
+def marcador_efectivo(estado, marcador_local, marcador_visitante):
+    """Marcador con el que se cuenta el partido: un W.O. sin marcador vale 20-0 para el local."""
+    if estado == 'finalizado_wo' and marcador_local == 0 and marcador_visitante == 0:
+        return 20, 0
+    return marcador_local, marcador_visitante
+
+
+def calcular_tabla(partidos, equipos=()):
+    """Tabla ordenada a partir de partidos finalizados, sin tocar la base.
+
+    ``partidos``: iterable de (id_local, id_visitante, marcador_local, marcador_visitante, estado).
+    ``equipos``: ids que deben aparecer aunque no hayan jugado (quedan con todo en cero).
+
+    Devuelve una lista de dicts con id_equipo, PJ, PG, PP, PF, PC, DIF, puntos y posicion.
+    """
+    def _inicial():
+        return {'PJ': 0, 'PG': 0, 'PP': 0, 'PF': 0, 'PC': 0, 'puntos': 0}
+
+    tabla = defaultdict(_inicial)
+    for e in equipos:
+        tabla[e]
+    resultados = []
+    for local, visitante, ml, mv, estado in partidos:
+        if estado not in ESTADOS_FINALES:
+            continue
+        es_wo = estado == 'finalizado_wo'
+        pf_local, pf_visitante = marcador_efectivo(estado, ml, mv)
+        # En baloncesto no hay empates: si los marcadores son iguales, se asigna victoria al local
+        gano_local = pf_local >= pf_visitante
+        ganador, perdedor = (local, visitante) if gano_local else (visitante, local)
+
+        tabla[local]['PJ'] += 1
+        tabla[local]['PF'] += pf_local
+        tabla[local]['PC'] += pf_visitante
+        tabla[visitante]['PJ'] += 1
+        tabla[visitante]['PF'] += pf_visitante
+        tabla[visitante]['PC'] += pf_local
+        tabla[ganador]['PG'] += 1
+        tabla[ganador]['puntos'] += 2
+        tabla[perdedor]['PP'] += 1
+        tabla[perdedor]['puntos'] += 0 if es_wo else 1
+        resultados.append((local, visitante, pf_local, pf_visitante))
+
+    filas = {i: dict(s, id_equipo=i, DIF=s['PF'] - s['PC']) for i, s in tabla.items()}
+    globales = {i: {'DIF': f['DIF'], 'PF': f['PF']} for i, f in filas.items()}
+    orden = [
+        e
+        for bloque in _agrupar(list(filas), lambda i: filas[i]['puntos'])
+        for e in desempatar(bloque, resultados, globales)
+    ]
+    lista = [filas[i] for i in orden]
+    for i, fila in enumerate(lista, start=1):
+        fila['posicion'] = i
+    return lista
+
+
+def grupos_de_categoria(id_torneo, id_categoria):
+    """{id_equipo: grupo} de las inscripciones aprobadas de la categoría (grupo puede ser None)."""
+    filas = db.session.execute(
+        db.select(Inscripcion.id_equipo, Inscripcion.grupo).where(
+            Inscripcion.id_torneo == id_torneo,
+            Inscripcion.id_categoria == id_categoria,
+            Inscripcion.estado_inscripcion == 'aprobado',
+        )
+    ).all()
+    return {f.id_equipo: f.grupo for f in filas}
+
+
+def partidos_fase_grupos(id_torneo, id_categoria=None, hasta_fecha=None):
+    """Partidos finalizados de la fase de grupos (sin llave), como tuplas para ``calcular_tabla``."""
+    query = Partido.query.filter(
+        Partido.id_torneo == id_torneo,
+        Partido.estado.in_(ESTADOS_FINALES),
+        Partido.llave.is_(None),
+    )
+    if id_categoria is not None:
+        query = query.filter(Partido.id_categoria == id_categoria)
+    if hasta_fecha is not None:
+        query = query.filter(Partido.fecha <= hasta_fecha)
+    return [(p.id_equipo_local, p.id_equipo_visitante, p.marcador_local, p.marcador_visitante, p.estado) for p in query.all()]
+
+
+def tablas_por_grupo(partidos, grupos):
+    """Una tabla por grupo. Sin grupos asignados devuelve {None: tabla única}.
+
+    Solo cuentan los partidos entre equipos del mismo grupo; los equipos sin partidos aparecen en cero.
+    """
+    letras = sorted({g for g in grupos.values() if g})
+    if not letras:
+        return {None: calcular_tabla(partidos, grupos.keys())}
+    tablas = {}
+    for letra in letras:
+        miembros = {e for e, g in grupos.items() if g == letra}
+        propios = [p for p in partidos if p[0] in miembros and p[1] in miembros]
+        tablas[letra] = calcular_tabla(propios, miembros)
+    return tablas
 
 
 def recalcular_tabla(id_torneo: int, id_categoria: int = None) -> list[dict]:
     """Calcula la tabla de posiciones completa para un torneo y categoría.
 
     Algoritmo en tres pasos:
-        1. **Una query SQL** → trae partidos finalizados del torneo.
+        1. **Una query SQL** → trae partidos finalizados de la fase de grupos.
         2. **Procesamiento en memoria** → acumula estadísticas por equipo en un dict.
         3. **Una query de enriquecimiento** → trae nombre y logo de equipos con ``in_``.
 
     Args:
         id_torneo: ID del torneo a procesar.
-        id_categoria: ID de la categoría a procesar.
+        id_categoria: ID de la categoría a procesar. Con categoría, los equipos
+            inscritos aparecen aunque no hayan jugado y, si hay grupos, cada
+            grupo tiene su tabla (las filas llevan ``grupo``).
 
     Returns:
-        Lista de dicts ordenada por: Puntos DESC → DIF DESC → PF DESC.
-        Cada elemento contiene::
+        Lista de dicts ordenada por grupo y posición. Cada elemento contiene::
 
             {
-                "posicion": 1,
+                "posicion": 1, "grupo": "A",
                 "id_equipo": 42,
                 "nombre_equipo": "Delfines BC",
                 "url_logo": "https://...",
@@ -100,121 +206,39 @@ def recalcular_tabla(id_torneo: int, id_categoria: int = None) -> list[dict]:
                 "puntos": 9
             }
     """
-    # ── PASO 1: Una sola query para todos los partidos finalizados ─
-    estados_finales = ('finalizado', 'finalizado_wo')
-
-    query = Partido.query.filter(
-        Partido.id_torneo == id_torneo,
-        Partido.estado.in_(estados_finales),
-    )
-
-    if id_categoria is not None:
-        query = query.filter(Partido.id_categoria == id_categoria)
-
-    partidos = query.all()
-
-    if not partidos:
+    partidos = partidos_fase_grupos(id_torneo, id_categoria)
+    grupos = grupos_de_categoria(id_torneo, id_categoria) if id_categoria is not None else {}
+    if not partidos and not grupos:
         return []
 
-    # ── PASO 2: Procesamiento en memoria con defaultdict ──────────
-    # Cada equipo comienza con estadísticas en cero.
-    # El defaultdict elimina la necesidad de verificar si el equipo
-    # ya existe antes de acumular.
-    def _equipo_inicial():
-        """Retorna dict con estadísticas inicializadas en cero para un equipo."""
-        return {'PJ': 0, 'PG': 0, 'PP': 0, 'PF': 0, 'PC': 0, 'puntos': 0}
+    tablas = tablas_por_grupo(partidos, grupos)
 
-    tabla = defaultdict(_equipo_inicial)
-    
-    # ── Para el desempate: marcadores efectivos de cada partido ───
-    resultados = []
-
-    for p in partidos:
-        es_wo = p.estado == 'finalizado_wo'
-
-        # ── Determinar marcadores efectivos ──────────────────────
-        # Para WO con marcador 0-0 (default), se asume 20-0 local.
-        if es_wo and p.marcador_local == 0 and p.marcador_visitante == 0:
-            pf_local, pc_local = 20, 0
-            pf_visitante, pc_visitante = 0, 20
-            gano_local = True
-        else:
-            pf_local = p.marcador_local
-            pc_local = p.marcador_visitante
-            pf_visitante = p.marcador_visitante
-            pc_visitante = p.marcador_local
-            # En baloncesto no hay empates — si los marcadores son iguales
-            # en un partido real, se asigna victoria al local por defecto.
-            gano_local = pf_local >= pf_visitante
-
-        pts_ganador = 2
-        pts_perdedor = 0 if es_wo else 1
-
-        # ── Acumular estadísticas del equipo local ────────────────
-        tabla[p.id_equipo_local]['PJ'] += 1
-        tabla[p.id_equipo_local]['PF'] += pf_local
-        tabla[p.id_equipo_local]['PC'] += pc_local
-
-        # ── Acumular estadísticas del equipo visitante ────────────
-        tabla[p.id_equipo_visitante]['PJ'] += 1
-        tabla[p.id_equipo_visitante]['PF'] += pf_visitante
-        tabla[p.id_equipo_visitante]['PC'] += pc_visitante
-
-        # ── Asignar victorias, derrotas y puntos clasificación ────
-        if gano_local:
-            tabla[p.id_equipo_local]['PG'] += 1
-            tabla[p.id_equipo_local]['puntos'] += pts_ganador
-            tabla[p.id_equipo_visitante]['PP'] += 1
-            tabla[p.id_equipo_visitante]['puntos'] += pts_perdedor
-        else:
-            tabla[p.id_equipo_visitante]['PG'] += 1
-            tabla[p.id_equipo_visitante]['puntos'] += pts_ganador
-            tabla[p.id_equipo_local]['PP'] += 1
-            tabla[p.id_equipo_local]['puntos'] += pts_perdedor
-        resultados.append((p.id_equipo_local, p.id_equipo_visitante, pf_local, pf_visitante))
-
-    # ── PASO 3: Enriquecimiento con una sola query in_ ────────────
-    # Traer nombre y logo de todos los equipos participantes de una vez,
-    # evitando N queries adicionales (una por equipo).
+    # ── Enriquecimiento con una sola query in_ ────────────────────
     from app.models.equipo import Equipo
 
-    ids_equipos = list(tabla.keys())
+    ids_equipos = [f['id_equipo'] for tabla in tablas.values() for f in tabla]
     equipos_db = db.session.execute(
         db.select(Equipo.id_equipo, Equipo.nombre_equipo, Equipo.url_logo)
         .where(Equipo.id_equipo.in_(ids_equipos))
     ).all()
-
     equipos_map = {row.id_equipo: row for row in equipos_db}
 
-    # ── PASO 4: Construir lista y calcular DIF ────────────────────
     lista = []
-    for id_equipo, stats in tabla.items():
-        equipo_data = equipos_map.get(id_equipo)
-        lista.append({
-            'id_equipo': id_equipo,
-            'nombre_equipo': equipo_data.nombre_equipo if equipo_data else f'Equipo #{id_equipo}',
-            'url_logo': equipo_data.url_logo if equipo_data else None,
-            'PJ': stats['PJ'],
-            'PG': stats['PG'],
-            'PP': stats['PP'],
-            'PF': stats['PF'],
-            'PC': stats['PC'],
-            'DIF': stats['PF'] - stats['PC'],
-            'puntos': stats['puntos'],
-        })
-
-    # ── PASO 5: Ordenar por puntos y desempatar por bloques (FIBA D.1) ──
-    por_id = {fila['id_equipo']: fila for fila in lista}
-    globales = {i: {'DIF': f['DIF'], 'PF': f['PF']} for i, f in por_id.items()}
-    orden = [
-        e
-        for bloque in _agrupar(list(por_id), lambda i: por_id[i]['puntos'])
-        for e in desempatar(bloque, resultados, globales)
-    ]
-    lista = [por_id[i] for i in orden]
-
-    # ── PASO 6: Agregar número de posición ────────────────────────
-    for i, entrada in enumerate(lista, start=1):
-        entrada['posicion'] = i
-
+    for letra, tabla in tablas.items():
+        for fila in tabla:
+            equipo = equipos_map.get(fila['id_equipo'])
+            lista.append({
+                'posicion': fila['posicion'],
+                'grupo': letra,
+                'id_equipo': fila['id_equipo'],
+                'nombre_equipo': equipo.nombre_equipo if equipo else f"Equipo #{fila['id_equipo']}",
+                'url_logo': equipo.url_logo if equipo else None,
+                'PJ': fila['PJ'],
+                'PG': fila['PG'],
+                'PP': fila['PP'],
+                'PF': fila['PF'],
+                'PC': fila['PC'],
+                'DIF': fila['DIF'],
+                'puntos': fila['puntos'],
+            })
     return lista

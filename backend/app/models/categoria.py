@@ -13,6 +13,8 @@ class Categoria(db.Model):
     edad_minima = db.Column(db.Integer, nullable=False, default=0)
     edad_maxima = db.Column(db.Integer, nullable=True)
     id_torneo = db.Column(db.Integer, db.ForeignKey('torneos.id_torneo', ondelete='CASCADE'), nullable=True)
+    # Formato de la fase final (ver services/llaves_service.FORMATOS); nulo = sin fase final
+    formato = db.Column(db.String(30), nullable=True)
 
     created_at = db.Column(db.DateTime, nullable=False, default=db.func.now())
     updated_at = db.Column(
@@ -40,6 +42,7 @@ class Categoria(db.Model):
             'genero_categoria': self.genero_categoria,
             'edad_minima': self.edad_minima,
             'edad_maxima': self.edad_maxima,
+            'formato': self.formato,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
         }

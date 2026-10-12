@@ -56,6 +56,7 @@ class PartidoCreateSchema(Schema):
     id_equipo_local = fields.Integer(required=True)
     id_equipo_visitante = fields.Integer(required=True)
     url_planilla_fiba = fields.String(allow_none=True, load_default=None)
+    llave = fields.String(allow_none=True, load_default=None, validate=validate.Length(max=10))
 
 
 class PartidoUpdateSchema(Schema):
@@ -103,6 +104,7 @@ class PartidoPublicSchema(Schema):
     marcador_local = fields.Integer()
     marcador_visitante = fields.Integer()
     fase = fields.String()
+    llave = fields.String(allow_none=True)
     id_categoria = fields.Integer()
     ubicacion = fields.String()
     url_planilla_fiba = fields.String(allow_none=True)
@@ -125,6 +127,7 @@ class PartidoAdminSchema(Schema):
     marcador_local = fields.Integer()
     marcador_visitante = fields.Integer()
     fase = fields.String()
+    llave = fields.String(allow_none=True)
     id_categoria = fields.Integer()
     ubicacion = fields.String()
     url_planilla_fiba = fields.String(allow_none=True)
