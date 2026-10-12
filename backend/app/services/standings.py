@@ -19,8 +19,55 @@ Reglas FIBA implementadas:
     - ``finalizado_wo``: Ganador 2 pts, Perdedor 0 pts.
       Si el marcador es 0-0 (default), se asume victoria del equipo local
       con marcador simbólico 20-0.
+    - Desempate (reglamento FIBA D.1, el que aplica el organizador): entre los
+      equipos empatados en puntos cuentan solo los partidos entre sí: primero
+      las victorias, luego la diferencia de puntos y luego los puntos anotados.
+      Si algún equipo se separa, el procedimiento vuelve a empezar con los que
+      siguen empatados. Si nada los separa, diferencia y puntos de todo el torneo.
 """
 from collections import defaultdict
+from itertools import groupby
+
+
+def _agrupar(ids, valor):
+    """Parte ``ids`` en bloques con el mismo ``valor``, de mayor a menor."""
+    ordenados = sorted(ids, key=valor, reverse=True)
+    return [list(g) for _, g in groupby(ordenados, key=valor)]
+
+
+def _mini_tabla(ids, resultados):
+    """Victorias, diferencia y puntos a favor contando solo los partidos entre ``ids``."""
+    grupo = set(ids)
+    t = {i: {'PG': 0, 'DIF': 0, 'PF': 0} for i in ids}
+    for a, b, pa, pb in resultados:
+        if a in grupo and b in grupo:
+            t[a]['PF'] += pa
+            t[a]['DIF'] += pa - pb
+            t[b]['PF'] += pb
+            t[b]['DIF'] += pb - pa
+            t[a if pa >= pb else b]['PG'] += 1
+    return t
+
+
+def desempatar(ids, resultados, globales):
+    """Ordena equipos empatados en puntos.
+
+    ``resultados``: lista de (local, visitante, puntos_local, puntos_visitante) con
+    marcadores efectivos (el W.O. ya viene como 20-0). ``globales``: dict por equipo
+    con 'DIF' y 'PF' de todo el torneo.
+    """
+    if len(ids) < 2:
+        return list(ids)
+    mini = _mini_tabla(ids, resultados)
+    criterios = [lambda i, c=c: mini[i][c] for c in ('PG', 'DIF', 'PF')]
+    criterios += [lambda i, c=c: globales[i][c] for c in ('DIF', 'PF')]
+    for criterio in criterios:
+        bloques = _agrupar(ids, criterio)
+        if len(bloques) > 1:
+            # Alguien se separó: el procedimiento vuelve a empezar con cada bloque
+            return [e for bloque in bloques for e in desempatar(bloque, resultados, globales)]
+    # ponytail: FIBA sortea; aquí queda el orden por id, estable para que la tabla no baile
+    return sorted(ids)
 
 from app import db
 from app.models.partido import Partido
@@ -79,9 +126,8 @@ def recalcular_tabla(id_torneo: int, id_categoria: int = None) -> list[dict]:
 
     tabla = defaultdict(_equipo_inicial)
     
-    # ── Para el desempate: Enfrentamientos directos ───────────────
-    # Registramos cuántas veces el equipo A le ganó al equipo B
-    head_to_head_wins = defaultdict(int)
+    # ── Para el desempate: marcadores efectivos de cada partido ───
+    resultados = []
 
     for p in partidos:
         es_wo = p.estado == 'finalizado_wo'
@@ -120,13 +166,12 @@ def recalcular_tabla(id_torneo: int, id_categoria: int = None) -> list[dict]:
             tabla[p.id_equipo_local]['puntos'] += pts_ganador
             tabla[p.id_equipo_visitante]['PP'] += 1
             tabla[p.id_equipo_visitante]['puntos'] += pts_perdedor
-            head_to_head_wins[(p.id_equipo_local, p.id_equipo_visitante)] += 1
         else:
             tabla[p.id_equipo_visitante]['PG'] += 1
             tabla[p.id_equipo_visitante]['puntos'] += pts_ganador
             tabla[p.id_equipo_local]['PP'] += 1
             tabla[p.id_equipo_local]['puntos'] += pts_perdedor
-            head_to_head_wins[(p.id_equipo_visitante, p.id_equipo_local)] += 1
+        resultados.append((p.id_equipo_local, p.id_equipo_visitante, pf_local, pf_visitante))
 
     # ── PASO 3: Enriquecimiento con una sola query in_ ────────────
     # Traer nombre y logo de todos los equipos participantes de una vez,
@@ -158,33 +203,15 @@ def recalcular_tabla(id_torneo: int, id_categoria: int = None) -> list[dict]:
             'puntos': stats['puntos'],
         })
 
-    # ── PASO 5: Ordenar por reglas de desempate FIBA ──────────────
-    from functools import cmp_to_key
-
-    def compare_teams(a, b):
-        # Criterio 1: Puntos (mayor a menor)
-        if a['puntos'] != b['puntos']:
-            return b['puntos'] - a['puntos']
-            
-        # Criterio 2: Supremacía (Enfrentamiento directo)
-        id_a = a['id_equipo']
-        id_b = b['id_equipo']
-        victorias_a = head_to_head_wins.get((id_a, id_b), 0)
-        victorias_b = head_to_head_wins.get((id_b, id_a), 0)
-        
-        if victorias_a > victorias_b:
-            return -1  # A va arriba
-        elif victorias_b > victorias_a:
-            return 1   # B va arriba
-            
-        # Criterio 3: Diferencia de canastas global — DIF (mayor a menor)
-        if a['DIF'] != b['DIF']:
-            return b['DIF'] - a['DIF']
-            
-        # Criterio 4: Puntos a Favor globales — PF (mayor a menor)
-        return b['PF'] - a['PF']
-
-    lista.sort(key=cmp_to_key(compare_teams))
+    # ── PASO 5: Ordenar por puntos y desempatar por bloques (FIBA D.1) ──
+    por_id = {fila['id_equipo']: fila for fila in lista}
+    globales = {i: {'DIF': f['DIF'], 'PF': f['PF']} for i, f in por_id.items()}
+    orden = [
+        e
+        for bloque in _agrupar(list(por_id), lambda i: por_id[i]['puntos'])
+        for e in desempatar(bloque, resultados, globales)
+    ]
+    lista = [por_id[i] for i in orden]
 
     # ── PASO 6: Agregar número de posición ────────────────────────
     for i, entrada in enumerate(lista, start=1):
