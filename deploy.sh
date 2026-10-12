@@ -20,7 +20,13 @@ echo ""
 echo "2. Compilando el Frontend (React)..."
 cd frontend
 npm install
-npm run build
+# Se compila en otra carpeta y se cambia al final: mientras compila, nginx sigue sirviendo
+# la versión anterior completa, y si el build falla el sitio queda como estaba.
+# La versión anterior queda en dist-viejo (para volver atrás: mv dist dist-roto && mv dist-viejo dist).
+npm run build -- --outDir dist-nuevo
+rm -rf dist-viejo
+if [ -d dist ]; then mv dist dist-viejo; fi
+mv dist-nuevo dist
 cd ..
 
 echo ""
