@@ -12,7 +12,7 @@ export const NOMBRE_FORMATO: Record<FormatoFaseFinal, string> = {
 export const LEYENDA_CRUCES: Record<FormatoFaseFinal, string> = {
   dos_grupos_cruces: 'Cuartos de final: 1.º A vs 4.º B · 2.º B vs 3.º A · 1.º B vs 4.º A · 2.º A vs 3.º B. Los primeros de grupo solo pueden encontrarse en la final.',
   un_grupo_semis: 'Semifinales: 1.º vs 4.º y 2.º vs 3.º. Los perdedores juegan por el tercer puesto y los ganadores, la final.',
-  tres_final_directa: 'El 1.º pasa directo a la final. El 2.º y el 3.º juegan un repechaje por el otro cupo.',
+  tres_final_directa: 'Fase de grupos de ida y vuelta. El 1.º pasa directo a la final. El 2.º y el 3.º juegan un repechaje por el otro cupo.',
 };
 
 // Colores de las líneas del recorrido: oro y crema para los de arriba, luego tintas que se distinguen sobre marino

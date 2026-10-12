@@ -36,9 +36,10 @@ FORMATOS = {
     },
     'tres_final_directa': {
         'nombre': 'Tres equipos, final directa',
-        'descripcion': 'Todos contra todos. El 1.º pasa a la final; el 2.º y el 3.º juegan un repechaje por el otro cupo.',
+        'descripcion': 'Todos contra todos, ida y vuelta. El 1.º pasa a la final; el 2.º y el 3.º juegan un repechaje por el otro cupo.',
         'grupos': [],
         'cupos': 3,
+        'vueltas': 2,  # ponytail: con 3 equipos el organizador juega ida y vuelta; el resto de formatos, una vuelta
         'llaves': [('R', '2', '3'), ('F', '1', 'G:R')],
     },
 }
@@ -71,12 +72,16 @@ def _resolver(ref, tablas, ganadores, perdedores):
     return tabla[puesto - 1]['id_equipo'] if len(tabla) >= puesto else None
 
 
-def _partidos_esperados(grupos):
-    """Todos contra todos dentro de cada grupo (o del grupo único)."""
+def _vueltas(formato):
+    return formato.get('vueltas', 1) if formato else 1
+
+
+def _partidos_esperados(grupos, vueltas=1):
+    """Todos contra todos dentro de cada grupo (o del grupo único), una o dos vueltas."""
     conteo = {}
     for g in grupos.values():
         conteo[g] = conteo.get(g, 0) + 1
-    return sum(n * (n - 1) // 2 for n in conteo.values())
+    return vueltas * sum(n * (n - 1) // 2 for n in conteo.values())
 
 
 def estado_fase_final(torneo, categoria):
@@ -84,7 +89,7 @@ def estado_fase_final(torneo, categoria):
     formato = FORMATOS.get(categoria.formato)
     grupos = grupos_de_categoria(torneo.id_torneo, categoria.id_categoria)
     partidos_grupos = partidos_fase_grupos(torneo.id_torneo, categoria.id_categoria)
-    esperados = _partidos_esperados(grupos)
+    esperados = _partidos_esperados(grupos, _vueltas(formato))
     pendientes = Partido.query.filter(
         Partido.id_torneo == torneo.id_torneo, Partido.id_categoria == categoria.id_categoria,
         Partido.llave.is_(None), Partido.estado.in_(('programado', 'en_curso')),
@@ -222,17 +227,18 @@ def recorrido(torneo, categoria):
     salida = {'fechas': [f.isoformat() for f in fechas], 'cupos': cupos, 'grupos': []}
     for letra, tabla in final.items():
         n = len(tabla)
+        por_jugar = (n - 1) * _vueltas(formato)  # partidos de cada equipo en la fase de grupos
         filas = []
         for f in tabla:
-            restantes = max(0, (n - 1) - f['PJ'])
+            restantes = max(0, por_jugar - f['PJ'])
             maximo = f['puntos'] + 2 * restantes
             if cupos is None or n <= cupos:
                 situacion = 'zona'
             else:
                 otros = [o for o in tabla if o['id_equipo'] != f['id_equipo']]
-                fuera_de_alcance = sum(1 for o in otros if o['puntos'] + 2 * max(0, (n - 1) - o['PJ']) < f['puntos'])
+                fuera_de_alcance = sum(1 for o in otros if o['puntos'] + 2 * max(0, por_jugar - o['PJ']) < f['puntos'])
                 imposibles = sum(1 for o in otros if o['puntos'] > maximo)
-                terminado = all(o['PJ'] >= n - 1 for o in tabla)
+                terminado = all(o['PJ'] >= por_jugar for o in tabla)
                 if terminado:
                     situacion = 'clasificado' if f['posicion'] <= cupos else 'eliminado'
                 elif fuera_de_alcance >= n - cupos:
@@ -256,5 +262,5 @@ def recorrido(torneo, categoria):
                     for t in por_fecha
                 ],
             })
-        salida['grupos'].append({'grupo': letra, 'equipos': filas, 'terminado': n > 0 and all(x['PJ'] >= n - 1 for x in tabla)})
+        salida['grupos'].append({'grupo': letra, 'equipos': filas, 'terminado': n > 0 and all(x['PJ'] >= por_jugar for x in tabla)})
     return salida

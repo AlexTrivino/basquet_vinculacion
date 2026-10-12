@@ -62,8 +62,8 @@ class TestFaseFinal(unittest.TestCase):
         r = getattr(self.client, metodo)(url, json=json, headers={'Authorization': f'Bearer {self._token("u-admin")}'})
         return r.status_code, r.get_json()
 
-    def _jugar(self, local, visitante, ml, mv, fecha=None, llave=None, fase='Primera fase'):
-        p = Partido(id_torneo=1, id_categoria=3, id_equipo_local=local, id_equipo_visitante=visitante,
+    def _jugar(self, local, visitante, ml, mv, fecha=None, llave=None, fase='Primera fase', cat=3):
+        p = Partido(id_torneo=1, id_categoria=cat, id_equipo_local=local, id_equipo_visitante=visitante,
                     fecha=fecha or self.dia, hora=hora(19, 0), estado='finalizado', fase=fase, llave=llave,
                     marcador_local=ml, marcador_visitante=mv)
         db.session.add(p)
@@ -196,6 +196,32 @@ class TestFaseFinal(unittest.TestCase):
         for g in data['grupos']:
             self.assertTrue(g['terminado'])
             self.assertEqual([e['situacion'] for e in g['equipos']], ['clasificado'] * 4 + ['eliminado'])
+
+    def test_tres_equipos_ida_y_vuelta(self):
+        """Cadetes +30 femenino: 3 equipos, ida y vuelta (6 partidos); recién entonces se arma el repechaje 2.º-3.º."""
+        db.session.add(Categoria(id_categoria=10, nombre_categoria='Cadetes +30 Femenino', genero_categoria='femenino', id_torneo=1, formato='tres_final_directa'))
+        for i in (11, 12, 13):
+            db.session.add(Equipo(id_equipo=i, nombre_equipo=f'EQUIPO {i}', id_usuario='u-del'))
+            db.session.add(Inscripcion(id_torneo=1, id_equipo=i, id_categoria=10, estado_inscripcion='aprobado'))
+        db.session.commit()
+        ida = [(11, 12), (12, 13), (11, 13)]
+        for local, visita in ida:
+            self._jugar(local, visita, 70, 60, cat=10)
+        data = self.client.get('/api/torneos/1/fase-final?id_categoria=10').get_json()['data']
+        self.assertEqual(data['fase_grupos']['esperados'], 6)
+        self.assertFalse(data['fase_grupos']['terminada'])  # la ida sola no cierra la fase
+        self.assertTrue(all(l['estado'] == 'espera' for l in data['llaves']))
+        grupo = self.client.get('/api/torneos/1/recorrido?id_categoria=10').get_json()['data']['grupos'][0]
+        self.assertEqual([e['restantes'] for e in grupo['equipos']], [2, 2, 2])
+        self.assertFalse(grupo['terminado'])
+        for local, visita in ida:  # vuelta: cambia la localía y repite el ganador
+            self._jugar(visita, local, 60, 70, fecha=date(2026, 10, 16), cat=10)
+        data = self.client.get('/api/torneos/1/fase-final?id_categoria=10').get_json()['data']
+        self.assertTrue(data['fase_grupos']['terminada'])
+        llaves = {l['codigo']: l for l in data['llaves']}
+        self.assertEqual((llaves['R']['estado'], llaves['R']['local']['id_equipo'], llaves['R']['visitante']['id_equipo']), ('listo', 12, 13))
+        self.assertEqual(llaves['F']['estado'], 'espera')  # 11 espera al ganador del repechaje
+        self.assertTrue(self.client.get('/api/torneos/1/recorrido?id_categoria=10').get_json()['data']['grupos'][0]['terminado'])
 
     def test_reglas_al_programar_y_finalizar(self):
         """En la fase de grupos solo juegan equipos del mismo grupo, no se finaliza empatado y el buscador responde."""
