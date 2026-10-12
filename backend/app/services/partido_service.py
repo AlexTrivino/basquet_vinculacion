@@ -112,7 +112,7 @@ def listar_partidos(id_torneo=None, estados=None, id_equipo=None, id_categoria=N
                      .outerjoin(ev, Partido.id_equipo_visitante == ev.id_equipo)\
                      .filter(
                          or_(
-                             Torneo.nombre_torneo.ilike(search_term),
+                             Torneo.nombre.ilike(search_term),
                              el.nombre_equipo.ilike(search_term),
                              ev.nombre_equipo.ilike(search_term)
                          )
@@ -134,13 +134,42 @@ def obtener_partido_por_id(id_partido):
     )
 
 
-def crear_partido(data):
-    """Crea un nuevo partido verificando que ambos equipos estén inscritos.
+def _validar_equipos(id_torneo, id_categoria, id_local, id_visitante, llave=None):
+    """Valida un cruce: equipos distintos, ambos aprobados en la categoría y, en la fase de grupos, del mismo grupo.
 
-    Validaciones previas:
-        1. El equipo local debe tener inscripción aprobada en el torneo.
-        2. El equipo visitante debe tener inscripción aprobada en el torneo.
-        3. Los dos equipos no pueden ser el mismo.
+    Raises:
+        ValueError: Si alguna validación falla con mensaje descriptivo.
+    """
+    if id_local == id_visitante:
+        raise ValueError('El equipo local y visitante no pueden ser el mismo.')
+
+    inscripcion_local = Inscripcion.query.filter_by(
+        id_torneo=id_torneo, id_equipo=id_local, id_categoria=id_categoria, estado_inscripcion='aprobado'
+    ).first()
+    if not inscripcion_local:
+        raise ValueError(
+            'El equipo local no tiene una inscripción aprobada para este torneo en esta categoría.'
+        )
+
+    inscripcion_visitante = Inscripcion.query.filter_by(
+        id_torneo=id_torneo, id_equipo=id_visitante, id_categoria=id_categoria, estado_inscripcion='aprobado'
+    ).first()
+    if not inscripcion_visitante:
+        raise ValueError(
+            'El equipo visitante no tiene una inscripción aprobada para este torneo en esta categoría.'
+        )
+
+    # Un partido de fase de grupos entre grupos distintos no contaría en ninguna tabla.
+    # Los cruces de la fase final llevan llave y sí mezclan grupos.
+    if not llave and inscripcion_local.grupo != inscripcion_visitante.grupo:
+        raise ValueError(
+            'En la fase de grupos solo se enfrentan equipos del mismo grupo '
+            f'(local: {inscripcion_local.grupo or "sin grupo"}, visitante: {inscripcion_visitante.grupo or "sin grupo"}).'
+        )
+
+
+def crear_partido(data):
+    """Crea un nuevo partido después de validar el cruce (ver ``_validar_equipos``).
 
     Args:
         data: Dict validado por ``PartidoCreateSchema``.
@@ -151,35 +180,9 @@ def crear_partido(data):
     Raises:
         ValueError: Si alguna validación falla con mensaje descriptivo.
     """
-    id_torneo = data['id_torneo']
-    id_categoria = data['id_categoria']
-    id_local = data['id_equipo_local']
-    id_visitante = data['id_equipo_visitante']
-
-    # ── Validación 0: No puede jugar un equipo contra sí mismo ────
-    if id_local == id_visitante:
-        raise ValueError('El equipo local y visitante no pueden ser el mismo.')
-
-    # ── Validación 1 y 2: Ambos equipos inscritos y aprobados ─────
-    # Se ejecutan en dos queries distintas (más legible que un JOIN complejo)
-    # dado que son validaciones de integridad, no consultas de listado.
-    inscripcion_local = Inscripcion.query.filter_by(
-        id_torneo=id_torneo, id_equipo=id_local, id_categoria=id_categoria, estado_inscripcion='aprobado'
-    ).first()
-
-    if not inscripcion_local:
-        raise ValueError(
-            'El equipo local no tiene una inscripción aprobada para este torneo en esta categoría.'
-        )
-
-    inscripcion_visitante = Inscripcion.query.filter_by(
-        id_torneo=id_torneo, id_equipo=id_visitante, id_categoria=id_categoria, estado_inscripcion='aprobado'
-    ).first()
-
-    if not inscripcion_visitante:
-        raise ValueError(
-            'El equipo visitante no tiene una inscripción aprobada para este torneo en esta categoría.'
-        )
+    _validar_equipos(
+        data['id_torneo'], data['id_categoria'], data['id_equipo_local'], data['id_equipo_visitante'], data.get('llave')
+    )
 
     # ── Creación ──────────────────────────────────────────────────
     try:
@@ -206,8 +209,23 @@ def actualizar_partido(partido, data):
 
     Returns:
         Instancia de ``Partido`` actualizada con relaciones cargadas.
+
+    Raises:
+        ValueError: Si los equipos nuevos no forman un cruce válido o el partido se finaliza empatado.
     """
     estado_previo = partido.estado
+
+    local = data.get('id_equipo_local', partido.id_equipo_local)
+    visitante = data.get('id_equipo_visitante', partido.id_equipo_visitante)
+    if (local, visitante) != (partido.id_equipo_local, partido.id_equipo_visitante):
+        _validar_equipos(partido.id_torneo, partido.id_categoria, local, visitante, partido.llave)
+
+    # En básquet no hay empates: un finalizado empatado contaría como victoria del local
+    # y en las llaves haría avanzar al local. Solo se revisa si la petición toca estado o marcador.
+    if {'estado', 'marcador_local', 'marcador_visitante'} & data.keys() \
+            and data.get('estado', partido.estado) == 'finalizado' \
+            and data.get('marcador_local', partido.marcador_local) == data.get('marcador_visitante', partido.marcador_visitante):
+        raise ValueError('En básquet no hay empates: revisa el marcador antes de finalizar el partido.')
 
     for key, value in data.items():
         setattr(partido, key, value)

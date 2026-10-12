@@ -194,7 +194,10 @@ def actualizar_partido(id_partido):
         if 'id_equipo_visitante' in data and data['id_equipo_visitante'] != partido.id_equipo_visitante:
             return api_error('VALIDATION_ERROR', 'No se puede cambiar el equipo visitante de un partido que ya no está programado.', 422)
 
-    partido = partido_service.actualizar_partido(partido, data)
+    try:
+        partido = partido_service.actualizar_partido(partido, data)
+    except ValueError as e:
+        return api_error('VALIDATION_ERROR', str(e), 422)
     return api_response(
         data=_admin_schema.dump(partido),
         message='Partido actualizado exitosamente.',

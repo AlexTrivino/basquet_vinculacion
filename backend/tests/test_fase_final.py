@@ -197,6 +197,29 @@ class TestFaseFinal(unittest.TestCase):
             self.assertTrue(g['terminado'])
             self.assertEqual([e['situacion'] for e in g['equipos']], ['clasificado'] * 4 + ['eliminado'])
 
+    def test_reglas_al_programar_y_finalizar(self):
+        """En la fase de grupos solo juegan equipos del mismo grupo, no se finaliza empatado y el buscador responde."""
+        base = {'id_torneo': 1, 'id_categoria': 3, 'fecha': '2026-09-20', 'hora': '19:00', 'fase': 'Primera fase', 'ubicacion': 'Coliseo'}
+        st, cuerpo = self._admin('post', '/api/partidos', {**base, 'id_equipo_local': 1, 'id_equipo_visitante': 6})
+        self.assertEqual(st, 422)
+        self.assertIn('mismo grupo', cuerpo['message'])
+        st, cuerpo = self._admin('post', '/api/partidos', {**base, 'id_equipo_local': 1, 'id_equipo_visitante': 2})
+        self.assertEqual(st, 201)
+        pid = cuerpo['data']['id_partido']
+        # Cambiar el visitante por uno del otro grupo tampoco se puede
+        st, _ = self._admin('put', f'/api/partidos/{pid}', {'id_equipo_visitante': 7})
+        self.assertEqual(st, 422)
+        # Empatado no se finaliza; con ganador sí
+        st, cuerpo = self._admin('put', f'/api/partidos/{pid}', {'estado': 'finalizado', 'marcador_local': 60, 'marcador_visitante': 60})
+        self.assertEqual(st, 422)
+        self.assertIn('empates', cuerpo['message'])
+        st, _ = self._admin('put', f'/api/partidos/{pid}', {'estado': 'finalizado', 'marcador_local': 61, 'marcador_visitante': 60})
+        self.assertEqual(st, 200)
+        # El buscador de partidos (antes respondía 500)
+        r = self.client.get('/api/partidos?search=FAE')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual([p['id_partido'] for p in r.get_json()['data']], [pid])
+
 
 if __name__ == '__main__':
     unittest.main()
