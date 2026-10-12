@@ -7,6 +7,13 @@ import type { Inscripcion } from '../../../types/api.types';
 import { toast } from 'sonner';
 import { AsyncButton } from '../../../components/AsyncButton';
 
+// Mismas piezas que el perfil del equipo (marino, oro y celeste): el aviso vive sobre su portada
+const MOVIL = 'relative z-20 block border-b border-oro/40 bg-marino-claro p-4 text-crema lg:hidden';
+const FLOTANTE = 'absolute right-8 top-24 z-40 mt-8 hidden w-80 rounded-2xl border border-oro/40 bg-marino-claro/95 p-6 text-crema shadow-2xl shadow-black/50 backdrop-blur lg:block';
+const ICONO = 'rounded-xl bg-oro/15 p-2 text-oro';
+const PRIMARIO = 'inline-flex w-full items-center justify-center gap-2 rounded-xl bg-celeste px-4 py-2.5 text-sm font-bold text-marino transition-colors hover:bg-white';
+const SECUNDARIO = 'inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/20 px-4 py-2.5 text-sm font-bold text-slate-200 transition-colors hover:bg-white/10';
+
 interface BannerNuevosTorneosProps {
   inscripciones: Inscripcion[];
   idEquipo: number;
@@ -38,55 +45,43 @@ export function BannerNuevosTorneos({ inscripciones, idEquipo }: BannerNuevosTor
     return (
       <>
         {/* VISTA MÓVIL BORRADOR */}
-        <div className="block lg:hidden bg-gradient-to-r from-amber-200 to-yellow-400 p-4 border-b border-yellow-500 shadow-sm relative z-20 text-yellow-900">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="bg-white/40 p-2 rounded-xl backdrop-blur-sm">
-              <PlayCircle className="w-5 h-5 text-yellow-800" />
+        <div className={MOVIL}>
+          <div className="mb-3 flex items-center gap-3">
+            <div className={ICONO}>
+              <PlayCircle className="h-5 w-5" aria-hidden="true" />
             </div>
-            <h3 className="font-bold text-lg">Inscripción en Pausa</h3>
+            <h3 className="text-lg font-bold">Inscripción en pausa</h3>
           </div>
-          <p className="text-sm text-yellow-800 mb-4 leading-relaxed">
+          <p className="mb-4 text-sm leading-relaxed text-slate-300">
             Tienes una solicitud en borrador. Termínala o elimínala para iniciar otra.
           </p>
           <div className="flex flex-col gap-2">
-            <Link
-              to="/delegado/inscripcion"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-yellow-600 text-white px-4 py-2 text-sm font-bold transition-colors hover:bg-yellow-700 shadow-sm"
-            >
-              Reanudar Solicitud <ArrowRight className="w-4 h-4" />
+            <Link to="/delegado/inscripcion" className={PRIMARIO}>
+              Reanudar solicitud <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-            <AsyncButton
-              onClickAction={handleDeleteBorrador}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-white/50 text-yellow-900 px-4 py-2 text-sm font-bold transition-colors hover:bg-white/80 shadow-sm"
-            >
-              <Trash2 className="w-4 h-4" /> Eliminar
+            <AsyncButton onClickAction={handleDeleteBorrador} className={SECUNDARIO}>
+              <Trash2 className="h-4 w-4" aria-hidden="true" /> Eliminar
             </AsyncButton>
           </div>
         </div>
 
         {/* VISTA DESKTOP BORRADOR */}
-        <div className="mt-8 hidden lg:block absolute top-24 right-8 z-40 bg-gradient-to-b from-amber-200 to-yellow-400 shadow-2xl rounded-2xl p-6 border border-yellow-500 w-80 transition-all duration-300 text-yellow-900">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="bg-white/40 p-2.5 rounded-xl backdrop-blur-sm">
-              <PlayCircle className="w-6 h-6 text-yellow-800" />
+        <div className={FLOTANTE}>
+          <div className="mb-4 flex items-center gap-3">
+            <div className={ICONO}>
+              <PlayCircle className="h-6 w-6" aria-hidden="true" />
             </div>
-            <h2 className="font-bold text-lg leading-tight">Inscripción en Pausa</h2>
+            <h2 className="font-display text-lg font-bold leading-tight">Inscripción en pausa</h2>
           </div>
-          <p className="text-sm text-yellow-800 mb-6 leading-relaxed">
+          <p className="mb-6 text-sm leading-relaxed text-slate-300">
             Tienes una solicitud de inscripción en borrador que aún no has completado. Debes terminarla o eliminarla para poder iniciar una nueva.
           </p>
           <div className="flex flex-col gap-3">
-            <Link
-              to="/delegado/inscripcion"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-yellow-600 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-yellow-700 shadow-md hover:shadow-lg hover:-translate-y-0.5"
-            >
-              Reanudar Solicitud <ArrowRight className="w-4 h-4" />
+            <Link to="/delegado/inscripcion" className={PRIMARIO}>
+              Reanudar solicitud <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-            <AsyncButton
-              onClickAction={handleDeleteBorrador}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white/50 px-4 py-3 text-sm font-bold text-yellow-900 transition-all hover:bg-white/80 shadow-sm hover:shadow-md"
-            >
-              <Trash2 className="w-4 h-4" /> Eliminar Borrador
+            <AsyncButton onClickAction={handleDeleteBorrador} className={SECUNDARIO}>
+              <Trash2 className="h-4 w-4" aria-hidden="true" /> Eliminar borrador
             </AsyncButton>
           </div>
         </div>
@@ -119,42 +114,36 @@ export function BannerNuevosTorneos({ inscripciones, idEquipo }: BannerNuevosTor
   return (
     <>
       {/* VISTA MÓVIL */}
-      <div className="block lg:hidden bg-gradient-to-r from-amber-500 to-orange-600 p-4 border-b border-orange-400 shadow-sm relative z-20 text-white">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="bg-white/20 p-2 rounded-xl backdrop-blur-sm">
-            <Trophy className="w-5 h-5 text-white" />
+      <div className={MOVIL}>
+        <div className="mb-3 flex items-center gap-3">
+          <div className={ICONO}>
+            <Trophy className="h-5 w-5" aria-hidden="true" />
           </div>
-          <h3 className="font-bold text-lg">¡Nuevo Torneo!</h3>
+          <h3 className="text-lg font-bold">¡Nuevo torneo!</h3>
         </div>
-        <p className="text-sm text-amber-50 mb-4 leading-relaxed">
-          El torneo <strong>{torneo.nombre}</strong> ha abierto inscripciones.
+        <p className="mb-4 text-sm leading-relaxed text-slate-300">
+          El torneo <strong className="text-crema">{torneo.nombre}</strong> ha abierto inscripciones.
         </p>
-        <Link
-          to={`/delegado/reinscripcion/${idEquipo}`}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-white text-orange-600 px-4 py-2 text-sm font-bold transition-colors hover:bg-orange-50 shadow-sm"
-        >
-          Inscribir Equipo <ArrowRight className="w-4 h-4" />
+        <Link to={`/delegado/reinscripcion/${idEquipo}`} className={PRIMARIO}>
+          Inscribir equipo <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </div>
 
       {/* VISTA DESKTOP FLOTANTE */}
-      <div className="mt-8 hidden lg:block absolute top-24 right-8 z-40 bg-gradient-to-b from-amber-500 to-orange-600 shadow-2xl rounded-2xl p-6 border border-orange-400 w-80 transition-all duration-300 text-white">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="bg-white/20 p-2.5 rounded-xl backdrop-blur-sm">
-            <Trophy className="w-6 h-6 text-white" />
+      <div className={FLOTANTE}>
+        <div className="mb-4 flex items-center gap-3">
+          <div className={ICONO}>
+            <Trophy className="h-6 w-6" aria-hidden="true" />
           </div>
-          <h2 className="font-bold text-lg leading-tight">¡Nuevo Torneo Disponible!</h2>
+          <h2 className="font-display text-lg font-bold leading-tight">¡Nuevo torneo disponible!</h2>
         </div>
 
-        <p className="text-sm text-amber-50 mb-6 leading-relaxed">
-          El torneo <strong>{torneo.nombre}</strong> ha abierto inscripciones. Inscribe a tu equipo ahora para asegurar tu cupo.
+        <p className="mb-6 text-sm leading-relaxed text-slate-300">
+          El torneo <strong className="text-crema">{torneo.nombre}</strong> ha abierto inscripciones. Inscribe a tu equipo ahora para asegurar tu cupo.
         </p>
 
-        <Link
-          to={`/delegado/reinscripcion/${idEquipo}`}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-bold text-orange-600 transition-all hover:bg-orange-50 shadow-md hover:shadow-lg hover:-translate-y-0.5"
-        >
-          Inscribir Equipo <ArrowRight className="w-4 h-4" />
+        <Link to={`/delegado/reinscripcion/${idEquipo}`} className={PRIMARIO}>
+          Inscribir equipo <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </div>
     </>

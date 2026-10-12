@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { AsyncButton } from '../../components/AsyncButton';
 import { generarLlaves, getFaseFinal, getTorneosAdmin, setFormatoCategoria, setGrupos } from '../../features/torneos/api/torneos.api';
 import { getInscripcionesPublicas } from '../../features/equipos/api/equipos.api';
-import type { FormatoFaseFinal, Llave } from '../../types/api.types';
+import type { Categoria, FormatoFaseFinal, Llave } from '../../types/api.types';
 
 const TARJETA = 'bg-white p-6 rounded-2xl border border-slate-200 shadow-sm';
 const SELECT = 'w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-primary-500 focus:outline-none';
@@ -17,6 +17,12 @@ const ESTADO: Record<Llave['estado'], { texto: string; clase: string }> = {
   programado: { texto: 'Programado', clase: 'bg-blue-50 text-blue-700' },
   listo: { texto: 'Listo para crear', clase: 'bg-emerald-50 text-emerald-700' },
   espera: { texto: 'En espera', clase: 'bg-amber-50 text-amber-700' },
+};
+
+// En el torneo hay categorías con el mismo nombre ("Juvenil" masculino y femenino): se distinguen por género
+const etiquetaCategoria = (c: Categoria) => {
+  const nombre = c.nombre_categoria ?? c.nombre ?? '';
+  return c.genero_categoria && !nombre.toLowerCase().includes(c.genero_categoria) ? `${nombre} (${c.genero_categoria})` : nombre;
 };
 
 function Paso({ n, titulo, children }: { n: number; titulo: string; children: React.ReactNode }) {
@@ -33,7 +39,7 @@ function Paso({ n, titulo, children }: { n: number; titulo: string; children: Re
 
 export default function FaseFinal() {
   const queryClient = useQueryClient();
-  const [idTorneo, setIdTorneo] = useState<number>(0);
+  const [elegido, setIdTorneo] = useState<number>(0);
   const [idCategoria, setIdCategoria] = useState<number>(0);
   const [asignacion, setAsignacion] = useState<Record<string, string | null>>({});
   const [programacion, setProgramacion] = useState<Record<string, { fecha: string; hora: string }>>({});
@@ -41,6 +47,9 @@ export default function FaseFinal() {
 
   const { data: torneosRes } = useQuery({ queryKey: ['torneos_admin'], queryFn: () => getTorneosAdmin(1, 100) });
   const torneos = torneosRes?.data || [];
+  // Sin elección, el torneo en curso o el programado más reciente (la lista viene del más nuevo al más viejo)
+  const actual = torneos.find((t) => t.estado === 'en_curso') ?? torneos.find((t) => t.estado === 'programado');
+  const idTorneo = elegido || (actual?.id_torneo ?? actual?.id ?? 0);
   const torneo = torneos.find((t) => (t.id_torneo ?? t.id) === idTorneo);
   const categorias = torneo?.categorias || [];
 
@@ -94,29 +103,33 @@ export default function FaseFinal() {
 
   return (
     <div className="space-y-6 w-full px-[10%] py-8">
-      <div className={`flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between ${TARJETA}`}>
+      <div className={`flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between ${TARJETA}`}>
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-blue-500/20 bg-blue-500/10 text-blue-600">
             <GitBranch className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-slate-900">Fase final</h1>
-            <p className="mt-0.5 text-sm text-slate-500">Formato de cada categoría, grupos y creación de las llaves.</p>
+            <h1 className="text-2xl font-black tracking-tight text-slate-900">Llaves</h1>
+            <p className="mt-0.5 text-sm text-slate-500">Formato de la fase final, grupos y partidos de las llaves de cada categoría.</p>
           </div>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 sm:min-w-[28rem]">
+        <div className="grid gap-3 sm:grid-cols-2 xl:min-w-[34rem]">
           <label className="text-sm font-medium text-gray-700">
             Torneo
             <select className={`${SELECT} mt-1`} value={idTorneo} onChange={(e) => { setIdTorneo(Number(e.target.value)); setIdCategoria(0); }}>
               <option value={0}>Seleccionar…</option>
-              {torneos.map((t) => <option key={t.id_torneo ?? t.id} value={t.id_torneo ?? t.id}>{t.nombre_torneo ?? t.nombre}</option>)}
+              {torneos.map((t) => (
+                <option key={t.id_torneo ?? t.id} value={t.id_torneo ?? t.id}>
+                  {t.nombre_torneo ?? t.nombre}{t.estado ? ` · ${t.estado.replace('_', ' ')}` : ''}
+                </option>
+              ))}
             </select>
           </label>
           <label className="text-sm font-medium text-gray-700">
             Categoría
             <select className={`${SELECT} mt-1`} value={idCategoria} disabled={!torneo} onChange={(e) => setIdCategoria(Number(e.target.value))}>
               <option value={0}>Seleccionar…</option>
-              {categorias.map((c) => <option key={c.id_categoria ?? c.id} value={c.id_categoria ?? c.id}>{c.nombre_categoria ?? c.nombre}</option>)}
+              {categorias.map((c) => <option key={c.id_categoria ?? c.id} value={c.id_categoria ?? c.id}>{etiquetaCategoria(c)}</option>)}
             </select>
           </label>
         </div>
@@ -175,7 +188,7 @@ export default function FaseFinal() {
           )}
 
           {formato && (
-            <Paso n={letras.length ? 3 : 2} titulo="Llaves">
+            <Paso n={letras.length ? 3 : 2} titulo="Cruces">
               <p className="mb-4 text-sm text-slate-500">
                 {fase.fase_grupos.terminada
                   ? 'Fase de grupos finalizada: las llaves con dos equipos definidos se pueden crear como partidos.'

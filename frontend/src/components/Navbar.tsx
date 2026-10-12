@@ -63,6 +63,10 @@ export function Navbar() {
         : isActive ? 'text-primary-600' : `${inactivo} hover:text-primary-600`
     }`;
   const separador = enInicio ? 'border-white/15' : 'border-gray-200';
+  // El super_admin tiene 9 enlaces más las vistas de usuario: por debajo de 1280 px no caben y usa el menú lateral
+  const desde = userRole === 'super_admin'
+    ? { boton: 'xl:hidden', barra: 'xl:flex', usuario: 'xl:block' }
+    : { boton: 'lg:hidden', barra: 'lg:flex', usuario: 'lg:block' };
 
   const { data: perfilRes } = useQuery({
     queryKey: ['mi_perfil'],
@@ -119,10 +123,10 @@ export function Navbar() {
     <>
       <nav className={`sticky top-0 z-50 w-full border-b ${enInicio ? 'border-white/10 bg-marino' : 'border-gray-200 bg-white shadow-sm'}`}>
         <div className="mx-auto flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4">
+          <div className="flex shrink-0 items-center gap-4">
             <button
               type="button"
-              className={`inline-flex items-center justify-center rounded-md p-2 lg:hidden ${enInicio ? 'text-slate-300 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'}`}
+              className={`inline-flex items-center justify-center rounded-md p-2 ${desde.boton} ${enInicio ? 'text-slate-300 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'}`}
               onClick={() => setIsSidebarOpen(true)}
               aria-label="Abrir menú"
             >
@@ -139,7 +143,7 @@ export function Navbar() {
             </Link>
           </div>
 
-          <div className="hidden lg:flex flex-1 justify-center lg:items-center lg:gap-6 2xl:gap-8">
+          <div className={`hidden flex-1 items-center justify-center gap-3 min-[1400px]:gap-6 2xl:gap-8 ${desde.barra}`}>
             {links.map((link) => {
               if (link.path === '/delegado/inscripcion' && isInscripcionDisabled) {
                 return (
@@ -219,7 +223,7 @@ export function Navbar() {
           {/* Acciones de usuario */}
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
-              <div className="relative hidden lg:block">
+              <div className={`relative hidden ${desde.usuario}`}>
                 <button
                   type="button"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -249,11 +253,13 @@ export function Navbar() {
                       className="fixed inset-0 z-10" 
                       onClick={() => setIsDropdownOpen(false)} 
                     />
-                    <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-xl bg-white py-1.5 shadow-xl ring-1 ring-black/5 z-20 divide-y divide-gray-100">
+                    <div className={`absolute right-0 z-20 mt-2 w-56 origin-top-right divide-y rounded-xl py-1.5 shadow-xl ${
+                      enInicio ? 'divide-white/10 bg-marino-claro ring-1 ring-oro/25 shadow-black/40' : 'divide-gray-100 bg-white ring-1 ring-black/5'
+                    }`}>
                       <div className="px-4 py-2.5">
-                        <p className="text-xs text-gray-500 font-medium">Conectado como</p>
-                        <p className="text-sm font-bold text-gray-900 truncate mt-0.5">{nombreUsuario}</p>
-                        <span className="inline-block mt-1.5 px-2 py-0.5 text-[10px] font-semibold rounded-md bg-primary-50 text-primary-700">
+                        <p className={`text-xs font-medium ${enInicio ? 'text-slate-400' : 'text-gray-500'}`}>Conectado como</p>
+                        <p className={`mt-0.5 truncate text-sm font-bold ${enInicio ? 'text-crema' : 'text-gray-900'}`}>{nombreUsuario}</p>
+                        <span className={`mt-1.5 inline-block rounded-md px-2 py-0.5 text-[10px] font-semibold ${enInicio ? 'bg-oro/15 text-oro' : 'bg-primary-50 text-primary-700'}`}>
                           {userRole === 'super_admin' ? 'Super Administrador' : userRole === 'visor' ? 'Visor' : 'Delegado'}
                         </span>
                       </div>
@@ -261,9 +267,9 @@ export function Navbar() {
                         <Link
                           to="/perfil"
                           onClick={() => setIsDropdownOpen(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+                          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors ${enInicio ? 'text-slate-200 hover:bg-white/5' : 'text-gray-700 hover:bg-gray-50'}`}
                         >
-                          <User className="w-4 h-4 text-gray-400" />
+                          <User className={`h-4 w-4 ${enInicio ? 'text-slate-400' : 'text-gray-400'}`} />
                           Mi Perfil
                         </Link>
                       </div>
@@ -273,9 +279,9 @@ export function Navbar() {
                             setIsDropdownOpen(false);
                             handleLogout();
                           }}
-                          className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium transition-colors"
+                          className={`flex w-full items-center gap-2 px-4 py-2 text-left text-sm font-medium transition-colors ${enInicio ? 'text-rose-300 hover:bg-rose-500/10' : 'text-red-600 hover:bg-red-50'}`}
                         >
-                          <LogOut className="w-4 h-4 text-red-500" />
+                          <LogOut className="h-4 w-4" />
                           Cerrar Sesión
                         </button>
                       </div>
@@ -311,6 +317,8 @@ export function Navbar() {
         disabledPaths={disabledPaths}
         userName={nombreUsuario}
         userRole={userRole}
+        ocultarDesde={desde.boton}
+        oscuro={enInicio}
       />
     </>
   );
