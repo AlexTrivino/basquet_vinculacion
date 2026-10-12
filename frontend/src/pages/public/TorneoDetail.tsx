@@ -139,7 +139,7 @@ export default function TorneoDetail() {
       {/* ─── Barra de control: pestañas en paralelogramo y categorías ─── */}
       <div className="sticky top-16 z-30 border-b border-white/10 bg-marino/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-          <nav className="-mx-4 flex gap-1.5 overflow-x-auto px-4 lg:mx-0 lg:px-0" aria-label="Secciones del torneo">
+          <nav className="-mx-4 flex gap-1.5 overflow-x-auto px-4 lg:mx-0 lg:shrink-0 lg:overflow-visible lg:px-0" aria-label="Secciones del torneo">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
