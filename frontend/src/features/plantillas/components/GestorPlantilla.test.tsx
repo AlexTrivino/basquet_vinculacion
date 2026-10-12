@@ -70,7 +70,7 @@ describe('GestorPlantilla - Modos Admin y ReadOnly', () => {
   it('Modo Estándar (No Admin): renderiza selectores de equipo y torneo si no es un wizard', async () => {
     renderComponent({ isAdmin: false });
     // Verifica que renderiza el componente principal de plantilla (o el selector dependiendo del estado)
-    const title = await screen.findByText('Roster del Equipo');
+    const title = await screen.findByText('Plantilla del Equipo');
     expect(title).toBeInTheDocument();
   });
 

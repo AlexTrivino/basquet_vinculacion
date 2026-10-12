@@ -71,6 +71,7 @@ class TestInscripcionDraftAndRoster(unittest.TestCase):
         p = plantilla_service.crear_plantilla({
             'id_equipo': eq.id_equipo,
             'id_torneo': t.id_torneo,
+            'id_categoria': c.id_categoria,
             'id_jugador': j.id_jugador,
             'numero_camiseta': 7
         })

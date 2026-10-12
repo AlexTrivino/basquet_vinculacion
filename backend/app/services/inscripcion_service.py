@@ -94,8 +94,8 @@ def crear_inscripcion(data):
     Validaciones previas a la inserción:
         1. El torneo debe existir y no estar inactivo.
         2. El equipo debe existir y estar activo.
-        3. El torneo debe estar en estado ``'programado'`` o ``'en_curso'``
-           para aceptar nuevas inscripciones.
+        3. El torneo debe estar ``'programado'``: en curso, finalizado o
+           anulado ya no acepta inscripciones.
 
     Post-inserción:
         - Captura ``IntegrityError`` del ``UniqueConstraint`` y lo convierte
@@ -116,9 +116,9 @@ def crear_inscripcion(data):
     if torneo is None or torneo.estado == 'inactivo':
         raise ValueError('El torneo especificado no existe o está inactivo.')
 
-    if torneo.estado in ['finalizado', 'en_curso']:
+    if torneo.estado != 'programado':
         raise ValueError(
-            'No se pueden registrar inscripciones en un torneo en curso o finalizado.'
+            'No se pueden registrar inscripciones en un torneo en curso, finalizado o anulado.'
         )
 
     # ── Validación 2: Equipo válido ───────────────────────────────

@@ -160,6 +160,10 @@ class TestInscripcionRechazoPurga(unittest.TestCase):
         from datetime import datetime, timedelta
 
         user = Usuario.query.first()
+        if not user:
+            user = Usuario(id_usuario=f"user-{uuid.uuid4().hex[:8]}", nombre="Delegado Purga", correo=f"purga_{uuid.uuid4().hex[:6]}@test.com", rol="delegado")
+            db.session.add(user)
+            db.session.flush()
         t = Torneo(nombre=f"Torneo Purga {uuid.uuid4().hex[:4]}", fecha_inicio=date.today(), fecha_fin=date.today(), estado="en_curso")
         db.session.add(t)
         db.session.flush()

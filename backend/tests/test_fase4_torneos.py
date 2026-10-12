@@ -1,5 +1,6 @@
 import unittest
 import io
+from datetime import date
 import os
 from unittest.mock import patch
 from marshmallow import ValidationError
@@ -23,7 +24,7 @@ class TestFase4TorneosBusiness(unittest.TestCase):
         db.create_all()
 
         # Crear torneo
-        self.torneo = Torneo(nombre="Torneo Test", fecha_inicio="2026-01-01", fecha_fin="2026-12-31", estado="programado")
+        self.torneo = Torneo(nombre="Torneo Test", fecha_inicio=date(2026, 1, 1), fecha_fin=date(2026, 12, 31), estado="programado")
         db.session.add(self.torneo)
         db.session.commit()
         self.t_id = self.torneo.id_torneo
@@ -32,6 +33,13 @@ class TestFase4TorneosBusiness(unittest.TestCase):
         db.session.remove()
         db.drop_all()
         self.ctx.pop()
+
+    def test_no_acepta_inscripciones_si_no_esta_programado(self):
+        from app.services.inscripcion_service import crear_inscripcion
+        self.torneo.estado = 'anulado'
+        db.session.commit()
+        with self.assertRaises(ValueError):
+            crear_inscripcion({'id_torneo': self.t_id, 'id_equipo': 1, 'id_categoria': 1})
 
     def test_schema_torneo_update_estado_anulado(self):
         schema = TorneoUpdateSchema()
