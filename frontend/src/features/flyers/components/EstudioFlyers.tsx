@@ -3,11 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { toPng } from 'html-to-image';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ChevronDown, Download } from 'lucide-react';
+import { ChevronDown, Copy, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { getTorneosAdmin } from '../../torneos/api/torneos.api';
 import { getDatosFlyers, type DatosFlyers, type FiguraFlyer } from '../api/flyers.api';
-import { FiguraDestacada, FORMATOS, ListaFiguras, ListaResultados, MarcoFlyer, type Formato } from './Flyer';
+import { cifra, diaSemana, fechaCartel, puntosDelDia, textoFigura, textoFiguras, textoResultados } from '../textos';
+import { FichaFigura, FORMATOS, HeroeFigura, ListaFiguras, ListaResultados, MarcoFlyer, type Formato } from './Flyer';
 
 type Tipo = 'resultados' | 'figura-fecha' | 'categoria' | 'equipo';
 const TIPOS: { valor: Tipo; texto: string }[] = [
@@ -19,8 +20,6 @@ const TIPOS: { valor: Tipo; texto: string }[] = [
 // Si un escudo o una foto no se pueden leer, la imagen sale igual (con ese hueco vacío)
 const PIXEL_VACIO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
-const fechaLarga = (f: string) => format(parseISO(f), "EEEE d 'de' MMMM", { locale: es });
-const fechaCorta = (f: string) => format(parseISO(f), "d 'de' MMMM", { locale: es });
 const archivo = (...partes: (string | number | undefined)[]) =>
   `flyer-${partes.filter((p) => p !== undefined && p !== '').join('-')}`
     .normalize('NFD')
@@ -35,51 +34,73 @@ function trocear<T>(lista: T[], n: number): T[][] {
 }
 
 interface Pagina {
-  titulo: string;
-  subtitulo?: string;
-  cinta: string;
+  titulo: readonly [string, string, string];
+  dato: readonly [string, string];
+  cifra: readonly [string, string | number];
+  gancho?: ReactNode;
+  heroe?: ReactNode;
+  formula?: boolean;
   cuerpo: ReactNode;
   archivo: string;
 }
 
-function armarPaginas(datos: DatosFlyers, tipo: Tipo, formato: Formato, categoria: string, equipo: string): Pagina[] {
+// Las láminas del flyer elegido y su caption para Instagram
+function armarFlyer(datos: DatosFlyers, tipo: Tipo, formato: Formato, categoria: string, equipo: string): { paginas: Pagina[]; texto: string } {
   const fecha = datos.fecha;
-  if (!fecha) return [];
-  const acumulado = `Acumulado al ${fechaCorta(fecha)}`;
-  const figura = (f: FiguraFlyer) => <FiguraDestacada figura={f} formato={formato} />;
+  const nada = { paginas: [], texto: '' };
+  if (!fecha) return nada;
+  const acumulado = ['Acumulado', fechaCartel(fecha)] as const;
+  const unaFigura = (f: FiguraFlyer, titulo: Pagina['titulo'], dato: Pagina['dato'], encabezado: string, nombre?: string | null) => ({
+    paginas: [{
+      titulo, dato, cifra: ['Valoración', f.valoracion] as const, formula: true,
+      heroe: <HeroeFigura figura={f} formato={formato} />,
+      cuerpo: <FichaFigura figura={f} />,
+      archivo: archivo('figura', nombre ?? undefined, fecha),
+    }],
+    texto: textoFigura(encabezado, f),
+  });
 
   if (tipo === 'resultados') {
-    const paginas = trocear(datos.resultados, FORMATOS[formato].resultados);
-    return paginas.map((trozo, i) => ({
-      titulo: 'Resultados',
-      subtitulo: paginas.length > 1 ? `Parte ${i + 1} de ${paginas.length}` : undefined,
-      cinta: fechaLarga(fecha),
-      cuerpo: <ListaResultados resultados={trozo} conFigura={formato === 'historia'} />,
-      archivo: archivo('resultados', fecha, paginas.length > 1 ? i + 1 : undefined),
-    }));
+    const trozos = trocear(datos.resultados, FORMATOS[formato].resultados);
+    const { partidos, puntos } = puntosDelDia(datos.resultados);
+    const gancho = partidos ? <><span className="text-oro">{cifra.format(puntos)}</span> {puntos === 1 ? 'punto' : 'puntos'} en la jornada</> : undefined;
+    return {
+      paginas: trozos.map((trozo, i) => ({
+        titulo: ['Resultados', 'del', diaSemana(fecha)],
+        dato: ['Fecha', fechaCartel(fecha)],
+        cifra: ['Partidos', datos.resultados.length],
+        gancho,
+        cuerpo: <ListaResultados resultados={trozo} conFigura={formato === 'historia'} />,
+        archivo: archivo('resultados', fecha, trozos.length > 1 ? i + 1 : undefined),
+      })),
+      texto: textoResultados(fecha, datos.resultados),
+    };
   }
   if (tipo === 'figura-fecha') {
     const f = datos.figura_fecha;
-    return f ? [{ titulo: 'Figura de la fecha', subtitulo: f.categoria ?? undefined, cinta: fechaLarga(fecha), cuerpo: figura(f), archivo: archivo('figura', fecha) }] : [];
+    return f ? unaFigura(f, ['Figura', 'de la', 'Fecha'], [diaSemana(fecha), fechaCartel(fecha)], 'Figura de la fecha') : nada;
   }
   if (tipo === 'categoria') {
     if (categoria === 'todas') {
-      const paginas = trocear(datos.figuras_categoria, FORMATOS[formato].figuras);
-      return paginas.map((trozo, i) => ({
-        titulo: 'Figuras del torneo',
-        subtitulo: paginas.length > 1 ? `La mejor valoración de cada categoría · ${i + 1} de ${paginas.length}` : 'La mejor valoración de cada categoría',
-        cinta: acumulado,
-        cuerpo: <ListaFiguras figuras={trozo} />,
-        archivo: archivo('figuras-categorias', fecha, paginas.length > 1 ? i + 1 : undefined),
-      }));
+      const trozos = trocear(datos.figuras_categoria, FORMATOS[formato].figuras);
+      return {
+        paginas: trozos.map((trozo, i) => ({
+          titulo: ['Figuras', 'del', 'Torneo'],
+          dato: acumulado,
+          cifra: ['Categorías', datos.figuras_categoria.length],
+          gancho: 'La mejor valoración de cada categoría',
+          formula: true,
+          cuerpo: <ListaFiguras figuras={trozo} />,
+          archivo: archivo('figuras-categorias', fecha, trozos.length > 1 ? i + 1 : undefined),
+        })),
+        texto: textoFiguras(fecha, datos.figuras_categoria),
+      };
     }
     const f = datos.figuras_categoria.find((x) => String(x.id_categoria) === categoria);
-    return f ? [{ titulo: 'Figura de la categoría', subtitulo: f.categoria ?? undefined, cinta: acumulado, cuerpo: figura(f), archivo: archivo('figura', f.categoria ?? '', fecha) }] : [];
+    return f ? unaFigura(f, ['Figura', 'de la', 'Categoría'], acumulado, `Figura de ${f.categoria}`, f.categoria) : nada;
   }
   const f = datos.figuras_equipo.find((x) => `${x.equipo?.id_equipo}-${x.id_categoria}` === equipo);
-  return f
-    ? [{ titulo: 'Figura del equipo', subtitulo: [f.equipo?.nombre_equipo, f.categoria].filter(Boolean).join(' · '), cinta: acumulado, cuerpo: figura(f), archivo: archivo('figura', f.equipo?.nombre_equipo, fecha) }]
-    : [];
+  return f ? unaFigura(f, ['Figura', 'del', 'Equipo'], acumulado, `Figura de ${f.equipo?.nombre_equipo} en ${f.categoria}`, f.equipo?.nombre_equipo) : nada;
 }
 
 // Ancho disponible para escalar la vista previa (el flyer se arma a tamaño real y se reduce con transform)
@@ -163,7 +184,7 @@ export function EstudioFlyers() {
   });
   const datos = data?.data;
   const equipoActual = equipo || (datos?.figuras_equipo[0] ? `${datos.figuras_equipo[0].equipo?.id_equipo}-${datos.figuras_equipo[0].id_categoria}` : '');
-  const paginas = datos ? armarPaginas(datos, tipo, formato, categoria, equipoActual) : [];
+  const { paginas, texto } = datos ? armarFlyer(datos, tipo, formato, categoria, equipoActual) : { paginas: [], texto: '' };
 
   const [ref, anchoVista] = useAncho<HTMLDivElement>();
   const { ancho, alto } = FORMATOS[formato];
@@ -180,6 +201,15 @@ export function EstudioFlyers() {
     a.href = url;
     a.download = paginas[i].archivo;
     a.click();
+  }
+
+  async function copiarTexto() {
+    try {
+      await navigator.clipboard.writeText(texto);
+      toast.success('Texto copiado. Pégalo como descripción de la publicación.');
+    } catch {
+      toast.error('No se pudo copiar el texto.');
+    }
   }
 
   async function descargar(cual: number | 'todas') {
@@ -248,6 +278,16 @@ export function EstudioFlyers() {
           <p className="text-xs leading-relaxed text-slate-400">
             Figura es la mejor valoración: puntos + rebotes + asistencias + tapones. Por categoría y por equipo se suma todo el torneo; en la fecha, cada partido.
           </p>
+          {texto && (
+            <button
+              type="button"
+              onClick={copiarTexto}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white/25 px-4 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-white/10 active:scale-[0.98]"
+            >
+              <Copy className="h-4 w-4" aria-hidden="true" />
+              Copiar texto para Instagram
+            </button>
+          )}
           {paginas.length > 1 && (
             <button
               type="button"
@@ -289,8 +329,12 @@ export function EstudioFlyers() {
                           formato={formato}
                           torneo={datos?.torneo.nombre ?? ''}
                           titulo={p.titulo}
-                          subtitulo={p.subtitulo}
-                          cinta={p.cinta}
+                          dato={p.dato}
+                          cifra={p.cifra}
+                          gancho={p.gancho}
+                          heroe={p.heroe}
+                          formula={p.formula}
+                          pagina={paginas.length > 1 ? [i + 1, paginas.length] : undefined}
                         >
                           {p.cuerpo}
                         </MarcoFlyer>

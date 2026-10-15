@@ -361,19 +361,23 @@ Debajo van los controles:
 La pausa congela la barra, y solo en pausa se anuncia el cambio a los lectores de pantalla.
 
 ### Silueta del jugador
-Un jugador sin foto, o cuya foto no carga, muestra `jugador-silueta.svg`: un busto liso en grises (de #c9c9c9 a #4a4a4a) sobre un fondo de estudio en grises (radial de #3b3b3b a #0c0c0c). Es la única imagen en blanco y negro del sistema, para que no se confunda con una foto. La usan el buscador, el perfil del jugador, el cromo, las listas del administrador y los flyers (`FotoJugador`). Nunca se usan iniciales en su lugar.
+Un jugador sin foto, o cuya foto no carga, muestra `jugador-silueta.svg`: un busto liso en grises (de #c9c9c9 a #4a4a4a) sobre un fondo de estudio en grises (radial de #3b3b3b a #0c0c0c). Es la única imagen en blanco y negro del sistema, para que no se confunda con una foto. La usan el buscador, el perfil del jugador, el cromo, las listas del administrador y los retratos chicos de los flyers (`FotoJugador`). Nunca se usan iniciales en su lugar. Como héroe de un flyer, el mismo busto va a contraluz (ver abajo).
 
 ### Flyer de Instagram (componente firma)
-`MarcoFlyer` arma un cartel de 1080 px de ancho, de 1350 px (publicación 4:5) o de 1920 px (historia 9:16), que se descarga como PNG desde el panel del administrador.
-- **Fondo:** marino con la foto del coliseo desenfocada en la parte alta, un velo marino, la marca de agua del logo al 7 % y un grano de impresión muy tenue. Lleva esquinas en L de 56 px en oro al 55 %.
-- **Encabezado:** el logo y, al lado, «Torneos Baloncesto Manta» en Inter 700 oro con tracking y el nombre del torneo en Cinzel crema.
-- **Título:** Cinzel 700 crema a 92 px. Debajo, el dato en una cinta dorada (la fecha o «Acumulado al…»).
-- **Pie:** filete oro, el dominio en crema y el coliseo en `slate-400`.
+`MarcoFlyer` arma un cartel de 1080 px de ancho, de 1350 px (publicación 4:5) o de 1920 px (historia 9:16), que se descarga como PNG desde el panel del administrador. Sigue la Noche Cinemática de la skill Steban: póster A1 para las listas y A2 para una figura. El oro hace el papel del color de acción y marca la fecha, la cifra clave y «Desliza».
+- **Fondo:** marino con la foto del coliseo en el 60 % de arriba, un velo marino, la marca de agua del logo al 7 % y un grano de impresión muy tenue.
+- **Franja:** tres columnas sobre un filete crema al 15 %. A la izquierda, el día, «Fecha» o «Acumulado» en Inter 600 oro con tracking y, debajo, la fecha `11 OCT` en Cinzel crema a 44 px. Al centro, el logo de 104 px. A la derecha, la cifra de la pieza: partidos, categorías o valoración.
+- **Título:** apilado y centrado: palabra en Cinzel 700 crema a 128 px, conector en Inter itálica a 40 px y otra palabra (`RESULTADOS / del / DOMINGO`, `FIGURA / de la / FECHA`). Ocupa cerca del 21 % del alto de la publicación. En las listas pisa la parte baja de la foto; en una figura, la base del héroe.
+- **Gancho:** bajo el título, en mayúsculas con tracking, con la cifra en oro: «229 puntos en la jornada» (sin los W.O.).
+- **Pie:** filete; a la izquierda, el nombre del torneo en Cinzel a 22 px; a la derecha, el dominio y el coliseo. En un juego de varias láminas, las primeras dicen «Desliza» con doble chevrón en oro y todas llevan «1 de 3».
+- **Microcopy:** en las figuras, la fórmula de la valoración en vertical en el margen derecho, a 30 px del borde.
 - **Variantes:**
-  - Resultados: carteles A vs B con medallones y el marcador del ganador en oro. Caben 5 por publicación y 7 por historia; si hay más, se reparten en varias láminas. Con tres o menos, las filas crecen y se centran.
-  - Figura (de la fecha, de una categoría o de un equipo): cromo grande de doble bisel con el dorsal contorneado, apellidos en Cinzel y la línea de números con las placas en oro.
-  - Figuras del torneo: una fila por categoría con cromo chico y la valoración en oro.
+  - Resultados: filas entre filetes. Arriba, la categoría y la hora `17H00` en `slate-300`; debajo, escudo, nombre, marcador (el del ganador en oro), nombre y escudo. Sin logo, el medallón es oscuro (marino claro con el escudo en crema al 30 %). Caben 4 por lámina. En la historia, cada fila suma la figura del partido. Con uno o dos partidos, las filas crecen.
+  - Figura (de la fecha, de una categoría o de un equipo): el jugador al centro, en 3:4, como héroe. La foto se desvanece hacia abajo con una máscara. Sin foto, va el busto a contraluz: relleno marino con filo oro, halo crema detrás y el dorsal gigante contorneado en oro, que el busto pisa. Debajo van el nombre en Cinzel a 52 px, el escudo con el equipo y la categoría, y los números como pares etiqueta → valor, separados por filetes, con los puntos en oro.
+  - Figuras del torneo: una fila por categoría con retrato de 72 × 96 px y la valoración en oro. Caben 4 por publicación y 5 por historia.
+- **Historia:** los 250 px de arriba y de abajo solo llevan fondo, porque ahí van la barra y la caja de respuesta de Instagram.
 - **Tamaño mínimo:** ningún texto baja de 20 px, para que se lea en el celular.
+- **Texto para Instagram:** el estudio copia un caption con emoji, gancho, detalle, enlace y `#BaloncestoManta #Manta #Manabí #Básquet`.
 
 Figura es la mejor valoración: puntos + rebotes + asistencias + tapones.
 
@@ -386,7 +390,7 @@ Es el mismo cartel que el del partido, en sólido: marino claro, borde oro al 30
 ### Cromo (componente firma)
 `Cromo` vuelve álbum la plantilla del perfil de equipo. Cada cromo es un enlace a la ficha del jugador.
 - **Doble bisel:** una bandeja con veladura blanca al 4 %, filete oro de 1 px al 40 %, radio de 1rem, relleno de 6 px y sombra de cromo. Dentro, el núcleo marino claro, con radio de 0.625rem y el filo de luz.
-- **Retrato:** 3:4, recortado al rostro (encuadre al 20 % desde arriba). Un degradado marino sube desde la base hasta la mitad. Sin foto, las iniciales van en Cinzel 700 a 3rem, en oro al 30 %.
+- **Retrato:** 3:4, recortado al rostro (encuadre al 20 % desde arriba). Un degradado marino sube desde la base hasta la mitad. Sin foto, va la silueta del jugador.
 - **Dorsal:** en la voz de dorsal, abajo a la izquierda, sobre el degradado.
 - **Nombre:** bajo el retrato, los apellidos en Cinzel 700 a 0.95rem crema (blancos al pasar el cursor) y, debajo, los nombres en Inter a 0.75rem `slate-400`, con mayúscula inicial. El nombre solo se parte cuando el orden de nombres y apellidos es claro; si no, va completo.
 - **Al pasar el cursor:** sube 6 px en 500 ms, su sombra se hunde, el filete pasa al 70 %, el retrato crece a 1.04 en 700 ms y un brillo de lámina (una banda crema al 30 %, inclinada −16°) lo cruza en 1 s, todo con la curva del álbum, `cubic-bezier(0.32, 0.72, 0, 1)`. Con movimiento reducido solo cambian el filete y el nombre.
