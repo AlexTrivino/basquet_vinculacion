@@ -74,34 +74,34 @@ export function LoginForm() {
   return (
     <form className="flex w-full flex-col gap-4">
       <div>
-        <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="email" className="mb-1 block text-sm font-medium text-slate-300">
           Correo electrónico
         </label>
         <input
           id="email"
           type="email"
           {...register('email')}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          className="w-full rounded-md border border-white/15 px-3 py-2 text-sm focus:border-celeste focus:outline-none focus:ring-1 focus:ring-celeste"
           placeholder="tu@correo.com"
         />
         {errors.email && (
-          <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
+          <p className="mt-1 text-xs text-red-300">{errors.email.message}</p>
         )}
       </div>
 
       <div>
-        <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="password" className="mb-1 block text-sm font-medium text-slate-300">
           Contraseña
         </label>
         <input
           id="password"
           type="password"
           {...register('password')}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          className="w-full rounded-md border border-white/15 px-3 py-2 text-sm focus:border-celeste focus:outline-none focus:ring-1 focus:ring-celeste"
           placeholder="••••••••"
         />
         {errors.password && (
-          <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>
+          <p className="mt-1 text-xs text-red-300">{errors.password.message}</p>
         )}
       </div>
 
@@ -112,12 +112,12 @@ export function LoginForm() {
             id="rememberMe"
             type="checkbox"
             {...register('rememberMe')}
-            className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
+            className="h-4 w-4 rounded border-white/15 text-celeste focus:ring-celeste cursor-pointer"
           />
-          <span className="text-sm text-gray-700">Recordar mi sesión</span>
+          <span className="text-sm text-slate-300">Recordar mi sesión</span>
         </label>
 
-        <Link to="/auth/recuperar" className="text-sm font-medium text-primary-600 hover:text-primary-500">
+        <Link to="/auth/recuperar" className="text-sm font-medium text-celeste hover:text-white">
           ¿Olvidaste tu contraseña?
         </Link>
       </div>
@@ -126,15 +126,15 @@ export function LoginForm() {
       <AsyncButton
         type="button"
         onClickAction={() => handleSubmit(onSubmit)()}
-        className="mt-2 w-full bg-primary-600 py-2.5 text-white hover:bg-primary-700"
+        className="mt-2 w-full bg-celeste py-2.5 text-marino hover:bg-white"
       >
         Ingresar
       </AsyncButton>
 
-      <div className="mt-2 flex flex-col items-center gap-2 text-sm text-gray-600">
+      <div className="mt-2 flex flex-col items-center gap-2 text-sm text-slate-300">
         <div>
           ¿No tienes una cuenta?{' '}
-          <Link to="/auth/registro" className="font-semibold text-primary-600 hover:text-primary-500">
+          <Link to="/auth/registro" className="font-semibold text-celeste hover:text-white">
             Regístrate aquí
           </Link>
         </div>

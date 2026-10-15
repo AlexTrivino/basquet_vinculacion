@@ -52,66 +52,66 @@ function ConfirmEnvioModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in">
+      <div className="bg-marino-claro rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in">
         <div className="flex items-start justify-between mb-5">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-emerald-100 rounded-xl">
-              <Trophy className="w-5 h-5 text-emerald-700" />
+            <div className="p-2.5 bg-emerald-500/15 rounded-xl">
+              <Trophy className="w-5 h-5 text-emerald-200" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-gray-900">Confirmar Inscripción</h3>
-              <p className="text-xs text-gray-500 mt-0.5">Revisa los datos antes de enviar</p>
+              <h3 className="text-base font-bold text-crema">Confirmar Inscripción</h3>
+              <p className="text-xs text-slate-400 mt-0.5">Revisa los datos antes de enviar</p>
             </div>
           </div>
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-300 hover:bg-white/10 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <div className="space-y-3 mb-6">
-          <div className="p-4 bg-gray-50 rounded-xl space-y-2.5">
+          <div className="p-4 bg-white/5 rounded-xl space-y-2.5">
             <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-500 font-medium">Equipo</span>
-              <span className="font-bold text-gray-900">{nombreEquipo}</span>
+              <span className="text-slate-400 font-medium">Equipo</span>
+              <span className="font-bold text-crema">{nombreEquipo}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-500 font-medium">Torneo</span>
-              <span className="font-semibold text-gray-800">{nombreTorneo}</span>
+              <span className="text-slate-400 font-medium">Torneo</span>
+              <span className="font-semibold text-crema">{nombreTorneo}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-500 font-medium">Categoría</span>
-              <span className="font-semibold text-gray-800">{nombreCategoria}</span>
+              <span className="text-slate-400 font-medium">Categoría</span>
+              <span className="font-semibold text-crema">{nombreCategoria}</span>
             </div>
-            <div className="pt-2 border-t border-gray-200 flex justify-between items-center text-sm">
-              <span className="text-gray-500 font-medium">Jugadores Registrados</span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs">
+            <div className="pt-2 border-t border-white/10 flex justify-between items-center text-sm">
+              <span className="text-slate-400 font-medium">Jugadores Registrados</span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-200 font-bold text-xs">
                 <Users className="w-3.5 h-3.5" /> {totalJugadores} jugadores
               </span>
             </div>
           </div>
 
           {/* Validaciones reglamentarias previas */}
-          <div className="p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1.5 text-xs text-emerald-900">
-            <p className="font-bold flex items-center gap-1.5 text-emerald-800 mb-1">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+          <div className="p-3.5 bg-emerald-500/10 border border-emerald-400/30 rounded-xl space-y-1.5 text-xs text-emerald-100">
+            <p className="font-bold flex items-center gap-1.5 text-emerald-200 mb-1">
+              <CheckCircle2 className="w-4 h-4 text-emerald-300" />
               Validaciones de Nómina Superadas:
             </p>
-            <div className="flex items-center gap-2 text-emerald-700">
-              <span className="text-emerald-500">✓</span> Mínimo reglamentario cumplido ({totalJugadores}/18 jugadores)
+            <div className="flex items-center gap-2 text-emerald-200">
+              <span className="text-emerald-400">✓</span> Mínimo reglamentario cumplido ({totalJugadores}/18 jugadores)
             </div>
-            <div className="flex items-center gap-2 text-emerald-700">
-              <span className="text-emerald-500">✓</span> Comprobante de pago adjunto
+            <div className="flex items-center gap-2 text-emerald-200">
+              <span className="text-emerald-400">✓</span> Comprobante de pago adjunto
             </div>
-            <div className="flex items-center gap-2 text-emerald-700">
-              <span className="text-emerald-500">✓</span> Dorsales de camiseta únicos y asignados
+            <div className="flex items-center gap-2 text-emerald-200">
+              <span className="text-emerald-400">✓</span> Dorsales de camiseta únicos y asignados
             </div>
           </div>
 
-          <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-start gap-2">
+          <div className="p-3 bg-amber-500/10 border border-amber-400/30 rounded-xl text-xs text-amber-200 flex items-start gap-2">
             <span className="shrink-0 mt-0.5">⚠️</span>
             <span>Al confirmar, la inscripción pasará a estado <strong>Pendiente de Revisión</strong> y será enviada al Administrador para su aprobación oficial.</span>
           </div>
@@ -121,13 +121,13 @@ function ConfirmEnvioModal({
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+            className="flex-1 px-4 py-2.5 rounded-xl border border-white/10 text-sm font-semibold text-slate-300 hover:bg-white/5 transition-colors disabled:opacity-50"
           >
             Cancelar
           </button>
           <AsyncButton
             onClickAction={onConfirm}
-            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 text-sm font-bold rounded-xl"
+            className="flex-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-100 py-2.5 text-sm font-bold rounded-xl"
           >
             Sí, Enviar Inscripción
           </AsyncButton>
@@ -315,15 +315,15 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
                 isStep2
-                  ? 'bg-emerald-100 text-emerald-700 border-2 border-emerald-500'
-                  : 'bg-primary-600 text-white shadow-sm ring-4 ring-primary-50'
+                  ? 'bg-emerald-500/15 text-emerald-200 border-2 border-emerald-400'
+                  : 'bg-celeste text-marino shadow-sm ring-4 ring-celeste/25'
               }`}
             >
               {isStep2 ? <CheckCircle2 className="w-4 h-4" /> : '1'}
             </div>
             <span
               className={`text-xs font-semibold hidden sm:inline ${
-                isStep2 ? 'text-emerald-700' : 'text-primary-700'
+                isStep2 ? 'text-emerald-200' : 'text-celeste'
               }`}
             >
               1. Datos del Equipo
@@ -333,7 +333,7 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
           {/* Línea conectora */}
           <div
             className={`w-12 sm:w-20 h-0.5 transition-colors ${
-              isStep2 ? 'bg-emerald-500' : 'bg-gray-200'
+              isStep2 ? 'bg-emerald-500' : 'bg-white/10'
             }`}
           />
 
@@ -342,15 +342,15 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
                 isStep2
-                  ? 'bg-primary-600 text-white shadow-sm ring-4 ring-primary-50'
-                  : 'bg-gray-100 text-gray-400 border border-gray-200'
+                  ? 'bg-celeste text-marino shadow-sm ring-4 ring-celeste/25'
+                  : 'bg-white/10 text-slate-400 border border-white/10'
               }`}
             >
               2
             </div>
             <span
               className={`text-xs font-semibold hidden sm:inline ${
-                isStep2 ? 'text-primary-700' : 'text-gray-400'
+                isStep2 ? 'text-celeste' : 'text-slate-400'
               }`}
             >
               2. Registro de Jugadores
@@ -376,13 +376,13 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
         {/* Cabecera Paso 2 */}
         <div className="max-w-4xl w-full mx-auto flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-xs text-gray-500 font-medium mb-1">
+            <div className="flex items-center gap-2 text-xs text-slate-400 font-medium mb-1">
               <span>Inscripción</span>
               <ChevronRight className="w-3.5 h-3.5" />
-              <span className="text-gray-800 font-semibold">{borradorData.nombreEquipo}</span>
+              <span className="text-crema font-semibold">{borradorData.nombreEquipo}</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Paso 2 — Registro de Jugadores</h1>
-            <p className="text-xs text-gray-500 mt-1">
+            <h1 className="font-display text-xl sm:text-2xl font-bold text-crema">Paso 2 — Registro de Jugadores</h1>
+            <p className="text-xs text-slate-400 mt-1">
               Registra entre 10 y 18 jugadores. Cuando completes el mínimo de 10, se habilitará el botón de envío.
             </p>
           </div>
@@ -401,7 +401,7 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
                 }
               }
             }}
-            className="inline-flex items-center justify-center gap-2 text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 px-4 py-2 rounded-xl text-sm font-bold transition-colors shadow-sm whitespace-nowrap"
+            className="inline-flex items-center justify-center gap-2 text-red-300 bg-red-500/10 hover:bg-red-500/20 border border-red-400/20 px-4 py-2 rounded-xl text-sm font-bold transition-colors shadow-sm whitespace-nowrap"
           >
             <Trash2 className="w-4 h-4" /> Descartar y volver
           </AsyncButton>
@@ -409,13 +409,13 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
 
         {/* Info del equipo */}
         <div className="flex flex-col sm:flex-row flex-wrap gap-3 max-w-4xl w-full mx-auto">
-          <span className="inline-flex items-center gap-2 bg-blue-50 text-blue-800 px-5 py-2.5 rounded-xl font-black border border-blue-200 text-base shadow-sm">
-            <Shield className="w-5 h-5 text-blue-600" /> Equipo: {borradorData.nombreEquipo}
+          <span className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-200 px-5 py-2.5 rounded-xl font-black border border-blue-400/30 text-base shadow-sm">
+            <Shield className="w-5 h-5 text-blue-300" /> Equipo: {borradorData.nombreEquipo}
           </span>
-          <span className="inline-flex items-center gap-2 bg-primary-50 text-primary-800 px-5 py-2.5 rounded-xl font-bold border border-primary-200 text-base shadow-sm">
-            <Trophy className="w-5 h-5 text-primary-600" /> Torneo: {borradorData.nombreTorneo}
+          <span className="inline-flex items-center gap-2 bg-oro/10 text-oro px-5 py-2.5 rounded-xl font-bold border border-oro/30 text-base shadow-sm">
+            <Trophy className="w-5 h-5 text-oro" /> Torneo: {borradorData.nombreTorneo}
           </span>
-          <span className="inline-flex items-center gap-2 bg-gray-50 text-gray-800 px-5 py-2.5 rounded-xl font-bold border border-gray-200 text-base shadow-sm">
+          <span className="inline-flex items-center gap-2 bg-white/5 text-crema px-5 py-2.5 rounded-xl font-bold border border-white/10 text-base shadow-sm">
             Categoría: {borradorData.nombreCategoria}
           </span>
         </div>
@@ -452,24 +452,24 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
 
   // Paso 1
   return (
-    <div className="mx-auto max-w-2xl rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+    <div className="mx-auto max-w-2xl rounded-xl border border-white/10 bg-marino-claro p-6 shadow-sm sm:p-8">
       <StepIndicator />
-      <h2 className="text-xl font-bold text-gray-900">Paso 1 — Datos del Equipo</h2>
-      <p className="mb-6 mt-1 text-sm text-gray-500">
+      <h2 className="text-xl font-bold text-crema">Paso 1 — Datos del Equipo</h2>
+      <p className="mb-6 mt-1 text-sm text-slate-400">
         Completa los campos y adjunta el comprobante de pago. Al continuar crearemos el borrador de tu inscripción.
       </p>
 
       <form onSubmit={handleSubmit(handlePaso1)} className="space-y-4">
         {/* Torneo */}
         <div>
-          <label htmlFor="torneo" className="mb-1 block text-sm font-medium text-gray-700">
-            Torneo <span className="text-red-500">*</span>
+          <label htmlFor="torneo" className="mb-1 block text-sm font-medium text-slate-300">
+            Torneo <span className="text-red-400">*</span>
           </label>
           <select
             id="torneo"
             {...register('torneo')}
             disabled={isLoadingTorneos}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:bg-gray-100"
+            className="w-full rounded-md border border-white/15 px-3 py-2 text-sm focus:border-celeste focus:outline-none focus:ring-1 focus:ring-celeste disabled:bg-white/10"
           >
             <option value="">Selecciona un torneo...</option>
             {torneos.map((t) => (
@@ -478,36 +478,36 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
               </option>
             ))}
           </select>
-          {errors.torneo && <p className="mt-1 text-xs text-red-500">{errors.torneo.message}</p>}
+          {errors.torneo && <p className="mt-1 text-xs text-red-400">{errors.torneo.message}</p>}
         </div>
 
         {/* Nombre del Equipo */}
         <div>
-          <label htmlFor="nombreEquipo" className="mb-1 block text-sm font-medium text-gray-700">
-            Nombre del Equipo <span className="text-red-500">*</span>
+          <label htmlFor="nombreEquipo" className="mb-1 block text-sm font-medium text-slate-300">
+            Nombre del Equipo <span className="text-red-400">*</span>
           </label>
           <input
             id="nombreEquipo"
             type="text"
             placeholder="Ej. Los Halcones"
             {...register('nombreEquipo')}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="w-full rounded-md border border-white/15 px-3 py-2 text-sm focus:border-celeste focus:outline-none focus:ring-1 focus:ring-celeste"
           />
           {errors.nombreEquipo && (
-            <p className="mt-1 text-xs text-red-500">{errors.nombreEquipo.message}</p>
+            <p className="mt-1 text-xs text-red-400">{errors.nombreEquipo.message}</p>
           )}
         </div>
 
         {/* Categoría */}
         <div>
-          <label htmlFor="categoria" className="mb-1 block text-sm font-medium text-gray-700">
-            Categoría <span className="text-red-500">*</span>
+          <label htmlFor="categoria" className="mb-1 block text-sm font-medium text-slate-300">
+            Categoría <span className="text-red-400">*</span>
           </label>
           <select
             id="categoria"
             {...register('categoria')}
             disabled={!selectedTorneo || isLoadingCategorias}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:bg-gray-100"
+            className="w-full rounded-md border border-white/15 px-3 py-2 text-sm focus:border-celeste focus:outline-none focus:ring-1 focus:ring-celeste disabled:bg-white/10"
           >
             <option value="">Selecciona una categoría...</option>
             {categorias.map((c) => (
@@ -516,15 +516,15 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
               </option>
             ))}
           </select>
-          {errors.categoria && <p className="mt-1 text-xs text-red-500">{errors.categoria.message}</p>}
+          {errors.categoria && <p className="mt-1 text-xs text-red-400">{errors.categoria.message}</p>}
         </div>
 
         {/* Comprobante de Pago */}
         <div>
-          <label htmlFor="comprobante" className="mb-1 block text-sm font-medium text-gray-700">
-            Comprobante de Pago <span className="text-red-500">*</span>
+          <label htmlFor="comprobante" className="mb-1 block text-sm font-medium text-slate-300">
+            Comprobante de Pago <span className="text-red-400">*</span>
           </label>
-          <p className="mb-2 text-xs text-gray-500">
+          <p className="mb-2 text-xs text-slate-400">
             Formato PDF o Imagen (JPG, PNG). Tamaño máximo: 5 MB.
           </p>
           <div className="flex items-center gap-2">
@@ -547,7 +547,7 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
                   setComprobanteFile(null);
                 }
               }}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+              className="w-full rounded-md border border-white/15 px-3 py-2 text-sm focus:border-celeste focus:outline-none focus:ring-1 focus:ring-celeste file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-celeste/10 file:text-celeste hover:file:bg-celeste/15"
             />
             {comprobanteFile && (
               <button
@@ -556,7 +556,7 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
                   setComprobanteFile(null);
                   if (comprobanteInputRef.current) comprobanteInputRef.current.value = '';
                 }}
-                className="shrink-0 p-2 text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                className="shrink-0 p-2 text-red-400 hover:bg-red-500/15 rounded-md transition-colors"
                 title="Eliminar archivo"
               >
                 <Trash2 className="w-5 h-5" />
@@ -567,10 +567,10 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
 
         {/* Logo del Equipo (Opcional) */}
         <div>
-          <label htmlFor="logo" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="logo" className="mb-1 block text-sm font-medium text-slate-300">
             Logo del Equipo (Opcional)
           </label>
-          <p className="mb-2 text-xs text-gray-500">
+          <p className="mb-2 text-xs text-slate-400">
             Tamaño máximo permitido: 2 MB. (JPG, PNG, WebP)
           </p>
           <div className="flex items-center gap-2">
@@ -593,7 +593,7 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
                   setLogoFile(null);
                 }
               }}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+              className="w-full rounded-md border border-white/15 px-3 py-2 text-sm focus:border-celeste focus:outline-none focus:ring-1 focus:ring-celeste file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-celeste/10 file:text-celeste hover:file:bg-celeste/15"
             />
             {logoFile && (
               <button
@@ -602,7 +602,7 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
                   setLogoFile(null);
                   if (logoInputRef.current) logoInputRef.current.value = '';
                 }}
-                className="shrink-0 p-2 text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                className="shrink-0 p-2 text-red-400 hover:bg-red-500/15 rounded-md transition-colors"
                 title="Eliminar logo"
               >
                 <Trash2 className="w-5 h-5" />
@@ -611,18 +611,18 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
           </div>
         </div>
 
-        <div className="mt-4 border-t border-gray-100 pt-5">
+        <div className="mt-4 border-t border-white/10 pt-5">
           <AsyncButton
             type="button"
             onClickAction={handleSubmit(handlePaso1)}
-            className="w-full bg-primary-600 py-2.5 text-white transition-colors hover:bg-primary-700 disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full bg-celeste py-2.5 text-marino transition-colors hover:bg-white disabled:opacity-50 flex items-center justify-center gap-2"
             disabled={!isValid || !comprobanteFile}
           >
             Continuar a Registro de Jugadores
             <ChevronRight className="w-4 h-4" />
           </AsyncButton>
           {!comprobanteFile && (
-            <p className="mt-2 text-center text-xs text-gray-400">Adjunta el comprobante de pago para continuar</p>
+            <p className="mt-2 text-center text-xs text-slate-400">Adjunta el comprobante de pago para continuar</p>
           )}
         </div>
       </form>

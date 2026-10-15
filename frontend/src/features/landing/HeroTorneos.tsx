@@ -3,11 +3,25 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ArrowRight, CalendarDays, Pause, Play } from 'lucide-react';
+import { ArrowRight, CalendarDays, Goal, Pause, Play } from 'lucide-react';
 import { getTorneos } from '../torneos/api/torneos.api';
+import { getEstadisticasPublicas } from '../estadisticas/api/estadisticas.api';
 import type { Torneo } from '../../types/api.types';
 
 const MAX_TORNEOS = 8;
+const cifra = new Intl.NumberFormat('es-EC');
+
+// Leyenda de puntos: la cifra en Inter 600 crema dentro de la frase (regla de las cifras de DESIGN.md)
+function Puntos({ puntos }: { puntos?: number }) {
+  if (puntos === undefined) return null;
+  return puntos > 0 ? (
+    <>
+      <strong className="font-semibold tabular-nums text-crema">{cifra.format(puntos)}</strong> puntos anotados
+    </>
+  ) : (
+    <>Aún sin puntos anotados</>
+  );
+}
 // Diagonal de la card (paralelogramo); en móvil el ticket usa una diagonal más corta
 const DIAGONAL = '[clip-path:polygon(6%_0,100%_0,94%_100%,0_100%)]';
 const DIAGONAL_TICKET = '[clip-path:polygon(4%_0,100%_0,96%_100%,0_100%)]';
@@ -20,7 +34,7 @@ function rangoFechas(torneo: Torneo): string {
   return `${format(inicio, formatoInicio, { locale: es })} - ${format(fin, 'd MMM yyyy', { locale: es })}`;
 }
 
-function SlideTorneo({ torneo }: { torneo: Torneo }) {
+function SlideTorneo({ torneo, puntos }: { torneo: Torneo; puntos?: number }) {
   const categorias = torneo.categorias ?? [];
 
   return (
@@ -32,6 +46,14 @@ function SlideTorneo({ torneo }: { torneo: Torneo }) {
         <CalendarDays className="h-4 w-4 text-oro" aria-hidden="true" />
         {rangoFechas(torneo)}
       </p>
+      {puntos !== undefined && (
+        <p className="mt-2 flex items-center gap-2 text-slate-300">
+          <Goal className="h-4 w-4 text-oro" aria-hidden="true" />
+          <span>
+            <Puntos puntos={puntos} />
+          </span>
+        </p>
+      )}
 
       {categorias.length > 0 && (
         <ul className="mt-6 flex flex-wrap gap-2" aria-label="Categorías">
@@ -57,7 +79,7 @@ function SlideTorneo({ torneo }: { torneo: Torneo }) {
 }
 
 // Móvil: ticket compacto del torneo. El carril deja ver el siguiente para invitar a deslizar.
-function TicketTorneo({ torneo, indice }: { torneo: Torneo; indice: number }) {
+function TicketTorneo({ torneo, indice, puntos }: { torneo: Torneo; indice: number; puntos?: number }) {
   return (
     <Link
       to={`/torneos/${torneo.id_torneo ?? torneo.id}`}
@@ -68,8 +90,15 @@ function TicketTorneo({ torneo, indice }: { torneo: Torneo; indice: number }) {
         <p className="line-clamp-2 font-display text-xl font-bold leading-tight text-crema">
           {torneo.nombre || torneo.nombre_torneo}
         </p>
-        <div className="mt-auto flex items-center justify-between gap-3 pt-3 text-[13px]">
-          <span className="tabular-nums text-slate-300">{rangoFechas(torneo)}</span>
+        <div className="mt-auto flex items-end justify-between gap-3 pt-3 text-[13px]">
+          <span className="flex flex-col text-slate-300">
+            <span className="tabular-nums">{rangoFechas(torneo)}</span>
+            {puntos !== undefined && (
+              <span className="text-slate-400">
+                <Puntos puntos={puntos} />
+              </span>
+            )}
+          </span>
           <span className="inline-flex shrink-0 items-center gap-1 font-semibold text-celeste">
             Ver torneo <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
           </span>
@@ -86,6 +115,10 @@ export function HeroTorneos() {
   });
   const torneos = (data?.data ?? []).slice(0, MAX_TORNEOS);
   const total = torneos.length;
+  // Misma consulta que el contador de Conócenos: una sola petición para los dos
+  const estadisticas = useQuery({ queryKey: ['landing', 'estadisticas-publicas'], queryFn: getEstadisticasPublicas });
+  const porTorneo = estadisticas.data?.data?.puntos_por_torneo;
+  const puntosDe = (t: Torneo) => (porTorneo ? (porTorneo[String(t.id_torneo ?? t.id)] ?? 0) : undefined);
 
   const [indice, setIndice] = useState(0);
   // Con "reducir movimiento" el carrusel arranca en pausa; el botón permite reanudarlo
@@ -192,7 +225,7 @@ export function HeroTorneos() {
               className={`${DIAGONAL} min-h-[22rem] bg-marino-claro/90 px-12 py-10 sm:px-16 sm:py-12`}
               aria-live={pausado ? 'polite' : 'off'}
             >
-              {estado ?? (actual && <SlideTorneo key={indice % total} torneo={actual} />)}
+              {estado ?? (actual && <SlideTorneo key={indice % total} torneo={actual} puntos={puntosDe(actual)} />)}
             </div>
           </div>
 
@@ -204,7 +237,7 @@ export function HeroTorneos() {
               className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 motion-safe:scroll-smooth [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:hidden [&::-webkit-scrollbar]:hidden"
             >
               {torneos.map((t, i) => (
-                <TicketTorneo key={t.id_torneo ?? t.id ?? i} torneo={t} indice={i} />
+                <TicketTorneo key={t.id_torneo ?? t.id ?? i} torneo={t} indice={i} puntos={puntosDe(t)} />
               ))}
             </div>
           )}

@@ -16,6 +16,8 @@ import {
 import { getPartidosByEquipo } from '../../features/partidos/api/partidos.api';
 import { getPlantillas } from '../../features/plantillas/api/plantillas.api';
 import { Escudo } from '../../features/torneos/components/PartidosList';
+import { FotoJugador } from '../../components/FotoJugador';
+import { partirNombre } from '../../utils/nombres';
 import { Esquinas } from '../../features/landing/SeccionPartidos';
 import axiosInstance from '../../api/axios.config';
 import { DesactivarEquipoModal } from '../../features/equipos/components/DesactivarEquipoModal';
@@ -48,22 +50,9 @@ const ESTADO_INSCRIPCION: Record<string, string> = {
   rechazado: 'Inscripción rechazada',
   retirado: 'Equipo retirado',
 };
-const PARTICULAS = new Set(['DE', 'DEL', 'LA', 'LAS', 'LOS', 'SAN', 'SANTA', 'Y']);
-
 // Partido.fecha llega como AAAA-MM-DD; el mediodía evita que la zona horaria cambie el día
 const fecha = (f: string | undefined, opciones: Intl.DateTimeFormatOptions) =>
   f ? new Date(`${f}T12:00:00`).toLocaleDateString('es-EC', opciones).replace('.', '') : '';
-
-// Como en un cromo: apellidos arriba y nombres debajo.
-// ponytail: asume el orden nombres + apellidos (1 y 1, 1 y 2 o 2 y 2); con partículas u otro largo muestra el nombre completo.
-function partirNombre(nombre: string) {
-  const p = nombre.split(/\s+/);
-  if (p.length >= 2 && p.length <= 4 && !p.some((w) => PARTICULAS.has(w.toUpperCase()))) {
-    const corte = p.length === 4 ? 2 : 1;
-    return { apellidos: p.slice(corte).join(' '), nombres: p.slice(0, corte).join(' ') };
-  }
-  return { apellidos: nombre, nombres: '' };
-}
 
 // El partido visto desde este equipo: rival y marcador propio primero
 function desdeEquipo(p: Partido, idEquipo: number) {
@@ -127,7 +116,6 @@ function Cromo({ item }: { item: Plantilla }) {
   const { apellidos, nombres } = partirNombre(nombre);
   const dorsal = item.numero_camiseta;
   const tieneDorsal = dorsal !== null && dorsal !== undefined;
-  const iniciales = nombre.split(/\s+/).slice(0, 2).map((w) => w[0]).join('');
 
   return (
     <li data-revelar="" className="cromo">
@@ -137,18 +125,11 @@ function Cromo({ item }: { item: Plantilla }) {
         className={`group flex h-full flex-col ${BANDEJA} hover:ring-oro/70 motion-safe:transition motion-safe:duration-500 ${CURVA} motion-safe:hover:-translate-y-1.5 motion-safe:hover:shadow-[0_32px_56px_-24px_rgb(0_0_0/0.85)]`}
       >
         <div className={`${NUCLEO} aspect-[3/4] overflow-hidden`}>
-          {j?.url_foto ? (
-            <img
-              src={j.url_foto}
-              alt=""
-              loading="lazy"
-              className={`h-full w-full object-cover object-[center_20%] motion-safe:transition-transform motion-safe:duration-700 ${CURVA} motion-safe:group-hover:scale-[1.04]`}
-            />
-          ) : (
-            <span aria-hidden="true" className="flex h-full items-center justify-center pb-12 font-display text-5xl font-bold text-oro/30">
-              {iniciales}
-            </span>
-          )}
+          <FotoJugador
+            url={j?.url_foto}
+            loading="lazy"
+            className={`h-full w-full object-cover object-[center_20%] motion-safe:transition-transform motion-safe:duration-700 ${CURVA} motion-safe:group-hover:scale-[1.04]`}
+          />
           <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-marino via-marino/50 to-transparent" />
           {tieneDorsal && (
             <span

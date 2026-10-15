@@ -72,24 +72,24 @@ export function GestionActaModal({ partido, onClose, onSuccess }: GestionActaMod
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden relative">
-        <div className="bg-primary-900 px-6 py-4 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-white">Gestión de Acta Oficial FIBA</h3>
-          <button onClick={onClose} className="text-primary-200 hover:text-white" disabled={isUploading || isDeleting}>
+      <div className="bg-marino-claro rounded-xl shadow-2xl w-full max-w-md overflow-hidden relative">
+        <div className="border-b border-white/10 px-6 py-4 flex items-center justify-between">
+          <h3 className="text-lg font-bold text-crema">Gestión de Acta Oficial FIBA</h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-white" disabled={isUploading || isDeleting}>
             <X className="w-5 h-5" />
           </button>
         </div>
         
         <div className="p-6 flex flex-col gap-4">
-          <p className="text-sm text-gray-500 mb-2">
-            Partido: <span className="font-semibold text-gray-900">{partido.equipo_local?.nombre_equipo} vs {partido.equipo_visitante?.nombre_equipo}</span>
+          <p className="text-sm text-slate-400 mb-2">
+            Partido: <span className="font-semibold text-crema">{partido.equipo_local?.nombre_equipo} vs {partido.equipo_visitante?.nombre_equipo}</span>
           </p>
 
           {!partido.url_planilla_fiba ? (
-            <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50">
-              <Upload className="w-8 h-8 text-gray-400 mb-2" />
-              <p className="text-sm font-medium text-gray-700 text-center mb-4">No hay acta subida para este partido</p>
-              <label className="cursor-pointer bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors w-full text-center">
+            <div className="flex flex-col items-center justify-center border-2 border-dashed border-white/15 rounded-lg p-6 bg-white/5">
+              <Upload className="w-8 h-8 text-slate-400 mb-2" />
+              <p className="text-sm font-medium text-slate-300 text-center mb-4">No hay acta subida para este partido</p>
+              <label className="cursor-pointer bg-celeste hover:bg-white text-marino text-sm font-medium px-4 py-2 rounded-md transition-colors w-full text-center">
                 {isUploading ? 'Subiendo...' : 'Seleccionar PDF'}
                 <input 
                   type="file" 
@@ -106,13 +106,13 @@ export function GestionActaModal({ partido, onClose, onSuccess }: GestionActaMod
                 href={partido.url_planilla_fiba} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-medium px-4 py-3 rounded-md transition-colors"
+                className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 text-crema text-sm font-medium px-4 py-3 rounded-md transition-colors"
               >
                 <FileText className="w-4 h-4" />
                 Ver Acta Actual
               </a>
               
-              <label className="cursor-pointer flex items-center justify-center gap-2 bg-primary-50 hover:bg-primary-100 border border-primary-200 text-primary-700 text-sm font-medium px-4 py-3 rounded-md transition-colors">
+              <label className="cursor-pointer flex items-center justify-center gap-2 bg-celeste/10 hover:bg-celeste/15 border border-celeste/30 text-celeste text-sm font-medium px-4 py-3 rounded-md transition-colors">
                 <Upload className="w-4 h-4" />
                 {isUploading ? 'Subiendo nueva acta...' : 'Reemplazar Acta'}
                 <input 
@@ -127,7 +127,7 @@ export function GestionActaModal({ partido, onClose, onSuccess }: GestionActaMod
               <button
                 onClick={handleDelete}
                 disabled={isUploading || isDeleting}
-                className="flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 text-sm font-medium px-4 py-3 rounded-md transition-colors"
+                className="flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 border border-red-400/30 text-red-200 text-sm font-medium px-4 py-3 rounded-md transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
                 {isDeleting ? 'Eliminando...' : 'Eliminar Acta Permanentemente'}

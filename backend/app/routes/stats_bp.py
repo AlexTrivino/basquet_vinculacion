@@ -23,19 +23,41 @@ _bulk_schema = EstadisticasBulkSchema()
 def estadisticas_publicas():
     """Totales públicos para la portada (sin autenticación).
 
-    ``puntos_totales`` suma los marcadores de todos los partidos finalizados.
+    ``puntos_totales`` suma los marcadores de todos los partidos finalizados y
+    ``puntos_por_torneo`` los reparte por torneo ({id_torneo: puntos}).
     Los ganados por W.O. no cuentan: su marcador es administrativo, no puntos anotados.
     """
     from app import db
     from app.models import Partido
     from sqlalchemy import func
 
-    puntos = (
-        db.session.query(func.coalesce(func.sum(Partido.marcador_local + Partido.marcador_visitante), 0))
+    por_torneo = dict(
+        db.session.query(Partido.id_torneo, func.sum(Partido.marcador_local + Partido.marcador_visitante))
         .filter(Partido.estado == 'finalizado')
-        .scalar()
+        .group_by(Partido.id_torneo)
+        .all()
     )
-    return api_response({'puntos_totales': int(puntos)})
+    return api_response({
+        'puntos_totales': int(sum(por_torneo.values())),
+        'puntos_por_torneo': {str(t): int(p) for t, p in por_torneo.items()},
+    })
+
+
+@stats_bp.route('/flyers', methods=['GET'])
+@token_required(allowed_roles=['super_admin'])
+def datos_flyers():
+    """Resultados de una fecha (``?fecha=AAAA-MM-DD``, por defecto la última jugada) y figuras del torneo para los flyers."""
+    from datetime import date
+    from app.services import flyers_service
+
+    id_torneo = request.args.get('id_torneo', type=int)
+    if not id_torneo:
+        return api_error('VALIDATION_ERROR', 'Falta el torneo (id_torneo).', 400)
+    try:
+        fecha = date.fromisoformat(request.args['fecha']) if request.args.get('fecha') else None
+        return api_response(flyers_service.datos_flyers(id_torneo, fecha))
+    except ValueError as e:
+        return api_error('VALIDATION_ERROR', str(e), 400)
 
 
 @stats_bp.route('/dashboard', methods=['GET'])

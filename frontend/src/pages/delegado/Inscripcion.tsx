@@ -29,8 +29,8 @@ export default function Inscripcion() {
   return (
     <main className="mx-auto w-full max-w-[1700px] px-2 sm:px-4 lg:px-6 py-6 transition-all duration-300">
       <div className="mb-6 max-w-4xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Registro de Equipo</h1>
-        <p className="mt-1.5 text-sm text-gray-600 font-medium">
+        <h1 className="font-display text-2xl sm:text-3xl font-bold text-crema">Registro de Equipo</h1>
+        <p className="mt-1.5 text-sm text-slate-300 font-medium">
           Proporciona la información requerida para avalar a tu equipo en el torneo actual.<br/>
           Solo se permite registrar {maxEquiposDelegado} equipo(s) por delegado.
         </p>
@@ -44,13 +44,13 @@ export default function Inscripcion() {
       ) : yaAlcanzoLimite ? (
         <div className="max-w-2xl mx-auto">
           <EmptyState
-            icon={<Users className="mx-auto h-12 w-12 text-primary-500" />}
+            icon={<Users className="mx-auto h-12 w-12 text-oro" />}
             title="Límite de Equipos Alcanzado"
             description={`Has alcanzado el límite de ${maxEquiposDelegado} equipo(s) permitido por delegado. Administra tu equipo actual o consulta el estado de tus inscripciones desde el panel principal.`}
             action={
               <Link
                 to="/delegado/dashboard"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary-600 text-white font-semibold text-sm hover:bg-primary-700 shadow-sm transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-celeste text-marino font-semibold text-sm hover:bg-white shadow-sm transition-colors"
               >
                 <span>Ir al Panel de Equipos</span>
                 <ArrowRight className="w-4 h-4" />

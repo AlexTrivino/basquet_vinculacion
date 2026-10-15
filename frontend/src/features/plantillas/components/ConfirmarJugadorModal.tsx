@@ -24,32 +24,32 @@ export function ConfirmarJugadorModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl relative overflow-hidden border border-gray-100">
-        <div className={`absolute top-0 left-0 w-full h-2 ${yaEnTorneo ? 'bg-amber-500' : 'bg-primary-600'}`} />
+      <div className="bg-marino-claro rounded-2xl p-6 max-w-md w-full shadow-2xl relative overflow-hidden border border-white/10">
+        <div className={`absolute top-0 left-0 w-full h-1 ${yaEnTorneo ? 'bg-amber-400' : 'bg-oro/70'}`} />
         
         <div className="flex flex-col items-center text-center">
           {yaEnTorneo ? (
-            <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mb-4 border border-amber-200 shadow-sm">
+            <div className="w-16 h-16 bg-amber-500/10 text-amber-300 rounded-full flex items-center justify-center mb-4 border border-amber-400/30 shadow-sm">
               <AlertTriangle className="w-8 h-8" />
             </div>
           ) : (
-            <div className="w-16 h-16 bg-primary-50 text-primary-600 rounded-full flex items-center justify-center mb-4 border border-primary-100 shadow-sm">
+            <div className="w-16 h-16 bg-oro/10 text-oro rounded-full flex items-center justify-center mb-4 border border-oro/30 shadow-sm">
               <UserCheck className="w-8 h-8" />
             </div>
           )}
           
-          <h2 className="text-xl font-extrabold text-gray-900 mb-2">
+          <h2 className="text-xl font-extrabold text-crema mb-2">
             {yaEnTorneo ? 'Jugador ya inscrito en esta categoría' : 'Jugador Registrado'}
           </h2>
           
           {yaEnTorneo ? (
-            <div className="text-sm text-gray-700 mb-5 font-medium leading-relaxed bg-amber-50/70 p-4 rounded-xl border border-amber-200 text-left">
+            <div className="text-sm text-slate-300 mb-5 font-medium leading-relaxed bg-amber-500/10 p-4 rounded-xl border border-amber-400/30 text-left">
               El jugador <strong>{jugador.nombre}</strong> (Cédula: <strong>{jugador.documento_identificacion}</strong>) ya se encuentra registrado en el equipo <strong>{equipoTorneo || 'otro equipo'}</strong> dentro de esta categoría.
               <br /><br />
-              <span className="text-amber-900 font-semibold">Un jugador no puede estar en dos equipos dentro de la misma categoría.</span>
+              <span className="text-amber-100 font-semibold">Un jugador no puede estar en dos equipos dentro de la misma categoría.</span>
             </div>
           ) : (
-            <div className="text-sm text-gray-600 mb-5 font-medium leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-200 text-left">
+            <div className="text-sm text-slate-300 mb-5 font-medium leading-relaxed bg-white/5 p-4 rounded-xl border border-white/10 text-left">
               El jugador <strong>{jugador.nombre}</strong> con documento <strong>{jugador.documento_identificacion}</strong> ya está registrado en la plataforma.
               <br /><br />
               Al pulsar <strong>Aceptar</strong>, el formulario se autocompletará con sus datos oficiales para que puedas asignarle el número de camiseta e integrarlo a tu plantilla.
@@ -61,7 +61,7 @@ export function ConfirmarJugadorModal({
               <img 
                 src={jugador.url_foto} 
                 alt="Foto del jugador" 
-                className={`w-20 h-20 rounded-full object-cover shadow border-2 mx-auto ${yaEnTorneo ? 'border-amber-300' : 'border-primary-200'}`}
+                className={`w-20 h-20 rounded-full object-cover shadow border-2 mx-auto ${yaEnTorneo ? 'border-amber-400/40' : 'border-celeste/30'}`}
               />
             </div>
           )}
@@ -71,7 +71,7 @@ export function ConfirmarJugadorModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full px-4 py-2.5 rounded-xl font-bold text-white transition-all shadow-sm bg-amber-600 hover:bg-amber-700 hover:shadow-md cursor-pointer"
+                className="w-full px-4 py-2.5 rounded-xl font-bold text-amber-100 transition-all shadow-sm bg-amber-500/20 hover:bg-amber-500/30 hover:shadow-md cursor-pointer"
               >
                 Entendido
               </button>
@@ -81,7 +81,7 @@ export function ConfirmarJugadorModal({
                   type="button"
                   onClick={onClose}
                   disabled={isPending}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition-colors cursor-pointer"
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-white/15 text-slate-300 font-semibold hover:bg-white/10 transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -89,7 +89,7 @@ export function ConfirmarJugadorModal({
                   type="button"
                   onClick={onConfirm}
                   disabled={isPending}
-                  className="flex-1 px-4 py-2.5 rounded-xl font-bold text-white transition-all shadow-sm bg-primary-600 hover:bg-primary-700 hover:shadow-md cursor-pointer"
+                  className="flex-1 px-4 py-2.5 rounded-xl font-bold text-marino transition-all shadow-sm bg-celeste hover:bg-white hover:shadow-md cursor-pointer"
                 >
                   Aceptar
                 </button>

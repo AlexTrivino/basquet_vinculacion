@@ -71,9 +71,9 @@ export function SearchableSelect({
     <div ref={wrapperRef} className={`relative w-full ${className}`}>
       {/* Botón de selección principal */}
       <div
-        className={`flex items-center justify-between w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm cursor-pointer shadow-sm ${
-          disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'hover:border-primary-400 focus:outline-none focus:ring-1 focus:ring-primary-500'
-        } ${isOpen ? 'ring-1 ring-primary-500 border-primary-500' : ''}`}
+        className={`flex items-center justify-between w-full rounded-md border border-white/15 bg-marino-claro px-3 py-2 text-sm cursor-pointer shadow-sm ${
+          disabled ? 'opacity-50 cursor-not-allowed bg-white/5' : 'hover:border-celeste/50 focus:outline-none focus:ring-1 focus:ring-celeste'
+        } ${isOpen ? 'ring-1 ring-celeste border-celeste' : ''}`}
         onClick={() => !disabled && setIsOpen(!isOpen)}
         tabIndex={disabled ? -1 : 0}
         onKeyDown={(e) => {
@@ -83,7 +83,7 @@ export function SearchableSelect({
           }
         }}
       >
-        <span className={`block truncate ${!selectedOption ? 'text-gray-500' : 'text-gray-900 font-medium'}`}>
+        <span className={`block truncate ${!selectedOption ? 'text-slate-400' : 'text-crema font-medium'}`}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <div className="flex items-center gap-1">
@@ -91,24 +91,24 @@ export function SearchableSelect({
             <button
               type="button"
               onClick={handleClear}
-              className="text-gray-400 hover:text-gray-600 focus:outline-none p-1 rounded-full hover:bg-gray-100 transition-colors"
+              className="text-slate-400 hover:text-slate-300 focus:outline-none p-1 rounded-full hover:bg-white/10 transition-colors"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           )}
-          <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </div>
       </div>
 
       {/* Dropdown con búsqueda */}
       {isOpen && !disabled && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 flex flex-col">
-          <div className="p-2 border-b border-gray-100 bg-gray-50 sticky top-0 rounded-t-md">
+        <div className="absolute z-50 w-full mt-1 bg-marino-claro border border-white/10 rounded-md shadow-lg max-h-60 flex flex-col">
+          <div className="p-2 border-b border-white/10 bg-marino-claro sticky top-0 rounded-t-md">
             <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
               <input
                 type="text"
-                className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full pl-9 pr-3 py-1.5 text-sm border border-white/15 rounded-md focus:outline-none focus:ring-1 focus:ring-celeste focus:border-celeste"
                 placeholder="Buscar..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -118,17 +118,17 @@ export function SearchableSelect({
             </div>
           </div>
           
-          <ul className="overflow-auto py-1 text-sm text-gray-700">
+          <ul className="overflow-auto py-1 text-sm text-slate-300">
             {filteredOptions.length === 0 ? (
-              <li className="px-3 py-3 text-center text-gray-500 italic">No se encontraron resultados</li>
+              <li className="px-3 py-3 text-center text-slate-400 italic">No se encontraron resultados</li>
             ) : (
               filteredOptions.map((option) => (
                 <li
                   key={option.value}
                   className={`px-3 py-2 cursor-pointer transition-colors ${
                     option.value === value
-                      ? 'bg-primary-50 text-primary-700 font-medium'
-                      : 'hover:bg-gray-100'
+                      ? 'bg-oro/10 text-oro font-medium'
+                      : 'hover:bg-white/10'
                   }`}
                   onClick={() => handleSelect(option.value)}
                 >

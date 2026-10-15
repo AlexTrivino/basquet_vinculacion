@@ -157,18 +157,18 @@ export function ModalCrearJugador({ isOpen, onClose }: ModalCrearJugadorProps) {
   return (
     <>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-        <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="w-full max-w-2xl bg-marino-claro rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
           {/* Header */}
-          <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-gray-50 shrink-0">
+          <div className="flex items-center justify-between p-5 border-b border-white/10 bg-white/5 shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-oro/10 text-oro flex items-center justify-center">
                 <UserPlus className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900">Agregar Jugador</h3>
+              <h3 className="text-lg font-bold text-crema">Agregar Jugador</h3>
             </div>
             <button
               onClick={handleClose}
-              className="p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-200 transition-colors"
+              className="p-2 text-slate-400 hover:text-slate-300 rounded-xl hover:bg-white/15 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -180,23 +180,23 @@ export function ModalCrearJugador({ isOpen, onClose }: ModalCrearJugadorProps) {
               
               {/* Sección Datos Personales */}
               <div className="space-y-5">
-                <h4 className="text-base font-bold text-gray-800 border-b pb-2">Datos Personales</h4>
+                <h4 className="text-base font-bold text-crema border-b pb-2">Datos Personales</h4>
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-gray-700">Nombre Completo <span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-semibold text-slate-300">Nombre Completo <span className="text-red-400">*</span></label>
                   <input
                     type="text"
                     {...register('nombre')}
                     placeholder="Ej. Juan Pérez"
                     className={`w-full h-11 px-3 border rounded-lg focus:ring-2 outline-none transition-shadow ${
-                      errors.nombre ? 'border-red-300 focus:ring-red-200 focus:border-red-500' : 'border-gray-300 focus:ring-primary-100 focus:border-primary-500'
+                      errors.nombre ? 'border-red-400/40 focus:ring-red-400/30 focus:border-red-400' : 'border-white/15 focus:ring-celeste/25 focus:border-celeste'
                     }`}
                   />
-                  {errors.nombre && <p className="text-xs text-red-500 mt-1">{errors.nombre.message}</p>}
+                  {errors.nombre && <p className="text-xs text-red-400 mt-1">{errors.nombre.message}</p>}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5 relative">
-                    <label className="block text-sm font-semibold text-gray-700">Cédula <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-semibold text-slate-300">Cédula <span className="text-red-400">*</span></label>
                     <input
                       type="text"
                       {...register('documento_identificacion', {
@@ -205,83 +205,83 @@ export function ModalCrearJugador({ isOpen, onClose }: ModalCrearJugadorProps) {
                       placeholder="10 dígitos"
                       maxLength={10}
                       className={`w-full h-11 px-3 border rounded-lg focus:ring-2 outline-none transition-shadow ${
-                        errors.documento_identificacion ? 'border-red-300 focus:ring-red-200 focus:border-red-500' : 'border-gray-300 focus:ring-primary-100 focus:border-primary-500'
+                        errors.documento_identificacion ? 'border-red-400/40 focus:ring-red-400/30 focus:border-red-400' : 'border-white/15 focus:ring-celeste/25 focus:border-celeste'
                       }`}
                     />
                     {isCheckingCedula && (
                       <div className="absolute right-3 top-9">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-600"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-celeste"></div>
                       </div>
                     )}
-                    {errors.documento_identificacion && <p className="text-xs text-red-500 mt-1">{errors.documento_identificacion.message}</p>}
+                    {errors.documento_identificacion && <p className="text-xs text-red-400 mt-1">{errors.documento_identificacion.message}</p>}
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block text-sm font-semibold text-gray-700">Fecha de Nacimiento <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-semibold text-slate-300">Fecha de Nacimiento <span className="text-red-400">*</span></label>
                     <input
                       type="date"
                       {...register('fecha_nacimiento')}
                       className={`w-full h-11 px-3 border rounded-lg focus:ring-2 outline-none transition-shadow ${
-                        errors.fecha_nacimiento ? 'border-red-300 focus:ring-red-200 focus:border-red-500' : 'border-gray-300 focus:ring-primary-100 focus:border-primary-500'
+                        errors.fecha_nacimiento ? 'border-red-400/40 focus:ring-red-400/30 focus:border-red-400' : 'border-white/15 focus:ring-celeste/25 focus:border-celeste'
                       }`}
                     />
-                    {errors.fecha_nacimiento && <p className="text-xs text-red-500 mt-1">{errors.fecha_nacimiento.message}</p>}
+                    {errors.fecha_nacimiento && <p className="text-xs text-red-400 mt-1">{errors.fecha_nacimiento.message}</p>}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="block text-sm font-semibold text-gray-700">Género <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-semibold text-slate-300">Género <span className="text-red-400">*</span></label>
                     <select
                       {...register('genero')}
-                      className={`w-full h-11 px-3 border rounded-lg focus:ring-2 outline-none transition-shadow bg-white ${
-                        errors.genero ? 'border-red-300 focus:ring-red-200 focus:border-red-500' : 'border-gray-300 focus:ring-primary-100 focus:border-primary-500'
+                      className={`w-full h-11 px-3 border rounded-lg focus:ring-2 outline-none transition-shadow bg-marino-claro ${
+                        errors.genero ? 'border-red-400/40 focus:ring-red-400/30 focus:border-red-400' : 'border-white/15 focus:ring-celeste/25 focus:border-celeste'
                       }`}
                     >
                       <option value="masculino">Masculino</option>
                       <option value="femenino">Femenino</option>
                     </select>
-                    {errors.genero && <p className="text-xs text-red-500 mt-1">{errors.genero.message}</p>}
+                    {errors.genero && <p className="text-xs text-red-400 mt-1">{errors.genero.message}</p>}
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block text-sm font-semibold text-gray-700">Teléfono</label>
+                    <label className="block text-sm font-semibold text-slate-300">Teléfono</label>
                     <input
                       type="text"
                       {...register('telefono')}
                       placeholder="10 dígitos (Opcional)"
                       maxLength={10}
                       className={`w-full h-11 px-3 border rounded-lg focus:ring-2 outline-none transition-shadow ${
-                        errors.telefono ? 'border-red-300 focus:ring-red-200 focus:border-red-500' : 'border-gray-300 focus:ring-primary-100 focus:border-primary-500'
+                        errors.telefono ? 'border-red-400/40 focus:ring-red-400/30 focus:border-red-400' : 'border-white/15 focus:ring-celeste/25 focus:border-celeste'
                       }`}
                     />
-                    {errors.telefono && <p className="text-xs text-red-500 mt-1">{errors.telefono.message}</p>}
+                    {errors.telefono && <p className="text-xs text-red-400 mt-1">{errors.telefono.message}</p>}
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-semibold text-gray-700">Correo Electrónico</label>
+                  <label className="block text-sm font-semibold text-slate-300">Correo Electrónico</label>
                   <input
                     type="email"
                     {...register('correo')}
                     placeholder="ejemplo@correo.com (Opcional)"
                     className={`w-full h-11 px-3 border rounded-lg focus:ring-2 outline-none transition-shadow ${
-                      errors.correo ? 'border-red-300 focus:ring-red-200 focus:border-red-500' : 'border-gray-300 focus:ring-primary-100 focus:border-primary-500'
+                      errors.correo ? 'border-red-400/40 focus:ring-red-400/30 focus:border-red-400' : 'border-white/15 focus:ring-celeste/25 focus:border-celeste'
                     }`}
                   />
-                  {errors.correo && <p className="text-xs text-red-500 mt-1">{errors.correo.message}</p>}
+                  {errors.correo && <p className="text-xs text-red-400 mt-1">{errors.correo.message}</p>}
                 </div>
               </div>
 
               {/* Sección Documentos */}
               <div className="space-y-5">
-                <h4 className="text-base font-bold text-gray-800 border-b pb-2">Documentos (Opcionales)</h4>
+                <h4 className="text-base font-bold text-crema border-b pb-2">Documentos (Opcionales)</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {/* Foto de Perfil */}
-                  <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
-                    <Camera className="w-8 h-8 text-gray-400 mb-2" />
-                    <span className="text-sm font-semibold text-gray-700 mb-1 text-center">Foto de Perfil</span>
-                    <span className="text-xs text-gray-500 text-center mb-3">Max 4MB (JPG, PNG)</span>
+                  <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-white/15 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+                    <Camera className="w-8 h-8 text-slate-400 mb-2" />
+                    <span className="text-sm font-semibold text-slate-300 mb-1 text-center">Foto de Perfil</span>
+                    <span className="text-xs text-slate-400 text-center mb-3">Max 4MB (JPG, PNG)</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -295,18 +295,18 @@ export function ModalCrearJugador({ isOpen, onClose }: ModalCrearJugadorProps) {
                     <button
                       type="button"
                       onClick={() => fotoRef.current?.click()}
-                      className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg shadow-sm hover:bg-gray-50"
+                      className="px-3 py-1.5 bg-marino-claro border border-white/15 text-slate-300 text-xs font-semibold rounded-lg shadow-sm hover:bg-white/5"
                     >
                       {fotoFile ? 'Cambiar archivo' : 'Seleccionar'}
                     </button>
-                    {fotoFile && <span className="mt-2 text-xs text-emerald-600 font-medium break-all text-center">{fotoFile.name}</span>}
+                    {fotoFile && <span className="mt-2 text-xs text-emerald-300 font-medium break-all text-center">{fotoFile.name}</span>}
                   </div>
 
                   {/* Cédula */}
-                  <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
-                    <FileText className="w-8 h-8 text-gray-400 mb-2" />
-                    <span className="text-sm font-semibold text-gray-700 mb-1 text-center">Cédula Identidad</span>
-                    <span className="text-xs text-gray-500 text-center mb-3">Max 4MB (PDF, JPG)</span>
+                  <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-white/15 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+                    <FileText className="w-8 h-8 text-slate-400 mb-2" />
+                    <span className="text-sm font-semibold text-slate-300 mb-1 text-center">Cédula Identidad</span>
+                    <span className="text-xs text-slate-400 text-center mb-3">Max 4MB (PDF, JPG)</span>
                     <input
                       type="file"
                       accept="image/*,.pdf"
@@ -320,18 +320,18 @@ export function ModalCrearJugador({ isOpen, onClose }: ModalCrearJugadorProps) {
                     <button
                       type="button"
                       onClick={() => cedulaRef.current?.click()}
-                      className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg shadow-sm hover:bg-gray-50"
+                      className="px-3 py-1.5 bg-marino-claro border border-white/15 text-slate-300 text-xs font-semibold rounded-lg shadow-sm hover:bg-white/5"
                     >
                       {cedulaFile ? 'Cambiar archivo' : 'Seleccionar'}
                     </button>
-                    {cedulaFile && <span className="mt-2 text-xs text-emerald-600 font-medium break-all text-center">{cedulaFile.name}</span>}
+                    {cedulaFile && <span className="mt-2 text-xs text-emerald-300 font-medium break-all text-center">{cedulaFile.name}</span>}
                   </div>
 
                   {/* Acta de Bachiller */}
-                  <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
-                    <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                    <span className="text-sm font-semibold text-gray-700 mb-1 text-center">Acta Bachiller</span>
-                    <span className="text-xs text-gray-500 text-center mb-3">Max 4MB (PDF, JPG)</span>
+                  <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-white/15 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+                    <Upload className="w-8 h-8 text-slate-400 mb-2" />
+                    <span className="text-sm font-semibold text-slate-300 mb-1 text-center">Acta Bachiller</span>
+                    <span className="text-xs text-slate-400 text-center mb-3">Max 4MB (PDF, JPG)</span>
                     <input
                       type="file"
                       accept="image/*,.pdf"
@@ -345,11 +345,11 @@ export function ModalCrearJugador({ isOpen, onClose }: ModalCrearJugadorProps) {
                     <button
                       type="button"
                       onClick={() => actaRef.current?.click()}
-                      className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-semibold rounded-lg shadow-sm hover:bg-gray-50"
+                      className="px-3 py-1.5 bg-marino-claro border border-white/15 text-slate-300 text-xs font-semibold rounded-lg shadow-sm hover:bg-white/5"
                     >
                       {actaFile ? 'Cambiar archivo' : 'Seleccionar'}
                     </button>
-                    {actaFile && <span className="mt-2 text-xs text-emerald-600 font-medium break-all text-center">{actaFile.name}</span>}
+                    {actaFile && <span className="mt-2 text-xs text-emerald-300 font-medium break-all text-center">{actaFile.name}</span>}
                   </div>
                 </div>
               </div>
@@ -358,11 +358,11 @@ export function ModalCrearJugador({ isOpen, onClose }: ModalCrearJugadorProps) {
           </div>
 
           {/* Footer */}
-          <div className="p-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 shrink-0">
+          <div className="p-5 border-t border-white/10 bg-white/5 flex justify-end gap-3 shrink-0">
             <button
               type="button"
               onClick={handleClose}
-              className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+              className="px-5 py-2.5 text-sm font-semibold text-slate-300 bg-marino-claro border border-white/15 rounded-xl hover:bg-white/5 transition-colors"
             >
               Cancelar
             </button>
@@ -370,10 +370,10 @@ export function ModalCrearJugador({ isOpen, onClose }: ModalCrearJugadorProps) {
               type="submit"
               form="crear-jugador-form"
               disabled={mutation.isPending || !isValid || isCheckingCedula}
-              className={`flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white rounded-xl shadow-sm transition-colors ${
+              className={`flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl shadow-sm transition-colors ${
                 (!isValid || isCheckingCedula || mutation.isPending)
-                  ? 'bg-gray-300 cursor-not-allowed text-gray-500'
-                  : 'bg-primary-600 hover:bg-primary-700 active:bg-primary-800'
+                  ? 'bg-white/20 cursor-not-allowed text-slate-400'
+                  : 'bg-celeste text-marino hover:bg-white'
               }`}
             >
               {mutation.isPending && (
@@ -388,18 +388,18 @@ export function ModalCrearJugador({ isOpen, onClose }: ModalCrearJugadorProps) {
       {/* Modal de Aviso de Duplicado */}
       {duplicateWarningOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 text-center animate-in zoom-in-95 duration-200">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 mb-4">
-              <AlertTriangle className="h-7 w-7 text-amber-600" />
+          <div className="bg-marino-claro rounded-2xl shadow-2xl w-full max-w-md p-6 text-center animate-in zoom-in-95 duration-200">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/15 mb-4">
+              <AlertTriangle className="h-7 w-7 text-amber-300" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Jugador ya registrado</h3>
-            <p className="text-sm text-gray-600 mb-6">
+            <h3 className="text-xl font-bold text-crema mb-2">Jugador ya registrado</h3>
+            <p className="text-sm text-slate-300 mb-6">
               Ya existe un jugador registrado con esta cédula en el sistema. 
               Si deseas actualizar su información o sus documentos, búscalo en la lista principal de jugadores y edita su perfil.
             </p>
             <button
               onClick={handleAceptarWarning}
-              className="w-full py-2.5 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors"
+              className="w-full py-2.5 bg-marino text-white rounded-xl font-semibold hover:bg-marino transition-colors"
             >
               Aceptar
             </button>

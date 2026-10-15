@@ -22,6 +22,7 @@ import { StatusBadge } from '../../../components/StatusBadge';
 import { AsyncButton } from '../../../components/AsyncButton';
 import { ModalRechazarInscripcion } from './ModalRechazarInscripcion';
 import { ModalEditarInscripcion } from './ModalEditarInscripcion';
+import { FotoJugador } from '../../../components/FotoJugador';
 
 interface ModalExpedienteInscripcionProps {
   isOpen: boolean;
@@ -109,11 +110,11 @@ export function ModalExpedienteInscripcion({
         aria-modal="true"
         aria-labelledby="modal-expediente-title"
       >
-        <div className="relative w-full max-w-[1550px] bg-white rounded-3xl shadow-2xl border border-gray-100 flex flex-col h-[94vh] max-h-[94vh] overflow-hidden">
+        <div className="relative w-full max-w-[1550px] bg-marino-claro rounded-3xl shadow-2xl border border-white/10 flex flex-col h-[94vh] max-h-[94vh] overflow-hidden">
           {/* Cabecera del Expediente */}
-          <div className="flex items-center justify-between px-6 sm:px-8 py-5 bg-gray-900 text-white shrink-0 shadow-md">
+          <div className="flex items-center justify-between px-6 sm:px-8 py-5 bg-marino text-white shrink-0 shadow-md">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-primary-600/30 border border-primary-500/40 text-primary-400 flex items-center justify-center shadow-inner">
+              <div className="w-12 h-12 rounded-2xl bg-oro/10 border border-oro/30 text-oro flex items-center justify-center shadow-inner">
                 <Shield className="w-6 h-6" />
               </div>
               <div>
@@ -125,9 +126,9 @@ export function ModalExpedienteInscripcion({
                     status={estado === 'pendiente' ? 'Pendiente' : estado === 'aprobado' ? 'Aprobado' : 'Rechazado'}
                   />
                 </div>
-                <p className="text-sm text-gray-300 mt-0.5">
+                <p className="text-sm text-slate-500 mt-0.5">
                   {inscripcion.torneo?.nombre || inscripcion.torneo?.nombre_torneo || 'Torneo'} •{' '}
-                  <span className="text-primary-300 font-semibold">
+                  <span className="text-crema font-semibold">
                     {categoria?.nombre_categoria || categoria?.nombre || 'Categoría General'}
                   </span>
                 </p>
@@ -135,7 +136,7 @@ export function ModalExpedienteInscripcion({
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-white p-2.5 rounded-2xl hover:bg-gray-800 transition-colors"
+              className="text-slate-400 hover:text-white p-2.5 rounded-2xl hover:bg-marino transition-colors"
               aria-label="Cerrar expediente"
             >
               <X className="w-6 h-6" />
@@ -143,20 +144,20 @@ export function ModalExpedienteInscripcion({
           </div>
 
           {/* Contenido Principal en 2 Columnas Desahogadas */}
-          <div className="p-6 sm:p-8 overflow-y-auto grid grid-cols-1 lg:grid-cols-12 gap-8 bg-gray-50/70 flex-1">
+          <div className="p-6 sm:p-8 overflow-y-auto grid grid-cols-1 lg:grid-cols-12 gap-8 bg-white/[0.03] flex-1">
             {/* Columna Izquierda: Información del Equipo, Delegado y Comprobante (4 columnas) */}
             <div className="lg:col-span-4 space-y-6">
               {/* Tarjeta de Información General */}
-              <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-5">
+              <div className="bg-marino-claro p-6 rounded-2xl border border-white/10 shadow-sm space-y-5">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-gray-500 flex items-center gap-2">
-                    <User className="w-4 h-4 text-primary-600" />
+                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                    <User className="w-4 h-4 text-oro" />
                     Datos de la Solicitud
                   </h3>
                   {inscripcion.torneo?.estado !== 'en_curso' && inscripcion.torneo?.estado !== 'finalizado' && (
                     <button
                       onClick={() => setModalEditarOpen(true)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-primary-700 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-celeste bg-celeste/10 rounded-lg hover:bg-celeste/15 transition-colors"
                       title="Editar torneo y categoría"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
@@ -166,31 +167,31 @@ export function ModalExpedienteInscripcion({
                 </div>
 
                 <div className="space-y-3.5 text-sm">
-                  <div className="flex items-start justify-between border-b border-gray-100 pb-3">
-                    <span className="text-gray-500 font-medium">Equipo:</span>
-                    <span className="font-bold text-gray-900 text-right text-base">{nombreEquipo}</span>
+                  <div className="flex items-start justify-between border-b border-white/10 pb-3">
+                    <span className="text-slate-400 font-medium">Equipo:</span>
+                    <span className="font-bold text-crema text-right text-base">{nombreEquipo}</span>
                   </div>
 
-                  <div className="flex items-start justify-between border-b border-gray-100 pb-3">
-                    <span className="text-gray-500 font-medium">Delegado:</span>
-                    <span className="font-semibold text-gray-900 text-right">
+                  <div className="flex items-start justify-between border-b border-white/10 pb-3">
+                    <span className="text-slate-400 font-medium">Delegado:</span>
+                    <span className="font-semibold text-crema text-right">
                       {usuarioDelegado?.nombre || 'No especificado'}
                     </span>
                   </div>
 
-                  <div className="flex items-start justify-between border-b border-gray-100 pb-3">
-                    <span className="text-gray-500 font-medium">Correo:</span>
-                    <span className="font-medium text-gray-700 text-right text-xs truncate max-w-[200px]">
+                  <div className="flex items-start justify-between border-b border-white/10 pb-3">
+                    <span className="text-slate-400 font-medium">Correo:</span>
+                    <span className="font-medium text-slate-300 text-right text-xs truncate max-w-[200px]">
                       {usuarioDelegado?.correo || 'Sin correo'}
                     </span>
                   </div>
 
-                  <div className="flex items-start justify-between border-b border-gray-100 pb-3">
-                    <span className="text-gray-500 font-medium">Categoría:</span>
-                    <span className="font-bold text-primary-700 text-right">
+                  <div className="flex items-start justify-between border-b border-white/10 pb-3">
+                    <span className="text-slate-400 font-medium">Categoría:</span>
+                    <span className="font-bold text-crema text-right">
                       {categoria?.nombre_categoria || categoria?.nombre || 'General'}
                       {(edadMin !== undefined || edadMax !== undefined) && (
-                        <span className="text-xs text-gray-500 font-normal block">
+                        <span className="text-xs text-slate-400 font-normal block">
                           ({edadMin ?? 0} a {edadMax ? `${edadMax} años` : 'adelante'})
                         </span>
                       )}
@@ -198,8 +199,8 @@ export function ModalExpedienteInscripcion({
                   </div>
 
                   <div className="flex items-start justify-between">
-                    <span className="text-gray-500 font-medium">Fecha Envío:</span>
-                    <span className="font-semibold text-gray-700 text-right">
+                    <span className="text-slate-400 font-medium">Fecha Envío:</span>
+                    <span className="font-semibold text-slate-300 text-right">
                       {formatDate(inscripcion.fecha_inscripcion)}
                     </span>
                   </div>
@@ -207,10 +208,10 @@ export function ModalExpedienteInscripcion({
               </div>
 
               {/* Tarjeta de Comprobante de Pago */}
-              <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+              <div className="bg-marino-claro p-6 rounded-2xl border border-white/10 shadow-sm space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-gray-500 flex items-center gap-2">
-                    <FileCheck className="w-4 h-4 text-emerald-600" />
+                  <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                    <FileCheck className="w-4 h-4 text-emerald-300" />
                     Comprobante de Pago
                   </h3>
                   {urlComprobante && (
@@ -218,7 +219,7 @@ export function ModalExpedienteInscripcion({
                       href={urlComprobante}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-primary-600 hover:text-primary-800 hover:underline"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-celeste hover:text-white hover:underline"
                     >
                       Abrir original <ExternalLink className="w-3.5 h-3.5" />
                     </a>
@@ -226,21 +227,21 @@ export function ModalExpedienteInscripcion({
                 </div>
 
                 {urlComprobante ? (
-                  <div className="rounded-2xl border border-gray-200 overflow-hidden bg-gray-50">
+                  <div className="rounded-2xl border border-white/10 overflow-hidden bg-white/5">
                     {isPdf ? (
                       <div className="p-8 text-center space-y-4">
-                        <div className="w-16 h-16 mx-auto rounded-2xl bg-red-100 text-red-600 flex items-center justify-center shadow-xs">
+                        <div className="w-16 h-16 mx-auto rounded-2xl bg-red-500/15 text-red-300 flex items-center justify-center shadow-xs">
                           <FileText className="w-8 h-8" />
                         </div>
                         <div>
-                          <p className="text-base font-bold text-gray-900">Documento PDF Adjunto</p>
-                          <p className="text-xs text-gray-500 mt-1">Comprobante de transferencia bancaria</p>
+                          <p className="text-base font-bold text-crema">Documento PDF Adjunto</p>
+                          <p className="text-xs text-slate-400 mt-1">Comprobante de transferencia bancaria</p>
                         </div>
                         <a
                           href={urlComprobante}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-2 w-full px-5 py-2.5 text-sm font-bold text-white bg-primary-600 rounded-xl hover:bg-primary-700 active:bg-primary-800 transition-colors shadow-sm"
+                          className="inline-flex items-center justify-center gap-2 w-full px-5 py-2.5 text-sm font-bold text-marino bg-celeste rounded-xl hover:bg-white active:bg-celeste transition-colors shadow-sm"
                         >
                           <Eye className="w-4 h-4" />
                           Previsualizar Documento PDF
@@ -265,25 +266,25 @@ export function ModalExpedienteInscripcion({
                     )}
                   </div>
                 ) : (
-                  <div className="p-6 rounded-2xl bg-amber-50 border border-amber-200 text-center space-y-2">
-                    <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto" />
-                    <p className="text-sm font-bold text-amber-800">Sin comprobante de pago</p>
-                    <p className="text-xs text-amber-700">Esta solicitud no cuenta con archivo de respaldo adjunto.</p>
+                  <div className="p-6 rounded-2xl bg-amber-500/10 border border-amber-400/30 text-center space-y-2">
+                    <AlertTriangle className="w-8 h-8 text-amber-400 mx-auto" />
+                    <p className="text-sm font-bold text-amber-200">Sin comprobante de pago</p>
+                    <p className="text-xs text-amber-200">Esta solicitud no cuenta con archivo de respaldo adjunto.</p>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Columna Derecha: Nómina y Plantilla de Jugadores (8 columnas) */}
-            <div className="lg:col-span-8 bg-white p-6 sm:p-7 rounded-2xl border border-gray-200 shadow-sm flex flex-col space-y-5">
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 pb-4">
+            <div className="lg:col-span-8 bg-marino-claro p-6 sm:p-7 rounded-2xl border border-white/10 shadow-sm flex flex-col space-y-5">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center border border-primary-100">
+                  <div className="w-10 h-10 rounded-xl bg-oro/10 text-oro flex items-center justify-center border border-oro/30">
                     <Users className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-base sm:text-lg font-bold text-gray-900">Plantilla Oficial de Jugadores</h3>
-                    <p className="text-xs sm:text-sm text-gray-500">Nómina enviada para revisión y validación reglamentaria</p>
+                    <h3 className="text-base sm:text-lg font-bold text-crema">Plantilla Oficial de Jugadores</h3>
+                    <p className="text-xs sm:text-sm text-slate-400">Nómina enviada para revisión y validación reglamentaria</p>
                   </div>
                 </div>
 
@@ -291,11 +292,11 @@ export function ModalExpedienteInscripcion({
                   <span
                     className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold ${
                       cumpleMinimo
-                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                        : 'bg-amber-100 text-amber-800 border border-amber-200'
+                        ? 'bg-emerald-500/15 text-emerald-200 border border-emerald-400/30'
+                        : 'bg-amber-500/15 text-amber-200 border border-amber-400/30'
                     }`}
                   >
-                    {cumpleMinimo ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <AlertTriangle className="w-4 h-4 text-amber-600" />}
+                    {cumpleMinimo ? <CheckCircle2 className="w-4 h-4 text-emerald-300" /> : <AlertTriangle className="w-4 h-4 text-amber-300" />}
                     {totalJugadores} / 18 Jugadores {cumpleMinimo ? '(Reglamentario)' : '(Incompleto)'}
                   </span>
                 </div>
@@ -303,20 +304,20 @@ export function ModalExpedienteInscripcion({
 
               {/* Lista de Jugadores */}
               {isLoadingPlantilla ? (
-                <div className="py-20 text-center text-gray-400 space-y-3">
-                  <div className="w-8 h-8 border-3 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto" />
+                <div className="py-20 text-center text-slate-400 space-y-3">
+                  <div className="w-8 h-8 border-3 border-celeste border-t-transparent rounded-full animate-spin mx-auto" />
                   <p className="text-sm font-medium">Cargando nómina de jugadores...</p>
                 </div>
               ) : plantillas.length === 0 ? (
-                <div className="py-20 text-center text-gray-400 space-y-3">
-                  <Users className="w-12 h-12 mx-auto text-gray-300" />
-                  <p className="text-base font-semibold text-gray-600">No hay jugadores registrados en esta plantilla.</p>
+                <div className="py-20 text-center text-slate-400 space-y-3">
+                  <Users className="w-12 h-12 mx-auto text-slate-500" />
+                  <p className="text-base font-semibold text-slate-300">No hay jugadores registrados en esta plantilla.</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto rounded-xl border border-gray-200 max-h-[540px] overflow-y-auto">
+                <div className="overflow-x-auto rounded-xl border border-white/10 max-h-[540px] overflow-y-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="bg-gray-50 text-gray-700 border-b border-gray-200 uppercase tracking-wider text-xs sticky top-0 z-10 font-bold">
+                      <tr className="bg-white/5 text-slate-300 border-b border-white/10 uppercase tracking-wider text-xs sticky top-0 z-10 font-bold">
                         <th className="py-3.5 px-4">Dorsal</th>
                         <th className="py-3.5 px-4">Foto</th>
                         <th className="py-3.5 px-4">Jugador / Datos</th>
@@ -325,7 +326,7 @@ export function ModalExpedienteInscripcion({
                         <th className="py-3.5 px-4 text-right">Documentos Adjuntos</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200 text-sm">
+                    <tbody className="divide-y divide-white/10 text-sm">
                       {plantillas.map((p) => {
                         const j = p.jugador;
                         const edad = calculateAge(j?.fecha_nacimiento);
@@ -344,10 +345,10 @@ export function ModalExpedienteInscripcion({
                         }
 
                         return (
-                          <tr key={p.id || p.id_plantilla} className="hover:bg-gray-50/80 transition-colors">
+                          <tr key={p.id || p.id_plantilla} className="hover:bg-white/5 transition-colors">
                             {/* Dorsal */}
                             <td className="py-3 px-4">
-                              <span className="inline-flex w-10 h-10 items-center justify-center rounded-xl bg-gray-100 font-extrabold text-gray-800 text-sm border border-gray-200 shadow-xs">
+                              <span className="inline-flex w-10 h-10 items-center justify-center rounded-xl bg-white/10 font-extrabold text-crema text-sm border border-white/10 shadow-xs">
                                 #{p.numero_camiseta ?? '-'}
                               </span>
                             </td>
@@ -359,7 +360,7 @@ export function ModalExpedienteInscripcion({
                                   href={j.url_foto}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="group relative block w-14 h-14 rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-primary-500 shadow-sm transition-all hover:scale-105"
+                                  className="group relative block w-14 h-14 rounded-2xl overflow-hidden border-2 border-white/10 hover:border-celeste shadow-sm transition-all hover:scale-105"
                                   title="Clic para ver foto en tamaño completo"
                                 >
                                   <img
@@ -372,22 +373,20 @@ export function ModalExpedienteInscripcion({
                                   </div>
                                 </a>
                               ) : (
-                                <div className="w-14 h-14 rounded-2xl bg-primary-50 text-primary-700 font-extrabold flex items-center justify-center text-lg border-2 border-primary-100 shadow-xs">
-                                  {j?.nombre ? j.nombre.charAt(0).toUpperCase() : '?'}
-                                </div>
+                                <FotoJugador className="w-14 h-14 rounded-2xl object-cover object-top border-2 border-celeste/30" />
                               )}
                             </td>
 
                             {/* Nombre del Jugador */}
                             <td className="py-3 px-4">
-                              <span className="font-bold text-gray-900 block text-sm">{j?.nombre || 'Sin nombre'}</span>
-                              <span className="text-xs text-gray-400">
+                              <span className="font-bold text-crema block text-sm">{j?.nombre || 'Sin nombre'}</span>
+                              <span className="text-xs text-slate-400">
                                 Nac: {formatDate(j?.fecha_nacimiento)}
                               </span>
                             </td>
 
                             {/* Cédula */}
-                            <td className="py-3 px-4 font-mono text-xs font-semibold text-gray-700">
+                            <td className="py-3 px-4 font-mono text-xs font-semibold text-slate-300">
                               {j?.documento_identificacion || '-'}
                             </td>
 
@@ -397,15 +396,15 @@ export function ModalExpedienteInscripcion({
                                 <span
                                   className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold ${
                                     cumpleEdad
-                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                                      : 'bg-red-50 text-red-700 border border-red-200'
+                                      ? 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/30'
+                                      : 'bg-red-500/10 text-red-200 border border-red-400/30'
                                   }`}
                                   title={cumpleEdad ? 'Edad reglamentaria' : advertenciaEdad}
                                 >
                                   {edad} años {!cumpleEdad && '⚠️'}
                                 </span>
                               ) : (
-                                <span className="text-gray-400 text-xs">-</span>
+                                <span className="text-slate-400 text-xs">-</span>
                               )}
                             </td>
 
@@ -417,14 +416,14 @@ export function ModalExpedienteInscripcion({
                                     href={j.url_cedula}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-primary-700 bg-primary-50 hover:bg-primary-100 active:bg-primary-200 border border-primary-200 transition-all shadow-xs"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-celeste bg-celeste/10 hover:bg-celeste/15 active:bg-celeste/25 border border-celeste/30 transition-all shadow-xs"
                                     title="Ver Cédula de Identidad en tamaño completo"
                                   >
-                                    <FileText className="w-3.5 h-3.5 text-primary-600" />
+                                    <FileText className="w-3.5 h-3.5 text-celeste" />
                                     Cédula
                                   </a>
                                 ) : (
-                                  <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium text-gray-400 bg-gray-100 border border-gray-200">
+                                  <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium text-slate-400 bg-white/10 border border-white/10">
                                     Sin cédula
                                   </span>
                                 )}
@@ -434,10 +433,10 @@ export function ModalExpedienteInscripcion({
                                     href={j.url_acta_bachiller}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 active:bg-amber-200 border border-amber-200 transition-all shadow-xs"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-amber-200 bg-amber-500/10 hover:bg-amber-500/20 active:bg-amber-500/25 border border-amber-400/30 transition-all shadow-xs"
                                     title="Ver Acta de Grado de Bachiller"
                                   >
-                                    <FileCheck className="w-3.5 h-3.5 text-amber-600" />
+                                    <FileCheck className="w-3.5 h-3.5 text-amber-300" />
                                     Acta de Grado
                                   </a>
                                 )}
@@ -454,11 +453,11 @@ export function ModalExpedienteInscripcion({
           </div>
 
           {/* Footer de Acciones del Expediente */}
-          <div className="flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 bg-white border-t border-gray-200 shrink-0 shadow-lg">
+          <div className="flex items-center justify-between px-6 sm:px-8 py-4 sm:py-5 bg-marino-claro border-t border-white/10 shrink-0 shadow-lg">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors"
+              className="px-5 py-2.5 text-sm font-semibold text-slate-300 bg-marino-claro border border-white/15 rounded-xl hover:bg-white/5 active:bg-white/10 transition-colors"
             >
               Cerrar Expediente
             </button>
@@ -469,7 +468,7 @@ export function ModalExpedienteInscripcion({
                   type="button"
                   onClick={() => setModalRechazarOpen(true)}
                   disabled={isUpdating}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-red-600 bg-red-50 border border-red-200 rounded-xl hover:bg-red-100 active:bg-red-200 transition-colors disabled:opacity-50 shadow-xs"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-red-300 bg-red-500/10 border border-red-400/30 rounded-xl hover:bg-red-500/20 active:bg-red-500/25 transition-colors disabled:opacity-50 shadow-xs"
                 >
                   <Ban className="w-4 h-4" />
                   Rechazar Solicitud
@@ -478,14 +477,14 @@ export function ModalExpedienteInscripcion({
                 <AsyncButton
                   onClickAction={handleConfirmAprobar}
                   disabled={isUpdating}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 active:bg-emerald-800 transition-colors shadow-sm disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-bold text-emerald-100 bg-emerald-500/20 rounded-xl hover:bg-emerald-500/30 active:bg-emerald-500/20 transition-colors shadow-sm disabled:opacity-50"
                 >
                   <Check className="w-4 h-4" />
                   Aprobar Inscripción
                 </AsyncButton>
               </div>
             ) : (
-              <div className="text-sm text-gray-500 font-semibold">
+              <div className="text-sm text-slate-400 font-semibold">
                 Esta solicitud ya fue resuelta ({estado.toUpperCase()}).
               </div>
             )}

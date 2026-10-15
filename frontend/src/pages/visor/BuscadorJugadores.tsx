@@ -6,6 +6,7 @@ import { getTorneos } from '../../features/torneos/api/torneos.api';
 import { getInscripcionesPublicas } from '../../features/equipos/api/equipos.api';
 import { buscarJugadores, type FiltrosVisor, type JugadorVisor } from '../../features/visor/api/visor.api';
 import { Escudo } from '../../features/torneos/components/PartidosList';
+import { FotoJugador } from '../../components/FotoJugador';
 
 const EDADES = [
   { valor: '', texto: 'Todas las edades' },
@@ -23,10 +24,6 @@ const CLAVES = ['q', 'id_torneo', 'id_categoria', 'id_equipo', 'genero', 'edad_m
 
 const selectCls =
   'block w-full cursor-pointer appearance-none rounded-lg border border-white/15 bg-marino-claro py-2.5 pl-3 pr-9 text-sm font-semibold text-crema transition-colors hover:border-oro/50 disabled:cursor-not-allowed disabled:opacity-50';
-
-function iniciales(nombre: string) {
-  return nombre.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]).join('');
-}
 
 function Selector({ id, label, value, onChange, disabled, children }: {
   id: string; label: string; value: string; onChange: (v: string) => void; disabled?: boolean; children: React.ReactNode;
@@ -62,13 +59,7 @@ function Escenario({ jugador }: { jugador: JugadorVisor }) {
       className="sticky top-20 hidden h-[calc(100dvh-6.5rem)] min-h-[34rem] overflow-hidden rounded-xl border border-oro/30 bg-marino-claro shadow-2xl shadow-black/40 lg:block"
     >
       <div key={jugador.id_jugador} className="aparecer absolute inset-0">
-        {jugador.url_foto ? (
-          <img src={jugador.url_foto} alt="" className="h-full w-full object-cover object-top" />
-        ) : (
-          <div className="flex h-full items-start justify-center pt-16">
-            <span className="font-display text-[11rem] font-black leading-none text-oro/20">{iniciales(jugador.nombre)}</span>
-          </div>
-        )}
+        <FotoJugador url={jugador.url_foto} className="h-full w-full object-cover object-top" />
       </div>
       <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-marino via-marino/60 via-45% to-transparent" />
 
@@ -306,18 +297,11 @@ export default function BuscadorJugadores() {
                             esActivo ? 'ring-white/10 lg:ring-2 lg:ring-oro/80' : 'ring-white/10'
                           }`}
                         >
-                          {j.url_foto ? (
-                            <img
-                              src={j.url_foto}
-                              alt=""
-                              loading="lazy"
-                              className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-110"
-                            />
-                          ) : (
-                            <div className="flex h-full items-center justify-center bg-gradient-to-b from-marino-claro to-marino">
-                              <span className="font-display text-4xl font-black text-oro/60">{iniciales(j.nombre)}</span>
-                            </div>
-                          )}
+                          <FotoJugador
+                            url={j.url_foto}
+                            loading="lazy"
+                            className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-110"
+                          />
                         </div>
                         <p className="mt-2 line-clamp-2 text-sm font-bold uppercase leading-snug text-crema transition-colors group-hover:text-white">
                           {j.nombre}

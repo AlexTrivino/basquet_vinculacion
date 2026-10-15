@@ -189,7 +189,7 @@ La cara pública de Torneos Baloncesto Manta se viste como el cartel de una noch
 
 La densidad es baja y el ritmo amplio: secciones con 80 a 96 px de aire vertical, contenedores de 72 a 80 rem y pares de texto y objeto en columnas asimétricas. La profundidad no viene de tarjetas flotando sobre gris, sino de capas tonales (marino, marino claro y una franja negra) y de atmósfera: la foto del coliseo con un zoom lento, el logo desenfocado como marca de agua con parallax y una luz radial tenue dentro de cada cartel de partido. El movimiento es ambiental y lento; en el perfil de equipo, además, los bloques y los cromos entran una sola vez al llegar a pantalla. Todo se apaga con movimiento reducido.
 
-Este sistema rechaza la plantilla genérica: no hay hero centrado, ni tarjetas de beneficios, ni fila de métricas. Vive dentro del contenedor `.tema-cartel` en la portada pública (`/`), el directorio y el perfil de equipos (`/equipos` y `/equipos/:id`), el detalle de torneo (`/torneos/:id`), el perfil de jugador (`/jugadores/:id`), el buscador de jugadores (`/visor`) y el panel del delegado (`/delegado/dashboard`), que muestra el perfil de su equipo. El resto del producto, es decir, las pantallas de administrador, las demás del delegado y la autenticación, sigue en el shell operativo «institucional neutro» del mismo `@theme`. Ese shell se ubica al final de Colors y queda fuera de estas reglas.
+Este sistema rechaza la plantilla genérica: no hay hero centrado, ni tarjetas de beneficios, ni fila de métricas. Desde octubre de 2026 viste todo el producto. Las páginas públicas (`/`, `/equipos` y `/equipos/:id`, `/torneos/:id`, `/jugadores/:id`), el buscador de jugadores (`/visor`) y el panel del delegado (`/delegado/dashboard`) lo usan completo, dentro de `.tema-cartel`. Las pantallas operativas (el panel de administrador, el resto del área de delegado, el perfil y la autenticación) lo usan en modo operar, con las reglas de «Pantallas operativas» al final de Colors. Ya no hay un shell claro.
 
 **Rasgos clave:**
 - Noche marino continua de borde a borde; el blanco solo sostiene marcas ajenas.
@@ -233,8 +233,14 @@ El botón flotante de WhatsApp usa el verde de la marca del servicio (#25D366) c
 
 **La regla del blanco prestado.** Una superficie blanca solo existe para que se lea una marca ajena: el escudo de un equipo o el logo de un auspiciante. La noche nunca se corta con secciones blancas.
 
-### Shell operativo (otro sistema)
-El mismo `@theme` declara la paleta «institucional neutra» del shell: la escala `primary-50` a `primary-900`, `accent-500` y `accent-600`, `success-500`, `danger-500` y `warning-500`, sobre los grises de Tailwind y el fondo claro del `body`. Rige todas las rutas fuera de este mundo: el panel de administrador (`/admin/*`), el resto del área de delegado (`/delegado/*`, salvo su panel) y la autenticación (`/auth/*`). También el `Navbar` fuera de las rutas de este mundo y el `Sidebar`. Este documento no la redefine: los colores de este mundo no entran en esas pantallas, y la escala `primary-*` no entra en este mundo.
+### Pantallas operativas
+El administrador (`/admin/*`), el resto del área de delegado, el perfil (`/perfil`) y la autenticación (`/auth/*`) usan la misma noche, con la densidad de una herramienta. El `@theme` ya no declara la escala `primary-*` ni los grises claros del antiguo shell.
+- **Superficies:** la página es marino. Paneles, tablas y modales van en marino claro opaco, con borde blanco al 10 % u oro al 25 % en los paneles principales. Las cabeceras pegajosas de tabla y los buscadores dentro de listas desplegables son opacos.
+- **Texto:** el título de cada pantalla va en Cinzel crema. Etiquetas, datos y botones van en Inter: crema para lo principal, `slate-300` para las etiquetas y `slate-400` para lo secundario.
+- **Acción:** la acción principal de cada pantalla («Nuevo torneo», «Agregar jugador», «Guardar») es el botón primario celeste con texto marino, y pasa a blanco al pasar el cursor. La selección actual (pestaña o fila elegida) también puede ir en celeste.
+- **Estados:** cada tono va en veladura: fondo del tono al 15 o 20 % y tinta del mismo tono en 100 a 300, nunca un relleno sólido. Verde para lo aprobado, ámbar y amarillo para lo pendiente, rojo o rosa para lo rechazado y lo destructivo, azul para lo programado.
+- **Íconos de cabecera:** en oro, sobre una caja con oro al 10 % y borde oro al 30 %, como los íconos de apoyo del home.
+- **Marcas ajenas:** los escudos de equipo van en el medallón blanco (`Escudo`) y los logos de auspiciantes sobre blanco.
 
 ## Typography
 
@@ -313,7 +319,7 @@ Sobrios y claros: la acción la dice el color, no la forma.
 - **Secundario:** contorno blanco de 1 px al 25 % y texto blanco; al pasar el cursor, una veladura blanca al 10 %. «Reintentar» usa este estilo en tamaño compacto (8 × 16 px). Sobre una foto lleva un respaldo marino al 70 % y relleno de 8 × 14 px: así van los controles del dueño en la portada del perfil («Cambiar portada»).
 - **Enlace de acción:** texto celeste en Inter 600, con flecha de 16 px; blanco al pasar el cursor («Ver torneo», «Regístrate»).
 - **Nombre que enlaza:** rivales y equipos conservan su voz y su tinta (Cinzel crema) y pasan a celeste al pasar el cursor, sin subrayado.
-- **Foco:** anillo celeste de 2 px, separado 3 px, en todas las páginas de este mundo (`html:has(.tema-cartel)`), navbar incluido.
+- **Foco:** anillo celeste de 2 px, separado 3 px, en todo el sitio, navbar incluido.
 - **Acceso:** «Ingresar», en la barra. Contorno oro al 70 %, texto oro e Inter 500; al pasar el cursor se llena de oro con texto marino. Conserva el radio de 0.75rem del `Navbar` compartido.
 - **Escudo:** en el perfil de equipo, el dueño cambia el escudo con un botón circular de 36 px montado en el borde del medallón: fondo marino, ícono oro y anillo oro al 60 % de 2 px; al pasar el cursor se llena de oro con el ícono marino. A su lado, «Quitar escudo» lleva un anillo blanco al 25 % y el ícono en `slate-300`.
 - **Destructivo:** «Desactivar» es un secundario con contorno `rose-300` al 40 % y tinta `rose-100`. «Quitar portada» y «Quitar escudo» son neutros y solo se tiñen de rosa al pasar el cursor: veladura `rose-500` del 20 al 30 % y tinta `rose-100`.
@@ -343,6 +349,7 @@ Sobrios y claros: la acción la dice el color, no la forma.
 - la cinta de estado;
 - el nombre del torneo, en la voz de titular;
 - el rango de fechas, con un calendario oro y cifras tabulares;
+- los puntos anotados en el torneo, en una frase con el ícono de puntos (`Goal`, el mismo del perfil del jugador) en oro y la cifra en Inter 600 crema («2.058 puntos anotados»). Es la suma de los marcadores de sus partidos finalizados (sin los W.O.), la misma cuenta del contador de Conócenos; sin partidos dice «Aún sin puntos anotados». En el ticket móvil va bajo las fechas, en `slate-400`;
 - los chips de categoría;
 - el enlace «Ver torneo».
 
@@ -352,6 +359,23 @@ Debajo van los controles:
 - **Progreso:** barra de 2 px, celeste sobre blanco al 10 %, que tarda 10 s y al terminar pasa al torneo siguiente.
 
 La pausa congela la barra, y solo en pausa se anuncia el cambio a los lectores de pantalla.
+
+### Silueta del jugador
+Un jugador sin foto, o cuya foto no carga, muestra `jugador-silueta.svg`: un busto liso en grises (de #c9c9c9 a #4a4a4a) sobre un fondo de estudio en grises (radial de #3b3b3b a #0c0c0c). Es la única imagen en blanco y negro del sistema, para que no se confunda con una foto. La usan el buscador, el perfil del jugador, el cromo, las listas del administrador y los flyers (`FotoJugador`). Nunca se usan iniciales en su lugar.
+
+### Flyer de Instagram (componente firma)
+`MarcoFlyer` arma un cartel de 1080 px de ancho, de 1350 px (publicación 4:5) o de 1920 px (historia 9:16), que se descarga como PNG desde el panel del administrador.
+- **Fondo:** marino con la foto del coliseo desenfocada en la parte alta, un velo marino, la marca de agua del logo al 7 % y un grano de impresión muy tenue. Lleva esquinas en L de 56 px en oro al 55 %.
+- **Encabezado:** el logo y, al lado, «Torneos Baloncesto Manta» en Inter 700 oro con tracking y el nombre del torneo en Cinzel crema.
+- **Título:** Cinzel 700 crema a 92 px. Debajo, el dato en una cinta dorada (la fecha o «Acumulado al…»).
+- **Pie:** filete oro, el dominio en crema y el coliseo en `slate-400`.
+- **Variantes:**
+  - Resultados: carteles A vs B con medallones y el marcador del ganador en oro. Caben 5 por publicación y 7 por historia; si hay más, se reparten en varias láminas. Con tres o menos, las filas crecen y se centran.
+  - Figura (de la fecha, de una categoría o de un equipo): cromo grande de doble bisel con el dorsal contorneado, apellidos en Cinzel y la línea de números con las placas en oro.
+  - Figuras del torneo: una fila por categoría con cromo chico y la valoración en oro.
+- **Tamaño mínimo:** ningún texto baja de 20 px, para que se lea en el celular.
+
+Figura es la mejor valoración: puntos + rebotes + asistencias + tapones.
 
 ### Banda de auspiciantes
 Desde 1024 px, el texto ocupa el 30 % y la banda el 70 %. La banda es un panel blanco con radio de 1rem, sombra de banda y 24 px de relleno vertical. Lleva una marquesina infinita de logos de 144 × 80 px, ajustados sin recorte y con 32 px a cada lado. Una máscara la desvanece en los bordes: transparente, negro del 8 % al 92 % y otra vez transparente. Recorre la lista en 45 s y se detiene al pasar el cursor. Solo la primera vuelta se anuncia a los lectores de pantalla. Sin auspiciantes, muestra un aviso breve en `slate-400`.
@@ -386,7 +410,7 @@ Los filtros son `<select>` nativos: contorno blanco al 15 %, radio de 0.5rem, te
 
 ### Navegación
 - **En este mundo** (`/`, `/equipos` y los perfiles de equipo, `/torneos/:id`, `/jugadores/:id`, `/visor` y `/delegado/dashboard`): barra fija de 64 px, marino, con una línea inferior blanca al 10 %. A la izquierda, el escudo recortado de 48 px y el nombre del sitio en Inter 700 a 1.25rem crema (oculto en móvil). Los enlaces van en Inter 500 a 0.875rem: `slate-300` en reposo, blancos al pasar el cursor y crema cuando están activos. A la derecha, el botón de acceso oro. Con sesión iniciada aparece un chip de usuario con veladura blanca al 5 % y la inicial en marino sobre un círculo oro.
-- **Fuera de esas rutas:** la misma barra vuelve al shell (blanca, con `primary-600`). El cajón móvil (`Sidebar`) aún no tiene variante oscura.
+- **En las pantallas operativas:** la misma barra. El super_admin la cambia por el cajón móvil por debajo de 1280 px. El cajón (`Sidebar`) es marino con borde blanco al 10 %, la tarjeta del usuario en veladura blanca y el enlace activo en crema sobre blanco al 10 %.
 
 ### Pie de página
 Fondo carbón, texto `slate-300` a 0.875rem, contenedor de 72rem y 64 px de relleno vertical. Cuatro columnas: marca (logo de 96 px de alto, línea oro y un párrafo), Torneos (hasta seis, del API), Navegación y Contacto. Cada título de columna lleva debajo una barra oro de 32 × 2 px. Los íconos de contacto van en anillos de 28 px con borde oro al 40 %. Los enlaces pasan a blanco al pasar el cursor. Una línea blanca al 10 % separa la franja legal, en `slate-400` a 0.75rem.
@@ -407,7 +431,7 @@ Columna "Síguenos": Instagram y Facebook como círculos de 44 px con borde oro 
 **La regla de la entrada única.** Una entrada ocurre una vez y nunca esconde contenido: el marcado nace visible y solo se oculta mientras espera su turno. Sin JavaScript, sin `IntersectionObserver` o con movimiento reducido, todo está a la vista desde el principio.
 
 ### Superficies del navegador
-En todas las páginas de este mundo (`html:has(.tema-cartel)`), el lienzo es marino y `color-scheme: dark` oscurece selectores, barras y controles nativos. La barra de desplazamiento lleva el pulgar celeste, mezclado al 45 % con marino, sobre un carril marino. La selección de texto es oro con texto marino. El cursor de texto y `accent-color` son celestes. El foco es un anillo celeste de 2 px con 3 px de separación. Los enlaces subrayados separan el subrayado 4 px.
+En todo el sitio (reglas sobre `html`), el lienzo es marino y `color-scheme: dark` oscurece selectores, barras y controles nativos. La barra de desplazamiento lleva el pulgar celeste, mezclado al 45 % con marino, sobre un carril marino. La selección de texto es oro con texto marino. El cursor de texto y `accent-color` son celestes. El foco es un anillo celeste de 2 px con 3 px de separación. Los enlaces subrayados separan el subrayado 4 px.
 
 ### Movimiento reducido
 Con `prefers-reduced-motion: reduce` se apagan el parallax, el zoom del hero y de la portada del perfil, las entradas (`.aparecer` y las del perfil de equipo, que dejan todo visible), el rebote del balón y de su sombra, la marquesina, el pulso de los esqueletos y, en el cromo, la elevación, el zoom del retrato y el brillo de lámina. El carrusel de torneos arranca en pausa (el botón permite reanudarlo) y el balón no gira.
@@ -433,4 +457,4 @@ Con `prefers-reduced-motion: reduce` se apagan el parallax, el zoom del hero y d
 - **No** uses sombras de color, sombras duras ni paneles de cristal.
 - **No** redondees las piezas de cartel (paralelogramo, rombo, esquinas en L).
 - **No** uses glifos ni emoji como íconos; los íconos son de lucide, de trazo uniforme.
-- **No** mezcles este mundo con el shell: nada de `primary-*` en sus páginas ni de marino u oro en las pantallas operativas.
+- **No** vuelvas a la paleta clara: nada de grises claros, fondos blancos (salvo bajo marcas ajenas) ni bandas de color en las cabeceras de los modales.

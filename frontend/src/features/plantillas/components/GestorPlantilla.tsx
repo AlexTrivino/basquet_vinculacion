@@ -47,6 +47,7 @@ import { ConfirmarJugadorModal } from './ConfirmarJugadorModal';
 import { EditarCamisetaModal } from './EditarCamisetaModal';
 import { ConfirmarEliminarJugadorModal } from './ConfirmarEliminarJugadorModal';
 import { useBusinessRules } from '../../../hooks/useBusinessRules';
+import { FotoJugador } from '../../../components/FotoJugador';
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB
 
@@ -567,29 +568,21 @@ export function GestorPlantilla({
       header: 'Jugador', 
       headerClassName: 'min-w-[140px]',
       render: (row) => {
-        const fotoUrl = row.jugador?.url_foto;
-        const inicial = row.jugador?.nombre?.charAt(0) || '?';
         const idJugador = row.jugador?.id_jugador || row.jugador?.id || row.id_jugador;
         const amonestado = amonestacionesActivas.some(s => s.id_jugador === idJugador);
         return (
           <div className="flex items-center gap-2.5">
-            {fotoUrl ? (
-              <img src={fotoUrl} alt="avatar" className="w-8 h-8 rounded-full object-cover bg-gray-100 border border-gray-200 shrink-0" />
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-primary-50 text-primary-700 flex items-center justify-center font-bold text-xs uppercase border border-primary-200 shrink-0">
-                {inicial}
-              </div>
-            )}
+            <FotoJugador url={row.jugador?.url_foto} className="w-8 h-8 rounded-full object-cover object-top border border-white/10 shrink-0" />
             <div className="flex flex-col min-w-0">
-              <span className="font-semibold text-gray-900 flex items-center gap-1 text-xs sm:text-sm truncate max-w-[130px] xl:max-w-[180px]" title={row.jugador?.nombre}>
+              <span className="font-semibold text-crema flex items-center gap-1 text-xs sm:text-sm truncate max-w-[130px] xl:max-w-[180px]" title={row.jugador?.nombre}>
                 {row.jugador?.nombre}
                 {amonestado && (
                   <span title="Jugador con faltas o amonestaciones activas">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-500 inline shrink-0" />
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400 inline shrink-0" />
                   </span>
                 )}
               </span>
-              <span className="text-[11px] text-gray-500">C.I. {row.jugador?.documento_identificacion}</span>
+              <span className="text-[11px] text-slate-400">C.I. {row.jugador?.documento_identificacion}</span>
             </div>
           </div>
         );
@@ -602,18 +595,18 @@ export function GestorPlantilla({
       cellClassName: 'text-center',
       render: (row) => (
         readOnly ? (
-          <span className="inline-flex items-center justify-center font-bold text-gray-800">
+          <span className="inline-flex items-center justify-center font-bold text-crema">
             #{row.numero_camiseta ?? '-'}
           </span>
         ) : (
           <button
             type="button"
             onClick={() => handleOpenEditarCamiseta(row)}
-            className="inline-flex items-center justify-center gap-1 rounded-lg bg-gray-100 hover:bg-primary-50 hover:border-primary-300 hover:text-primary-700 px-2 py-0.5 text-xs font-bold text-gray-800 border border-gray-200 transition-all cursor-pointer group"
+            className="inline-flex items-center justify-center gap-1 rounded-lg bg-white/10 hover:bg-celeste/10 hover:border-celeste/50 hover:text-celeste px-2 py-0.5 text-xs font-bold text-crema border border-white/10 transition-all cursor-pointer group"
             title="Clic para modificar número de camiseta"
           >
             <span>#{row.numero_camiseta ?? '-'}</span>
-            <Pencil className="w-3 h-3 text-gray-400 group-hover:text-primary-600 transition-colors" />
+            <Pencil className="w-3 h-3 text-slate-400 group-hover:text-celeste transition-colors" />
           </button>
         )
       )
@@ -627,10 +620,10 @@ export function GestorPlantilla({
         const fecha = formatDate(row.jugador?.fecha_nacimiento);
         return (
           <div className="flex flex-col">
-            <span className="font-medium text-gray-900 text-xs">
+            <span className="font-medium text-crema text-xs">
               {edad !== null ? `${edad} años` : '-'}
             </span>
-            <span className="text-[10px] text-gray-500">{fecha}</span>
+            <span className="text-[10px] text-slate-400">{fecha}</span>
           </div>
         );
       }
@@ -645,16 +638,16 @@ export function GestorPlantilla({
         return (
           <div className="flex flex-col gap-0.5">
             {tel ? (
-              <span className="text-xs font-medium text-gray-800 flex items-center gap-1">
-                <Phone className="w-3 h-3 text-gray-400 shrink-0" />
+              <span className="text-xs font-medium text-crema flex items-center gap-1">
+                <Phone className="w-3 h-3 text-slate-400 shrink-0" />
                 {formatPhone(tel)}
               </span>
             ) : (
-              <span className="text-xs text-gray-400">Sin teléfono</span>
+              <span className="text-xs text-slate-400">Sin teléfono</span>
             )}
             {mail && (
-              <span className="text-[11px] text-gray-500 flex items-center gap-1 truncate max-w-[110px] xl:max-w-[150px]" title={mail}>
-                <Mail className="w-3 h-3 text-gray-400 shrink-0" />
+              <span className="text-[11px] text-slate-400 flex items-center gap-1 truncate max-w-[110px] xl:max-w-[150px]" title={mail}>
+                <Mail className="w-3 h-3 text-slate-400 shrink-0" />
                 {mail}
               </span>
             )}
@@ -676,18 +669,18 @@ export function GestorPlantilla({
             <span
               className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold border ${
                 isComplete
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  : 'bg-amber-50 text-amber-700 border-amber-200'
+                  ? 'bg-emerald-500/10 text-emerald-200 border-emerald-400/30'
+                  : 'bg-amber-500/10 text-amber-200 border-amber-400/30'
               }`}
             >
               {isComplete ? (
                 <>
-                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                  <CheckCircle2 className="w-3 h-3 text-emerald-300" />
                   Completo
                 </>
               ) : (
                 <>
-                  <AlertTriangle className="w-3 h-3 text-amber-600" />
+                  <AlertTriangle className="w-3 h-3 text-amber-300" />
                   Falta Cédula
                 </>
               )}
@@ -699,12 +692,12 @@ export function GestorPlantilla({
                   target="_blank" 
                   rel="noopener noreferrer"
                   title="Ver Cédula de Identidad"
-                  className="px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors text-[10px] font-medium inline-flex items-center gap-1"
+                  className="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 transition-colors text-[10px] font-medium inline-flex items-center gap-1"
                 >
                   <FileText className="w-3 h-3" /> Cédula
                 </a>
               ) : (
-                <span className="text-[10px] text-gray-400">Sin cédula</span>
+                <span className="text-[10px] text-slate-400">Sin cédula</span>
               )}
               {hasActa && (
                 <a 
@@ -712,7 +705,7 @@ export function GestorPlantilla({
                   target="_blank" 
                   rel="noopener noreferrer"
                   title="Ver Acta de Bachiller"
-                  className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors text-[10px] font-medium inline-flex items-center gap-1"
+                  className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition-colors text-[10px] font-medium inline-flex items-center gap-1"
                 >
                   <FileText className="w-3 h-3" /> Acta
                 </a>
@@ -734,21 +727,21 @@ export function GestorPlantilla({
           <div className="flex items-center justify-end gap-0.5">
             <button
               onClick={() => handleOpenEditarCamiseta(row)}
-              className="text-gray-400 hover:text-primary-600 transition-colors p-1.5 rounded-lg hover:bg-primary-50"
+              className="text-slate-400 hover:text-celeste transition-colors p-1.5 rounded-lg hover:bg-celeste/10"
               title="Modificar Camiseta"
             >
               <Pencil className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => handleClickActualizarFoto(idJugador)}
-              className="text-gray-400 hover:text-primary-600 transition-colors p-1.5 rounded-lg hover:bg-gray-100"
+              className="text-slate-400 hover:text-celeste transition-colors p-1.5 rounded-lg hover:bg-white/10"
               title="Actualizar Foto de Perfil"
             >
               <ImageIcon className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => handleOpenEliminarModal(row)}
-              className="text-gray-400 hover:text-red-600 transition-colors p-1.5 rounded-lg hover:bg-red-50"
+              className="text-slate-400 hover:text-red-300 transition-colors p-1.5 rounded-lg hover:bg-red-500/15"
               title="Quitar de la Plantilla"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -777,17 +770,17 @@ export function GestorPlantilla({
 
     if (inscripciones.length === 0) {
       return (
-        <div className="max-w-md mx-auto my-12 p-8 bg-white rounded-2xl border border-gray-200 text-center shadow-sm flex flex-col items-center">
-          <div className="p-3 bg-gray-100 text-gray-500 rounded-2xl mb-4">
+        <div className="max-w-md mx-auto my-12 p-8 bg-marino-claro rounded-2xl border border-white/10 text-center shadow-sm flex flex-col items-center">
+          <div className="p-3 bg-white/10 text-slate-400 rounded-2xl mb-4">
             <Users className="w-8 h-8" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Sin Equipos Registrados</h2>
-          <p className="text-sm text-gray-600 mb-6 max-w-sm">
+          <h2 className="text-xl font-bold text-crema mb-2">Sin Equipos Registrados</h2>
+          <p className="text-sm text-slate-300 mb-6 max-w-sm">
             Aún no tienes ningún equipo registrado. Inicia el proceso de inscripción para armar tu plantilla.
           </p>
           <Link
             to="/delegado/inscripcion"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 transition-colors shadow-sm"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-celeste px-5 py-2.5 text-sm font-semibold text-marino hover:bg-white transition-colors shadow-sm"
           >
             Inscribir un Equipo
           </Link>
@@ -797,17 +790,17 @@ export function GestorPlantilla({
 
     if (inscripciones.length > 1 && !activeTeamId) {
       return (
-        <div className="max-w-md mx-auto my-12 p-8 bg-white rounded-2xl border border-gray-200 text-center shadow-sm flex flex-col items-center">
-          <div className="p-3 bg-primary-50 text-primary-600 rounded-2xl mb-4">
+        <div className="max-w-md mx-auto my-12 p-8 bg-marino-claro rounded-2xl border border-white/10 text-center shadow-sm flex flex-col items-center">
+          <div className="p-3 bg-oro/10 text-oro rounded-2xl mb-4">
             <Users className="w-8 h-8" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Selecciona un Equipo</h2>
-          <p className="text-sm text-gray-600 mb-6 max-w-sm">
+          <h2 className="text-xl font-bold text-crema mb-2">Selecciona un Equipo</h2>
+          <p className="text-sm text-slate-300 mb-6 max-w-sm">
             Tienes varios equipos registrados. Para gestionar la nómina de jugadores, primero debes elegir cuál equipo deseas administrar en tu panel.
           </p>
           <Link
             to="/delegado/dashboard"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 transition-colors shadow-sm"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-celeste px-5 py-2.5 text-sm font-semibold text-marino hover:bg-white transition-colors shadow-sm"
           >
             Ir al Panel de Equipos
           </Link>
@@ -819,14 +812,14 @@ export function GestorPlantilla({
       const isPendiente = (inscripcion.estado_inscripcion === 'pendiente' || inscripcion.estado === 'pendiente');
       const isBorrador = (inscripcion.estado_inscripcion === 'borrador' || inscripcion.estado === 'borrador');
       return (
-        <div className="max-w-md mx-auto my-12 p-8 bg-white rounded-2xl border border-amber-200 bg-amber-50/40 text-center shadow-sm flex flex-col items-center">
-          <div className="p-3 bg-amber-100 text-amber-700 rounded-2xl mb-4">
+        <div className="max-w-md mx-auto my-12 p-8 bg-marino-claro rounded-2xl border border-amber-400/30 bg-amber-500/10 text-center shadow-sm flex flex-col items-center">
+          <div className="p-3 bg-amber-500/15 text-amber-200 rounded-2xl mb-4">
             <AlertCircle className="w-8 h-8" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
+          <h2 className="text-xl font-bold text-crema mb-2">
             {isPendiente ? 'Inscripción en Revisión' : isBorrador ? 'Inscripción en Borrador' : 'Inscripción No Aprobada'}
           </h2>
-          <p className="text-sm text-gray-600 mb-6 max-w-sm">
+          <p className="text-sm text-slate-300 mb-6 max-w-sm">
             {isPendiente 
               ? 'La gestión de la plantilla oficial estará disponible una vez que el administrador evalúe y apruebe la inscripción de tu equipo.'
               : isBorrador
@@ -835,7 +828,7 @@ export function GestorPlantilla({
           </p>
           <Link
             to="/delegado/dashboard"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 transition-colors shadow-sm"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-marino px-5 py-2.5 text-sm font-semibold text-white hover:bg-marino transition-colors shadow-sm"
           >
             Volver al Panel
           </Link>
@@ -850,19 +843,19 @@ export function GestorPlantilla({
 
   if (isEditDisabled && !readOnly) {
     return (
-      <div className="max-w-md mx-auto my-12 p-8 bg-white rounded-2xl border border-blue-200 bg-blue-50/40 text-center shadow-sm flex flex-col items-center">
-        <div className="p-3 bg-blue-100 text-blue-700 rounded-2xl mb-4">
+      <div className="max-w-md mx-auto my-12 p-8 bg-marino-claro rounded-2xl border border-blue-400/30 bg-blue-500/10 text-center shadow-sm flex flex-col items-center">
+        <div className="p-3 bg-blue-500/15 text-blue-200 rounded-2xl mb-4">
           <Info className="w-8 h-8" />
         </div>
-        <h2 className="text-xl font-bold text-gray-900 mb-2">
+        <h2 className="text-xl font-bold text-crema mb-2">
           Torneo En Curso
         </h2>
-        <p className="text-sm text-gray-600 mb-6 max-w-sm">
+        <p className="text-sm text-slate-300 mb-6 max-w-sm">
           El torneo se encuentra activo. La edición de la plantilla (añadir, modificar o eliminar jugadores) está bloqueada. Para registrar lesiones o sanciones, por favor contacta a la administración.
         </p>
         <Link
           to="/delegado/dashboard"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 transition-colors shadow-sm"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-celeste px-5 py-2.5 text-sm font-semibold text-marino hover:bg-white transition-colors shadow-sm"
         >
           Volver al Panel
         </Link>
@@ -883,46 +876,46 @@ export function GestorPlantilla({
       {/* Título de la Página — ocultamos en modo wizard (el wizard tiene su propio encabezado) */}
       {!isWizardMode && (
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Gestión de Jugadores</h1>
-          <p className="text-xs text-gray-500">
+          <h1 className="font-display text-xl sm:text-2xl font-bold text-crema">Gestión de Jugadores</h1>
+          <p className="text-xs text-slate-400">
             Visualiza tu plantilla y registra nuevos perfiles para evaluación técnica.
           </p>
         </div>
       )}
 
       {/* Tarjeta Resumen de Cupos y Regulación (Min 10 - Max 18) */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-4.5 shadow-sm flex flex-col gap-3 max-w-4xl w-full mx-auto">
+      <div className="bg-marino-claro rounded-2xl border border-white/10 p-4 sm:p-4.5 shadow-sm flex flex-col gap-3 max-w-4xl w-full mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className={`p-2.5 rounded-xl shrink-0 ${
               isMaxReached 
-                ? 'bg-blue-50 text-blue-600' 
+                ? 'bg-blue-500/10 text-blue-300' 
                 : isMinReached 
-                  ? 'bg-emerald-50 text-emerald-600' 
-                  : 'bg-amber-50 text-amber-600'
+                  ? 'bg-emerald-500/10 text-emerald-300' 
+                  : 'bg-amber-500/10 text-amber-300'
             }`}>
               <Users className="w-5 h-5" />
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-bold text-gray-900 text-sm sm:text-base">
+                <h3 className="font-bold text-crema text-sm sm:text-base">
                   Cupo de Plantilla: {totalJugadores} / {MAX_JUGADORES}
                 </h3>
                 {isMaxReached ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-200">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-200 border border-blue-400/30">
                     <CheckCircle2 className="w-3.5 h-3.5" /> Cupo Lleno
                   </span>
                 ) : isMinReached ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-200 border border-emerald-400/30">
                     <CheckCircle2 className="w-3.5 h-3.5" /> Plantilla Habilitada
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-200 border border-amber-400/30">
                     <AlertCircle className="w-3.5 h-3.5" /> Faltan {faltantesMinimo} para habilitar
                   </span>
                 )}
               </div>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-xs text-slate-400 mt-0.5">
                 Reglamento oficial: Mínimo {MIN_JUGADORES} y máximo {MAX_JUGADORES} jugadores inscritos por equipo.
               </p>
             </div>
@@ -935,8 +928,8 @@ export function GestorPlantilla({
               title={isMaxReached ? `Se ha alcanzado el límite máximo de ${MAX_JUGADORES} jugadores` : 'Añadir nuevo jugador'}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl shadow-sm transition-all sm:w-auto w-full justify-center shrink-0 ${
                 isMaxReached 
-                  ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
-                  : 'bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed'
+                  ? 'bg-white/10 text-slate-400 border border-white/10 cursor-not-allowed'
+                  : 'bg-celeste text-marino hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed'
               }`}
             >
               <UserPlus className="h-4 w-4" />
@@ -947,11 +940,11 @@ export function GestorPlantilla({
 
         {/* Barra de Progreso */}
         <div className="w-full pt-1">
-          <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden flex">
+          <div className="w-full bg-white/10 h-2.5 rounded-full overflow-hidden flex">
             <div 
               className={`h-full transition-all duration-500 rounded-full ${
                 isMaxReached 
-                  ? 'bg-blue-600' 
+                  ? 'bg-celeste' 
                   : isMinReached 
                     ? 'bg-emerald-500' 
                     : 'bg-amber-500'
@@ -959,7 +952,7 @@ export function GestorPlantilla({
               style={{ width: `${porcentajeCapacidad}%` }}
             />
           </div>
-          <div className="flex justify-between text-[11px] text-gray-400 mt-1.5 font-medium">
+          <div className="flex justify-between text-[11px] text-slate-400 mt-1.5 font-medium">
             <span>0</span>
             <span>Mínimo {MIN_JUGADORES}</span>
             <span>Máximo {MAX_JUGADORES}</span>
@@ -968,8 +961,8 @@ export function GestorPlantilla({
 
         {/* Mensaje de advertencia si no cumple el mínimo */}
         {!isMinReached && totalJugadores > 0 && (
-          <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 flex items-start gap-2">
-            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <div className="p-3 bg-amber-500/10 border border-amber-400/30 rounded-xl text-xs text-amber-200 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
             <span>
               Tu equipo cuenta con <strong>{totalJugadores} jugadores</strong>. Recuerda registrar al menos <strong>{MIN_JUGADORES} jugadores</strong> para que tu equipo esté formalmente habilitado a participar en los partidos del torneo.
             </span>
@@ -980,8 +973,8 @@ export function GestorPlantilla({
       {/* Header Superior de la Plantilla */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
-          <h2 className="text-lg font-bold text-gray-900">Plantilla del Equipo</h2>
-          <p className="text-xs text-gray-500">Administra y registra a los jugadores oficiales en la plantilla de tu equipo.</p>
+          <h2 className="text-lg font-bold text-crema">Plantilla del Equipo</h2>
+          <p className="text-xs text-slate-400">Administra y registra a los jugadores oficiales en la plantilla de tu equipo.</p>
         </div>
       </div>
 
@@ -990,13 +983,13 @@ export function GestorPlantilla({
         
         {/* Columna Izquierda: Formulario Equilibrado */}
         {showForm && !readOnly && (
-          <div className="lg:col-span-5 xl:col-span-4 2xl:col-span-4 bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 shadow-sm relative animate-fade-in">
+          <div className="lg:col-span-5 xl:col-span-4 2xl:col-span-4 bg-marino-claro border border-white/10 rounded-2xl p-4 sm:p-5 shadow-sm relative animate-fade-in">
             {/* Botones de acción superior: Limpiar y Cerrar */}
             <div className="absolute top-4 right-4 flex items-center gap-1">
               <button 
                 type="button"
                 onClick={handleClearForm}
-                className="flex items-center gap-1 px-2 py-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors text-xs font-medium"
+                className="flex items-center gap-1 px-2 py-1 rounded-lg text-slate-400 hover:text-slate-300 hover:bg-white/10 transition-colors text-xs font-medium"
                 title="Limpiar campos del formulario"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
@@ -1005,7 +998,7 @@ export function GestorPlantilla({
               <button 
                 type="button"
                 onClick={handleResetForm}
-                className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-300 hover:bg-white/10 transition-colors"
                 title="Cerrar formulario"
               >
                 <X className="w-4 h-4" />
@@ -1013,10 +1006,10 @@ export function GestorPlantilla({
             </div>
 
             <div className="mb-3.5 pr-20">
-              <h3 className="text-lg font-bold text-gray-900 leading-tight">
+              <h3 className="text-lg font-bold text-crema leading-tight">
                 {isExistingPlayer ? 'Vincular Jugador Existente' : 'Registrar Nuevo Jugador'}
               </h3>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-xs text-slate-400 mt-0.5">
                 {isExistingPlayer 
                   ? 'Jugador verificado. Asigna la camiseta para integrarlo.'
                   : 'Ingresa los datos personales y documentos del jugador.'}
@@ -1025,15 +1018,15 @@ export function GestorPlantilla({
 
             {/* Banner de Categoría y Rango de Edad */}
             {categoriaActiva && (
-              <div className="mb-3 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-                <div className="flex items-center gap-1.5 text-blue-900 font-medium truncate">
-                  <Trophy className="w-4 h-4 text-blue-600 shrink-0" />
+              <div className="mb-3 p-3 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-400/30 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                <div className="flex items-center gap-1.5 text-blue-100 font-medium truncate">
+                  <Trophy className="w-4 h-4 text-blue-300 shrink-0" />
                   <span className="truncate">
                     <strong>Categoría:</strong> {categoriaActiva.nombre_categoria || categoriaActiva.nombre}
                     {categoriaActiva.genero_categoria ? ` (${categoriaActiva.genero_categoria})` : ''}
                   </span>
                 </div>
-                <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-600 text-white font-bold text-[11px] self-start sm:self-auto shrink-0 shadow-2xs">
+                <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 text-slate-200 ring-1 ring-white/10 font-bold text-[11px] self-start sm:self-auto shrink-0 shadow-2xs">
                   <span>Edad permitida:</span>
                   <span>
                     {categoriaActiva.edad_minima ?? 0}
@@ -1044,14 +1037,14 @@ export function GestorPlantilla({
             )}
 
             {/* Aviso superior de campos obligatorios */}
-            <div className="mb-3 p-2.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-2 text-xs text-amber-800 font-medium">
-              <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
-              <span>Los campos con <span className="text-red-500 font-bold">*</span> son obligatorios.</span>
+            <div className="mb-3 p-2.5 bg-amber-500/10 border border-amber-400/30 rounded-xl flex items-center gap-2 text-xs text-amber-200 font-medium">
+              <AlertTriangle className="w-4 h-4 text-amber-300 flex-shrink-0" />
+              <span>Los campos con <span className="text-red-400 font-bold">*</span> son obligatorios.</span>
             </div>
 
             {isExistingPlayer && (
-              <div className="mb-3 p-2.5 bg-blue-50 border border-blue-200 rounded-xl flex items-center gap-2 text-xs text-blue-800 font-medium">
-                <CheckCircle2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
+              <div className="mb-3 p-2.5 bg-blue-500/10 border border-blue-400/30 rounded-xl flex items-center gap-2 text-xs text-blue-200 font-medium">
+                <CheckCircle2 className="w-4 h-4 text-blue-300 flex-shrink-0" />
                 <span>Datos oficiales bloqueados para proteger el perfil.</span>
               </div>
             )}
@@ -1061,8 +1054,8 @@ export function GestorPlantilla({
               {/* Fila 1: Documento de Identidad + Camiseta */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    Doc. Identidad <span className="text-red-500 ml-0.5">*</span>
+                  <label className="mb-1 block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    Doc. Identidad <span className="text-red-400 ml-0.5">*</span>
                   </label>
                   <div className="relative">
                     <input 
@@ -1081,24 +1074,24 @@ export function GestorPlantilla({
                       disabled={isExistingPlayer}
                       className={`w-full rounded-xl border px-3 py-2 text-sm transition-all focus:outline-none ${
                         isExistingPlayer 
-                          ? 'bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed' 
-                          : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-100'
+                          ? 'bg-white/10 text-slate-400 border-white/10 cursor-not-allowed' 
+                          : 'border-white/15 focus:border-celeste focus:ring-2 focus:ring-celeste/25'
                       }`} 
                     />
                     {isCheckingCedula && (
                       <div className="absolute right-3 top-2.5">
-                        <div className="w-4 h-4 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-celeste border-t-transparent rounded-full animate-spin" />
                       </div>
                     )}
                   </div>
                   {errors.documento_identificacion && (
-                    <p className="mt-1 text-xs text-red-600">{errors.documento_identificacion.message}</p>
+                    <p className="mt-1 text-xs text-red-300">{errors.documento_identificacion.message}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-gray-700">
-                    N° Camiseta <span className="text-red-500 ml-0.5">*</span>
+                  <label className="mb-1 block text-xs font-semibold text-slate-300">
+                    N° Camiseta <span className="text-red-400 ml-0.5">*</span>
                   </label>
                   <input 
                     type="number" 
@@ -1108,21 +1101,21 @@ export function GestorPlantilla({
                     {...register('numero_camiseta', { valueAsNumber: true })} 
                     className={`w-full rounded-xl border px-3 py-2 text-sm transition-all focus:outline-none ${
                       dorsalDuplicado
-                        ? 'border-red-400 bg-red-50/20 focus:border-red-500 focus:ring-2 focus:ring-red-100'
-                        : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-100'
+                        ? 'border-red-400 bg-red-500/10 focus:border-red-400 focus:ring-2 focus:ring-red-400/30'
+                        : 'border-white/15 focus:border-celeste focus:ring-2 focus:ring-celeste/25'
                     }`} 
                   />
-                  {errors.numero_camiseta && <p className="mt-1 text-xs text-red-600">{errors.numero_camiseta.message}</p>}
+                  {errors.numero_camiseta && <p className="mt-1 text-xs text-red-300">{errors.numero_camiseta.message}</p>}
                   {dorsalDuplicado && !errors.numero_camiseta && (
-                    <p className="mt-1 text-xs text-red-600 font-medium animate-fade-in">{dorsalDuplicado}</p>
+                    <p className="mt-1 text-xs text-red-300 font-medium animate-fade-in">{dorsalDuplicado}</p>
                   )}
                 </div>
               </div>
 
               {/* Fila 2: Nombres y Apellidos */}
               <div>
-                <label className="mb-1 block text-xs font-semibold text-gray-700">
-                  Nombres y Apellidos <span className="text-red-500 ml-0.5">*</span>
+                <label className="mb-1 block text-xs font-semibold text-slate-300">
+                  Nombres y Apellidos <span className="text-red-400 ml-0.5">*</span>
                 </label>
                 <input 
                   type="text" 
@@ -1133,18 +1126,18 @@ export function GestorPlantilla({
                   disabled={isExistingPlayer}
                   className={`w-full rounded-xl border px-3 py-2 text-sm transition-all focus:outline-none ${
                     isExistingPlayer 
-                      ? 'bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed' 
-                      : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-100'
+                      ? 'bg-white/10 text-slate-400 border-white/10 cursor-not-allowed' 
+                      : 'border-white/15 focus:border-celeste focus:ring-2 focus:ring-celeste/25'
                   }`} 
                 />
-                {errors.nombre && <p className="mt-1 text-xs text-red-600">{errors.nombre.message}</p>}
+                {errors.nombre && <p className="mt-1 text-xs text-red-300">{errors.nombre.message}</p>}
               </div>
 
               {/* Fila 3: Fecha de Nacimiento y Edad */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-gray-700">
-                    Fecha Nacimiento <span className="text-red-500 ml-0.5">*</span>
+                  <label className="mb-1 block text-xs font-semibold text-slate-300">
+                    Fecha Nacimiento <span className="text-red-400 ml-0.5">*</span>
                   </label>
                   <input 
                     type="date" 
@@ -1152,16 +1145,16 @@ export function GestorPlantilla({
                     disabled={isExistingPlayer}
                     className={`w-full rounded-xl border px-3 py-2 text-sm transition-all focus:outline-none ${
                       isExistingPlayer 
-                        ? 'bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed' 
+                        ? 'bg-white/10 text-slate-400 border-white/10 cursor-not-allowed' 
                         : errorEdad
-                          ? 'border-red-400 bg-red-50/20 focus:border-red-500 focus:ring-2 focus:ring-red-100'
-                          : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-100'
+                          ? 'border-red-400 bg-red-500/10 focus:border-red-400 focus:ring-2 focus:ring-red-400/30'
+                          : 'border-white/15 focus:border-celeste focus:ring-2 focus:ring-celeste/25'
                     }`} 
                   />
-                  {errors.fecha_nacimiento && <p className="mt-1 text-xs text-red-600">{errors.fecha_nacimiento.message}</p>}
+                  {errors.fecha_nacimiento && <p className="mt-1 text-xs text-red-300">{errors.fecha_nacimiento.message}</p>}
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-gray-700">Edad Calculada</label>
+                  <label className="mb-1 block text-xs font-semibold text-slate-300">Edad Calculada</label>
                   <input 
                     type="text" 
                     readOnly
@@ -1169,10 +1162,10 @@ export function GestorPlantilla({
                     placeholder="Autocalculada"
                     className={`w-full rounded-xl border px-3 py-2 text-sm font-semibold cursor-not-allowed transition-colors ${
                       errorEdad 
-                        ? 'border-red-300 bg-red-50 text-red-700' 
+                        ? 'border-red-400/40 bg-red-500/10 text-red-200' 
                         : edadCalculada !== null 
-                          ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
-                          : 'border-gray-200 bg-gray-100 text-gray-600'
+                          ? 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200'
+                          : 'border-white/10 bg-white/10 text-slate-300'
                     }`} 
                   />
                 </div>
@@ -1180,14 +1173,14 @@ export function GestorPlantilla({
 
               {/* Mensaje reactivo de validación de edad */}
               {errorEdad && (
-                <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-start gap-2 animate-fade-in">
-                  <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                <div className="p-2.5 bg-red-500/10 border border-red-400/30 rounded-xl text-xs text-red-200 flex items-start gap-2 animate-fade-in">
+                  <AlertCircle className="w-4 h-4 text-red-300 shrink-0 mt-0.5" />
                   <span className="font-medium">{errorEdad}</span>
                 </div>
               )}
               {!errorEdad && edadCalculada !== null && categoriaActiva && (
-                <div className="p-2 bg-emerald-50/80 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center gap-1.5 animate-fade-in">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <div className="p-2 bg-emerald-500/10 border border-emerald-400/30 rounded-xl text-xs text-emerald-200 flex items-center gap-1.5 animate-fade-in">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
                   <span>Edad válida ({edadCalculada} años) para <strong>{categoriaActiva.nombre_categoria || categoriaActiva.nombre}</strong>.</span>
                 </div>
               )}
@@ -1195,8 +1188,8 @@ export function GestorPlantilla({
               {/* Fila 4: Teléfono y Correo */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-gray-700">
-                    Teléfono <span className="text-red-500 ml-0.5">*</span>
+                  <label className="mb-1 block text-xs font-semibold text-slate-300">
+                    Teléfono <span className="text-red-400 ml-0.5">*</span>
                   </label>
                   <input 
                     type="text" 
@@ -1208,38 +1201,38 @@ export function GestorPlantilla({
                     disabled={isExistingPlayer}
                     className={`w-full rounded-xl border px-3 py-2 text-sm transition-all focus:outline-none ${
                       isExistingPlayer 
-                        ? 'bg-gray-100 text-gray-500 border-gray-200 cursor-not-allowed' 
-                        : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-100'
+                        ? 'bg-white/10 text-slate-400 border-white/10 cursor-not-allowed' 
+                        : 'border-white/15 focus:border-celeste focus:ring-2 focus:ring-celeste/25'
                     }`} 
                   />
-                  {errors.telefono && <p className="mt-1 text-xs text-red-600">{errors.telefono.message}</p>}
+                  {errors.telefono && <p className="mt-1 text-xs text-red-300">{errors.telefono.message}</p>}
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-gray-700">Correo (Opcional)</label>
+                  <label className="mb-1 block text-xs font-semibold text-slate-300">Correo (Opcional)</label>
                   <input 
                     type="email" 
                     placeholder="ejemplo@correo.com"
                     {...register('correo')} 
-                    className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-100 focus:outline-none" 
+                    className="w-full rounded-xl border border-white/15 px-3 py-2 text-sm focus:border-celeste focus:ring-2 focus:ring-celeste/25 focus:outline-none" 
                   />
-                  {errors.correo && <p className="mt-1 text-xs text-red-600">{errors.correo.message}</p>}
+                  {errors.correo && <p className="mt-1 text-xs text-red-300">{errors.correo.message}</p>}
                 </div>
               </div>
 
               {/* Separador y Mini Cards de Documentos */}
-              <div className="pt-2 border-t border-gray-100">
-                <p className="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">Documentos Adjuntos Opcionales (Máx 4 MB)</p>
+              <div className="pt-2 border-t border-white/10">
+                <p className="text-xs font-bold text-crema uppercase tracking-wider mb-2">Documentos Adjuntos Opcionales (Máx 4 MB)</p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   
                   {/* Foto de Perfil */}
-                  <div className={`relative rounded-xl border p-2.5 flex flex-col justify-between transition-colors ${fotoFile ? 'border-primary-300 bg-primary-50/40' : 'border-gray-200 bg-gray-50/50 hover:bg-gray-50'}`}>
+                  <div className={`relative rounded-xl border p-2.5 flex flex-col justify-between transition-colors ${fotoFile ? 'border-celeste/50 bg-celeste/5' : 'border-white/10 bg-white/[0.03] hover:bg-white/5'}`}>
                     <div className="flex items-center justify-between gap-1 mb-1.5">
-                      <span className="text-[11px] font-bold text-gray-700 uppercase tracking-wide truncate">Foto de perfil</span>
+                      <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wide truncate">Foto de perfil</span>
                       {fotoFile && (
                         <button 
                           type="button" 
                           onClick={() => { setFotoFile(null); if (fotoInputRef.current) fotoInputRef.current.value = ''; }}
-                          className="text-red-500 hover:text-red-700 p-0.5 rounded"
+                          className="text-red-400 hover:text-red-200 p-0.5 rounded"
                           title="Quitar"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -1256,22 +1249,22 @@ export function GestorPlantilla({
                     />
                     <label 
                       htmlFor="input-doc-foto" 
-                      className="cursor-pointer flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-white border border-gray-200 hover:border-primary-400 text-xs font-medium text-gray-700 hover:text-primary-700 transition-all truncate shadow-2xs"
+                      className="cursor-pointer flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-marino-claro border border-white/10 hover:border-celeste/50 text-xs font-medium text-slate-300 hover:text-celeste transition-all truncate shadow-2xs"
                     >
-                      <ImageIcon className="w-3.5 h-3.5 flex-shrink-0 text-gray-400" />
+                      <ImageIcon className="w-3.5 h-3.5 flex-shrink-0 text-slate-400" />
                       <span className="truncate">{fotoFile ? fotoFile.name : 'Subir foto'}</span>
                     </label>
                   </div>
 
                   {/* Cédula */}
-                  <div className={`relative rounded-xl border p-2.5 flex flex-col justify-between transition-colors ${cedulaFile ? 'border-primary-300 bg-primary-50/40' : 'border-gray-200 bg-gray-50/50 hover:bg-gray-50'}`}>
+                  <div className={`relative rounded-xl border p-2.5 flex flex-col justify-between transition-colors ${cedulaFile ? 'border-celeste/50 bg-celeste/5' : 'border-white/10 bg-white/[0.03] hover:bg-white/5'}`}>
                     <div className="flex items-center justify-between gap-1 mb-1.5">
-                      <span className="text-[11px] font-bold text-gray-700 uppercase tracking-wide truncate">Cédula</span>
+                      <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wide truncate">Cédula</span>
                       {cedulaFile && (
                         <button 
                           type="button" 
                           onClick={() => { setCedulaFile(null); if (cedulaInputRef.current) cedulaInputRef.current.value = ''; }}
-                          className="text-red-500 hover:text-red-700 p-0.5 rounded"
+                          className="text-red-400 hover:text-red-200 p-0.5 rounded"
                           title="Quitar"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -1288,22 +1281,22 @@ export function GestorPlantilla({
                     />
                     <label 
                       htmlFor="input-doc-cedula" 
-                      className="cursor-pointer flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-white border border-gray-200 hover:border-primary-400 text-xs font-medium text-gray-700 hover:text-primary-700 transition-all truncate shadow-2xs"
+                      className="cursor-pointer flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-marino-claro border border-white/10 hover:border-celeste/50 text-xs font-medium text-slate-300 hover:text-celeste transition-all truncate shadow-2xs"
                     >
-                      <FileText className="w-3.5 h-3.5 flex-shrink-0 text-gray-400" />
+                      <FileText className="w-3.5 h-3.5 flex-shrink-0 text-slate-400" />
                       <span className="truncate">{cedulaFile ? cedulaFile.name : 'Subir cédula'}</span>
                     </label>
                   </div>
 
                   {/* Acta de Bachiller */}
-                  <div className={`relative rounded-xl border p-2.5 flex flex-col justify-between transition-colors ${actaFile ? 'border-primary-300 bg-primary-50/40' : 'border-gray-200 bg-gray-50/50 hover:bg-gray-50'}`}>
+                  <div className={`relative rounded-xl border p-2.5 flex flex-col justify-between transition-colors ${actaFile ? 'border-celeste/50 bg-celeste/5' : 'border-white/10 bg-white/[0.03] hover:bg-white/5'}`}>
                     <div className="flex items-center justify-between gap-1 mb-1.5">
-                      <span className="text-[11px] font-bold text-gray-700 uppercase tracking-wide truncate">Acta Bach.</span>
+                      <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wide truncate">Acta Bach.</span>
                       {actaFile && (
                         <button 
                           type="button" 
                           onClick={() => { setActaFile(null); if (actaInputRef.current) actaInputRef.current.value = ''; }}
-                          className="text-red-500 hover:text-red-700 p-0.5 rounded"
+                          className="text-red-400 hover:text-red-200 p-0.5 rounded"
                           title="Quitar"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -1320,9 +1313,9 @@ export function GestorPlantilla({
                     />
                     <label 
                       htmlFor="input-doc-acta" 
-                      className="cursor-pointer flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-white border border-gray-200 hover:border-primary-400 text-xs font-medium text-gray-700 hover:text-primary-700 transition-all truncate shadow-2xs"
+                      className="cursor-pointer flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-marino-claro border border-white/10 hover:border-celeste/50 text-xs font-medium text-slate-300 hover:text-celeste transition-all truncate shadow-2xs"
                     >
-                      <FileText className="w-3.5 h-3.5 flex-shrink-0 text-gray-400" />
+                      <FileText className="w-3.5 h-3.5 flex-shrink-0 text-slate-400" />
                       <span className="truncate">{actaFile ? actaFile.name : 'Subir acta'}</span>
                     </label>
                   </div>
@@ -1331,11 +1324,11 @@ export function GestorPlantilla({
               </div>
 
               {/* Tarjeta Informativa de Edición */}
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-800 flex items-start gap-2">
-                <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+              <div className="p-3 bg-blue-500/10 border border-blue-400/30 rounded-xl text-xs text-blue-200 flex items-start gap-2">
+                <Info className="w-4 h-4 text-blue-300 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="font-semibold mb-0.5">Información</p>
-                  <p className="text-blue-700 leading-relaxed">Si necesitas editar los datos de un jugador ya registrado, comunícate con el administrador del torneo.</p>
+                  <p className="text-blue-200 leading-relaxed">Si necesitas editar los datos de un jugador ya registrado, comunícate con el administrador del torneo.</p>
                 </div>
               </div>
               
@@ -1344,10 +1337,10 @@ export function GestorPlantilla({
                 <AsyncButton 
                   onClickAction={handleSubmit(onSubmit)} 
                   disabled={!isValid || !!errorEdad || isCheckingCedula || !!dorsalDuplicado}
-                  className={`w-full py-3 text-white rounded-xl font-bold shadow-sm transition-all text-sm ${
+                  className={`w-full py-3 rounded-xl font-bold shadow-sm transition-all text-sm ${
                     isValid && !errorEdad && !isCheckingCedula && !dorsalDuplicado
-                      ? 'bg-primary-600 hover:bg-primary-700 cursor-pointer' 
-                      : 'bg-gray-300 cursor-not-allowed opacity-60'
+                      ? 'bg-celeste text-marino hover:bg-white cursor-pointer' 
+                      : 'bg-white/20 cursor-not-allowed opacity-60'
                   }`}
                 >
                   {isExistingPlayer ? 'Vincular Jugador a Plantilla' : 'Guardar Jugador'}
@@ -1360,7 +1353,7 @@ export function GestorPlantilla({
         {/* Columna Derecha (o ancho completo centrado): Tabla de la Plantilla */}
         <div className={showForm ? 'lg:col-span-7 xl:col-span-8 2xl:col-span-8 min-w-0' : 'max-w-4xl w-full mx-auto'}>
           {isError ? (
-            <div className="text-red-500 text-center py-6 bg-red-50 rounded-2xl border border-red-100 font-medium text-sm">
+            <div className="text-red-400 text-center py-6 bg-red-500/10 rounded-2xl border border-red-400/20 font-medium text-sm">
               Error al cargar la plantilla del equipo.
             </div>
           ) : isLoading ? (
@@ -1369,10 +1362,10 @@ export function GestorPlantilla({
             <EmptyState
               title="Plantilla Vacía"
               description="Aún no tienes jugadores inscritos en tu plantilla oficial."
-              icon={<UserPlus className="mx-auto h-12 w-12 text-gray-400" />}
+              icon={<UserPlus className="mx-auto h-12 w-12 text-slate-400" />}
             />
           ) : (
-            <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+            <div className="bg-marino-claro rounded-2xl border border-white/10 overflow-hidden shadow-sm">
               <DataGridTable
                 columns={columns}
                 data={plantilla}
@@ -1388,31 +1381,31 @@ export function GestorPlantilla({
       {isWizardMode && (
         <div className={`rounded-2xl border-2 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4 transition-all duration-300 max-w-4xl w-full mx-auto ${
           isMinReached
-            ? 'border-emerald-300 bg-gradient-to-r from-emerald-50 to-teal-50 shadow-md shadow-emerald-100'
-            : 'border-amber-200 bg-amber-50'
+            ? 'border-emerald-400/40 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 shadow-md shadow-emerald-100'
+            : 'border-amber-400/30 bg-amber-500/10'
         }`}>
           <div className="flex items-center gap-3 flex-1">
             <div className={`p-2.5 rounded-xl shrink-0 ${
-              isMinReached ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+              isMinReached ? 'bg-emerald-500/15 text-emerald-200' : 'bg-amber-500/15 text-amber-200'
             }`}>
               <Trophy className="w-5 h-5" />
             </div>
             <div>
               {isMinReached ? (
                 <>
-                  <p className="font-bold text-emerald-900 text-sm">
+                  <p className="font-bold text-emerald-100 text-sm">
                     ¡Nómina lista para competir — {totalJugadores}/{MAX_JUGADORES} jugadores registrados!
                   </p>
-                  <p className="text-xs text-emerald-700 mt-0.5">
+                  <p className="text-xs text-emerald-200 mt-0.5">
                     Tu equipo cumple el reglamento. Pulsa <strong>Inscribir Equipo</strong> para enviar la solicitud al administrador.
                   </p>
                 </>
               ) : (
                 <>
-                  <p className="font-bold text-amber-900 text-sm">
+                  <p className="font-bold text-amber-100 text-sm">
                     Faltan {faltantesMinimo} jugador{faltantesMinimo !== 1 ? 'es' : ''} para poder inscribir tu equipo
                   </p>
-                  <p className="text-xs text-amber-700 mt-0.5">
+                  <p className="text-xs text-amber-200 mt-0.5">
                     Añade al menos <strong>{MIN_JUGADORES} jugadores</strong> para habilitar el botón de envío.
                   </p>
                 </>
@@ -1426,8 +1419,8 @@ export function GestorPlantilla({
             onClick={handlePreFinalizar}
             className={`flex items-center gap-2.5 px-5 py-3 rounded-xl font-bold text-sm transition-all shrink-0 shadow-sm sm:w-auto w-full justify-center ${
               isMinReached && !isSubmittingInscripcion
-                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200 hover:shadow-emerald-300 hover:shadow-md cursor-pointer'
-                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                ? 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-100 shadow-emerald-200 hover:shadow-emerald-300 hover:shadow-md cursor-pointer'
+                : 'bg-white/10 text-slate-400 cursor-not-allowed'
             }`}
           >
             {isSubmittingInscripcion ? (

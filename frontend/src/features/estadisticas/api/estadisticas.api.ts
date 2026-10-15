@@ -33,7 +33,9 @@ export async function postEstadisticasBulk(data: any): Promise<ApiResponse<any>>
 
 
 // Totales públicos de la portada (sin autenticación)
-export async function getEstadisticasPublicas(): Promise<ApiResponse<{ puntos_totales: number }>> {
+export async function getEstadisticasPublicas(): Promise<
+  ApiResponse<{ puntos_totales: number; puntos_por_torneo?: Record<string, number> }>
+> {
   const response = await axiosInstance.get('/estadisticas/publicas');
   return response.data;
 }

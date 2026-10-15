@@ -19,29 +19,10 @@ interface SidebarProps {
   userRole?: string | null;
   /** Desde qué ancho se oculta (el mismo en que aparece la barra completa) */
   ocultarDesde?: string;
-  /** En las páginas oscuras el menú toma la paleta de la página */
-  oscuro?: boolean;
 }
 
-const CLARO = {
-  panel: 'bg-white',
-  borde: 'border-gray-200',
-  logo: '/logo.png',
-  titulo: 'text-primary-600',
-  cerrar: 'text-gray-500 hover:bg-gray-100',
-  tarjeta: 'bg-gray-50 border-gray-100',
-  inicial: 'bg-primary-100 text-primary-700',
-  nombre: 'text-gray-900',
-  rol: 'text-gray-500',
-  activo: 'bg-primary-50 text-primary-600',
-  inactivo: 'text-gray-700 hover:bg-gray-100 hover:text-gray-900',
-  deshabilitado: 'text-gray-400 bg-gray-50',
-  rotulo: 'text-gray-400',
-  icono: 'text-gray-500',
-  salir: 'text-red-600 hover:bg-red-50',
-};
-
-const OSCURO: typeof CLARO = {
+// Misma noche que el resto del sitio (marino, crema y oro)
+const t = {
   panel: 'bg-marino border-r border-white/10',
   borde: 'border-white/10',
   logo: '/img/logo-recortado.webp',
@@ -73,10 +54,8 @@ export function Sidebar({
   userName,
   userRole,
   ocultarDesde = 'lg:hidden',
-  oscuro = false,
 }: SidebarProps) {
   const userInitial = userName ? userName.trim().charAt(0).toUpperCase() : 'U';
-  const t = oscuro ? OSCURO : CLARO;
   const enlace = ({ isActive }: { isActive: boolean }) => `rounded-md px-3 py-2 text-sm font-medium ${isActive ? t.activo : t.inactivo}`;
 
   return (

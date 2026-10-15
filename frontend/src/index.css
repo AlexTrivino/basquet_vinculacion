@@ -3,11 +3,10 @@
 /*
  * ─── Design Tokens del Proyecto ──────────────────────────────────
  *
- * Paleta neutra institucional para el shell de la app.
- * Los colores dinámicos por torneo se inyectan via CSS custom
- * properties en runtime (--torneo-primary, --torneo-accent).
+ * Una sola paleta para todo el sitio, público y operativo: la noche marino
+ * del cartel con oro, crema y el celeste de acción (ver DESIGN.md).
  *
- * Tipografía: Inter (Google Fonts) — importada en index.html.
+ * Tipografía: Inter y Cinzel (Google Fonts), importadas en index.html.
  */
 
 @theme {
@@ -15,51 +14,17 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Cinzel", ui-serif, Georgia, serif;
 
-  /* ── Página de inicio: colores del logo + dorado para logros ─── */
+  /* ── Colores del logo + dorado para logros ─────────────────────── */
   --color-marino: #081226;
   --color-marino-claro: #0E1D3D;
   --color-celeste: #29A9E1;
   --color-oro: #D6B36A;
   --color-crema: #F1E7D0;
 
-  /* ── Paleta neutra institucional (Shell) ─────────────────────── */
-  --color-primary-50: #EFF6FF;
-  --color-primary-100: #DBEAFE;
-  --color-primary-200: #BFDBFE;
-  --color-primary-300: #93C5FD;
-  --color-primary-400: #60A5FA;
-  --color-primary-500: #3B82F6;
-  --color-primary-600: #2563EB;
-  --color-primary-700: #1D4ED8;
-  --color-primary-800: #1E3A5F;
-  --color-primary-900: #0F172A;
-
-  --color-accent-500: #F59E0B;
-  --color-accent-600: #D97706;
-
-  --color-success-500: #22C55E;
-  --color-danger-500: #EF4444;
-  --color-warning-500: #F59E0B;
-
   /* ── Bordes ──────────────────────────────────────────────────── */
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
   --radius-2xl: 1rem;
-}
-
-/*
- * ─── Colores Dinámicos por Torneo ────────────────────────────────
- *
- * Estas variables se inyectan en runtime desde React al cargar un
- * torneo. Se consumen via: bg-[var(--torneo-primary)]
- *
- * Defaults: heredan de la paleta institucional para evitar
- * flashes de contenido sin estilo.
- */
-:root {
-  --torneo-primary: #1D4ED8;
-  --torneo-accent: #F59E0B;
-  --torneo-bg: #EFF6FF;
 }
 
 /*
@@ -202,26 +167,23 @@
   animation-play-state: paused;
 }
 
-/* Superficies del navegador en la página de inicio (selección, foco, scrollbar) */
-html:has(.tema-cartel) {
+/* Superficies del navegador: todo el sitio es la misma noche, también las pantallas operativas */
+html {
   color-scheme: dark; /* selects, scrollbars y controles nativos en oscuro */
   background-color: var(--color-marino);
   scrollbar-color: color-mix(in srgb, var(--color-celeste) 45%, var(--color-marino)) var(--color-marino);
-}
-html:has(.tema-cartel) ::selection {
-  background-color: var(--color-oro);
-  color: var(--color-marino);
-}
-.tema-cartel {
   caret-color: var(--color-celeste);
   accent-color: var(--color-celeste);
 }
-/* html:has(): el navbar vive fuera de <main>, pero en la portada también lleva el foco celeste */
-html:has(.tema-cartel) :focus-visible {
+::selection {
+  background-color: var(--color-oro);
+  color: var(--color-marino);
+}
+:focus-visible {
   outline: 2px solid var(--color-celeste);
   outline-offset: 3px;
 }
-.tema-cartel a {
+a {
   text-underline-offset: 4px;
 }
 
@@ -233,13 +195,7 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: #F8FAFC;
-  color: #0F172A;
+  background-color: var(--color-marino);
+  color: #F1F5F9; /* slate-100 */
   min-height: 100dvh;
-}
-
-/* Focus visible accesible para navegación por teclado */
-*:focus-visible {
-  outline: 2px solid var(--color-primary-500);
-  outline-offset: 2px;
 }

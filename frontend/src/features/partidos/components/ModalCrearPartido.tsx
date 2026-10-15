@@ -103,14 +103,14 @@ export function ModalCrearPartido({ onClose, defaultTorneo = '' }: ModalCrearPar
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden relative animate-fade-in-up">
+      <div className="bg-marino-claro rounded-xl shadow-xl w-full max-w-2xl overflow-hidden relative animate-fade-in-up">
         {/* Header */}
-        <div className="bg-gray-50 border-b border-gray-100 px-6 py-4 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-primary-600" />
+        <div className="bg-white/5 border-b border-white/10 px-6 py-4 flex items-center justify-between">
+          <h3 className="text-lg font-bold text-crema flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-oro" />
             Programar Nuevo Partido
           </h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-300">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -120,7 +120,7 @@ export function ModalCrearPartido({ onClose, defaultTorneo = '' }: ModalCrearPar
             
             {/* Torneo */}
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-gray-700">Torneo</label>
+              <label className="mb-1 block text-sm font-medium text-slate-300">Torneo</label>
               <SearchableSelect
                 options={torneoOptions}
                 value={watchTorneo || ''}
@@ -132,12 +132,12 @@ export function ModalCrearPartido({ onClose, defaultTorneo = '' }: ModalCrearPar
                 }}
                 disabled={loadingTorneos}
               />
-              {errors.id_torneo && <p className="mt-1 text-xs text-red-600">{errors.id_torneo.message as string}</p>}
+              {errors.id_torneo && <p className="mt-1 text-xs text-red-300">{errors.id_torneo.message as string}</p>}
             </div>
 
             {/* Categoría */}
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-gray-700">Categoría</label>
+              <label className="mb-1 block text-sm font-medium text-slate-300">Categoría</label>
               <SearchableSelect
                 options={categoriaOptions}
                 value={watchCategoria || ''}
@@ -148,63 +148,63 @@ export function ModalCrearPartido({ onClose, defaultTorneo = '' }: ModalCrearPar
                 }}
                 disabled={!watchTorneo || categoriaOptions.length === 0}
               />
-              {errors.id_categoria && <p className="mt-1 text-xs text-red-600">{errors.id_categoria.message as string}</p>}
+              {errors.id_categoria && <p className="mt-1 text-xs text-red-300">{errors.id_categoria.message as string}</p>}
             </div>
 
             {/* Equipo Local */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Equipo Local</label>
+              <label className="mb-1 block text-sm font-medium text-slate-300">Equipo Local</label>
               <SearchableSelect
                 options={equiposOpciones.filter(o => o.value !== watchVisitante)}
                 value={watchLocal || ''}
                 onChange={(v) => setValue('id_equipo_local', v as number)}
                 disabled={!watchCategoria || loadingInscripciones}
               />
-              {errors.id_equipo_local && <p className="mt-1 text-xs text-red-600">{errors.id_equipo_local.message as string}</p>}
+              {errors.id_equipo_local && <p className="mt-1 text-xs text-red-300">{errors.id_equipo_local.message as string}</p>}
             </div>
 
             {/* Equipo Visitante */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Equipo Visitante</label>
+              <label className="mb-1 block text-sm font-medium text-slate-300">Equipo Visitante</label>
               <SearchableSelect
                 options={equiposOpciones.filter(o => o.value !== watchLocal)}
                 value={watchVisitante || ''}
                 onChange={(v) => setValue('id_equipo_visitante', v as number)}
                 disabled={!watchCategoria || loadingInscripciones}
               />
-              {errors.id_equipo_visitante && <p className="mt-1 text-xs text-red-600">{errors.id_equipo_visitante.message as string}</p>}
+              {errors.id_equipo_visitante && <p className="mt-1 text-xs text-red-300">{errors.id_equipo_visitante.message as string}</p>}
             </div>
 
             {/* Fecha y Hora */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Fecha</label>
-              <input type="date" {...register('fecha')} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
-              {errors.fecha && <p className="mt-1 text-xs text-red-600">{errors.fecha.message as string}</p>}
+              <label className="mb-1 block text-sm font-medium text-slate-300">Fecha</label>
+              <input type="date" {...register('fecha')} className="w-full rounded-md border border-white/15 px-3 py-2 text-sm focus:border-celeste focus:outline-none" />
+              {errors.fecha && <p className="mt-1 text-xs text-red-300">{errors.fecha.message as string}</p>}
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Hora</label>
-              <input type="time" {...register('hora')} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
-              {errors.hora && <p className="mt-1 text-xs text-red-600">{errors.hora.message as string}</p>}
+              <label className="mb-1 block text-sm font-medium text-slate-300">Hora</label>
+              <input type="time" {...register('hora')} className="w-full rounded-md border border-white/15 px-3 py-2 text-sm focus:border-celeste focus:outline-none" />
+              {errors.hora && <p className="mt-1 text-xs text-red-300">{errors.hora.message as string}</p>}
             </div>
 
             {/* Fase y Ubicación */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Fase</label>
-              <input type="text" placeholder="Ej: Grupos" {...register('fase')} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
-              {errors.fase && <p className="mt-1 text-xs text-red-600">{errors.fase.message as string}</p>}
+              <label className="mb-1 block text-sm font-medium text-slate-300">Fase</label>
+              <input type="text" placeholder="Ej: Grupos" {...register('fase')} className="w-full rounded-md border border-white/15 px-3 py-2 text-sm focus:border-celeste focus:outline-none" />
+              {errors.fase && <p className="mt-1 text-xs text-red-300">{errors.fase.message as string}</p>}
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Ubicación</label>
-              <input type="text" {...register('ubicacion')} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
-              {errors.ubicacion && <p className="mt-1 text-xs text-red-600">{errors.ubicacion.message as string}</p>}
+              <label className="mb-1 block text-sm font-medium text-slate-300">Ubicación</label>
+              <input type="text" {...register('ubicacion')} className="w-full rounded-md border border-white/15 px-3 py-2 text-sm focus:border-celeste focus:outline-none" />
+              {errors.ubicacion && <p className="mt-1 text-xs text-red-300">{errors.ubicacion.message as string}</p>}
             </div>
           </div>
 
           <div className="mt-6 flex justify-end gap-3">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+            <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-slate-300 bg-marino-claro border border-white/15 rounded-md hover:bg-white/5">
               Cancelar
             </button>
-            <AsyncButton onClickAction={handleSubmit(onSubmit)} className="bg-primary-600 text-white px-6 py-2 rounded-md shadow-sm hover:bg-primary-700 font-medium">
+            <AsyncButton onClickAction={handleSubmit(onSubmit)} className="bg-celeste text-marino px-6 py-2 rounded-md shadow-sm hover:bg-white font-medium">
               Guardar Partido
             </AsyncButton>
           </div>

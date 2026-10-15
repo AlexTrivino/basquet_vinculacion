@@ -65,19 +65,19 @@ export function DesactivarEquipoModal({ isOpen, onClose, idEquipo, isAdmin = fal
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-2 bg-red-600" />
+      <div className="bg-marino-claro rounded-2xl p-6 max-w-md w-full shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-2 bg-red-500/20" />
         
         <div className="flex flex-col items-center text-center">
-          <div className="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-4 border border-red-100 shadow-sm">
+          <div className="w-16 h-16 bg-red-500/10 text-red-300 rounded-full flex items-center justify-center mb-4 border border-red-400/20 shadow-sm">
             <ShieldAlert className="w-8 h-8" />
           </div>
           
-          <h2 className="text-xl font-extrabold text-gray-900 mb-2">
+          <h2 className="text-xl font-extrabold text-crema mb-2">
             Desactivar Equipo
           </h2>
           
-          <p className="text-sm text-gray-600 mb-6 font-medium leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-200">
+          <p className="text-sm text-slate-300 mb-6 font-medium leading-relaxed bg-white/5 p-4 rounded-xl border border-white/10">
             {isAdmin 
               ? "La desactivación de un equipo puede ser revocada desde el panel de gestión de equipos." 
               : "La desactivación de un equipo solo puede ser revocada por el administrador de la organización. esta acción le permitirá registrar un nuevo equipo en caso de tener cupos disponibles."}
@@ -87,7 +87,7 @@ export function DesactivarEquipoModal({ isOpen, onClose, idEquipo, isAdmin = fal
             <button
               onClick={onClose}
               disabled={desactivarMutation.isPending}
-              className="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+              className="flex-1 px-4 py-2.5 rounded-xl border border-white/15 text-slate-300 font-semibold hover:bg-white/5 transition-colors"
             >
               Cancelar
             </button>
@@ -96,8 +96,8 @@ export function DesactivarEquipoModal({ isOpen, onClose, idEquipo, isAdmin = fal
               disabled={countdown > 0 || desactivarMutation.isPending}
               className={`flex-1 px-4 py-2.5 rounded-xl font-bold text-white transition-all shadow-sm ${
                 countdown > 0 || desactivarMutation.isPending
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-red-600 hover:bg-red-700 hover:shadow-md"
+                  ? "bg-white/25 cursor-not-allowed"
+                  : "bg-red-500/20 hover:bg-red-500/30 hover:shadow-md"
               }`}
             >
               {desactivarMutation.isPending 

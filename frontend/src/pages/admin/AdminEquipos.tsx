@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { Shield, X, Edit, Trash2, Search, Filter, RefreshCw, Users } from 'lucide-react';
+import { Escudo } from '../../features/torneos/components/PartidosList';
 
 import { getEquiposAdmin, updateEquipo, uploadLogoEquipo, uploadBannerEquipo, deleteLogoEquipo, deleteBannerEquipo, reactivarEquipo } from '../../features/equipos/api/equipos.api';
 import { getTorneos } from '../../features/torneos/api/torneos.api';
@@ -211,15 +212,9 @@ export default function AdminEquipos() {
       header: 'Equipo',
       render: (row) => (
         <div className="flex items-center gap-3">
-          {row.url_logo ? (
-            <img src={row.url_logo} alt="Logo" className="w-8 h-8 rounded-full object-cover border border-slate-200" />
-          ) : (
-            <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
-              <Shield className="w-4 h-4" />
-            </div>
-          )}
+          <Escudo url={row.url_logo} className="h-9 w-9" />
           <div className="flex flex-col">
-            <span className="font-bold text-slate-900">{row.nombre_equipo}</span>
+            <span className="font-bold text-crema">{row.nombre_equipo}</span>
             <span className="text-[11px] text-slate-500 font-medium">ID: {row.id_equipo}</span>
           </div>
         </div>
@@ -230,7 +225,7 @@ export default function AdminEquipos() {
       header: 'Delegado',
       render: (row) => (
         <div className="flex flex-col">
-          <span className="font-medium text-slate-900">{row.usuario?.nombre || 'Desconocido'}</span>
+          <span className="font-medium text-crema">{row.usuario?.nombre || 'Desconocido'}</span>
           <span className="text-xs text-slate-500">{row.usuario?.correo || 'Sin correo'}</span>
         </div>
       )
@@ -247,7 +242,7 @@ export default function AdminEquipos() {
         return (
           <div className="flex flex-wrap gap-1">
             {uniqueCats.map((cat, i) => (
-              <span key={i} className="inline-flex bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[10px] font-semibold border border-slate-200">
+              <span key={i} className="inline-flex bg-white/10 text-slate-300 px-2 py-0.5 rounded text-[10px] font-semibold border border-white/10">
                 {cat as string}
               </span>
             ))}
@@ -259,10 +254,10 @@ export default function AdminEquipos() {
       key: 'estado',
       header: 'Estado',
       render: (row) => {
-        let colors = 'bg-slate-100 text-slate-800 border-slate-200';
-        if (row.estado === 'activo' || row.estado === 'aprobado') colors = 'bg-emerald-100 text-emerald-800 border-emerald-200';
-        else if (row.estado === 'inactivo' || row.estado === 'rechazado') colors = 'bg-rose-100 text-rose-800 border-rose-200';
-        else if (row.estado === 'pendiente') colors = 'bg-amber-100 text-amber-800 border-amber-200';
+        let colors = 'bg-white/10 text-crema border-white/10';
+        if (row.estado === 'activo' || row.estado === 'aprobado') colors = 'bg-emerald-500/15 text-emerald-200 border-emerald-400/30';
+        else if (row.estado === 'inactivo' || row.estado === 'rechazado') colors = 'bg-rose-500/15 text-rose-200 border-rose-400/30';
+        else if (row.estado === 'pendiente') colors = 'bg-amber-500/15 text-amber-200 border-amber-400/30';
 
         return (
           <span className={`inline-flex items-center justify-center rounded-md px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider border ${colors}`}>
@@ -278,7 +273,7 @@ export default function AdminEquipos() {
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => setManagingPlantillasEquipo(row)}
-            className="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-indigo-200 transition-colors"
+            className="px-2.5 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-indigo-400/30 transition-colors"
             title="Gestionar Plantillas"
           >
             <Users className="w-3.5 h-3.5" />
@@ -287,7 +282,7 @@ export default function AdminEquipos() {
 
           <button
             onClick={() => openEditModal(row)}
-            className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-blue-200 transition-colors"
+            className="px-2.5 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-blue-400/30 transition-colors"
             title="Editar Equipo"
           >
             <Edit className="w-3.5 h-3.5" />
@@ -297,7 +292,7 @@ export default function AdminEquipos() {
           {row.estado === 'activo' ? (
             <button
               onClick={() => setEquipoToDeactivate(row.id_equipo)}
-              className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-semibold border border-rose-200 transition-colors"
+              className="p-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-200 rounded-lg text-xs font-semibold border border-rose-400/30 transition-colors"
               title="Desactivar Equipo"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -306,7 +301,7 @@ export default function AdminEquipos() {
             <button
               onClick={() => reactivarMutation.mutate(row.id_equipo)}
               disabled={reactivarMutation.isPending}
-              className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-xs font-semibold border border-emerald-200 transition-colors"
+              className="p-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-200 rounded-lg text-xs font-semibold border border-emerald-400/30 transition-colors"
               title="Reactivar Equipo"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${reactivarMutation.isPending ? 'animate-spin' : ''}`} />
@@ -320,17 +315,17 @@ export default function AdminEquipos() {
   return (
     <div className="space-y-6 w-full px-[10%] py-8">
       {/* Cabecera idéntica a Jugadores y Torneos */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-marino-claro p-6 rounded-2xl border border-white/10 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center border border-indigo-500/20">
+          <div className="w-12 h-12 shrink-0 rounded-xl bg-oro/10 text-oro flex items-center justify-center border border-oro/30">
             <Shield className="w-6 h-6" />
           </div>
           <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <h1 className="font-display text-2xl font-black text-crema tracking-tight">
                 Gestión de Equipos
               </h1>
-              <span className="px-2.5 py-0.5 text-xs font-bold bg-slate-100 text-slate-700 rounded-full border border-slate-200">
+              <span className="px-2.5 py-0.5 text-xs font-bold bg-white/10 text-slate-300 rounded-full border border-white/10">
                 {response?.pagination?.total || 0} registros
               </span>
             </div>
@@ -344,26 +339,26 @@ export default function AdminEquipos() {
           <button
             onClick={() => { setPage(1); queryClient.invalidateQueries({ queryKey: ['admin-equipos'] }); }}
             disabled={isLoading}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/10 text-slate-300 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-blue-600' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-blue-300' : ''}`} />
             <span>Actualizar</span>
           </button>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <div className="bg-marino-claro p-5 rounded-2xl border border-white/10 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
-            <Filter className="w-4 h-4 text-indigo-600" />
+          <div className="flex items-center gap-2 text-sm font-bold text-crema">
+            <Filter className="w-4 h-4 text-indigo-300" />
             <span>Filtros y Búsqueda</span>
           </div>
 
           {hasActiveFilters && (
             <button
               onClick={handleResetFilters}
-              className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 hover:underline"
+              className="text-xs font-semibold text-indigo-300 hover:text-indigo-200 hover:underline"
             >
               Limpiar filtros
             </button>
@@ -378,7 +373,7 @@ export default function AdminEquipos() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Buscar por nombre de equipo..."
-              className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+              className="w-full pl-9 pr-4 py-2 border border-white/15 rounded-xl text-sm focus:ring-2 focus:ring-celeste focus:border-celeste bg-marino-claro"
             />
           </div>
 
@@ -390,7 +385,7 @@ export default function AdminEquipos() {
                 setSelectedCategoria('');
                 setPage(1);
               }}
-              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+              className="w-full px-3 py-2 border border-white/15 rounded-xl text-sm focus:ring-2 focus:ring-celeste focus:border-celeste bg-marino-claro"
             >
               <option value="">Todos los torneos</option>
               {torneos.map((t: any) => (
@@ -409,7 +404,7 @@ export default function AdminEquipos() {
                 setPage(1);
               }}
               disabled={!selectedTorneo || categorias.length === 0}
-              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white capitalize disabled:opacity-50"
+              className="w-full px-3 py-2 border border-white/15 rounded-xl text-sm focus:ring-2 focus:ring-celeste focus:border-celeste bg-marino-claro capitalize disabled:opacity-50"
             >
               <option value="">Todas las categorías</option>
               {categorias.map((c: any) => (
@@ -424,7 +419,7 @@ export default function AdminEquipos() {
             <select
               value={selectedEstado}
               onChange={(e) => setSelectedEstado(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+              className="w-full px-3 py-2 border border-white/15 rounded-xl text-sm focus:ring-2 focus:ring-celeste focus:border-celeste bg-marino-claro"
             >
               <option value="">Todos los Estados</option>
               <option value="activo">Activo</option>
@@ -436,7 +431,7 @@ export default function AdminEquipos() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-marino-claro rounded-2xl border border-white/10 shadow-sm overflow-hidden">
         <DataGridTable
           columns={columns}
           data={equipos}
@@ -446,19 +441,19 @@ export default function AdminEquipos() {
         
         {/* Paginación */}
         {response?.pagination && response.pagination.pages > 1 && (
-          <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-4 py-3 sm:px-6">
+          <div className="flex items-center justify-between border-t border-white/10 bg-white/5 px-4 py-3 sm:px-6">
             <div className="flex flex-1 justify-between sm:justify-end gap-2">
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="relative inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                className="relative inline-flex items-center rounded-lg border border-white/15 bg-marino-claro px-4 py-2 text-sm font-semibold text-slate-300 hover:bg-white/5 disabled:opacity-50"
               >
                 Anterior
               </button>
               <button
                 onClick={() => setPage(p => Math.min(response.pagination.pages, p + 1))}
                 disabled={page === response.pagination.pages}
-                className="relative inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                className="relative inline-flex items-center rounded-lg border border-white/15 bg-marino-claro px-4 py-2 text-sm font-semibold text-slate-300 hover:bg-white/5 disabled:opacity-50"
               >
                 Siguiente
               </button>
@@ -477,34 +472,34 @@ export default function AdminEquipos() {
       {/* Modal Editar Equipo */}
       {editingEquipo && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden">
-            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 bg-slate-50">
-              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <Edit className="w-5 h-5 text-blue-600" />
+          <div className="w-full max-w-lg rounded-2xl bg-marino-claro shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between border-b border-white/10 px-6 py-4 bg-white/5">
+              <h2 className="text-xl font-bold text-crema flex items-center gap-2">
+                <Edit className="w-5 h-5 text-blue-300" />
                 Editar Equipo
               </h2>
-              <button onClick={closeEditModal} className="text-slate-400 hover:text-slate-600 transition-colors">
+              <button onClick={closeEditModal} className="text-slate-400 hover:text-slate-300 transition-colors">
                 <X className="h-5 w-5" />
               </button>
             </div>
             
             <form onSubmit={handleSubmit(onEditSubmit)} className="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1">Nombre del Equipo *</label>
+                <label className="block text-sm font-bold text-slate-300 mb-1">Nombre del Equipo *</label>
                 <input
                   type="text"
                   {...register('nombre_equipo')}
-                  className="block w-full rounded-xl border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2.5 border"
+                  className="block w-full rounded-xl border-white/15 shadow-sm focus:border-celeste focus:ring-celeste sm:text-sm px-3 py-2.5 border"
                   placeholder="Ej: Delfines BC"
                 />
-                {errors.nombre_equipo && <p className="mt-1 text-sm text-red-600">{errors.nombre_equipo.message}</p>}
+                {errors.nombre_equipo && <p className="mt-1 text-sm text-red-300">{errors.nombre_equipo.message}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-slate-700 mb-1">Estado del Equipo</label>
+                <label className="block text-sm font-bold text-slate-300 mb-1">Estado del Equipo</label>
                 <select
                   {...register('estado')}
-                  className="block w-full rounded-xl border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2.5 border bg-white"
+                  className="block w-full rounded-xl border-white/15 shadow-sm focus:border-celeste focus:ring-celeste sm:text-sm px-3 py-2.5 border bg-marino-claro"
                 >
                   <option value="activo">Activo</option>
                   <option value="inactivo">Inactivo</option>
@@ -512,9 +507,9 @@ export default function AdminEquipos() {
                 </select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 border-t border-slate-100 pt-5">
+              <div className="grid grid-cols-2 gap-4 border-t border-white/10 pt-5">
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Logo del Equipo</label>
+                  <label className="block text-sm font-bold text-slate-300 mb-2">Logo del Equipo</label>
                   <FileUploadButton
                     onFileSelect={handleUploadLogo}
                     accept="image/*"
@@ -526,7 +521,7 @@ export default function AdminEquipos() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Banner del Equipo</label>
+                  <label className="block text-sm font-bold text-slate-300 mb-2">Banner del Equipo</label>
                   <FileUploadButton
                     onFileSelect={handleUploadBanner}
                     accept="image/*"
@@ -539,17 +534,17 @@ export default function AdminEquipos() {
                 </div>
               </div>
 
-              <div className="mt-6 flex justify-end gap-3 border-t border-slate-100 pt-5">
+              <div className="mt-6 flex justify-end gap-3 border-t border-white/10 pt-5">
                 <button
                   type="button"
                   onClick={closeEditModal}
-                  className="rounded-xl px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 border border-slate-300 transition-colors"
+                  className="rounded-xl px-5 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/5 border border-white/15 transition-colors"
                 >
                   Cancelar
                 </button>
                 <AsyncButton
                   onClickAction={handleSubmit(onEditSubmit)}
-                  className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                  className="rounded-xl bg-celeste px-5 py-2.5 text-sm font-semibold text-marino hover:bg-white transition-colors"
                 >
                   Guardar Cambios
                 </AsyncButton>

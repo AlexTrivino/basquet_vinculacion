@@ -172,15 +172,15 @@ export default function AdminPartidos() {
     { 
       key: 'fecha', 
       header: 'Fecha y Hora', 
-      render: (row) => <span className="font-medium text-gray-900">{row.fecha} {row.hora}</span> 
+      render: (row) => <span className="font-medium text-crema">{row.fecha} {row.hora}</span> 
     },
     { 
       key: 'fase', 
       header: 'Fase/Categoría', 
       render: (row) => (
         <div className="flex flex-col">
-          <span className="font-semibold text-gray-800 text-sm">{row.fase || 'Regular'}</span>
-          <span className="text-gray-500 text-xs">{row.categoria?.nombre_categoria}</span>
+          <span className="font-semibold text-crema text-sm">{row.fase || 'Regular'}</span>
+          <span className="text-slate-400 text-xs">{row.categoria?.nombre_categoria}</span>
         </div>
       ) 
     },
@@ -189,9 +189,9 @@ export default function AdminPartidos() {
       header: 'Encuentro', 
       render: (row) => (
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-gray-900">{row.equipo_local?.nombre_equipo || 'Local'}</span>
-          <span className="text-gray-400 text-xs">vs</span>
-          <span className="font-semibold text-gray-900">{row.equipo_visitante?.nombre_equipo || 'Visitante'}</span>
+          <span className="font-semibold text-crema">{row.equipo_local?.nombre_equipo || 'Local'}</span>
+          <span className="text-slate-400 text-xs">vs</span>
+          <span className="font-semibold text-crema">{row.equipo_visitante?.nombre_equipo || 'Visitante'}</span>
         </div>
       ) 
     },
@@ -199,7 +199,7 @@ export default function AdminPartidos() {
       key: 'marcador', 
       header: 'Marcador', 
       render: (row) => (
-        <span className="font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded">
+        <span className="font-bold text-slate-300 bg-white/10 px-2 py-1 rounded">
           {row.marcador_local} - {row.marcador_visitante}
         </span>
       ) 
@@ -220,12 +220,12 @@ export default function AdminPartidos() {
             textOverride={row.estado === 'anulado' ? 'Anulado' : undefined}
           />
           {isPendienteFinalizar(row) && (
-            <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded flex items-center gap-1">
+            <span className="text-[10px] font-bold text-amber-200 bg-amber-500/15 px-1.5 py-0.5 rounded flex items-center gap-1">
               <Calendar className="w-3 h-3" /> Pendiente Finalizar
             </span>
           )}
           {row.estado === 'finalizado' && (!row.stats_local_procesadas || !row.stats_visitante_procesadas) && (
-            <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-bold text-amber-200 bg-amber-500/15 px-1.5 py-0.5 rounded">
               Sin Estadísticas
             </span>
           )}
@@ -240,7 +240,7 @@ export default function AdminPartidos() {
           {row.estado !== 'anulado' && (
             <button 
               onClick={() => setEditarPartido(row)}
-              className="bg-primary-600 hover:bg-primary-700 text-white shadow-sm px-3 py-1.5 rounded text-xs font-semibold transition-colors"
+              className="bg-celeste hover:bg-white text-marino shadow-sm px-3 py-1.5 rounded text-xs font-semibold transition-colors"
             >
               Editar
             </button>
@@ -248,7 +248,7 @@ export default function AdminPartidos() {
           {row.estado !== 'anulado' && row.estado !== 'suspendido' && (
             <button 
               onClick={() => setFinalizarPartido(row)}
-              className="bg-green-600 hover:bg-green-700 text-white shadow-sm px-3 py-1.5 rounded text-xs font-semibold transition-colors"
+              className="bg-green-500/20 hover:bg-green-500/30 text-green-100 shadow-sm px-3 py-1.5 rounded text-xs font-semibold transition-colors"
             >
               Resultados
             </button>
@@ -256,14 +256,14 @@ export default function AdminPartidos() {
           {row.estado === 'anulado' ? (
             <button 
               onClick={() => handleRestaurar(row.id_partido!)}
-              className="bg-amber-600 hover:bg-amber-700 text-white shadow-sm px-3 py-1.5 rounded text-xs font-semibold transition-colors"
+              className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-100 shadow-sm px-3 py-1.5 rounded text-xs font-semibold transition-colors"
             >
               Restaurar
             </button>
           ) : (
             <button 
               onClick={() => handleAnular(row.id_partido!)}
-              className="bg-red-600 hover:bg-red-700 text-white shadow-sm px-3 py-1.5 rounded text-xs font-semibold transition-colors"
+              className="bg-red-500/20 hover:bg-red-500/30 text-red-100 shadow-sm px-3 py-1.5 rounded text-xs font-semibold transition-colors"
             >
               Anular
             </button>
@@ -276,27 +276,27 @@ export default function AdminPartidos() {
   return (
     <div className="space-y-6 animate-fade-in px-4 sm:px-6 lg:px-8 py-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-marino-claro p-6 rounded-xl border border-white/10 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            <Calendar className="w-8 h-8 text-primary-600" />
+          <h1 className="font-display text-2xl font-bold text-crema flex items-center gap-3">
+            <Calendar className="w-8 h-8 text-oro" />
             Gestión de Partidos
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-slate-400 mt-1">
             Administra el calendario, resultados y estadísticas de los encuentros.
           </p>
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <button 
             onClick={() => queryClient.invalidateQueries({ queryKey: ['partidos'] })}
-            className="flex items-center justify-center p-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
+            className="flex items-center justify-center p-2 rounded-lg border border-white/15 text-slate-300 hover:bg-white/5 transition-colors"
             title="Actualizar tabla"
           >
-            <RotateCcw className={`w-5 h-5 ${isFetching ? 'animate-spin text-primary-600' : ''}`} />
+            <RotateCcw className={`w-5 h-5 ${isFetching ? 'animate-spin text-celeste' : ''}`} />
           </button>
           <button 
             onClick={() => setIsCrearOpen(true)}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-primary-600 px-4 py-2 text-sm font-medium text-white rounded-lg shadow-sm hover:bg-primary-700 transition-colors"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-celeste px-4 py-2 text-sm font-medium text-marino rounded-lg shadow-sm hover:bg-white transition-colors"
           >
             <Plus className="w-5 h-5" />
             Nuevo Partido
@@ -305,16 +305,16 @@ export default function AdminPartidos() {
       </div>
 
       {/* Panel de Filtros */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-visible">
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-gray-800 font-semibold">
-            <Filter className="w-5 h-5 text-gray-400" />
+      <div className="bg-marino-claro rounded-xl border border-white/10 shadow-sm overflow-visible">
+        <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-crema font-semibold">
+            <Filter className="w-5 h-5 text-slate-400" />
             Filtros y Búsqueda
           </div>
           {hasActiveFilters && (
             <button 
               onClick={clearFilters}
-              className="text-xs font-medium text-red-600 hover:text-red-800 hover:bg-red-50 px-2 py-1 rounded transition-colors"
+              className="text-xs font-medium text-red-300 hover:text-red-200 hover:bg-red-500/15 px-2 py-1 rounded transition-colors"
             >
               Limpiar Filtros
             </button>
@@ -324,13 +324,13 @@ export default function AdminPartidos() {
         <div className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Búsqueda */}
           <div className="relative">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
             <input
               type="text"
               placeholder="Buscar torneo o equipo..."
               value={searchTerm}
               onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
-              className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="w-full pl-9 pr-3 py-2 text-sm border border-white/15 rounded-md focus:outline-none focus:ring-1 focus:ring-celeste"
             />
           </div>
 
@@ -354,7 +354,7 @@ export default function AdminPartidos() {
           <select 
             value={sortOrder}
             onChange={(e) => { setSortOrder(e.target.value as 'asc'|'desc'); setPage(1); }}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-primary-500"
+            className="w-full border border-white/15 rounded-md px-3 py-2 text-sm bg-marino-claro focus:outline-none focus:ring-1 focus:ring-celeste"
           >
             <option value="desc">Más Recientes Primero</option>
             <option value="asc">Más Antiguos Primero</option>
@@ -363,46 +363,46 @@ export default function AdminPartidos() {
 
         {/* Checkboxes de Estado */}
         <div className="px-5 pb-5 pt-0">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Estados</p>
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Estados</p>
           <div className="flex flex-wrap gap-3">
             {['programado', 'en_curso', 'finalizado', 'finalizado_wo', 'suspendido', 'anulado'].map((estado) => (
-              <label key={estado} className="flex items-center gap-2 cursor-pointer bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200 transition-colors">
+              <label key={estado} className="flex items-center gap-2 cursor-pointer bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full border border-white/10 transition-colors">
                 <input
                   type="checkbox"
                   checked={selectedEstados.includes(estado)}
                   onChange={() => toggleEstado(estado)}
-                  className="rounded text-primary-600 focus:ring-primary-500"
+                  className="rounded text-celeste focus:ring-celeste"
                 />
-                <span className="text-sm font-medium text-gray-700 capitalize">
+                <span className="text-sm font-medium text-slate-300 capitalize">
                   {estado === 'finalizado_wo' ? 'Finalizado W.O.' : estado}
                 </span>
               </label>
             ))}
             
-            <div className="w-px h-6 bg-gray-300 mx-1"></div>
+            <div className="w-px h-6 bg-white/20 mx-1"></div>
             
-            <label className="flex items-center gap-2 cursor-pointer bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-full border border-amber-200 transition-colors">
+            <label className="flex items-center gap-2 cursor-pointer bg-amber-500/10 hover:bg-amber-500/20 px-3 py-1.5 rounded-full border border-amber-400/30 transition-colors">
               <input
                 type="checkbox"
                 checked={pendientesStats}
                 onChange={(e) => { setPendientesStats(e.target.checked); setPage(1); }}
-                className="rounded text-amber-600 focus:ring-amber-500"
+                className="rounded text-amber-300 focus:ring-celeste"
               />
-              <span className="text-sm font-bold text-amber-700">Sin Estadísticas</span>
+              <span className="text-sm font-bold text-amber-200">Sin Estadísticas</span>
             </label>
           </div>
         </div>
       </div>
 
       {/* Tabla */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <div className="bg-marino-claro rounded-xl border border-white/10 shadow-sm p-6">
         {loadingPartidos ? (
           <Skeleton className="h-96 w-full rounded-xl" />
         ) : partidos.length === 0 ? (
           <EmptyState
             title="No se encontraron partidos"
             description={hasActiveFilters ? "Intenta ajustar los filtros para ver más resultados." : "Aún no hay partidos programados en el sistema."}
-            icon={<Calendar className="mx-auto h-12 w-12 text-gray-400" />}
+            icon={<Calendar className="mx-auto h-12 w-12 text-slate-400" />}
           />
         ) : (
           <>
@@ -412,16 +412,16 @@ export default function AdminPartidos() {
               ariaLabel="Tabla de Partidos" 
             />
             {pagination && pagination.pages > 1 && (
-              <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-4 py-3 sm:px-6 rounded-b-xl">
-                <div className="text-sm text-gray-500">
-                  Página <span className="font-bold text-gray-900">{pagination.page}</span> de <span className="font-bold text-gray-900">{pagination.pages}</span>
+              <div className="flex items-center justify-between border-t border-white/10 bg-white/5 px-4 py-3 sm:px-6 rounded-b-xl">
+                <div className="text-sm text-slate-400">
+                  Página <span className="font-bold text-crema">{pagination.page}</span> de <span className="font-bold text-crema">{pagination.pages}</span>
                 </div>
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={pagination.page === 1}
-                    className="px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                    className="px-3 py-1.5 rounded-lg border border-white/15 bg-marino-claro text-sm font-medium text-slate-300 hover:bg-white/5 disabled:opacity-50 transition-colors"
                   >
                     Anterior
                   </button>
@@ -429,7 +429,7 @@ export default function AdminPartidos() {
                     type="button"
                     onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
                     disabled={pagination.page === pagination.pages}
-                    className="px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+                    className="px-3 py-1.5 rounded-lg border border-white/15 bg-marino-claro text-sm font-medium text-slate-300 hover:bg-white/5 disabled:opacity-50 transition-colors"
                   >
                     Siguiente
                   </button>

@@ -100,30 +100,30 @@ export function ReinscripcionWizard({ idEquipo }: ReinscripcionWizardProps) {
   };
 
   return (
-    <div className="mx-auto max-w-xl rounded-2xl border border-gray-200 bg-white p-6 shadow-xl sm:p-8">
+    <div className="mx-auto max-w-xl rounded-2xl border border-white/10 bg-marino-claro p-6 shadow-xl sm:p-8">
       <button
         onClick={() => navigate('/delegado/dashboard')}
-        className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors mb-6"
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-crema transition-colors mb-6"
       >
         <ArrowLeft className="w-4 h-4" /> Volver al panel
       </button>
 
-      <h2 className="text-2xl font-bold text-gray-900">Reinscribir Equipo</h2>
-      <p className="mb-6 mt-2 text-sm text-gray-600 leading-relaxed">
+      <h2 className="text-2xl font-bold text-crema">Reinscribir Equipo</h2>
+      <p className="mb-6 mt-2 text-sm text-slate-300 leading-relaxed">
         Selecciona la categoría y adjunta el comprobante de pago para la nueva temporada. 
         Puedes importar automáticamente los jugadores de tu última participación.
       </p>
 
       {/* REGLAS DE REINSCRIPCIÓN */}
-      <div className="mb-6 rounded-xl bg-blue-50 p-4 border border-blue-100 flex gap-3">
-        <div className="shrink-0 text-blue-500 mt-0.5">
+      <div className="mb-6 rounded-xl bg-blue-500/10 p-4 border border-blue-400/20 flex gap-3">
+        <div className="shrink-0 text-blue-400 mt-0.5">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
         <div>
-          <h3 className="text-sm font-bold text-blue-900">Reglas de Reinscripción</h3>
-          <p className="text-sm text-blue-800 mt-1 leading-relaxed">
+          <h3 className="text-sm font-bold text-blue-100">Reglas de Reinscripción</h3>
+          <p className="text-sm text-blue-200 mt-1 leading-relaxed">
             Un equipo solo puede registrarse en <strong>una (1) categoría por cada torneo</strong>. 
             Al finalizar este paso, la solicitud se guardará como <strong>borrador</strong> y no podrás 
             iniciar otra hasta que la completes o la elimines.
@@ -134,14 +134,14 @@ export function ReinscripcionWizard({ idEquipo }: ReinscripcionWizardProps) {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {/* Torneo */}
         <div>
-          <label htmlFor="torneo" className="mb-1 block text-sm font-medium text-gray-700">
-            Torneo <span className="text-red-500">*</span>
+          <label htmlFor="torneo" className="mb-1 block text-sm font-medium text-slate-300">
+            Torneo <span className="text-red-400">*</span>
           </label>
           <select
             id="torneo"
             {...register('torneo')}
             disabled={isLoadingTorneos}
-            className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all disabled:bg-gray-50"
+            className="w-full rounded-xl border border-white/15 px-4 py-3 text-sm focus:border-celeste focus:outline-none focus:ring-2 focus:ring-celeste/25 transition-all disabled:bg-white/5"
           >
             <option value="">Selecciona un torneo...</option>
             {torneos.map((t: any) => (
@@ -150,19 +150,19 @@ export function ReinscripcionWizard({ idEquipo }: ReinscripcionWizardProps) {
               </option>
             ))}
           </select>
-          {errors.torneo && <p className="mt-1.5 text-xs text-red-500 font-medium">{errors.torneo.message}</p>}
+          {errors.torneo && <p className="mt-1.5 text-xs text-red-400 font-medium">{errors.torneo.message}</p>}
         </div>
 
         {/* Categoría */}
         <div>
-          <label htmlFor="categoria" className="mb-1 block text-sm font-medium text-gray-700">
-            Categoría <span className="text-red-500">*</span>
+          <label htmlFor="categoria" className="mb-1 block text-sm font-medium text-slate-300">
+            Categoría <span className="text-red-400">*</span>
           </label>
           <select
             id="categoria"
             {...register('categoria')}
             disabled={isLoadingCategorias}
-            className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all disabled:bg-gray-50"
+            className="w-full rounded-xl border border-white/15 px-4 py-3 text-sm focus:border-celeste focus:outline-none focus:ring-2 focus:ring-celeste/25 transition-all disabled:bg-white/5"
           >
             <option value="">Selecciona una categoría...</option>
             {categorias.map((c) => (
@@ -171,24 +171,24 @@ export function ReinscripcionWizard({ idEquipo }: ReinscripcionWizardProps) {
               </option>
             ))}
           </select>
-          {errors.categoria && <p className="mt-1.5 text-xs text-red-500 font-medium">{errors.categoria.message}</p>}
+          {errors.categoria && <p className="mt-1.5 text-xs text-red-400 font-medium">{errors.categoria.message}</p>}
         </div>
 
         {/* Clonar Plantilla (Toggle switch o checkbox) */}
-        <div className="flex items-start gap-3 p-4 rounded-xl bg-primary-50/50 border border-primary-100">
+        <div className="flex items-start gap-3 p-4 rounded-xl bg-celeste/5 border border-celeste/30">
           <div className="flex h-6 items-center">
             <input
               id="clonarPlantilla"
               type="checkbox"
               {...register('clonarPlantilla')}
-              className="h-5 w-5 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
+              className="h-5 w-5 rounded border-white/15 text-celeste focus:ring-celeste"
             />
           </div>
           <div className="text-sm leading-6">
-            <label htmlFor="clonarPlantilla" className="font-bold text-gray-900 cursor-pointer">
+            <label htmlFor="clonarPlantilla" className="font-bold text-crema cursor-pointer">
               Importar jugadores del torneo anterior
             </label>
-            <p className="text-gray-500 text-xs mt-0.5">
+            <p className="text-slate-400 text-xs mt-0.5">
               Traerá automáticamente la nómina de tu última participación. Podrás editarla antes de enviar.
             </p>
           </div>
@@ -196,10 +196,10 @@ export function ReinscripcionWizard({ idEquipo }: ReinscripcionWizardProps) {
 
         {/* Comprobante de Pago */}
         <div>
-          <label htmlFor="comprobante" className="mb-1 block text-sm font-medium text-gray-700">
-            Comprobante de Pago <span className="text-red-500">*</span>
+          <label htmlFor="comprobante" className="mb-1 block text-sm font-medium text-slate-300">
+            Comprobante de Pago <span className="text-red-400">*</span>
           </label>
-          <p className="mb-2 text-xs text-gray-500">
+          <p className="mb-2 text-xs text-slate-400">
             Formato PDF o Imagen (JPG, PNG). Tamaño máximo: 5 MB.
           </p>
           <div className="flex items-center gap-2">
@@ -222,7 +222,7 @@ export function ReinscripcionWizard({ idEquipo }: ReinscripcionWizardProps) {
                   setComprobanteFile(null);
                 }
               }}
-              className="w-full rounded-xl border border-gray-300 px-3 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 transition-all cursor-pointer bg-gray-50/50"
+              className="w-full rounded-xl border border-white/15 px-3 py-2.5 text-sm focus:border-celeste focus:outline-none focus:ring-2 focus:ring-celeste/25 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-celeste/10 file:text-celeste hover:file:bg-celeste/15 transition-all cursor-pointer bg-white/[0.03]"
             />
             {comprobanteFile && (
               <button
@@ -231,7 +231,7 @@ export function ReinscripcionWizard({ idEquipo }: ReinscripcionWizardProps) {
                   setComprobanteFile(null);
                   if (comprobanteInputRef.current) comprobanteInputRef.current.value = '';
                 }}
-                className="shrink-0 p-2.5 text-red-500 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors"
+                className="shrink-0 p-2.5 text-red-400 hover:bg-red-500/15 hover:text-red-300 rounded-xl transition-colors"
                 title="Eliminar archivo"
               >
                 <Trash2 className="w-5 h-5" />
@@ -240,11 +240,11 @@ export function ReinscripcionWizard({ idEquipo }: ReinscripcionWizardProps) {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-gray-100 pt-6">
+        <div className="mt-8 border-t border-white/10 pt-6">
           <AsyncButton
             type="button"
             onClickAction={handleSubmit(onSubmit)}
-            className="w-full bg-primary-600 py-3.5 text-white font-bold rounded-xl shadow-md shadow-primary-500/20 hover:shadow-lg hover:shadow-primary-500/30 hover:-translate-y-0.5 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full bg-celeste py-3.5 text-marino font-bold rounded-xl shadow-md shadow-black/30 hover:shadow-lg hover:shadow-black/40 hover:-translate-y-0.5 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             disabled={!isValid || !comprobanteFile}
           >
             Siguiente Paso

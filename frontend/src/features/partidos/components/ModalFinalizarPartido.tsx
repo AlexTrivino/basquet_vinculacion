@@ -187,16 +187,16 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="bg-gray-100 rounded-xl shadow-2xl w-full max-w-[1600px] max-h-[95vh] flex flex-col overflow-hidden relative animate-fade-in-up">
+      <div className="bg-marino-claro ring-1 ring-oro/25 rounded-xl shadow-2xl w-full max-w-[1600px] max-h-[95vh] flex flex-col overflow-hidden relative animate-fade-in-up">
         {/* Header */}
-        <div className="bg-primary-900 px-6 py-4 flex items-center justify-between shrink-0 shadow-md z-10">
+        <div className="border-b border-white/10 bg-marino px-6 py-4 flex items-center justify-between shrink-0 z-10">
           <div className="flex items-center gap-3">
-            <Trophy className="w-6 h-6 text-primary-300" />
-            <h3 className="text-xl font-bold text-white">
+            <Trophy className="w-6 h-6 text-oro" />
+            <h3 className="text-xl font-bold text-crema">
               Gestor de Estadísticas y Resultados
             </h3>
           </div>
-          <button onClick={onClose} className="text-primary-300 hover:text-white transition-colors bg-white/10 p-2 rounded-full hover:bg-white/20">
+          <button onClick={onClose} className="text-slate-300 hover:text-white transition-colors bg-white/10 p-2 rounded-full hover:bg-white/20">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -205,16 +205,16 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
         <div className="flex-1 overflow-y-auto">
           {loadingBoxScore ? (
             <div className="flex justify-center items-center h-64">
-              <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
+              <div className="w-10 h-10 border-4 border-celeste border-t-transparent rounded-full animate-spin" />
             </div>
           ) : (
             <form id="finalizarForm" onSubmit={handleSubmit(onSubmit)} className="p-4 space-y-6">
               
               {/* Sección Top: Estado y Marcadores */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col md:flex-row gap-6 items-center justify-between">
+              <div className="bg-marino-claro rounded-xl shadow-sm border border-white/10 p-6 flex flex-col md:flex-row gap-6 items-center justify-between">
                 <div className="flex flex-col items-center md:items-start w-full md:w-1/3">
-                  <span className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Estado del Partido</span>
-                  <select {...register('estado')} className="w-full max-w-xs rounded-md border border-gray-300 px-3 py-2 text-md font-medium text-gray-800 bg-gray-50 focus:border-primary-500 focus:outline-none">
+                  <span className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Estado del Partido</span>
+                  <select {...register('estado')} className="w-full max-w-xs rounded-md border border-white/15 px-3 py-2 text-md font-medium text-crema bg-white/5 focus:border-celeste focus:outline-none">
                     <option value="programado">Programado</option>
                     <option value="en_curso">En Curso</option>
                     <option value="finalizado">Finalizado</option>
@@ -223,19 +223,19 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
                   </select>
                 </div>
 
-                <div className="flex items-center gap-6 md:gap-12 w-full md:w-auto justify-center bg-gray-50 p-6 rounded-xl border border-gray-100">
+                <div className="flex items-center gap-6 md:gap-12 w-full md:w-auto justify-center bg-white/5 p-6 rounded-xl border border-white/10">
                   <div className="flex flex-col items-center">
-                    <span className="font-bold text-gray-800 text-lg mb-3 max-w-[150px] truncate text-center" title={partido.equipo_local?.nombre_equipo}>
+                    <span className="font-bold text-crema text-lg mb-3 max-w-[150px] truncate text-center" title={partido.equipo_local?.nombre_equipo}>
                       {partido.equipo_local?.nombre_equipo || 'Local'}
                     </span>
-                    <input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register('marcador_local', { valueAsNumber: true })} className="w-28 text-center rounded-lg border-2 border-gray-300 px-3 py-3 text-4xl font-black text-primary-700 bg-white focus:border-primary-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                    <input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register('marcador_local', { valueAsNumber: true })} className="w-28 text-center rounded-lg border-2 border-white/15 px-3 py-3 text-4xl font-black text-celeste bg-marino-claro focus:border-celeste focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                   </div>
-                  <span className="text-3xl font-black text-gray-300 px-2 mt-8">-</span>
+                  <span className="text-3xl font-black text-slate-500 px-2 mt-8">-</span>
                   <div className="flex flex-col items-center">
-                    <span className="font-bold text-gray-800 text-lg mb-3 max-w-[150px] truncate text-center" title={partido.equipo_visitante?.nombre_equipo}>
+                    <span className="font-bold text-crema text-lg mb-3 max-w-[150px] truncate text-center" title={partido.equipo_visitante?.nombre_equipo}>
                       {partido.equipo_visitante?.nombre_equipo || 'Visitante'}
                     </span>
-                    <input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register('marcador_visitante', { valueAsNumber: true })} className="w-28 text-center rounded-lg border-2 border-gray-300 px-3 py-3 text-4xl font-black text-primary-700 bg-white focus:border-primary-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                    <input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register('marcador_visitante', { valueAsNumber: true })} className="w-28 text-center rounded-lg border-2 border-white/15 px-3 py-3 text-4xl font-black text-celeste bg-marino-claro focus:border-celeste focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                   </div>
                 </div>
                 
@@ -248,7 +248,7 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
                 <button 
                   type="button" 
                   onClick={() => setShowStats(!showStats)}
-                  className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold transition-colors"
+                  className="flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/15 text-slate-300 px-6 py-3 rounded-lg font-semibold transition-colors"
                 >
                   {showStats ? (
                     <>
@@ -269,17 +269,17 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in-up">
                 
                 {/* Equipo Local */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
-                  <div className="bg-blue-50 border-b border-blue-100 px-4 py-3 flex items-center justify-between">
+                <div className="bg-marino-claro rounded-xl shadow-sm border border-white/10 overflow-hidden flex flex-col">
+                  <div className="bg-blue-500/10 border-b border-blue-400/20 px-4 py-3 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-blue-500" />
-                      <h4 className="font-bold text-blue-900">{partido.equipo_local?.nombre_equipo} (Local)</h4>
+                      <h4 className="font-bold text-blue-100">{partido.equipo_local?.nombre_equipo} (Local)</h4>
                     </div>
-                    <button type="button" onClick={handleLimpiarLocal} className="text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded transition-colors">Limpiar</button>
+                    <button type="button" onClick={handleLimpiarLocal} className="text-xs font-semibold text-blue-300 hover:text-blue-200 bg-blue-500/15 hover:bg-blue-500/30 px-2 py-1 rounded transition-colors">Limpiar</button>
                   </div>
 
                   {/* Balance Local (Movido arriba) */}
-                  <div className={`px-4 py-2 border-b flex items-center justify-between text-sm ${isBalancedLocal ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
+                  <div className={`px-4 py-2 border-b flex items-center justify-between text-sm ${isBalancedLocal ? 'bg-green-500/10 border-green-400/30 text-green-200' : 'bg-red-500/10 border-red-400/30 text-red-200'}`}>
                     <span className="font-medium">Total puntos: <strong>{totalPuntosLocal}</strong></span>
                     {isBalancedLocal ? (
                       <span className="font-bold flex items-center gap-1">¡Balance Correcto!</span>
@@ -290,10 +290,10 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
                   
                   <div className="overflow-x-auto p-0">
                     {fieldsLocal.length === 0 ? (
-                      <p className="text-center text-gray-500 py-8 text-sm italic">No hay jugadores activos.</p>
+                      <p className="text-center text-slate-400 py-8 text-sm italic">No hay jugadores activos.</p>
                     ) : (
                       <table className="w-full text-xs text-left">
-                        <thead className="bg-gray-50 border-b border-gray-200 text-gray-600 sticky top-0">
+                        <thead className="bg-marino border-b border-white/10 text-slate-300 sticky top-0">
                           <tr>
                             <th className="px-3 py-2 font-semibold">#</th>
                             <th className="px-3 py-2 font-semibold">Jugador</th>
@@ -305,17 +305,17 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
                             <th className="px-2 py-2 text-center" title="Tapones">Tapones</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-white/10">
                           {fieldsLocal.map((field, idx) => (
-                            <tr key={field.id} className="hover:bg-gray-50 transition-colors">
-                              <td className="px-3 py-1.5 font-medium text-gray-500">{field.dorsal}</td>
-                              <td className="px-3 py-1.5 font-semibold text-gray-800 truncate max-w-[120px]" title={field.nombre}>{field.nombre}</td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.puntos`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.triples`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.tiros_libres_anotados`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.rebotes`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.asistencias`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.tapones`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                            <tr key={field.id} className="hover:bg-white/5 transition-colors">
+                              <td className="px-3 py-1.5 font-medium text-slate-400">{field.dorsal}</td>
+                              <td className="px-3 py-1.5 font-semibold text-crema truncate max-w-[120px]" title={field.nombre}>{field.nombre}</td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.puntos`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-white/15 py-1 focus:border-celeste focus:ring-1 focus:ring-celeste font-medium bg-marino-claro [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.triples`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-white/15 py-1 focus:border-celeste focus:ring-1 focus:ring-celeste bg-marino-claro [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.tiros_libres_anotados`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-white/15 py-1 focus:border-celeste focus:ring-1 focus:ring-celeste bg-marino-claro [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.rebotes`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-white/15 py-1 focus:border-celeste focus:ring-1 focus:ring-celeste bg-marino-claro [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.asistencias`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-white/15 py-1 focus:border-celeste focus:ring-1 focus:ring-celeste bg-marino-claro [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_local.${idx}.tapones`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-white/15 py-1 focus:border-celeste focus:ring-1 focus:ring-celeste bg-marino-claro [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
                             </tr>
                           ))}
                         </tbody>
@@ -325,17 +325,17 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
                 </div>
 
                 {/* Equipo Visitante */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
-                  <div className="bg-amber-50 border-b border-amber-100 px-4 py-3 flex items-center justify-between">
+                <div className="bg-marino-claro rounded-xl shadow-sm border border-white/10 overflow-hidden flex flex-col">
+                  <div className="bg-amber-500/10 border-b border-amber-400/20 px-4 py-3 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-amber-500" />
-                      <h4 className="font-bold text-amber-900">{partido.equipo_visitante?.nombre_equipo} (Visitante)</h4>
+                      <h4 className="font-bold text-amber-100">{partido.equipo_visitante?.nombre_equipo} (Visitante)</h4>
                     </div>
-                    <button type="button" onClick={handleLimpiarVisitante} className="text-xs font-semibold text-amber-600 hover:text-amber-800 bg-amber-100 hover:bg-amber-200 px-2 py-1 rounded transition-colors">Limpiar</button>
+                    <button type="button" onClick={handleLimpiarVisitante} className="text-xs font-semibold text-amber-300 hover:text-amber-200 bg-amber-500/15 hover:bg-amber-500/30 px-2 py-1 rounded transition-colors">Limpiar</button>
                   </div>
 
                   {/* Balance Visitante (Movido arriba) */}
-                  <div className={`px-4 py-2 border-b flex items-center justify-between text-sm ${isBalancedVisitante ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
+                  <div className={`px-4 py-2 border-b flex items-center justify-between text-sm ${isBalancedVisitante ? 'bg-green-500/10 border-green-400/30 text-green-200' : 'bg-red-500/10 border-red-400/30 text-red-200'}`}>
                     <span className="font-medium">Total puntos: <strong>{totalPuntosVisitante}</strong></span>
                     {isBalancedVisitante ? (
                       <span className="font-bold flex items-center gap-1">¡Balance Correcto!</span>
@@ -346,10 +346,10 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
                   
                   <div className="overflow-x-auto p-0">
                     {fieldsVisitante.length === 0 ? (
-                      <p className="text-center text-gray-500 py-8 text-sm italic">No hay jugadores activos.</p>
+                      <p className="text-center text-slate-400 py-8 text-sm italic">No hay jugadores activos.</p>
                     ) : (
                       <table className="w-full text-xs text-left">
-                        <thead className="bg-gray-50 border-b border-gray-200 text-gray-600 sticky top-0">
+                        <thead className="bg-marino border-b border-white/10 text-slate-300 sticky top-0">
                           <tr>
                             <th className="px-3 py-2 font-semibold">#</th>
                             <th className="px-3 py-2 font-semibold">Jugador</th>
@@ -361,17 +361,17 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
                             <th className="px-2 py-2 text-center" title="Tapones">Tapones</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-white/10">
                           {fieldsVisitante.map((field, idx) => (
-                            <tr key={field.id} className="hover:bg-gray-50 transition-colors">
-                              <td className="px-3 py-1.5 font-medium text-gray-500">{field.dorsal}</td>
-                              <td className="px-3 py-1.5 font-semibold text-gray-800 truncate max-w-[120px]" title={field.nombre}>{field.nombre}</td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.puntos`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 font-medium bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.triples`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.tiros_libres_anotados`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.rebotes`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.asistencias`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
-                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.tapones`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-gray-300 py-1 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 bg-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                            <tr key={field.id} className="hover:bg-white/5 transition-colors">
+                              <td className="px-3 py-1.5 font-medium text-slate-400">{field.dorsal}</td>
+                              <td className="px-3 py-1.5 font-semibold text-crema truncate max-w-[120px]" title={field.nombre}>{field.nombre}</td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.puntos`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-white/15 py-1 focus:border-celeste focus:ring-1 focus:ring-celeste font-medium bg-marino-claro [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.triples`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-white/15 py-1 focus:border-celeste focus:ring-1 focus:ring-celeste bg-marino-claro [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.tiros_libres_anotados`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-white/15 py-1 focus:border-celeste focus:ring-1 focus:ring-celeste bg-marino-claro [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.rebotes`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-white/15 py-1 focus:border-celeste focus:ring-1 focus:ring-celeste bg-marino-claro [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.asistencias`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-white/15 py-1 focus:border-celeste focus:ring-1 focus:ring-celeste bg-marino-claro [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
+                              <td className="px-1 py-1.5 text-center"><input type="number" min="0" onKeyDown={handleNumericKeyDown} {...register(`stats_visitante.${idx}.tapones`, { setValueAs: v => v === '' || isNaN(Number(v)) ? 0 : Number(v) })} className="w-12 text-center rounded border border-white/15 py-1 focus:border-celeste focus:ring-1 focus:ring-celeste bg-marino-claro [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" /></td>
                             </tr>
                           ))}
                         </tbody>
@@ -384,9 +384,9 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
               )}
 
               {/* Sección Acta FIBA */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h4 className="text-md font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-gray-500" />
+              <div className="bg-marino-claro rounded-xl shadow-sm border border-white/10 p-6">
+                <h4 className="text-md font-bold text-crema mb-4 flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-slate-400" />
                   Acta FIBA Oficial (Opcional)
                 </h4>
                 
@@ -396,25 +396,25 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
                       type="file" 
                       accept="application/pdf,image/jpeg,image/png"
                       onChange={(e) => setActaFile(e.target.files?.[0] || null)}
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer border border-gray-300 rounded-md focus:outline-none bg-gray-50" 
+                      className="block w-full text-sm text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-celeste/10 file:text-celeste hover:file:bg-celeste/15 cursor-pointer border border-white/15 rounded-md focus:outline-none bg-white/5" 
                     />
                   </div>
                   
                   {partido.url_planilla_fiba && !actaFile && (
-                    <div className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2.5 rounded-md border border-green-200 text-sm font-medium whitespace-nowrap">
+                    <div className="flex items-center gap-2 bg-green-500/10 text-green-200 px-4 py-2.5 rounded-md border border-green-400/30 text-sm font-medium whitespace-nowrap">
                       <FileText className="w-4 h-4" />
                       Acta actual subida
-                      <a href={partido.url_planilla_fiba} target="_blank" rel="noopener noreferrer" className="ml-2 text-primary-600 hover:underline">Ver</a>
+                      <a href={partido.url_planilla_fiba} target="_blank" rel="noopener noreferrer" className="ml-2 text-celeste hover:underline">Ver</a>
                     </div>
                   )}
                   {actaFile && (
-                    <div className="flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2.5 rounded-md border border-blue-200 text-sm font-medium whitespace-nowrap">
+                    <div className="flex items-center gap-2 bg-blue-500/10 text-blue-200 px-4 py-2.5 rounded-md border border-blue-400/30 text-sm font-medium whitespace-nowrap">
                       <Upload className="w-4 h-4" />
                       Lista para subir: {actaFile.name}
                     </div>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 mt-2">Formatos permitidos: PDF, JPG, PNG. Tamaño máximo: 5MB.</p>
+                <p className="text-xs text-slate-400 mt-2">Formatos permitidos: PDF, JPG, PNG. Tamaño máximo: 5MB.</p>
               </div>
 
             </form>
@@ -422,18 +422,18 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
         </div>
 
         {/* Footer */}
-        <div className="bg-white border-t border-gray-200 px-6 py-4 flex justify-between items-center shrink-0 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)] z-10">
-          <div className="text-sm text-gray-500 font-medium">
+        <div className="bg-marino-claro border-t border-white/10 px-6 py-4 flex justify-between items-center shrink-0 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)] z-10">
+          <div className="text-sm text-slate-400 font-medium">
             {showStats ? 'Por favor, verifica que los balances coincidan antes de guardar.' : 'Guarda el resultado oficial del encuentro.'}
           </div>
           <div className="flex gap-3">
-            <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+            <button type="button" onClick={onClose} className="px-5 py-2.5 text-sm font-bold text-slate-300 bg-white/10 hover:bg-white/15 rounded-lg transition-colors">
               Cancelar
             </button>
             <AsyncButton 
               onClickAction={handleSubmit(onSubmit)} 
               disabled={showStats && (!isBalancedLocal || !isBalancedVisitante)}
-              className="bg-primary-600 text-white px-8 py-2.5 rounded-lg shadow-md hover:bg-primary-700 hover:shadow-lg font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md flex items-center gap-2"
+              className="bg-celeste text-marino px-8 py-2.5 rounded-lg shadow-md hover:bg-white hover:shadow-lg font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md flex items-center gap-2"
             >
               Guardar y Finalizar
             </AsyncButton>

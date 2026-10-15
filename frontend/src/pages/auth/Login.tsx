@@ -16,22 +16,22 @@ export default function Login() {
   }, []);
 
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8 relative">
+    <main className="flex min-h-dvh items-center justify-center px-4 py-12 sm:px-6 lg:px-8 relative">
 
       
-      <div className="w-full max-w-md space-y-8 rounded-xl bg-white p-8 shadow-xl ring-1 ring-gray-900/5">
+      <div className="w-full max-w-md space-y-8 rounded-xl bg-marino-claro p-8 shadow-xl ring-1 ring-white/5">
         <div className="text-center flex flex-col items-center">
           <img src="/logo.png" alt="Torneos Baloncesto Manta Logo" className="h-60 w-200 object-contain mb-4" />
-          <h2 className="text-3xl font-bold tracking-tight text-primary-900">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-crema">
             Iniciar Sesión
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-slate-300">
             Accede al panel de Torneos Baloncesto Manta
           </p>
         </div>
         
         <LoginForm />
-        <Link to="/" className="mt-4 flex w-full justify-center items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none">
+        <Link to="/" className="mt-4 flex w-full justify-center items-center gap-2 rounded-md border border-white/15 bg-marino-claro px-4 py-2 text-sm font-medium text-slate-300 shadow-sm hover:bg-white/5 focus:outline-none">
           <ArrowLeft className="w-4 h-4" />
           Volver al portal público
         </Link>

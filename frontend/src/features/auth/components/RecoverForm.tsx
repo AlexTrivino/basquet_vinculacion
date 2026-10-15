@@ -42,11 +42,11 @@ export function RecoverForm() {
   if (isSent) {
     return (
       <div className="text-center">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">¡Revisa tu bandeja de entrada!</h3>
-        <p className="text-sm text-gray-600 mb-6">
+        <h3 className="text-lg font-medium text-crema mb-2">¡Revisa tu bandeja de entrada!</h3>
+        <p className="text-sm text-slate-300 mb-6">
           Hemos enviado un enlace de recuperación. Por favor revisa también tu carpeta de spam.
         </p>
-        <Link to="/auth/login" className="font-semibold text-primary-600 hover:text-primary-500">
+        <Link to="/auth/login" className="font-semibold text-celeste hover:text-white">
           Volver al inicio de sesión
         </Link>
       </div>
@@ -56,32 +56,32 @@ export function RecoverForm() {
   return (
     <form className="flex w-full flex-col gap-4">
       <div>
-        <label htmlFor="email" className="mb-1 block text-sm font-medium text-gray-700">
+        <label htmlFor="email" className="mb-1 block text-sm font-medium text-slate-300">
           Correo electrónico registrado
         </label>
         <input
           id="email"
           type="email"
           {...register('email')}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          className="w-full rounded-md border border-white/15 px-3 py-2 text-sm focus:border-celeste focus:outline-none focus:ring-1 focus:ring-celeste"
           placeholder="tu@correo.com"
         />
         {errors.email && (
-          <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
+          <p className="mt-1 text-xs text-red-300">{errors.email.message}</p>
         )}
       </div>
 
       <AsyncButton
         type="button"
         onClickAction={handleSubmit(onSubmit)}
-        className="mt-2 w-full bg-primary-600 py-2.5 text-white hover:bg-primary-700"
+        className="mt-2 w-full bg-celeste py-2.5 text-marino hover:bg-white"
       >
         Enviar instrucciones
       </AsyncButton>
 
-      <div className="mt-4 text-center text-sm text-gray-600">
+      <div className="mt-4 text-center text-sm text-slate-300">
         ¿Recordaste tu contraseña?{' '}
-        <Link to="/auth/login" className="font-semibold text-primary-600 hover:text-primary-500">
+        <Link to="/auth/login" className="font-semibold text-celeste hover:text-white">
           Vuelve a iniciar sesión
         </Link>
       </div>

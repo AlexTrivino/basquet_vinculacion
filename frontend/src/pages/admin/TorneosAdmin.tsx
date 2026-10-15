@@ -233,11 +233,11 @@ export default function TorneosAdmin() {
       header: 'Nombre del Torneo',
       render: (row) => (
         <div className="flex flex-col">
-          <span className="font-bold text-slate-900">{row.nombre || row.nombre_torneo}</span>
+          <span className="font-bold text-crema">{row.nombre || row.nombre_torneo}</span>
           {row.categorias && row.categorias.length > 0 ? (
              <span className="text-xs text-slate-500 font-medium">{row.categorias.length} categorías</span>
           ) : (
-             <span className="text-xs text-orange-500 font-medium">Sin categorías</span>
+             <span className="text-xs text-orange-400 font-medium">Sin categorías</span>
           )}
         </div>
       ),
@@ -246,7 +246,7 @@ export default function TorneosAdmin() {
       key: 'fechas',
       header: 'Período',
       render: (row) => (
-        <div className="flex flex-col text-sm text-slate-600 font-medium">
+        <div className="flex flex-col text-sm text-slate-300 font-medium">
           <span><span className="text-slate-400">Del:</span> {row.fecha_inicio ? new Date(row.fecha_inicio).toLocaleDateString() : 'N/A'}</span>
           <span><span className="text-slate-400">Al:</span> {row.fecha_fin ? new Date(row.fecha_fin).toLocaleDateString() : 'N/A'}</span>
         </div>
@@ -263,7 +263,7 @@ export default function TorneosAdmin() {
               target="_blank"
               rel="noopener noreferrer"
               title="Ver Calendario Oficial"
-              className="h-7 px-3 rounded-md flex items-center justify-center gap-1.5 text-xs font-bold transition-colors bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200 w-[68px]"
+              className="h-7 px-3 rounded-md flex items-center justify-center gap-1.5 text-xs font-bold transition-colors bg-emerald-500/15 text-emerald-200 border border-emerald-400/40 hover:bg-emerald-500/30 w-[68px]"
             >
               <FileSpreadsheet className="w-4 h-4" />
               <span>Ver</span>
@@ -271,7 +271,7 @@ export default function TorneosAdmin() {
           ) : (
             <span
               title="Sin calendario"
-              className="h-7 px-3 rounded-md flex items-center justify-center text-xs font-bold transition-colors bg-slate-100 text-slate-400 border border-slate-200 w-[68px]"
+              className="h-7 px-3 rounded-md flex items-center justify-center text-xs font-bold transition-colors bg-white/10 text-slate-400 border border-white/10 w-[68px]"
             >
               <FileSpreadsheet className="w-4 h-4" />
             </span>
@@ -283,11 +283,11 @@ export default function TorneosAdmin() {
       key: 'estado',
       header: 'Estado',
       render: (row) => {
-        let colors = 'bg-slate-100 text-slate-800 border-slate-200';
-        if (row.estado === 'programado') colors = 'bg-blue-100 text-blue-800 border-blue-200';
-        else if (row.estado === 'en_curso') colors = 'bg-emerald-100 text-emerald-800 border-emerald-200';
-        else if (row.estado === 'finalizado') colors = 'bg-purple-100 text-purple-800 border-purple-200';
-        else if (row.estado === 'anulado') colors = 'bg-rose-100 text-rose-800 border-rose-200';
+        let colors = 'bg-white/10 text-crema border-white/10';
+        if (row.estado === 'programado') colors = 'bg-blue-500/15 text-blue-200 border-blue-400/30';
+        else if (row.estado === 'en_curso') colors = 'bg-emerald-500/15 text-emerald-200 border-emerald-400/30';
+        else if (row.estado === 'finalizado') colors = 'bg-purple-500/15 text-purple-200 border-purple-400/30';
+        else if (row.estado === 'anulado') colors = 'bg-rose-500/15 text-rose-200 border-rose-400/30';
 
         return (
           <span className={`inline-flex items-center justify-center rounded-md px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider border ${colors}`}>
@@ -303,7 +303,7 @@ export default function TorneosAdmin() {
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => openModal(row)}
-            className="p-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold flex items-center gap-1 border border-blue-200 transition-colors"
+            className="p-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-200 rounded-lg text-xs font-semibold flex items-center gap-1 border border-blue-400/30 transition-colors"
             title="Editar Torneo"
           >
             <Edit className="w-3.5 h-3.5" />
@@ -315,8 +315,8 @@ export default function TorneosAdmin() {
             disabled={row.estado === 'anulado'}
             className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 border transition-colors ${
               row.estado === 'anulado'
-                ? 'bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed opacity-60'
-                : 'bg-rose-50 hover:bg-rose-100 text-rose-700 border-rose-200'
+                ? 'bg-white/5 text-slate-400 border-white/10 cursor-not-allowed opacity-60'
+                : 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-200 border-rose-400/30'
             }`}
             title="Anular Torneo"
           >
@@ -348,17 +348,17 @@ export default function TorneosAdmin() {
   return (
     <div className="space-y-6 w-full px-[10%] py-8">
       {/* Cabecera idéntica a Jugadores */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-marino-claro p-6 rounded-2xl border border-white/10 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center border border-blue-500/20">
+          <div className="w-12 h-12 shrink-0 rounded-xl bg-oro/10 text-oro flex items-center justify-center border border-oro/30">
             <Trophy className="w-6 h-6" />
           </div>
           <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <h1 className="font-display text-2xl font-black text-crema tracking-tight">
                 Gestión de Torneos
               </h1>
-              <span className="px-2.5 py-0.5 text-xs font-bold bg-slate-100 text-slate-700 rounded-full border border-slate-200">
+              <span className="px-2.5 py-0.5 text-xs font-bold bg-white/10 text-slate-300 rounded-full border border-white/10">
                 {totalTorneos} registros
               </span>
             </div>
@@ -372,15 +372,15 @@ export default function TorneosAdmin() {
           <button
             onClick={() => queryClient.invalidateQueries({ queryKey: ['torneos_admin'] })}
             disabled={isLoading}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/10 text-slate-300 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-blue-600' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-blue-300' : ''}`} />
             <span>Actualizar</span>
           </button>
           
           <button
             onClick={() => openModal()}
-            className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-celeste hover:bg-white text-marino rounded-xl text-sm font-semibold transition-colors shadow-sm"
           >
             <Plus className="w-4 h-4" />
             <span>Nuevo Torneo</span>
@@ -389,17 +389,17 @@ export default function TorneosAdmin() {
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <div className="bg-marino-claro p-5 rounded-2xl border border-white/10 shadow-sm space-y-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm font-bold text-slate-800">
-            <Filter className="w-4 h-4 text-blue-600" />
+          <div className="flex items-center gap-2 text-sm font-bold text-crema">
+            <Filter className="w-4 h-4 text-blue-300" />
             <span>Filtros y Búsqueda</span>
           </div>
 
           {hasActiveFilters && (
             <button
               onClick={handleResetFilters}
-              className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+              className="text-xs font-semibold text-blue-300 hover:text-blue-200 hover:underline"
             >
               Limpiar filtros
             </button>
@@ -414,7 +414,7 @@ export default function TorneosAdmin() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Buscar torneo por nombre..."
-              className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              className="w-full pl-9 pr-4 py-2 border border-white/15 rounded-xl text-sm focus:ring-2 focus:ring-celeste focus:border-celeste bg-marino-claro"
             />
           </div>
 
@@ -422,7 +422,7 @@ export default function TorneosAdmin() {
             <select
               value={selectedEstado}
               onChange={(e) => setSelectedEstado(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+              className="w-full px-3 py-2 border border-white/15 rounded-xl text-sm focus:ring-2 focus:ring-celeste focus:border-celeste bg-marino-claro"
             >
               <option value="">Todos los Estados</option>
               <option value="programado">Programado</option>
@@ -435,7 +435,7 @@ export default function TorneosAdmin() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-marino-claro rounded-2xl border border-white/10 shadow-sm overflow-hidden">
         <DataGridTable
           columns={columns}
           data={filteredTorneos}
@@ -447,56 +447,56 @@ export default function TorneosAdmin() {
       {/* Modal CRUD */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="w-full max-w-2xl rounded-xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <h2 className="text-xl font-bold text-gray-900">
+          <div className="w-full max-w-2xl rounded-xl bg-marino-claro shadow-2xl">
+            <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
+              <h2 className="text-xl font-bold text-crema">
                 {editingTorneo ? 'Editar Torneo' : 'Crear Nuevo Torneo'}
               </h2>
-              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 transition-colors">
+              <button onClick={closeModal} className="text-slate-400 hover:text-slate-300 transition-colors">
                 <X className="h-5 w-5" />
               </button>
             </div>
             
             <form onSubmit={handleSubmit(onSubmit as any)} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Nombre del Torneo *</label>
+                <label className="block text-sm font-medium text-slate-300">Nombre del Torneo *</label>
                 <input
                   type="text"
                   {...register('nombre')}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-3 py-2 border"
+                  className="mt-1 block w-full rounded-md border-white/15 shadow-sm focus:border-celeste focus:ring-celeste sm:text-sm px-3 py-2 border"
                   placeholder="Ej: Torneo Clausura 2026"
                 />
-                {errors.nombre && <p className="mt-1 text-sm text-red-600">{errors.nombre.message}</p>}
+                {errors.nombre && <p className="mt-1 text-sm text-red-300">{errors.nombre.message}</p>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Fecha Inicio *</label>
+                  <label className="block text-sm font-medium text-slate-300">Fecha Inicio *</label>
                   <input
                     type="date"
                     {...register('fecha_inicio')}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-3 py-2 border"
+                    className="mt-1 block w-full rounded-md border-white/15 shadow-sm focus:border-celeste focus:ring-celeste sm:text-sm px-3 py-2 border"
                   />
-                  {errors.fecha_inicio && <p className="mt-1 text-sm text-red-600">{errors.fecha_inicio.message}</p>}
+                  {errors.fecha_inicio && <p className="mt-1 text-sm text-red-300">{errors.fecha_inicio.message}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Fecha Fin *</label>
+                  <label className="block text-sm font-medium text-slate-300">Fecha Fin *</label>
                   <input
                     type="date"
                     {...register('fecha_fin')}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-3 py-2 border"
+                    className="mt-1 block w-full rounded-md border-white/15 shadow-sm focus:border-celeste focus:ring-celeste sm:text-sm px-3 py-2 border"
                   />
-                  {errors.fecha_fin && <p className="mt-1 text-sm text-red-600">{errors.fecha_fin.message}</p>}
+                  {errors.fecha_fin && <p className="mt-1 text-sm text-red-300">{errors.fecha_fin.message}</p>}
                 </div>
               </div>
 
               {editingTorneo && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Estado del Torneo</label>
+                  <label className="block text-sm font-medium text-slate-300">Estado del Torneo</label>
                   <select
                     {...register('estado')}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm px-3 py-2 border bg-white"
+                    className="mt-1 block w-full rounded-md border-white/15 shadow-sm focus:border-celeste focus:ring-celeste sm:text-sm px-3 py-2 border bg-marino-claro"
                   >
                     <option value="programado">Programado</option>
                     <option value="en_curso">En Curso</option>
@@ -508,8 +508,8 @@ export default function TorneosAdmin() {
 
               {/* Calendario Excel */}
               {editingTorneo && (
-                <div className="border-t border-gray-100 pt-4 mt-4">
-                  <h3 className="text-sm font-bold text-gray-900 mb-2">Calendario de Juegos (Excel)</h3>
+                <div className="border-t border-white/10 pt-4 mt-4">
+                  <h3 className="text-sm font-bold text-crema mb-2">Calendario de Juegos (Excel)</h3>
                   <FileUploadButton
                     onFileSelect={handleUploadCalendario}
                     accept=".xlsx,.xls"
@@ -523,54 +523,54 @@ export default function TorneosAdmin() {
               )}
 
               {/* Sección de Categorías */}
-              <div className="border-t border-gray-100 pt-4 mt-4">
-                <h3 className="text-sm font-bold text-gray-900 mb-3">Categorías del Torneo</h3>
+              <div className="border-t border-white/10 pt-4 mt-4">
+                <h3 className="text-sm font-bold text-crema mb-3">Categorías del Torneo</h3>
                   
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 items-end mb-4 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 items-end mb-4 bg-white/5 p-3 rounded-lg border border-white/10">
                     <div className="col-span-2 sm:col-span-2">
-                      <label className="block text-xs font-medium text-gray-700">Nombre</label>
+                      <label className="block text-xs font-medium text-slate-300">Nombre</label>
                       <input 
                         type="text" 
                         value={newCatNombre} 
                         onChange={e => setNewCatNombre(e.target.value)}
                         placeholder="Ej: Sub-18" 
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-2 py-1.5 border"
+                        className="mt-1 block w-full rounded-md border-white/15 shadow-sm focus:border-celeste focus:ring-celeste text-sm px-2 py-1.5 border"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700">Género</label>
+                      <label className="block text-xs font-medium text-slate-300">Género</label>
                       <select 
                         value={newCatGenero} 
                         onChange={e => setNewCatGenero(e.target.value)}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-2 py-1.5 border bg-white"
+                        className="mt-1 block w-full rounded-md border-white/15 shadow-sm focus:border-celeste focus:ring-celeste text-sm px-2 py-1.5 border bg-marino-claro"
                       >
                         <option value="masculino">Masculino</option>
                         <option value="femenino">Femenino</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700">Ed. Mín.</label>
+                      <label className="block text-xs font-medium text-slate-300">Ed. Mín.</label>
                       <input 
                         type="number" 
                         value={newCatMin} 
                         onChange={e => setNewCatMin(Number(e.target.value))}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-2 py-1.5 border"
+                        className="mt-1 block w-full rounded-md border-white/15 shadow-sm focus:border-celeste focus:ring-celeste text-sm px-2 py-1.5 border"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700">Ed. Máx.</label>
+                      <label className="block text-xs font-medium text-slate-300">Ed. Máx.</label>
                       <div className="flex gap-2">
                         <input 
                           type="number" 
                           value={newCatMax} 
                           onChange={e => setNewCatMax(e.target.value ? Number(e.target.value) : '')}
                           placeholder="Sin lim."
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm px-2 py-1.5 border"
+                          className="mt-1 block w-full rounded-md border-white/15 shadow-sm focus:border-celeste focus:ring-celeste text-sm px-2 py-1.5 border"
                         />
                         <button
                           type="button"
                           onClick={handleAddCategoria}
-                          className="mt-1 flex items-center justify-center rounded-md bg-gray-900 px-2 py-1.5 text-white hover:bg-gray-800 transition-colors"
+                          className="mt-1 flex items-center justify-center rounded-md bg-marino px-2 py-1.5 text-white hover:bg-marino transition-colors"
                           title="Añadir Categoría"
                         >
                           <Plus className="h-4 w-4" />
@@ -582,17 +582,17 @@ export default function TorneosAdmin() {
                   {categoriasList.length > 0 ? (
                     <ul className="space-y-2 max-h-32 overflow-y-auto pr-2">
                       {categoriasList.map((cat, index) => (
-                        <li key={index} className="flex items-center justify-between bg-white border border-gray-200 rounded-md p-2 shadow-sm">
+                        <li key={index} className="flex items-center justify-between bg-marino-claro border border-white/10 rounded-md p-2 shadow-sm">
                           <div className="flex flex-col">
-                            <span className="text-sm font-semibold text-gray-900">{cat.nombre_categoria} <span className="text-xs font-normal text-gray-500 capitalize">({cat.genero_categoria})</span></span>
-                            <span className="text-xs text-gray-500">
+                            <span className="text-sm font-semibold text-crema">{cat.nombre_categoria} <span className="text-xs font-normal text-slate-400 capitalize">({cat.genero_categoria})</span></span>
+                            <span className="text-xs text-slate-400">
                               Edad: {cat.edad_minima} - {cat.edad_maxima ? cat.edad_maxima : 'Sin límite'}
                             </span>
                           </div>
                           <button
                             type="button"
                             onClick={() => handleRemoveCategoria(index, cat.id_categoria || cat.id)}
-                            className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+                            className="p-1.5 text-red-300 hover:bg-red-500/15 rounded transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -600,21 +600,21 @@ export default function TorneosAdmin() {
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-xs text-gray-500 text-center italic py-2">No has agregado categorías a este torneo.</p>
+                    <p className="text-xs text-slate-400 text-center italic py-2">No has agregado categorías a este torneo.</p>
                   )}
               </div>
 
-              <div className="mt-6 flex justify-end gap-3 border-t border-gray-100 pt-5">
+              <div className="mt-6 flex justify-end gap-3 border-t border-white/10 pt-5">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="rounded-lg px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 border border-gray-300 transition-colors"
+                  className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-300 hover:bg-white/5 border border-white/15 transition-colors"
                 >
                   Cancelar
                 </button>
                 <AsyncButton
                   onClickAction={handleSubmit(onSubmit as any)}
-                  className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-500 transition-colors"
+                  className="rounded-lg bg-celeste px-4 py-2 text-sm font-semibold text-marino hover:bg-white transition-colors"
                 >
                   {editingTorneo ? 'Guardar Cambios' : 'Crear Torneo'}
                 </AsyncButton>

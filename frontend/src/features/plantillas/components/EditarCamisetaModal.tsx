@@ -69,35 +69,35 @@ export function EditarCamisetaModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl relative overflow-hidden border border-gray-100">
-        <div className="absolute top-0 left-0 w-full h-2 bg-primary-600" />
+      <div className="bg-marino-claro rounded-2xl p-6 max-w-sm w-full shadow-2xl relative overflow-hidden border border-white/10">
+        <div className="absolute top-0 left-0 w-full h-1 bg-oro/70" />
 
         <button
           onClick={onClose}
           disabled={isSaving}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-300 transition-colors p-1 rounded-lg hover:bg-white/10"
           title="Cerrar"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="flex flex-col items-center text-center">
-          <div className="w-14 h-14 bg-primary-50 text-primary-600 rounded-full flex items-center justify-center mb-3 border border-primary-100 shadow-sm">
+          <div className="w-14 h-14 bg-oro/10 text-oro rounded-full flex items-center justify-center mb-3 border border-oro/30 shadow-sm">
             <Shirt className="w-7 h-7" />
           </div>
 
-          <h2 className="text-lg font-bold text-gray-900 mb-1">
+          <h2 className="text-lg font-bold text-crema mb-1">
             Modificar Camiseta
           </h2>
 
-          <p className="text-xs text-gray-500 mb-4">
-            Jugador: <strong className="text-gray-800">{plantilla.jugador?.nombre || 'Jugador'}</strong>
+          <p className="text-xs text-slate-400 mb-4">
+            Jugador: <strong className="text-crema">{plantilla.jugador?.nombre || 'Jugador'}</strong>
           </p>
 
           <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
             <div className="text-left">
-              <label className="block text-xs font-semibold text-gray-700 mb-1">
-                Nuevo Número de Camiseta (0 - 99) <span className="text-red-500">*</span>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
+                Nuevo Número de Camiseta (0 - 99) <span className="text-red-400">*</span>
               </label>
               <div className="relative">
                 <input
@@ -110,12 +110,12 @@ export function EditarCamisetaModal({
                   disabled={isSaving}
                   className={`w-full rounded-xl border px-3 py-2.5 text-center text-lg font-bold transition-all focus:outline-none ${
                     error
-                      ? 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100 text-red-700'
-                      : 'border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 text-gray-900'
+                      ? 'border-red-400 focus:border-red-400 focus:ring-2 focus:ring-red-400/30 text-red-200'
+                      : 'border-white/15 focus:border-celeste focus:ring-2 focus:ring-celeste/25 text-crema'
                   }`}
                 />
               </div>
-              {error && <p className="mt-1 text-xs text-red-600 text-center font-medium">{error}</p>}
+              {error && <p className="mt-1 text-xs text-red-300 text-center font-medium">{error}</p>}
             </div>
 
             <div className="flex gap-2.5 pt-2">
@@ -123,14 +123,14 @@ export function EditarCamisetaModal({
                 type="button"
                 onClick={onClose}
                 disabled={isSaving}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition-colors text-sm cursor-pointer disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 rounded-xl border border-white/15 text-slate-300 font-semibold hover:bg-white/10 transition-colors text-sm cursor-pointer disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={isSaving || !numero.trim() || !!error}
-                className="flex-1 px-4 py-2.5 rounded-xl font-bold text-white transition-all shadow-sm bg-primary-600 hover:bg-primary-700 hover:shadow-md text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2.5 rounded-xl font-bold text-marino transition-all shadow-sm bg-celeste hover:bg-white hover:shadow-md text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSaving ? (
                   <>

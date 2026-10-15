@@ -85,6 +85,19 @@ describe('Home (página de inicio)', () => {
     expect(await screen.findByRole('heading', { level: 2, name: 'Liga Provincial 2024' })).toBeInTheDocument();
   });
 
+  it('cada torneo del hero dice cuántos puntos se anotaron en él', async () => {
+    vi.mocked(getEstadisticasPublicas).mockResolvedValue({
+      success: true, message: '', data: { puntos_totales: 15230, puntos_por_torneo: { '1': 12480 } },
+    } as never);
+    renderHome();
+
+    const tarjeta = (await screen.findByRole('heading', { level: 2, name: 'Copa Verano Manta 2026' })).closest('article')!;
+    expect(await within(tarjeta).findByText('12.480')).toBeInTheDocument();
+    expect(within(tarjeta).getByText(/puntos anotados/)).toBeInTheDocument();
+    // La Liga 2024 no tiene puntos en el mapa: su ticket lo dice
+    expect(screen.getAllByText('Aún sin puntos anotados').length).toBeGreaterThan(0);
+  });
+
   it('muestra juntos los próximos partidos y los resultados, con el ganador marcado', async () => {
     renderHome();
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Menu, User, ChevronDown, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useBusinessRules } from '../hooks/useBusinessRules';
@@ -53,16 +53,8 @@ export function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  // En las páginas públicas oscuras (y el panel del delegado, que muestra el perfil de su equipo) el navbar toma los colores de la página (marino, crema y oro)
-  const { pathname } = useLocation();
-  const enInicio = pathname === '/' || pathname.startsWith('/equipos') || pathname.startsWith('/torneos/') || pathname.startsWith('/jugadores/') || pathname === '/visor' || pathname === '/delegado/dashboard';
-  const claseEnlace = (isActive: boolean, inactivo: string) =>
-    `text-sm font-medium ${
-      enInicio
-        ? isActive ? 'text-crema' : 'text-slate-300 hover:text-white'
-        : isActive ? 'text-primary-600' : `${inactivo} hover:text-primary-600`
-    }`;
-  const separador = enInicio ? 'border-white/15' : 'border-gray-200';
+  const claseEnlace = (isActive: boolean) => `text-sm font-medium ${isActive ? 'text-crema' : 'text-slate-300 hover:text-white'}`;
+  const separador = 'border-white/15';
   // El super_admin tiene 9 enlaces más las vistas de usuario: por debajo de 1280 px no caben y usa el menú lateral
   const desde = userRole === 'super_admin'
     ? { boton: 'xl:hidden', barra: 'xl:flex', usuario: 'xl:block' }
@@ -121,12 +113,12 @@ export function Navbar() {
 
   return (
     <>
-      <nav className={`sticky top-0 z-50 w-full border-b ${enInicio ? 'border-white/10 bg-marino' : 'border-gray-200 bg-white shadow-sm'}`}>
+      <nav className={`sticky top-0 z-50 w-full border-b border-white/10 bg-marino`}>
         <div className="mx-auto flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex shrink-0 items-center gap-4">
             <button
               type="button"
-              className={`inline-flex items-center justify-center rounded-md p-2 ${desde.boton} ${enInicio ? 'text-slate-300 hover:bg-white/10 hover:text-white' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'}`}
+              className={`inline-flex items-center justify-center rounded-md p-2 ${desde.boton} text-slate-300 hover:bg-white/10 hover:text-white`}
               onClick={() => setIsSidebarOpen(true)}
               aria-label="Abrir menú"
             >
@@ -135,11 +127,11 @@ export function Navbar() {
             <Link to="/" className="flex items-center gap-3">
               {/* En la portada va el recorte del escudo: sobre marino el logo con márgenes se pierde */}
               <img
-                src={enInicio ? '/img/logo-recortado.webp' : '/logo.png'}
+                src="/img/logo-recortado.webp"
                 alt="Torneos Baloncesto Manta Logo"
                 className="h-12 w-12 object-contain"
               />
-              <span className={`whitespace-nowrap text-xl font-bold ${userRole === 'super_admin' ? 'hidden min-[1800px]:block' : 'hidden sm:block'} ${enInicio ? 'text-crema' : 'text-primary-600'}`}>Torneos Baloncesto Manta</span>
+              <span className={`whitespace-nowrap text-xl font-bold ${userRole === 'super_admin' ? 'hidden min-[1800px]:block' : 'hidden sm:block'} text-crema`}>Torneos Baloncesto Manta</span>
             </Link>
           </div>
 
@@ -149,7 +141,7 @@ export function Navbar() {
                 return (
                   <span
                     key={link.path}
-                    className="text-sm font-medium text-gray-400 cursor-not-allowed py-2 select-none"
+                    className="text-sm font-medium text-slate-500 cursor-not-allowed py-2 select-none"
                     title={`Límite de ${maxEquiposDelegado} equipo(s) alcanzado`}
                   >
                     {link.name}
@@ -169,7 +161,7 @@ export function Navbar() {
                 return (
                   <span
                     key={link.path}
-                    className="text-sm font-medium text-gray-400 cursor-not-allowed py-2 select-none"
+                    className="text-sm font-medium text-slate-500 cursor-not-allowed py-2 select-none"
                     title={tooltip}
                   >
                     {link.name}
@@ -181,7 +173,7 @@ export function Navbar() {
                 <NavLink
                   key={link.path}
                   to={link.path}
-                  className={({ isActive }) => claseEnlace(isActive, 'text-gray-600')}
+                  className={({ isActive }) => claseEnlace(isActive)}
                 >
                   {link.name}
                 </NavLink>
@@ -191,9 +183,9 @@ export function Navbar() {
             {/* Separador de Vistas de Usuario para Super Admin */}
             {userRole === 'super_admin' && (
               <div className={`flex items-center gap-4 ml-4 pl-4 border-l-2 ${separador}`}>
-                <span className="hidden text-[10px] font-bold text-gray-400 uppercase tracking-widest 2xl:inline">Vistas de Usuario</span>
+                <span className="hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest 2xl:inline">Vistas de Usuario</span>
                 {NAV_LINKS.public_admin.map(link => (
-                  <NavLink key={link.path} to={link.path} className={({ isActive }) => claseEnlace(isActive, 'text-gray-500')}>
+                  <NavLink key={link.path} to={link.path} className={({ isActive }) => claseEnlace(isActive)}>
                     {link.name}
                   </NavLink>
                 ))}
@@ -203,9 +195,9 @@ export function Navbar() {
             {/* Separador de Vistas de Usuario para Delegado */}
             {userRole === 'delegado' && (
               <div className={`flex items-center gap-4 ml-4 pl-4 border-l-2 ${separador}`}>
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Vistas de Usuario</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Vistas de Usuario</span>
                 {NAV_LINKS.public_delegado.map(link => (
-                  <NavLink key={link.path} to={link.path} className={({ isActive }) => claseEnlace(isActive, 'text-gray-500')}>
+                  <NavLink key={link.path} to={link.path} className={({ isActive }) => claseEnlace(isActive)}>
                     {link.name}
                   </NavLink>
                 ))}
@@ -214,7 +206,7 @@ export function Navbar() {
             
             {/* Team Switcher Desktop */}
             {userRole === 'delegado' && inscripciones.length > 1 && (
-              <div className="ml-4 pl-4 border-l border-gray-200">
+              <div className="ml-4 pl-4 border-l border-white/15">
                 {renderTeamSwitcher()}
               </div>
             )}
@@ -227,25 +219,21 @@ export function Navbar() {
                 <button
                   type="button"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className={`inline-flex items-center gap-2.5 rounded-full border py-1.5 pl-2 pr-3.5 transition-all focus:outline-none ${
-                    enInicio
-                      ? 'border-white/15 bg-white/5 text-slate-200 hover:bg-white/10'
-                      : 'border-gray-200 bg-white text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300'
-                  }`}
+                  className={`inline-flex items-center gap-2.5 rounded-full border py-1.5 pl-2 pr-3.5 transition-all focus:outline-none border-white/15 bg-white/5 text-slate-200 hover:bg-white/10`}
                   aria-expanded={isDropdownOpen}
                 >
-                  <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ring-2 ${enInicio ? 'bg-oro text-marino ring-marino' : 'bg-primary-100 text-primary-700 ring-white'}`}>
+                  <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ring-2 bg-oro text-marino ring-marino`}>
                     {userInitial}
                   </div>
                   <div className="flex flex-col text-left">
-                    <span className={`text-xs font-bold max-w-[130px] truncate leading-tight ${enInicio ? 'text-crema' : 'text-gray-900'}`}>
+                    <span className={`text-xs font-bold max-w-[130px] truncate leading-tight text-crema`}>
                       {nombreUsuario}
                     </span>
-                    <span className={`text-[10px] font-medium capitalize leading-tight ${enInicio ? 'text-slate-400' : 'text-gray-500'}`}>
+                    <span className={`text-[10px] font-medium capitalize leading-tight text-slate-400`}>
                       {userRole === 'super_admin' ? 'Super Admin' : userRole === 'visor' ? 'Visor' : 'Delegado'}
                     </span>
                   </div>
-                  <ChevronDown className={`h-3.5 w-3.5 text-gray-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {isDropdownOpen && (
                   <>
@@ -253,13 +241,11 @@ export function Navbar() {
                       className="fixed inset-0 z-10" 
                       onClick={() => setIsDropdownOpen(false)} 
                     />
-                    <div className={`absolute right-0 z-20 mt-2 w-56 origin-top-right divide-y rounded-xl py-1.5 shadow-xl ${
-                      enInicio ? 'divide-white/10 bg-marino-claro ring-1 ring-oro/25 shadow-black/40' : 'divide-gray-100 bg-white ring-1 ring-black/5'
-                    }`}>
+                    <div className={`absolute right-0 z-20 mt-2 w-56 origin-top-right divide-y rounded-xl py-1.5 shadow-xl divide-white/10 bg-marino-claro ring-1 ring-oro/25 shadow-black/40`}>
                       <div className="px-4 py-2.5">
-                        <p className={`text-xs font-medium ${enInicio ? 'text-slate-400' : 'text-gray-500'}`}>Conectado como</p>
-                        <p className={`mt-0.5 truncate text-sm font-bold ${enInicio ? 'text-crema' : 'text-gray-900'}`}>{nombreUsuario}</p>
-                        <span className={`mt-1.5 inline-block rounded-md px-2 py-0.5 text-[10px] font-semibold ${enInicio ? 'bg-oro/15 text-oro' : 'bg-primary-50 text-primary-700'}`}>
+                        <p className={`text-xs font-medium text-slate-400`}>Conectado como</p>
+                        <p className={`mt-0.5 truncate text-sm font-bold text-crema`}>{nombreUsuario}</p>
+                        <span className={`mt-1.5 inline-block rounded-md px-2 py-0.5 text-[10px] font-semibold bg-oro/15 text-oro`}>
                           {userRole === 'super_admin' ? 'Super Administrador' : userRole === 'visor' ? 'Visor' : 'Delegado'}
                         </span>
                       </div>
@@ -267,9 +253,9 @@ export function Navbar() {
                         <Link
                           to="/perfil"
                           onClick={() => setIsDropdownOpen(false)}
-                          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors ${enInicio ? 'text-slate-200 hover:bg-white/5' : 'text-gray-700 hover:bg-gray-50'}`}
+                          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors text-slate-200 hover:bg-white/5`}
                         >
-                          <User className={`h-4 w-4 ${enInicio ? 'text-slate-400' : 'text-gray-400'}`} />
+                          <User className={`h-4 w-4 text-slate-400`} />
                           Mi Perfil
                         </Link>
                       </div>
@@ -279,7 +265,7 @@ export function Navbar() {
                             setIsDropdownOpen(false);
                             handleLogout();
                           }}
-                          className={`flex w-full items-center gap-2 px-4 py-2 text-left text-sm font-medium transition-colors ${enInicio ? 'text-rose-300 hover:bg-rose-500/10' : 'text-red-600 hover:bg-red-50'}`}
+                          className={`flex w-full items-center gap-2 px-4 py-2 text-left text-sm font-medium transition-colors text-rose-300 hover:bg-rose-500/10`}
                         >
                           <LogOut className="h-4 w-4" />
                           Cerrar Sesión
@@ -292,11 +278,7 @@ export function Navbar() {
             ) : (
               <Link
                 to="/auth/login"
-                className={`inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium ${
-                  enInicio
-                    ? 'border border-oro/70 text-oro hover:bg-oro hover:text-marino'
-                    : 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm'
-                }`}
+                className={`inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium border border-oro/70 text-oro hover:bg-oro hover:text-marino`}
               >
                 Ingresar
               </Link>
@@ -318,7 +300,6 @@ export function Navbar() {
         userName={nombreUsuario}
         userRole={userRole}
         ocultarDesde={desde.boton}
-        oscuro={enInicio}
       />
     </>
   );

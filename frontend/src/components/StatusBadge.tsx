@@ -7,8 +7,8 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, textOverride, title }: StatusBadgeProps) {
-  let bgColor = 'bg-gray-100';
-  let textColor = 'text-gray-800';
+  let bgColor = 'bg-white/10';
+  let textColor = 'text-crema';
   let defaultTitle = title;
 
   switch (status.toLowerCase()) {
@@ -16,31 +16,31 @@ export function StatusBadge({ status, textOverride, title }: StatusBadgeProps) {
     case 'activo':
     case 'finalizado':
     case 'finalizado w.o.':
-      bgColor = 'bg-green-100';
-      textColor = 'text-green-800';
+      bgColor = 'bg-green-500/15';
+      textColor = 'text-green-200';
       break;
     case 'rechazado':
     case 'retirado':
     case 'inactivo':
     case 'suspendido':
-      bgColor = 'bg-red-100';
-      textColor = 'text-red-800';
+      bgColor = 'bg-red-500/15';
+      textColor = 'text-red-200';
       break;
     case 'borrador':
-      bgColor = 'bg-amber-100';
-      textColor = 'text-amber-800';
+      bgColor = 'bg-amber-500/15';
+      textColor = 'text-amber-200';
       break;
     case 'pendiente':
     case 'en_curso':
-      bgColor = 'bg-yellow-100';
-      textColor = 'text-yellow-800';
+      bgColor = 'bg-yellow-500/15';
+      textColor = 'text-yellow-200';
       if (!defaultTitle && status.toLowerCase() === 'pendiente') {
           defaultTitle = 'La administración hará las revisiones y luego aprobará';
       }
       break;
     case 'programado':
-      bgColor = 'bg-blue-100';
-      textColor = 'text-blue-800';
+      bgColor = 'bg-blue-500/15';
+      textColor = 'text-blue-200';
       break;
   }
 

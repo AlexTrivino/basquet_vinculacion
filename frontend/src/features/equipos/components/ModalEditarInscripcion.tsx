@@ -90,19 +90,19 @@ export function ModalEditarInscripcion({ isOpen, onClose, inscripcion }: ModalEd
   return (
     <>
       <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50">
-            <h3 className="text-lg font-bold text-gray-900">Editar Inscripción</h3>
-            <button onClick={onClose} className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
+        <div className="w-full max-w-md bg-marino-claro rounded-2xl shadow-xl overflow-hidden">
+          <div className="flex items-center justify-between p-4 border-b border-white/10 bg-white/5">
+            <h3 className="text-lg font-bold text-crema">Editar Inscripción</h3>
+            <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-slate-300 rounded-lg hover:bg-white/15 transition-colors">
               <X className="w-5 h-5" />
             </button>
           </div>
 
           <div className="p-6 space-y-5">
             {/* Aviso */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-              <div className="text-sm text-amber-800">
+            <div className="bg-amber-500/10 border border-amber-400/30 rounded-xl p-4 flex gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-300 shrink-0 mt-0.5" />
+              <div className="text-sm text-amber-200">
                 <p className="font-semibold mb-1">Nota importante:</p>
                 <p>Solo se pueden editar inscripciones si el torneo destino está en estado <b>programado</b>.</p>
                 <p className="mt-1">Para editar la plantilla de jugadores, dirígete al panel de <b>Gestión de Equipos</b>.</p>
@@ -111,14 +111,14 @@ export function ModalEditarInscripcion({ isOpen, onClose, inscripcion }: ModalEd
 
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <label className="block text-sm font-semibold text-gray-700">Torneo</label>
+                <label className="block text-sm font-semibold text-slate-300">Torneo</label>
                 <select
                   value={selectedTorneo}
                   onChange={(e) => {
                     setSelectedTorneo(Number(e.target.value));
                     setSelectedCategoria('');
                   }}
-                  className="w-full h-11 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white"
+                  className="w-full h-11 px-3 border border-white/15 rounded-lg focus:ring-2 focus:ring-celeste focus:border-celeste bg-marino-claro"
                 >
                   <option value="" disabled>Seleccione un torneo...</option>
                   {torneos.map((t: any) => (
@@ -130,12 +130,12 @@ export function ModalEditarInscripcion({ isOpen, onClose, inscripcion }: ModalEd
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-sm font-semibold text-gray-700">Categoría</label>
+                <label className="block text-sm font-semibold text-slate-300">Categoría</label>
                 <select
                   value={selectedCategoria}
                   onChange={(e) => setSelectedCategoria(Number(e.target.value))}
                   disabled={!selectedTorneo}
-                  className="w-full h-11 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white disabled:bg-gray-100 disabled:text-gray-400"
+                  className="w-full h-11 px-3 border border-white/15 rounded-lg focus:ring-2 focus:ring-celeste focus:border-celeste bg-marino-claro disabled:bg-white/10 disabled:text-slate-400"
                 >
                   <option value="" disabled>Seleccione una categoría...</option>
                   {categorias.map((c: any) => {
@@ -159,17 +159,17 @@ export function ModalEditarInscripcion({ isOpen, onClose, inscripcion }: ModalEd
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 p-4 bg-gray-50 border-t border-gray-100">
+          <div className="flex justify-end gap-3 p-4 bg-white/5 border-t border-white/10">
             <button
               onClick={onClose}
-              className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+              className="px-4 py-2.5 text-sm font-semibold text-slate-300 bg-marino-claro border border-white/15 rounded-xl hover:bg-white/5 transition-colors"
             >
               Cancelar
             </button>
             <button
               onClick={() => setIsConfirmOpen(true)}
               disabled={!selectedTorneo || !selectedCategoria || (selectedTorneo === currentIdTorneo && selectedCategoria === currentIdCategoria)}
-              className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-white bg-primary-600 rounded-xl hover:bg-primary-700 focus:ring-4 focus:ring-primary-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-marino bg-celeste rounded-xl hover:bg-white focus:ring-4 focus:ring-celeste/25 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="w-4 h-4" />
               Guardar Cambios

@@ -70,87 +70,87 @@ export default function MiPerfil() {
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-celeste border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
+      <div className="bg-marino-claro shadow-sm ring-1 ring-white/5 sm:rounded-xl md:col-span-2">
         <div className="px-4 py-6 sm:p-8">
           <div className="max-w-2xl space-y-10">
             <div>
-              <h2 className="text-base font-semibold leading-7 text-gray-900">Perfil Público</h2>
-              <p className="mt-1 text-sm leading-6 text-gray-600">
+              <h2 className="text-base font-semibold leading-7 text-crema">Perfil Público</h2>
+              <p className="mt-1 text-sm leading-6 text-slate-300">
                 Esta información se mostrará públicamente, así que ten cuidado con lo que compartes.
               </p>
 
-              <form className="mt-6 space-y-8 border-t border-gray-100 pt-6" onSubmit={(e) => e.preventDefault()}>
+              <form className="mt-6 space-y-8 border-t border-white/10 pt-6" onSubmit={(e) => e.preventDefault()}>
                 <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                   
                   <div className="sm:col-span-4">
-                    <label htmlFor="correo" className="block text-sm font-medium leading-6 text-gray-900">
+                    <label htmlFor="correo" className="block text-sm font-medium leading-6 text-crema">
                       Correo Electrónico
                     </label>
                     <div className="mt-2 relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <Mail className="h-5 w-5 text-gray-400" />
+                        <Mail className="h-5 w-5 text-slate-400" />
                       </div>
                       <input
                         id="correo"
                         type="email"
                         disabled
                         {...register('correo')}
-                        className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 bg-gray-50 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                        className="block w-full rounded-md border-0 py-1.5 pl-10 text-slate-400 shadow-sm ring-1 ring-inset ring-white/15 bg-white/5 focus:ring-2 focus:ring-inset focus:ring-celeste sm:text-sm sm:leading-6"
                       />
                     </div>
-                    <p className="mt-2 text-xs text-gray-500">El correo electrónico no puede ser modificado.</p>
+                    <p className="mt-2 text-xs text-slate-400">El correo electrónico no puede ser modificado.</p>
                   </div>
 
                   <div className="sm:col-span-4">
-                    <label htmlFor="rol" className="block text-sm font-medium leading-6 text-gray-900">
+                    <label htmlFor="rol" className="block text-sm font-medium leading-6 text-crema">
                       Rol de Usuario
                     </label>
                     <div className="mt-2 relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <Shield className="h-5 w-5 text-gray-400" />
+                        <Shield className="h-5 w-5 text-slate-400" />
                       </div>
                       <input
                         id="rol"
                         type="text"
                         disabled
                         {...register('rol')}
-                        className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-300 bg-gray-50 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                        className="block w-full rounded-md border-0 py-1.5 pl-10 text-slate-400 shadow-sm ring-1 ring-inset ring-white/15 bg-white/5 focus:ring-2 focus:ring-inset focus:ring-celeste sm:text-sm sm:leading-6"
                       />
                     </div>
                   </div>
 
                   <div className="sm:col-span-4">
-                    <label htmlFor="nombre" className="block text-sm font-medium leading-6 text-gray-900">
+                    <label htmlFor="nombre" className="block text-sm font-medium leading-6 text-crema">
                       Nombre Completo
                     </label>
                     <div className="mt-2 relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <User className="h-5 w-5 text-gray-400" />
+                        <User className="h-5 w-5 text-slate-400" />
                       </div>
                       <input
                         id="nombre"
                         type="text"
                         {...register('nombre', { required: 'El nombre es obligatorio' })}
-                        className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                        className="block w-full rounded-md border-0 py-1.5 pl-10 text-crema shadow-sm ring-1 ring-inset ring-white/15 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-celeste sm:text-sm sm:leading-6"
                       />
                     </div>
-                    {errors.nombre && <p className="mt-1 text-xs text-red-600">{errors.nombre.message}</p>}
+                    {errors.nombre && <p className="mt-1 text-xs text-red-300">{errors.nombre.message}</p>}
                   </div>
 
                 </div>
 
-                <div className="flex items-center justify-end gap-x-6 border-t border-gray-100 pt-6">
+                <div className="flex items-center justify-end gap-x-6 border-t border-white/10 pt-6">
                   <AsyncButton 
                     disabled={!isDirty || isSubmitting}
                     onClickAction={handleSubmit(onSubmit)} 
-                    className="rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="rounded-md bg-celeste px-3 py-2 text-sm font-semibold text-marino shadow-sm hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-celeste disabled:bg-white/25 disabled:cursor-not-allowed"
                   >
                     Guardar Cambios
                   </AsyncButton>
@@ -161,24 +161,24 @@ export default function MiPerfil() {
         </div>
       </div>
 
-      <div className="mt-8 bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
+      <div className="mt-8 bg-marino-claro shadow-sm ring-1 ring-white/5 sm:rounded-xl md:col-span-2">
         <div className="px-4 py-6 sm:p-8">
           <div className="max-w-2xl space-y-10">
             <div>
-              <h2 className="text-base font-semibold leading-7 text-gray-900">Seguridad</h2>
-              <p className="mt-1 text-sm leading-6 text-gray-600">
+              <h2 className="text-base font-semibold leading-7 text-crema">Seguridad</h2>
+              <p className="mt-1 text-sm leading-6 text-slate-300">
                 Actualiza tu contraseña para mantener tu cuenta segura.
               </p>
 
-              <div className="mt-6 space-y-8 border-t border-gray-100 pt-6">
+              <div className="mt-6 space-y-8 border-t border-white/10 pt-6">
                 <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                   <div className="sm:col-span-4">
-                    <label htmlFor="new-password" className="block text-sm font-medium leading-6 text-gray-900">
+                    <label htmlFor="new-password" className="block text-sm font-medium leading-6 text-crema">
                       Nueva Contraseña
                     </label>
                     <div className="mt-2 relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <Lock className="h-5 w-5 text-gray-400" />
+                        <Lock className="h-5 w-5 text-slate-400" />
                       </div>
                       <input
                         id="new-password"
@@ -186,16 +186,16 @@ export default function MiPerfil() {
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         placeholder="Mínimo 6 caracteres"
-                        className="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-600 sm:text-sm sm:leading-6"
+                        className="block w-full rounded-md border-0 py-1.5 pl-10 text-crema shadow-sm ring-1 ring-inset ring-white/15 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-celeste sm:text-sm sm:leading-6"
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-x-6 border-t border-gray-100 pt-6">
+                <div className="flex items-center justify-end gap-x-6 border-t border-white/10 pt-6">
                   <AsyncButton 
                     onClickAction={handleUpdatePassword} 
-                    className="rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+                    className="rounded-md bg-celeste px-3 py-2 text-sm font-semibold text-marino shadow-sm hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-celeste"
                   >
                     Actualizar Contraseña
                   </AsyncButton>

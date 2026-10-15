@@ -45,7 +45,7 @@ const withSuspense = (Component: React.LazyExoticComponent<any>) => (
   <Suspense
     fallback={
       <div className="flex min-h-[50vh] items-center justify-center p-8">
-        <div className="text-gray-500">Cargando contenido...</div>
+        <div className="text-slate-400">Cargando contenido...</div>
       </div>
     }
   >

@@ -221,7 +221,7 @@ export function ModalEditarJugadorAdmin({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+      <div className="bg-marino-claro rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-white/10 flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -244,14 +244,14 @@ export function ModalEditarJugadorAdmin({
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-slate-200 bg-slate-50 px-6 pt-3 gap-2">
+        <div className="flex border-b border-white/10 bg-white/5 px-6 pt-3 gap-2">
           <button
             type="button"
             onClick={() => setActiveTab('datos')}
             className={`pb-3 px-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
               activeTab === 'datos'
-                ? 'border-orange-600 text-orange-600'
-                : 'border-transparent text-slate-500 hover:text-slate-900'
+                ? 'border-orange-400 text-orange-300'
+                : 'border-transparent text-slate-500 hover:text-crema'
             }`}
           >
             <User className="w-4 h-4" />
@@ -262,8 +262,8 @@ export function ModalEditarJugadorAdmin({
             onClick={() => setActiveTab('documentos')}
             className={`pb-3 px-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
               activeTab === 'documentos'
-                ? 'border-orange-600 text-orange-600'
-                : 'border-transparent text-slate-500 hover:text-slate-900'
+                ? 'border-orange-400 text-orange-300'
+                : 'border-transparent text-slate-500 hover:text-crema'
             }`}
           >
             <FileText className="w-4 h-4" />
@@ -274,8 +274,8 @@ export function ModalEditarJugadorAdmin({
             onClick={() => setActiveTab('estado')}
             className={`pb-3 px-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
               activeTab === 'estado'
-                ? 'border-orange-600 text-orange-600'
-                : 'border-transparent text-slate-500 hover:text-slate-900'
+                ? 'border-orange-400 text-orange-300'
+                : 'border-transparent text-slate-500 hover:text-crema'
             }`}
           >
             <Activity className="w-4 h-4" />
@@ -288,7 +288,7 @@ export function ModalEditarJugadorAdmin({
           {activeTab === 'datos' && (
             <form id="form-jugador" onSubmit={handleSubmitDatos} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
                   Nombre Completo *
                 </label>
                 <div className="relative">
@@ -298,7 +298,7 @@ export function ModalEditarJugadorAdmin({
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
                     required
-                    className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full pl-9 pr-4 py-2 border border-white/15 rounded-lg text-sm focus:ring-2 focus:ring-celeste focus:border-celeste"
                     placeholder="Ej. Juan Carlos Pérez Rodríguez"
                   />
                 </div>
@@ -306,7 +306,7 @@ export function ModalEditarJugadorAdmin({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
                     Cédula / Documento (10 dígitos) *
                   </label>
                   <div className="relative">
@@ -317,20 +317,20 @@ export function ModalEditarJugadorAdmin({
                       value={documento}
                       onChange={(e) => setDocumento(e.target.value.replace(/[^0-9]/g, ''))}
                       required
-                      className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-mono"
+                      className="w-full pl-9 pr-4 py-2 border border-white/15 rounded-lg text-sm focus:ring-2 focus:ring-celeste focus:border-celeste font-mono"
                       placeholder="1312345678"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
                     Género *
                   </label>
                   <select
                     value={genero}
                     onChange={(e) => setGenero(e.target.value as 'masculino' | 'femenino')}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white"
+                    className="w-full px-3 py-2 border border-white/15 rounded-lg text-sm focus:ring-2 focus:ring-celeste focus:border-celeste bg-marino-claro"
                   >
                     <option value="masculino">Masculino</option>
                     <option value="femenino">Femenino</option>
@@ -340,7 +340,7 @@ export function ModalEditarJugadorAdmin({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
                     Fecha de Nacimiento *
                   </label>
                   <div className="relative">
@@ -350,18 +350,18 @@ export function ModalEditarJugadorAdmin({
                       value={fechaNacimiento}
                       onChange={(e) => setFechaNacimiento(e.target.value)}
                       required
-                      className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-full pl-9 pr-4 py-2 border border-white/15 rounded-lg text-sm focus:ring-2 focus:ring-celeste focus:border-celeste"
                     />
                   </div>
                   {edad !== null && (
                     <p className="text-xs text-slate-500 mt-1 font-medium">
-                      Edad calculada: <span className="text-orange-600 font-bold">{edad} años</span>
+                      Edad calculada: <span className="text-orange-300 font-bold">{edad} años</span>
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
                     Teléfono (10 dígitos)
                   </label>
                   <div className="relative">
@@ -371,7 +371,7 @@ export function ModalEditarJugadorAdmin({
                       maxLength={10}
                       value={telefono}
                       onChange={(e) => setTelefono(e.target.value.replace(/[^0-9]/g, ''))}
-                      className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-mono"
+                      className="w-full pl-9 pr-4 py-2 border border-white/15 rounded-lg text-sm focus:ring-2 focus:ring-celeste focus:border-celeste font-mono"
                       placeholder="0987654321"
                     />
                   </div>
@@ -379,7 +379,7 @@ export function ModalEditarJugadorAdmin({
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
                   Correo Electrónico
                 </label>
                 <div className="relative">
@@ -388,7 +388,7 @@ export function ModalEditarJugadorAdmin({
                     type="email"
                     value={correo}
                     onChange={(e) => setCorreo(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full pl-9 pr-4 py-2 border border-white/15 rounded-lg text-sm focus:ring-2 focus:ring-celeste focus:border-celeste"
                     placeholder="jugador@ejemplo.com"
                   />
                 </div>
@@ -399,9 +399,9 @@ export function ModalEditarJugadorAdmin({
           {activeTab === 'documentos' && (
             <div className="space-y-6">
               {/* Foto de Perfil */}
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center gap-4 justify-between">
+              <div className="p-4 bg-white/5 rounded-xl border border-white/10 flex flex-col sm:flex-row items-center gap-4 justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="relative w-16 h-16 rounded-full overflow-hidden bg-slate-200 border-2 border-orange-500 shrink-0 flex items-center justify-center">
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden bg-white/10 border-2 border-orange-400 shrink-0 flex items-center justify-center">
                     {currentJugador.url_foto ? (
                       <img
                         src={currentJugador.url_foto}
@@ -413,15 +413,15 @@ export function ModalEditarJugadorAdmin({
                     )}
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-900 text-sm">Foto de Perfil</h4>
+                    <h4 className="font-bold text-crema text-sm">Foto de Perfil</h4>
                     <p className="text-xs text-slate-500">
                       Formatos JPG, PNG, WebP (Máx. 4 MB)
                     </p>
                     <span
                       className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full mt-1 ${
                         currentJugador.url_foto
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-amber-100 text-amber-800'
+                          ? 'bg-emerald-500/15 text-emerald-200'
+                          : 'bg-amber-500/15 text-amber-200'
                       }`}
                     >
                       {currentJugador.url_foto ? (
@@ -445,12 +445,12 @@ export function ModalEditarJugadorAdmin({
                     type="button"
                     disabled={uploadingFoto}
                     onClick={() => fotoInputRef.current?.click()}
-                    className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-colors shadow-sm disabled:opacity-50"
+                    className="flex items-center gap-2 px-3 py-2 bg-marino-claro border border-white/15 hover:bg-white/10 text-slate-300 rounded-lg text-xs font-bold transition-colors shadow-sm disabled:opacity-50"
                   >
                     {uploadingFoto ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-orange-600" />
+                      <Loader2 className="w-4 h-4 animate-spin text-orange-300" />
                     ) : (
-                      <Camera className="w-4 h-4 text-orange-600" />
+                      <Camera className="w-4 h-4 text-orange-300" />
                     )}
                     {currentJugador.url_foto ? 'Cambiar Foto' : 'Subir Foto'}
                   </button>
@@ -458,20 +458,20 @@ export function ModalEditarJugadorAdmin({
               </div>
 
               {/* Documento Cédula */}
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center gap-4 justify-between">
+              <div className="p-4 bg-white/5 rounded-xl border border-white/10 flex flex-col sm:flex-row items-center gap-4 justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-200">
+                  <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-300 flex items-center justify-center shrink-0 border border-blue-400/30">
                     <CreditCard className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-900 text-sm">Cédula de Identidad</h4>
+                    <h4 className="font-bold text-crema text-sm">Cédula de Identidad</h4>
                     <p className="text-xs text-slate-500">PDF, JPG o PNG (Máx. 4 MB)</p>
                     <div className="flex items-center gap-2 mt-1">
                       <span
                         className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${
                           currentJugador.url_cedula
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-amber-100 text-amber-800'
+                            ? 'bg-emerald-500/15 text-emerald-200'
+                            : 'bg-amber-500/15 text-amber-200'
                         }`}
                       >
                         {currentJugador.url_cedula ? (
@@ -486,7 +486,7 @@ export function ModalEditarJugadorAdmin({
                           href={currentJugador.url_cedula}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline font-semibold"
+                          className="inline-flex items-center gap-1 text-xs text-blue-300 hover:underline font-semibold"
                         >
                           <ExternalLink className="w-3 h-3" />
                           Ver Cédula
@@ -507,12 +507,12 @@ export function ModalEditarJugadorAdmin({
                     type="button"
                     disabled={uploadingCedula}
                     onClick={() => cedulaInputRef.current?.click()}
-                    className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-colors shadow-sm disabled:opacity-50"
+                    className="flex items-center gap-2 px-3 py-2 bg-marino-claro border border-white/15 hover:bg-white/10 text-slate-300 rounded-lg text-xs font-bold transition-colors shadow-sm disabled:opacity-50"
                   >
                     {uploadingCedula ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                      <Loader2 className="w-4 h-4 animate-spin text-blue-300" />
                     ) : (
-                      <Upload className="w-4 h-4 text-blue-600" />
+                      <Upload className="w-4 h-4 text-blue-300" />
                     )}
                     {currentJugador.url_cedula ? 'Reemplazar Cédula' : 'Subir Cédula'}
                   </button>
@@ -520,20 +520,20 @@ export function ModalEditarJugadorAdmin({
               </div>
 
               {/* Acta de Bachiller */}
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center gap-4 justify-between">
+              <div className="p-4 bg-white/5 rounded-xl border border-white/10 flex flex-col sm:flex-row items-center gap-4 justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 border border-purple-200">
+                  <div className="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-300 flex items-center justify-center shrink-0 border border-purple-400/30">
                     <FileText className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-900 text-sm">Acta de Grado / Título</h4>
+                    <h4 className="font-bold text-crema text-sm">Acta de Grado / Título</h4>
                     <p className="text-xs text-slate-500">PDF, JPG o PNG (Máx. 4 MB)</p>
                     <div className="flex items-center gap-2 mt-1">
                       <span
                         className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${
                           currentJugador.url_acta_bachiller
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : 'bg-slate-200 text-slate-700'
+                            ? 'bg-emerald-500/15 text-emerald-200'
+                            : 'bg-white/10 text-slate-300'
                         }`}
                       >
                         {currentJugador.url_acta_bachiller ? (
@@ -548,7 +548,7 @@ export function ModalEditarJugadorAdmin({
                           href={currentJugador.url_acta_bachiller}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs text-purple-600 hover:underline font-semibold"
+                          className="inline-flex items-center gap-1 text-xs text-purple-300 hover:underline font-semibold"
                         >
                           <ExternalLink className="w-3 h-3" />
                           Ver Acta
@@ -569,12 +569,12 @@ export function ModalEditarJugadorAdmin({
                     type="button"
                     disabled={uploadingActa}
                     onClick={() => actaInputRef.current?.click()}
-                    className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 rounded-lg text-xs font-bold transition-colors shadow-sm disabled:opacity-50"
+                    className="flex items-center gap-2 px-3 py-2 bg-marino-claro border border-white/15 hover:bg-white/10 text-slate-300 rounded-lg text-xs font-bold transition-colors shadow-sm disabled:opacity-50"
                   >
                     {uploadingActa ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-purple-600" />
+                      <Loader2 className="w-4 h-4 animate-spin text-purple-300" />
                     ) : (
-                      <Upload className="w-4 h-4 text-purple-600" />
+                      <Upload className="w-4 h-4 text-purple-300" />
                     )}
                     {currentJugador.url_acta_bachiller ? 'Reemplazar Acta' : 'Subir Acta'}
                   </button>
@@ -586,8 +586,8 @@ export function ModalEditarJugadorAdmin({
           {activeTab === 'estado' && (
             <div className="space-y-6">
               {/* Selector de Estado */}
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
+              <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">
                   Estado en la Plataforma
                 </label>
                 <div className="grid grid-cols-2 gap-3">
@@ -596,11 +596,11 @@ export function ModalEditarJugadorAdmin({
                     onClick={() => setEstado('activo')}
                     className={`p-3 rounded-xl border-2 flex items-center gap-3 transition-all ${
                       estado === 'activo'
-                        ? 'border-emerald-500 bg-emerald-50 text-emerald-900 font-bold'
-                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                        ? 'border-emerald-400 bg-emerald-500/10 text-emerald-100 font-bold'
+                        : 'border-white/10 bg-marino-claro text-slate-300 hover:border-white/15'
                     }`}
                   >
-                    <CheckCircle2 className={`w-5 h-5 ${estado === 'activo' ? 'text-emerald-600' : 'text-slate-400'}`} />
+                    <CheckCircle2 className={`w-5 h-5 ${estado === 'activo' ? 'text-emerald-300' : 'text-slate-400'}`} />
                     <div className="text-left">
                       <p className="text-sm font-bold">Activo</p>
                       <p className="text-xs text-slate-500">Habilitado para jugar</p>
@@ -612,11 +612,11 @@ export function ModalEditarJugadorAdmin({
                     onClick={() => setEstado('inactivo')}
                     className={`p-3 rounded-xl border-2 flex items-center gap-3 transition-all ${
                       estado === 'inactivo'
-                        ? 'border-rose-500 bg-rose-50 text-rose-900 font-bold'
-                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                        ? 'border-rose-400 bg-rose-500/10 text-rose-100 font-bold'
+                        : 'border-white/10 bg-marino-claro text-slate-300 hover:border-white/15'
                     }`}
                   >
-                    <ShieldAlert className={`w-5 h-5 ${estado === 'inactivo' ? 'text-rose-600' : 'text-slate-400'}`} />
+                    <ShieldAlert className={`w-5 h-5 ${estado === 'inactivo' ? 'text-rose-300' : 'text-slate-400'}`} />
                     <div className="text-left">
                       <p className="text-sm font-bold">Inactivo</p>
                       <p className="text-xs text-slate-500">Deshabilitado</p>
@@ -626,9 +626,9 @@ export function ModalEditarJugadorAdmin({
               </div>
 
               {/* Plantillas y Participaciones */}
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <h4 className="font-bold text-slate-900 text-sm mb-3 flex items-center gap-2">
-                  <Trophy className="w-4 h-4 text-amber-500" />
+              <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+                <h4 className="font-bold text-crema text-sm mb-3 flex items-center gap-2">
+                  <Trophy className="w-4 h-4 text-amber-400" />
                   Equipos y Torneos Asignados
                 </h4>
 
@@ -637,15 +637,15 @@ export function ModalEditarJugadorAdmin({
                     {currentJugador.plantillas.map((p) => (
                       <div
                         key={p.id_plantilla}
-                        className="bg-white p-3 rounded-lg border border-slate-200 flex items-center justify-between text-xs"
+                        className="bg-marino-claro p-3 rounded-lg border border-white/10 flex items-center justify-between text-xs"
                       >
                         <div>
-                          <span className="font-bold text-slate-900">{p.nombre_equipo || 'Equipo'}</span>
+                          <span className="font-bold text-crema">{p.nombre_equipo || 'Equipo'}</span>
                           <span className="text-slate-400 mx-1.5">•</span>
-                          <span className="text-slate-600">{p.nombre_torneo || 'Torneo'}</span>
+                          <span className="text-slate-300">{p.nombre_torneo || 'Torneo'}</span>
                         </div>
                         {p.numero_camiseta !== null && p.numero_camiseta !== undefined && (
-                          <span className="px-2 py-0.5 bg-orange-100 text-orange-800 rounded font-bold">
+                          <span className="px-2 py-0.5 bg-orange-500/15 text-orange-200 rounded font-bold">
                             #{p.numero_camiseta}
                           </span>
                         )}
@@ -663,11 +663,11 @@ export function ModalEditarJugadorAdmin({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <div className="px-6 py-4 bg-white/5 border-t border-white/10 flex items-center justify-between">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors"
+            className="px-4 py-2 text-sm font-semibold text-slate-300 hover:text-crema transition-colors"
           >
             Cancelar
           </button>
@@ -676,7 +676,7 @@ export function ModalEditarJugadorAdmin({
             type="button"
             disabled={isSaving}
             onClick={handleSubmitDatos}
-            className="px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm font-bold shadow-md shadow-orange-600/20 flex items-center gap-2 transition-all disabled:opacity-50"
+            className="px-6 py-2 bg-orange-500/20 hover:bg-orange-500/30 text-orange-100 rounded-lg text-sm font-bold shadow-md shadow-black/30 flex items-center gap-2 transition-all disabled:opacity-50"
           >
             {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
             {isSaving ? 'Guardando...' : 'Guardar Cambios'}

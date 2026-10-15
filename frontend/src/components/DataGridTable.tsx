@@ -30,34 +30,34 @@ export function DataGridTable<T extends { id?: string | number }>({
   if (isLoading) {
     return (
       <div className="w-full animate-pulse" aria-busy="true">
-        <div className="mb-2 h-10 w-full rounded bg-gray-200"></div>
+        <div className="mb-2 h-10 w-full rounded bg-white/10"></div>
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="mb-2 h-12 w-full rounded bg-gray-100"></div>
+          <div key={i} className="mb-2 h-12 w-full rounded bg-white/10"></div>
         ))}
       </div>
     );
   }
 
   if (data.length === 0) {
-    return <div className="p-4 text-center text-sm text-gray-500">{emptyMessage}</div>;
+    return <div className="p-4 text-center text-sm text-slate-400">{emptyMessage}</div>;
   }
 
   return (
-    <div className={`w-full overflow-x-auto rounded-lg border border-gray-200 shadow-sm ${className}`}>
+    <div className={`w-full overflow-x-auto rounded-lg border border-white/10 shadow-sm ${className}`}>
       <table
-        className={`w-full text-left text-gray-600 ${
+        className={`w-full text-left text-slate-300 ${
           compact ? 'text-xs' : 'whitespace-nowrap text-sm'
         }`}
         aria-label={ariaLabel}
       >
-        <thead className="border-b border-gray-200 bg-gray-50 text-gray-900">
+        <thead className="border-b border-white/10 bg-white/5 text-crema">
           <tr>
             {columns.map((col) => (
               <th
                 key={col.key}
                 scope="col"
                 className={`${
-                  compact ? 'px-3.5 py-2.5 text-xs font-bold text-slate-700' : 'px-6 py-3 font-semibold'
+                  compact ? 'px-3.5 py-2.5 text-xs font-bold text-slate-300' : 'px-6 py-3 font-semibold'
                 } ${col.headerClassName || ''}`}
               >
                 {col.header}
@@ -65,9 +65,9 @@ export function DataGridTable<T extends { id?: string | number }>({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200 bg-white">
+        <tbody className="divide-y divide-white/10 bg-marino-claro">
           {data.map((row, index) => (
-            <tr key={row.id || index} className="hover:bg-gray-50/80 transition-colors">
+            <tr key={row.id || index} className="hover:bg-white/5 transition-colors">
               {columns.map((col) => (
                 <td
                   key={col.key}

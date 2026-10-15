@@ -5,6 +5,7 @@ import { getJugadorPerfil } from '../../features/jugadores/api/jugadores.api';
 import { useAuth } from '../../context/AuthContext';
 import { PartidosJugador } from '../../features/visor/components/PartidosJugador';
 import { Escudo } from '../../features/torneos/components/PartidosList';
+import { FotoJugador } from '../../components/FotoJugador';
 import {
   Shield,
   Activity,
@@ -171,13 +172,6 @@ export default function JugadorProfile() {
   }
 
   const nombreCompletoUpper = (jugador.nombre || '').toUpperCase();
-  const iniciales = (jugador.nombre || '')
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w: string) => w.charAt(0))
-    .join('')
-    .toUpperCase();
 
   // El backend solo envía los datos personales al admin o al delegado del equipo del jugador
   const puedeVerDatosPrivados = jugador.documento_identificacion !== undefined;
@@ -260,11 +254,7 @@ export default function JugadorProfile() {
   
             <div className="w-44 sm:w-52 lg:w-full">
               <div className="flex aspect-[3/4] items-center justify-center overflow-hidden rounded-xl bg-marino-claro shadow-2xl shadow-black/50 ring-2 ring-oro/40">
-                {jugador.url_foto ? (
-                  <img src={jugador.url_foto} alt={nombreCompletoUpper} className="h-full w-full object-cover object-top" />
-                ) : (
-                  <span className="font-display text-7xl font-black text-oro/40">{iniciales || 'J'}</span>
-                )}
+                <FotoJugador url={jugador.url_foto} alt={nombreCompletoUpper} className="h-full w-full object-cover object-top" />
               </div>
             </div>
           </div>

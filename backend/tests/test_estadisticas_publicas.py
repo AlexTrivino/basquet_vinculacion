@@ -24,11 +24,11 @@ class TestEstadisticasPublicas(unittest.TestCase):
         db.drop_all()
         self.ctx.pop()
 
-    def _partido(self, estado, local, visitante):
+    def _partido(self, estado, local, visitante, torneo=1):
         db.session.add(Partido(
             fecha=date(2026, 9, 1), hora=time(19, 0), estado=estado, fase='Jornada 1',
             marcador_local=local, marcador_visitante=visitante,
-            id_torneo=1, id_categoria=1, id_equipo_local=1, id_equipo_visitante=2,
+            id_torneo=torneo, id_categoria=1, id_equipo_local=1, id_equipo_visitante=2,
         ))
 
     def test_sin_partidos_devuelve_cero(self):
@@ -44,6 +44,15 @@ class TestEstadisticasPublicas(unittest.TestCase):
         db.session.commit()
         r = self.client.get('/api/estadisticas/publicas')
         self.assertEqual(r.get_json()['data']['puntos_totales'], 78 + 84 + 66 + 59)
+
+    def test_reparte_los_puntos_por_torneo(self):
+        self._partido('finalizado', 78, 84, torneo=1)
+        self._partido('finalizado', 66, 59, torneo=2)
+        self._partido('finalizado_wo', 20, 0, torneo=2)
+        db.session.commit()
+        data = self.client.get('/api/estadisticas/publicas').get_json()['data']
+        self.assertEqual(data['puntos_por_torneo'], {'1': 162, '2': 125})
+        self.assertEqual(data['puntos_totales'], 287)
 
 
 if __name__ == '__main__':

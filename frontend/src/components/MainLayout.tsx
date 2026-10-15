@@ -4,7 +4,7 @@ import { BotonWhatsApp } from './Contacto';
 
 export function MainLayout() {
   return (
-    <div className="flex min-h-dvh flex-col bg-gray-50">
+    <div className="flex min-h-dvh flex-col bg-marino">
       <Navbar />
       <div className="flex-1">
         <Outlet />

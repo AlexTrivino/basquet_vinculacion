@@ -72,16 +72,16 @@ export function FileUploadButton({
 
   if (currentFileUrl) {
     return (
-      <div className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg">
+      <div className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-lg">
         <div className="flex items-center space-x-3 overflow-hidden">
-          <div className="p-2 bg-primary-100 text-primary-600 rounded-lg">
+          <div className="p-2 bg-oro/10 text-oro rounded-lg">
             <FileIcon className="h-5 w-5" />
           </div>
           <a
             href={currentFileUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm font-medium text-primary-600 hover:underline truncate max-w-[200px]"
+            className="text-sm font-medium text-celeste hover:underline truncate max-w-[200px]"
           >
             Ver Archivo Actual
           </a>
@@ -90,7 +90,7 @@ export function FileUploadButton({
           <button
             type="button"
             onClick={onRemove}
-            className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
+            className="p-1.5 text-red-300 hover:bg-red-500/15 rounded transition-colors"
             title="Eliminar archivo"
           >
             <X className="h-4 w-4" />
@@ -117,17 +117,17 @@ export function FileUploadButton({
         onDrop={onDrop}
         disabled={isLoading}
         className={`w-full flex flex-col items-center justify-center p-4 border-2 border-dashed rounded-lg transition-colors
-          ${isDragging ? 'border-primary-500 bg-primary-50' : 'border-gray-300 hover:border-gray-400 bg-gray-50'}
+          ${isDragging ? 'border-celeste bg-celeste/10' : 'border-white/15 hover:border-white/25 bg-white/5'}
           ${isLoading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}
         `}
       >
         {isLoading ? (
-          <Loader2 className="h-6 w-6 text-primary-600 animate-spin mb-2" />
+          <Loader2 className="h-6 w-6 text-celeste animate-spin mb-2" />
         ) : (
-          <Upload className={`h-6 w-6 mb-2 ${isDragging ? 'text-primary-600' : 'text-gray-400'}`} />
+          <Upload className={`h-6 w-6 mb-2 ${isDragging ? 'text-celeste' : 'text-slate-400'}`} />
         )}
-        <span className="text-sm font-medium text-gray-700">{label}</span>
-        <span className="text-xs text-gray-500 mt-1">
+        <span className="text-sm font-medium text-slate-300">{label}</span>
+        <span className="text-xs text-slate-400 mt-1">
           {accept.split(',').join(', ')} (Max. {maxSizeMB}MB)
         </span>
       </button>
