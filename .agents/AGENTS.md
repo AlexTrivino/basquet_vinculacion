@@ -14,7 +14,7 @@ y nunca escribir código de relleno ni sobre-diseñar.
 ### Restricciones Adicionales de Negocio
 - **Límite de Equipos:** Un usuario delegado puede crear y gestionar un **máximo de 3 equipos**.
 - **Gestión Estricta:** La gestión de plantillas solo se permite si la inscripción está estrictamente **aprobada**.
-- **Tamaño de Plantilla:** Un equipo debe tener un **mínimo de 10 jugadores** para estar reglamentariamente habilitado a competir, y un **máximo de 18 jugadores** registrados.
+- **Tamaño de Plantilla:** Un equipo debe tener un **mínimo de 5 jugadores** para estar reglamentariamente habilitado a competir, y un **máximo de 18 jugadores** registrados.
 - **Acciones Destructivas:** La desactivación de equipos es exclusiva del `super_admin`. Los delegados no tienen acceso a esta función.
 
 ---
@@ -317,7 +317,7 @@ Durante cualquier proceso de conexión entre el Frontend (React) y el Backend (F
 3. **Pruebas de Backend (Pytest):**
    - Validación rigurosa de DTOs/Schemas Marshmallow y modelos SQLAlchemy.
    - Pruebas de integridad transaccional (rollback en fallo, prevención de duplicados vía `UniqueConstraint`).
-   - Pruebas de reglas de negocio (límite de 3 equipos por delegado, rango de 10-18 jugadores por plantilla, deshabilitación de equipos).
+   - Pruebas de reglas de negocio (límite de 3 equipos por delegado, rango de 5-18 jugadores por plantilla, deshabilitación de equipos).
 
 ---
 

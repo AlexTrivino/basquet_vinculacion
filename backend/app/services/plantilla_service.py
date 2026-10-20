@@ -21,9 +21,8 @@ from app.models.jugador import Jugador
 from app.models.plantilla import Plantilla
 
 
-# ── Constantes de Reglas de Negocio ───────────────────────────────
-MIN_JUGADORES_PLANTILLA = 10
-MAX_JUGADORES_PLANTILLA = 18
+# ── Constantes de Reglas de Negocio (una sola fuente: utils/business_rules) ──
+from app.utils.business_rules import MAX_JUGADORES_PLANTILLA, MIN_JUGADORES_PLANTILLA  # noqa: F401 (inscripcion_bp importa el mínimo de aquí)
 
 
 # ── Utilidad de cálculo de edad ───────────────────────────────────

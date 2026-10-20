@@ -53,7 +53,10 @@ def listar_partidos():
         search=search,
         sort_order=sort_order
     )
-    items, pagination = paginate_query(query)
+    # La vista del torneo pide todos sus partidos de una vez (per_page=1000); con el tope general de 50,
+    # el calendario se cortaba en la fecha del partido 50.
+    # ponytail: tope de 1000 por torneo; si alguno lo pasa, que el frontend pida las páginas siguientes.
+    items, pagination = paginate_query(query, max_per_page=1000)
     return api_response(data=_public_many.dump(items), pagination=pagination)
 
 

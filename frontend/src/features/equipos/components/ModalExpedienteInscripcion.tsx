@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import type { Inscripcion, Plantilla } from '../../../types/api.types';
 import { getPlantillas } from '../../plantillas/api/plantillas.api';
+import { useBusinessRules } from '../../../hooks/useBusinessRules';
 import { StatusBadge } from '../../../components/StatusBadge';
 import { AsyncButton } from '../../../components/AsyncButton';
 import { ModalRechazarInscripcion } from './ModalRechazarInscripcion';
@@ -63,6 +64,7 @@ export function ModalExpedienteInscripcion({
 }: ModalExpedienteInscripcionProps) {
   const [modalRechazarOpen, setModalRechazarOpen] = useState(false);
   const [modalEditarOpen, setModalEditarOpen] = useState(false);
+  const { rules } = useBusinessRules();
 
   const idEquipo = inscripcion?.equipo?.id_equipo || inscripcion?.equipo?.id || inscripcion?.id_equipo;
   const idTorneo = inscripcion?.torneo?.id_torneo || inscripcion?.torneo?.id || inscripcion?.id_torneo;
@@ -80,7 +82,7 @@ export function ModalExpedienteInscripcion({
 
   const plantillas: Plantilla[] = plantillasResponse?.data || [];
   const totalJugadores = plantillas.length;
-  const cumpleMinimo = totalJugadores >= 10;
+  const cumpleMinimo = totalJugadores >= rules.MIN_JUGADORES_PLANTILLA;
 
   if (!isOpen || !inscripcion) return null;
 

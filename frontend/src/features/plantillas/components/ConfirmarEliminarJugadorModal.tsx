@@ -19,7 +19,7 @@ export function ConfirmarEliminarJugadorModal({
   dorsal,
   isDeleting = false,
   willBreakMinimo = false,
-  minJugadores = 10,
+  minJugadores = 5,
 }: Props) {
   if (!isOpen) return null;
 

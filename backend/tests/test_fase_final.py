@@ -2,7 +2,7 @@
 import os
 import time
 import unittest
-from datetime import date, time as hora
+from datetime import date, time as hora, timedelta
 
 import jwt
 
@@ -245,6 +245,14 @@ class TestFaseFinal(unittest.TestCase):
         r = self.client.get('/api/partidos?search=FAE')
         self.assertEqual(r.status_code, 200)
         self.assertEqual([p['id_partido'] for p in r.get_json()['data']], [pid])
+
+    def test_el_calendario_del_torneo_trae_todos_sus_partidos(self):
+        """La vista del torneo pide per_page=1000; con el tope de 50 el calendario se cortaba en la fecha del partido 50."""
+        for k in range(60):
+            self._jugar(1, 2, 70, 60, fecha=self.dia + timedelta(days=k))
+        cuerpo = self.client.get('/api/partidos?id_torneo=1&per_page=1000').get_json()
+        self.assertEqual(len(cuerpo['data']), 60)
+        self.assertEqual(cuerpo['data'][-1]['fecha'], (self.dia + timedelta(days=59)).isoformat())
 
 
 if __name__ == '__main__':

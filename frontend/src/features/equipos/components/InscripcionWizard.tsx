@@ -12,6 +12,7 @@ import { getTorneos } from '../../torneos/api/torneos.api';
 import { getCategorias } from '../../categorias/api/categorias.api';
 import { GestorPlantilla } from '../../plantillas/components/GestorPlantilla';
 import { getPlantillas } from '../../plantillas/api/plantillas.api';
+import { useBusinessRules } from '../../../hooks/useBusinessRules';
 import type { Inscripcion, Categoria } from '../../../types/api.types';
 
 const MAX_COMPROBANTE_SIZE = 5 * 1024 * 1024; // 5 MB
@@ -146,6 +147,7 @@ interface InscripcionWizardProps {
 export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps = {}) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { rules } = useBusinessRules();
 
   // Estado del wizard
   const [currentStep, setCurrentStep] = useState<1 | 2>(borradorExistente ? 2 : 1);
@@ -383,7 +385,7 @@ export function InscripcionWizard({ borradorExistente }: InscripcionWizardProps 
             </div>
             <h1 className="font-display text-xl sm:text-2xl font-bold text-crema">Paso 2 — Registro de Jugadores</h1>
             <p className="text-xs text-slate-400 mt-1">
-              Registra entre 10 y 18 jugadores. Cuando completes el mínimo de 10, se habilitará el botón de envío.
+              Registra entre {rules.MIN_JUGADORES_PLANTILLA} y {rules.MAX_JUGADORES_PLANTILLA} jugadores. Cuando completes el mínimo de {rules.MIN_JUGADORES_PLANTILLA}, se habilitará el botón de envío.
             </p>
           </div>
           

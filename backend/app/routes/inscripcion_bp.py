@@ -515,7 +515,7 @@ def crear_inscripcion_completa():
 @inscripcion_bp.route('/<int:id_inscripcion>/finalizar-borrador', methods=['POST'])
 @token_required(allowed_roles=['super_admin', 'delegado'])
 def finalizar_borrador_inscripcion(id_inscripcion):
-    """Valida que la plantilla cumpla con el mínimo de 10 y máximo de 18 jugadores
+    """Valida que la plantilla cumpla con el mínimo y el máximo de jugadores (``utils/business_rules``)
 
     y cambia el estado de 'borrador' a 'pendiente' para revisión del Administrador.
     """

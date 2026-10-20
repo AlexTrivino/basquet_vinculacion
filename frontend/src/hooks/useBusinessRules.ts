@@ -10,7 +10,7 @@ interface BusinessRules {
 const defaultRules: BusinessRules = {
   MAX_EQUIPOS_POR_DELEGADO: 1, // Fallback
   MAX_JUGADORES_PLANTILLA: 18,
-  MIN_JUGADORES_PLANTILLA: 10,
+  MIN_JUGADORES_PLANTILLA: 5,
 };
 
 export function useBusinessRules() {

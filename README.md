@@ -90,11 +90,11 @@ basquet_vinculacion/
 
 ## 🏗️ Reglas de Negocio Principales
 
-- **Tamaño de Plantilla:** Cada equipo debe registrar un **mínimo de 10 jugadores** para estar formalmente habilitado a competir, y un **máximo de 18 jugadores**.
+- **Tamaño de Plantilla:** Cada equipo debe registrar un **mínimo de 5 jugadores** para estar formalmente habilitado a competir, y un **máximo de 18 jugadores**.
 - **Límite de Equipos por Delegado:** Un usuario con rol `delegado` puede crear y gestionar un **máximo de 3 equipos**.
 - **Flujo de Inscripción en 2 Pasos (Wizard):**
   1. *Paso 1 — Datos del Club:* Registro de nombre, categoría y comprobante de pago bancario.
-  2. *Paso 2 — Nómina de Jugadores:* Carga de jugadores con dorsales y cédulas. Una vez cumplido el mínimo de 10 jugadores, se habilita el envío formal a revisión.
+  2. *Paso 2 — Nómina de Jugadores:* Carga de jugadores con dorsales y cédulas. Una vez cumplido el mínimo de 5 jugadores, se habilita el envío formal a revisión.
 - **Unicidad de Dorsales:** No se permiten números de camiseta duplicados dentro del mismo equipo. La interfaz valida la unicidad en tiempo real.
 - **Cálculo de Edades por Año Calendario:** Para torneos por categorías de edad, el cálculo se rige por el año de nacimiento (`año_actual - año_nacimiento`), garantizando igualdad competitiva para todo el ciclo anual.
 - **Puntuación y Standings FIBA:** Victoria = 2 puntos, Derrota = 1 punto, No Presentación (Walkover) = 0 puntos. Desempates automáticos por Diferencia de Canastas (DIF) y Puntos a Favor (PF).
