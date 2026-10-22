@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom';
 import { getPartidosByTorneo } from '../api/torneos.api';
 import { Calendar as CalendarIcon, FileText, Activity, ChevronLeft, ChevronRight, MapPin, Shield } from 'lucide-react';
 import { BoxScoreModal } from '../../partidos/components/BoxScoreModal';
+import { useAuth } from '../../../context/AuthContext';
 import { lazy, Suspense, useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, isToday, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-// El flyer de la fecha (y html-to-image) solo se descarga cuando alguien elige una fecha
+// El flyer de la fecha (y html-to-image) solo se descarga cuando el admin elige una fecha
 const FlyerFecha = lazy(() => import('../../flyers/components/FlyerFecha'));
 
 interface PartidosListProps {
@@ -61,6 +62,7 @@ export function PartidosList({ torneoId, idCategoria, urlCalendario, categorias 
   const [selectedMatch, setSelectedMatch] = useState<any | null>(null);
   const [currentMonth, setCurrentMonth] = useState<Date | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const esAdmin = useAuth().userRole === 'super_admin';
 
   const { data: response, isLoading, isError } = useQuery({
     queryKey: ['torneos', torneoId, 'partidos', idCategoria],
@@ -146,14 +148,16 @@ export function PartidosList({ torneoId, idCategoria, urlCalendario, categorias 
 
   const claveSeleccion = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : null;
   const datesToRender = claveSeleccion ? (partidosGrouped[claveSeleccion] ? [claveSeleccion] : []) : Object.keys(partidosGrouped);
+  // Solo el admin ve y descarga el flyer de la fecha elegida
+  const flyer = esAdmin && claveSeleccion && partidosGrouped[claveSeleccion] ? { fecha: claveSeleccion, partidos: partidosGrouped[claveSeleccion] } : null;
 
   return (
     <div>
       {enlaceCalendario && <div className="mb-6 flex justify-end">{enlaceCalendario}</div>}
 
       <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] xl:gap-10">
-        {/* ─── Calendario del mes (obligatorio) y, debajo, el flyer de la fecha elegida: a la derecha en escritorio, arriba en móvil ─── */}
-        <div className="flex min-w-0 flex-col gap-6 xl:order-2">
+        {/* ─── Calendario del mes (obligatorio), fijo salvo cuando el admin tiene el flyer debajo: a la derecha en escritorio, arriba en móvil ─── */}
+        <div className={`flex min-w-0 flex-col gap-6 xl:order-2 ${flyer ? '' : 'xl:sticky xl:top-40'}`}>
           <aside className="rounded-xl border border-oro/30 bg-marino-claro/80 p-4 shadow-xl shadow-black/30 backdrop-blur-sm sm:p-5">
             <div className="mb-5 flex items-center justify-between">
               <h3 className="font-display text-lg font-bold capitalize text-crema">{format(mes, 'MMMM yyyy', { locale: es })}</h3>
@@ -235,13 +239,13 @@ export function PartidosList({ torneoId, idCategoria, urlCalendario, categorias 
                 Ver todos los partidos
               </button>
             ) : (
-              <p className="mt-4 text-sm text-slate-400">Toca una fecha con partidos para ver y descargar su flyer.</p>
+              esAdmin && <p className="mt-4 text-sm text-slate-400">Toca una fecha con partidos para ver y descargar su flyer.</p>
             )}
           </aside>
 
-          {claveSeleccion && partidosGrouped[claveSeleccion] && (
+          {flyer && (
             <Suspense fallback={<div className="aspect-[4/5] w-full rounded-xl bg-white/5 motion-safe:animate-pulse" aria-busy="true" />}>
-              <FlyerFecha fecha={claveSeleccion} partidos={partidosGrouped[claveSeleccion]} />
+              <FlyerFecha fecha={flyer.fecha} partidos={flyer.partidos} />
             </Suspense>
           )}
         </div>
