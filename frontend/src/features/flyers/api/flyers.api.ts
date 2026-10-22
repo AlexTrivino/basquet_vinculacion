@@ -11,9 +11,9 @@ export interface FiguraFlyer {
   jugador: { id_jugador: number; nombre: string; url_foto: string | null; numero_camiseta: number | null };
   equipo: EquipoFlyer | null;
   categoria: string | null;
-  linea: { puntos: number; rebotes: number; asistencias: number; tapones: number; triples: number };
+  linea: { puntos: number; rebotes: number; asistencias: number; tapones: number; triples: number; tiros_libres: number };
   valoracion: number;
-  partido?: string; // figura de una fecha
+  partido?: string | null; // figura de una fecha, o el único partido del acumulado
   id_categoria?: number; // figuras acumuladas del torneo
   partidos?: number;
   promedio_puntos?: number;
@@ -24,6 +24,7 @@ export interface ResultadoFlyer {
   hora: string | null;
   categoria: string | null;
   fase: string;
+  llave?: string | null;
   estado: string;
   local: EquipoFlyer & { marcador: number };
   visitante: EquipoFlyer & { marcador: number };
@@ -38,6 +39,9 @@ export interface DatosFlyers {
   figura_fecha: FiguraFlyer | null;
   figuras_categoria: FiguraFlyer[];
   figuras_equipo: FiguraFlyer[];
+  // Totales por jugador (y categoría) para los líderes: de la fecha y de todo el torneo
+  jugadores_fecha: FiguraFlyer[];
+  jugadores_torneo: FiguraFlyer[];
 }
 
 // Resultados de una fecha (por defecto la última jugada) y figuras del torneo

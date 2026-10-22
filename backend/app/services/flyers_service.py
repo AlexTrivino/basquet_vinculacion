@@ -1,9 +1,11 @@
-"""Datos para los flyers de Instagram: resultados de una fecha y las figuras del torneo.
+"""Datos para los flyers de Instagram: resultados de una fecha, las figuras y los líderes del torneo.
 
 Figura = mayor valoración, que aquí es puntos + rebotes + asistencias + tapones (lo que se
 registra por partido; no hay tiros fallados, robos ni pérdidas). En empate, más puntos.
 El equipo de cada jugador en un partido sale de la plantilla del torneo: es el lado del
 partido (local o visitante) en cuya plantilla está.
+Los líderes (mayor encestador, triplista…) se ordenan en el frontend con los totales por
+jugador de la fecha y del torneo (``jugadores_fecha`` y ``jugadores_torneo``).
 """
 from collections import Counter, defaultdict
 
@@ -13,13 +15,13 @@ from app import db
 from app.models import Categoria, Equipo, Estadistica, Partido, Plantilla, Torneo
 
 FINALES = ('finalizado', 'finalizado_wo')
-CAMPOS = ('puntos', 'rebotes', 'asistencias', 'tapones', 'triples')
+CAMPOS = ('puntos', 'rebotes', 'asistencias', 'tapones', 'triples', 'tiros_libres')
 
 
 def _linea(e):
     return {
-        'puntos': e.puntos_anotados, 'rebotes': e.rebotes, 'asistencias': e.asistencias,
-        'tapones': e.tapones, 'triples': e.triples_anotados,
+        'puntos': e.puntos_anotados or 0, 'rebotes': e.rebotes or 0, 'asistencias': e.asistencias or 0,
+        'tapones': e.tapones or 0, 'triples': e.triples_anotados or 0, 'tiros_libres': e.tiros_libres_anotados or 0,
     }
 
 
@@ -118,16 +120,20 @@ def datos_flyers(id_torneo, fecha=None):
     ]
     figura_fecha = max(figuras_partido.values(), key=_orden, default=None)
 
-    # ── Figuras acumuladas del torneo: por categoría y por equipo ──
-    acumulado = defaultdict(lambda: {'linea': dict.fromkeys(CAMPOS, 0), 'partidos': 0, 'equipos': Counter(), 'jugador': None})
-    for e, p, equipo in filas:
-        a = acumulado[(p.id_categoria, e.id_jugador)]
-        for campo, valor in _linea(e).items():
-            a['linea'][campo] += valor
-        a['partidos'] += 1
-        if equipo:
-            a['equipos'][equipo] += 1
-        a['jugador'] = e.jugador
+    # ── Totales por jugador (y categoría): del torneo y de la fecha ──
+    def acumular(filas_elegidas):
+        acumulado = defaultdict(lambda: {'linea': dict.fromkeys(CAMPOS, 0), 'partidos': 0, 'equipos': Counter(), 'jugador': None, 'ultimo': None})
+        for e, p, equipo in filas_elegidas:
+            a = acumulado[(p.id_categoria, e.id_jugador)]
+            for campo, valor in _linea(e).items():
+                a['linea'][campo] += valor
+            a['partidos'] += 1
+            if equipo:
+                a['equipos'][equipo] += 1
+            a['jugador'], a['ultimo'] = e.jugador, p
+        return acumulado
+
+    acumulado = acumular(filas)
 
     def figura_acumulada(id_categoria, id_jugador, a):
         equipo = a['equipos'].most_common(1)[0][0] if a['equipos'] else None
@@ -143,6 +149,7 @@ def datos_flyers(id_torneo, fecha=None):
             'id_categoria': id_categoria,
             'linea': a['linea'],
             'partidos': a['partidos'],
+            'partido': nombre_partido(a['ultimo']) if a['partidos'] == 1 else None,
             'promedio_puntos': round(a['linea']['puntos'] / a['partidos'], 1) if a['partidos'] else 0,
             'valoracion': _valoracion(a['linea']),
         }
@@ -165,4 +172,6 @@ def datos_flyers(id_torneo, fecha=None):
         'figura_fecha': figura_fecha,
         'figuras_categoria': sorted(mejores_categoria.values(), key=lambda f: f['categoria'] or ''),
         'figuras_equipo': sorted(mejores_equipo.values(), key=lambda f: (f['categoria'] or '', f['equipo']['nombre_equipo'])),
+        'jugadores_fecha': [figura_acumulada(c, j, a) for (c, j), a in acumular(f for f in filas if f[1].fecha == fecha).items()],
+        'jugadores_torneo': [figura_acumulada(c, j, a) for (c, j), a in acumulado.items()],
     }

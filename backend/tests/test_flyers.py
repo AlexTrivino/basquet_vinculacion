@@ -84,6 +84,25 @@ class TestFlyers(unittest.TestCase):
         por_equipo = {f['equipo']['nombre_equipo']: f['jugador']['id_jugador'] for f in data['figuras_equipo']}
         self.assertEqual(por_equipo, {'FAE': 10, 'SAN JOSÉ': 20})
 
+    def test_totales_para_los_lideres(self):
+        """Los líderes salen de los totales por jugador: los de la fecha y los de todo el torneo."""
+        p1 = self._partido(1, 2, 70, 60, date(2026, 10, 4))
+        p2 = self._partido(2, 1, 66, 64, date(2026, 10, 11))
+        for p, jugador, triples, libres in ((p1, 10, 4, 2), (p2, 10, 1, 6), (p2, 21, 3, 0)):
+            db.session.add(Estadistica(id_partido=p.id_partido, id_jugador=jugador, puntos_anotados=3 * triples + libres,
+                                       triples_anotados=triples, tiros_libres_anotados=libres, rebotes=0, asistencias=0))
+        db.session.commit()
+
+        data = self._get('/api/estadisticas/flyers?id_torneo=1')[1]['data']
+        fecha = {j['jugador']['id_jugador']: j for j in data['jugadores_fecha']}
+        torneo = {j['jugador']['id_jugador']: j for j in data['jugadores_torneo']}
+        # La fecha (11-10) solo suma su partido; el torneo, los dos
+        self.assertEqual((fecha[10]['linea']['triples'], fecha[10]['linea']['tiros_libres'], fecha[10]['partidos']), (1, 6, 1))
+        self.assertEqual(fecha[10]['partido'], 'SAN JOSÉ vs FAE')
+        self.assertEqual((torneo[10]['linea']['triples'], torneo[10]['linea']['tiros_libres'], torneo[10]['partidos']), (5, 8, 2))
+        self.assertIsNone(torneo[10]['partido'])
+        self.assertEqual((torneo[21]['equipo']['nombre_equipo'], torneo[21]['jugador']['numero_camiseta']), ('SAN JOSÉ', 5))
+
     def test_otra_fecha_y_errores(self):
         self._partido(1, 2, 70, 60, date(2026, 10, 4), stats=[(10, 30, 5, 2)])
         status, body = self._get('/api/estadisticas/flyers?id_torneo=1&fecha=2026-10-04')

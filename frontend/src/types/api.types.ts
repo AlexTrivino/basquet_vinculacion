@@ -135,6 +135,7 @@ export interface Partido {
   fecha?: string;
   hora?: string;
   fase?: string;
+  llave?: string | null;
   ubicacion?: string;
   estado: 'programado' | 'en_curso' | 'finalizado' | 'finalizado_wo' | 'suspendido' | 'anulado';
   marcador_local: number;

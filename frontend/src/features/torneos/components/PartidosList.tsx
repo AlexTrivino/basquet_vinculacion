@@ -3,9 +3,12 @@ import { Link } from 'react-router-dom';
 import { getPartidosByTorneo } from '../api/torneos.api';
 import { Calendar as CalendarIcon, FileText, Activity, ChevronLeft, ChevronRight, MapPin, Shield } from 'lucide-react';
 import { BoxScoreModal } from '../../partidos/components/BoxScoreModal';
-import { useState, useMemo } from 'react';
+import { lazy, Suspense, useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, isToday, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
+
+// El flyer de la fecha (y html-to-image) solo se descarga cuando alguien elige una fecha
+const FlyerFecha = lazy(() => import('../../flyers/components/FlyerFecha'));
 
 interface PartidosListProps {
   torneoId: string;
@@ -149,89 +152,99 @@ export function PartidosList({ torneoId, idCategoria, urlCalendario, categorias 
       {enlaceCalendario && <div className="mb-6 flex justify-end">{enlaceCalendario}</div>}
 
       <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] xl:gap-10">
-        {/* ─── Calendario del mes (obligatorio): a la derecha en escritorio, arriba en móvil ─── */}
-        <aside className="rounded-xl border border-oro/30 bg-marino-claro/80 p-4 shadow-xl shadow-black/30 backdrop-blur-sm sm:p-5 xl:sticky xl:top-40 xl:order-2">
-          <div className="mb-5 flex items-center justify-between">
-            <h3 className="font-display text-lg font-bold capitalize text-crema">{format(mes, 'MMMM yyyy', { locale: es })}</h3>
-            <div className="flex gap-1">
-              <button
-                type="button"
-                aria-label="Mes anterior"
-                onClick={() => setCurrentMonth(subMonths(mes, 1))}
-                className="rounded-lg p-1.5 text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
-              >
-                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                aria-label="Mes siguiente"
-                onClick={() => setCurrentMonth(addMonths(mes, 1))}
-                className="rounded-lg p-1.5 text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
-              >
-                <ChevronRight className="h-5 w-5" aria-hidden="true" />
-              </button>
-            </div>
-          </div>
-
-          <div className="mb-2 grid grid-cols-7 gap-1">
-            {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((d) => (
-              <div key={d} className="py-1 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                {d}
-              </div>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-7 gap-1">
-            {Array.from({ length: startOfMonth(mes).getDay() }).map((_, i) => (
-              <div key={`vacio-${i}`} className="h-12 sm:h-14" />
-            ))}
-            {daysInMonth.map((day) => {
-              const dateStr = format(day, 'yyyy-MM-dd');
-              const dayMatches = partidosGrouped[dateStr] || [];
-              const isSelected = !!selectedDate && isSameDay(day, selectedDate);
-              const hoy = isToday(day);
-              const dayCategories = Array.from(new Set(dayMatches.map((m) => m.id_categoria || m.categoria?.id_categoria))).filter(Boolean);
-
-              return (
+        {/* ─── Calendario del mes (obligatorio) y, debajo, el flyer de la fecha elegida: a la derecha en escritorio, arriba en móvil ─── */}
+        <div className="flex min-w-0 flex-col gap-6 xl:order-2">
+          <aside className="rounded-xl border border-oro/30 bg-marino-claro/80 p-4 shadow-xl shadow-black/30 backdrop-blur-sm sm:p-5">
+            <div className="mb-5 flex items-center justify-between">
+              <h3 className="font-display text-lg font-bold capitalize text-crema">{format(mes, 'MMMM yyyy', { locale: es })}</h3>
+              <div className="flex gap-1">
                 <button
-                  key={dateStr}
                   type="button"
-                  aria-pressed={isSelected}
-                  aria-label={`${format(day, "d 'de' MMMM", { locale: es })}${dayMatches.length ? `, ${dayMatches.length} partidos` : ''}`}
-                  onClick={() => setSelectedDate(isSelected ? null : day)}
-                  className={`flex h-12 flex-col items-center justify-start rounded-lg pt-1.5 text-sm tabular-nums transition-colors sm:h-14 sm:pt-2 ${
-                    isSelected
-                      ? 'bg-oro font-bold text-marino'
-                      : dayMatches.length
-                        ? 'font-semibold text-crema hover:bg-white/10'
-                        : 'text-slate-500 hover:bg-white/5'
-                  } ${hoy && !isSelected ? 'ring-1 ring-inset ring-celeste' : ''}`}
+                  aria-label="Mes anterior"
+                  onClick={() => setCurrentMonth(subMonths(mes, 1))}
+                  className="rounded-lg p-1.5 text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
                 >
-                  {format(day, 'd')}
-                  <span className="mt-1 flex flex-wrap justify-center gap-0.5 px-0.5">
-                    {dayCategories.slice(0, 4).map((catId) => (
-                      <span
-                        key={catId as number}
-                        className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-marino' : colorCategoria(indiceCategoria.get(catId as number) ?? 0).punto}`}
-                      />
-                    ))}
-                    {dayCategories.length > 4 && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-marino' : 'bg-slate-400'}`} />}
-                  </span>
+                  <ChevronLeft className="h-5 w-5" aria-hidden="true" />
                 </button>
-              );
-            })}
-          </div>
+                <button
+                  type="button"
+                  aria-label="Mes siguiente"
+                  onClick={() => setCurrentMonth(addMonths(mes, 1))}
+                  className="rounded-lg p-1.5 text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
+                >
+                  <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
 
-          {selectedDate && (
-            <button
-              type="button"
-              onClick={() => setSelectedDate(null)}
-              className="mt-5 w-full rounded-lg border border-white/15 py-2.5 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/10"
-            >
-              Ver todos los partidos
-            </button>
+            <div className="mb-2 grid grid-cols-7 gap-1">
+              {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((d) => (
+                <div key={d} className="py-1 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                  {d}
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-7 gap-1">
+              {Array.from({ length: startOfMonth(mes).getDay() }).map((_, i) => (
+                <div key={`vacio-${i}`} className="h-12 sm:h-14" />
+              ))}
+              {daysInMonth.map((day) => {
+                const dateStr = format(day, 'yyyy-MM-dd');
+                const dayMatches = partidosGrouped[dateStr] || [];
+                const isSelected = !!selectedDate && isSameDay(day, selectedDate);
+                const hoy = isToday(day);
+                const dayCategories = Array.from(new Set(dayMatches.map((m) => m.id_categoria || m.categoria?.id_categoria))).filter(Boolean);
+
+                return (
+                  <button
+                    key={dateStr}
+                    type="button"
+                    aria-pressed={isSelected}
+                    aria-label={`${format(day, "d 'de' MMMM", { locale: es })}${dayMatches.length ? `, ${dayMatches.length} partidos` : ''}`}
+                    onClick={() => setSelectedDate(isSelected ? null : day)}
+                    className={`flex h-12 flex-col items-center justify-start rounded-lg pt-1.5 text-sm tabular-nums transition-colors sm:h-14 sm:pt-2 ${
+                      isSelected
+                        ? 'bg-oro font-bold text-marino'
+                        : dayMatches.length
+                          ? 'font-semibold text-crema hover:bg-white/10'
+                          : 'text-slate-500 hover:bg-white/5'
+                    } ${hoy && !isSelected ? 'ring-1 ring-inset ring-celeste' : ''}`}
+                  >
+                    {format(day, 'd')}
+                    <span className="mt-1 flex flex-wrap justify-center gap-0.5 px-0.5">
+                      {dayCategories.slice(0, 4).map((catId) => (
+                        <span
+                          key={catId as number}
+                          className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-marino' : colorCategoria(indiceCategoria.get(catId as number) ?? 0).punto}`}
+                        />
+                      ))}
+                      {dayCategories.length > 4 && <span className={`h-1.5 w-1.5 rounded-full ${isSelected ? 'bg-marino' : 'bg-slate-400'}`} />}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {selectedDate ? (
+              <button
+                type="button"
+                onClick={() => setSelectedDate(null)}
+                className="mt-5 w-full rounded-lg border border-white/15 py-2.5 text-sm font-semibold text-slate-200 transition-colors hover:bg-white/10"
+              >
+                Ver todos los partidos
+              </button>
+            ) : (
+              <p className="mt-4 text-sm text-slate-400">Toca una fecha con partidos para ver y descargar su flyer.</p>
+            )}
+          </aside>
+
+          {claveSeleccion && partidosGrouped[claveSeleccion] && (
+            <Suspense fallback={<div className="aspect-[4/5] w-full rounded-xl bg-white/5 motion-safe:animate-pulse" aria-busy="true" />}>
+              <FlyerFecha fecha={claveSeleccion} partidos={partidosGrouped[claveSeleccion]} />
+            </Suspense>
           )}
-        </aside>
+        </div>
 
         {/* ─── Partidos agrupados por día, como boletos del cartel ─── */}
         <div className="flex flex-col gap-10">
