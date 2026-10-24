@@ -45,12 +45,13 @@ export function textoResultados(fecha: string, resultados: ResultadoFlyer[]) {
 }
 
 export function textoFigura(encabezado: string, f: FiguraFlyer) {
-  const { puntos, rebotes, asistencias, tapones } = f.linea;
+  const numeros = numerosDe(f.linea).map((n) => cuenta(n.valor, n.unidad[0], n.unidad[1]));
+  const con = numeros.length ? `, con ${numeros.length > 1 ? `${numeros.slice(0, -1).join(', ')} y ${numeros.at(-1)}` : numeros[0]}` : '';
   const donde = f.partidos !== undefined ? `en ${cuenta(f.partidos, 'partido', 'partidos')}` : f.partido ? `en ${f.partido}` : '';
   // El equipo va entre paréntesis salvo que el encabezado ya lo nombre (figura del equipo)
   const quien = f.equipo && !encabezado.includes(f.equipo.nombre_equipo) ? `${f.jugador.nombre} (${f.equipo.nombre_equipo})` : f.jugador.nombre;
   return [
-    `🔥 ${encabezado}: ${quien}, con ${puntos} puntos, ${rebotes} rebotes, ${asistencias} asistencias y ${tapones} tapones ${donde}. Valoración: ${f.valoracion}.`.replace(' .', '.'),
+    `🔥 ${encabezado}: ${quien}${con} ${donde}. Valoración: ${f.valoracion}.`.replace(' .', '.'),
     ENLACE,
     ETIQUETAS,
   ].join('\n\n');
@@ -76,9 +77,25 @@ export const ESTADISTICAS = [
   { clave: 'rebotes', titulo: ['Mayor', '', 'Rebotero'], nombre: 'Mayor rebotero', unidad: ['rebote', 'rebotes'], emoji: '💪' },
   { clave: 'asistencias', titulo: ['Mayor', '', 'Asistidor'], nombre: 'Mayor asistidor', unidad: ['asistencia', 'asistencias'], emoji: '🤝' },
   { clave: 'tapones', titulo: ['Mayor', '', 'Taponero'], nombre: 'Mayor taponero', unidad: ['tapón', 'tapones'], emoji: '🚫' },
-  { clave: 'tiros_libres', titulo: ['Rey del', '', 'Tiro libre'], nombre: 'Rey del tiro libre', unidad: ['tiro libre', 'tiros libres'], emoji: '🏀' },
+  { clave: 'tiros_libres', titulo: ['Líder del', '', 'Tiro libre'], nombre: 'Líder del tiro libre', unidad: ['tiro libre', 'tiros libres'], emoji: '🏀' },
 ] as const;
 export type EstadisticaLider = (typeof ESTADISTICAS)[number];
+
+// Números de la figura y de su caption, en el orden de ESTADISTICAS y sin tiros libres.
+// Los que están en 0 no salen: ni la etiqueta ni la cifra.
+export const numerosDe = (linea: FiguraFlyer['linea']) =>
+  ESTADISTICAS.filter((e) => e.clave !== 'tiros_libres' && linea[e.clave] > 0).map((e) => ({
+    clave: e.clave,
+    valor: linea[e.clave],
+    etiqueta: mayuscula(e.unidad[1]),
+    unidad: e.unidad,
+  }));
+
+// Línea corta de las filas (figuras del torneo, figura de cada partido): solo pts, reb y ast para que quepa
+// junto al equipo, y tampoco salen los que están en 0
+const CORTA = { puntos: 'pts', rebotes: 'reb', asistencias: 'ast' } as const;
+export const lineaCorta = (linea: FiguraFlyer['linea']) =>
+  (Object.keys(CORTA) as (keyof typeof CORTA)[]).filter((k) => linea[k] > 0).map((k) => `${linea[k]} ${CORTA[k]}`).join(', ');
 
 // Los n mejores en una estadística (sin ceros); en empate, la mejor valoración
 export function topJugadores(jugadores: FiguraFlyer[], clave: EstadisticaLider['clave'], idCategoria?: number, n = 3) {

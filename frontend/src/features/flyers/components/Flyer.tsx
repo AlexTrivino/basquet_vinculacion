@@ -2,7 +2,7 @@ import { forwardRef, type ReactNode } from 'react';
 import { ChevronsRight, Shield } from 'lucide-react';
 import { Escudo } from '../../torneos/components/PartidosList';
 import { FotoJugador } from '../../../components/FotoJugador';
-import { horaCartel } from '../textos';
+import { horaCartel, lineaCorta, numerosDe } from '../textos';
 import type { FiguraFlyer, ResultadoFlyer } from '../api/flyers.api';
 
 // Lienzos a 1080 px de ancho: redes (publicación 4:5) y estados (historia 9:16). En la historia, los
@@ -173,8 +173,7 @@ export function ListaPartidos({ partidos, conFigura }: { partidos: ResultadoFlye
               </div>
               {conFigura && r.figura && (
                 <p className="mt-[10px] truncate text-[22px] text-slate-300">
-                  Figura: <span className="font-semibold text-crema">{r.figura.jugador.nombre}</span> · {r.figura.linea.puntos} pts,{' '}
-                  {r.figura.linea.rebotes} reb, {r.figura.linea.asistencias} ast
+                  Figura: <span className="font-semibold text-crema">{r.figura.jugador.nombre}</span> · {lineaCorta(r.figura.linea)}
                 </p>
               )}
             </li>
@@ -255,25 +254,22 @@ function Identidad({ figura }: { figura: FiguraFlyer }) {
   );
 }
 
-// Nombre, equipo y la línea de números como pares etiqueta → valor entre filetes
+// Nombre, equipo y la línea de números como pares etiqueta → valor entre filetes (sin los que están en 0)
 export function FichaFigura({ figura }: { figura: FiguraFlyer }) {
-  const numeros: [string, number][] = [
-    ['Puntos', figura.linea.puntos],
-    ['Rebotes', figura.linea.rebotes],
-    ['Asistencias', figura.linea.asistencias],
-    ['Tapones', figura.linea.tapones],
-  ];
+  const numeros = numerosDe(figura.linea);
   return (
     <div className="flex h-full flex-col justify-center">
       <Identidad figura={figura} />
-      <dl className="mt-[28px] grid grid-cols-4 border-y border-crema/15">
-        {numeros.map(([etiqueta, valor], i) => (
-          <div key={etiqueta} className={`py-[16px] text-center ${i ? 'border-l border-crema/15' : ''}`}>
-            <dt className="text-[20px] font-semibold uppercase tracking-[0.16em] text-slate-300">{etiqueta}</dt>
-            <dd className={`mt-[8px] font-display text-[68px] font-bold leading-none tabular-nums ${i === 0 ? 'text-oro' : 'text-crema'}`}>{valor}</dd>
-          </div>
-        ))}
-      </dl>
+      {numeros.length > 0 && (
+        <dl className="mt-[28px] grid border-y border-crema/15" style={{ gridTemplateColumns: `repeat(${numeros.length}, minmax(0, 1fr))` }}>
+          {numeros.map((n, i) => (
+            <div key={n.clave} className={`py-[16px] text-center ${i ? 'border-l border-crema/15' : ''}`}>
+              <dt className="text-[20px] font-semibold uppercase tracking-[0.1em] text-slate-300">{n.etiqueta}</dt>
+              <dd className={`mt-[8px] font-display text-[68px] font-bold leading-none tabular-nums ${i === 0 ? 'text-oro' : 'text-crema'}`}>{n.valor}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
     </div>
   );
 }
@@ -330,7 +326,7 @@ export function ListaFiguras({ figuras }: { figuras: FiguraFlyer[] }) {
               <p className="truncate text-[20px] font-semibold uppercase tracking-[0.16em] text-slate-300">{f.categoria}</p>
               <p className="mt-[6px] truncate font-display text-[32px] font-bold leading-tight text-crema">{f.jugador.nombre}</p>
               <p className="mt-[4px] truncate text-[22px] text-slate-300">
-                {f.equipo?.nombre_equipo ?? 'Sin equipo'} · {f.linea.puntos} pts, {f.linea.rebotes} reb, {f.linea.asistencias} ast
+                {f.equipo?.nombre_equipo ?? 'Sin equipo'} · {lineaCorta(f.linea)}
               </p>
             </div>
             <div className="text-right">

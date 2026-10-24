@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fechaCartel, filaDePartido, horaCartel, textoPartidos, textoResultados, topJugadores } from './textos';
+import { fechaCartel, filaDePartido, horaCartel, lineaCorta, numerosDe, textoFigura, textoPartidos, textoResultados, topJugadores } from './textos';
 import type { FiguraFlyer, ResultadoFlyer } from './api/flyers.api';
 import type { Partido } from '../../types/api.types';
 
@@ -43,5 +43,15 @@ describe('textos de los flyers', () => {
     const jugadores = [j(1, 2, 10), j(2, 5, 12), j(3, 5, 20), j(4, 0, 30), j(5, 9, 40, 10)];
     expect(topJugadores(jugadores, 'triples').map((x) => x.jugador.id_jugador)).toEqual([5, 3, 2]);
     expect(topJugadores(jugadores, 'triples', 3).map((x) => x.jugador.id_jugador)).toEqual([3, 2, 1]);
+  });
+
+  it('la figura suma los triples y no muestra los números en cero', () => {
+    const f = {
+      jugador: { id_jugador: 9, nombre: 'ANA MERO' }, equipo: null, valoracion: 25, partidos: 1,
+      linea: { puntos: 20, triples: 3, rebotes: 0, asistencias: 4, tapones: 1, tiros_libres: 2 },
+    } as unknown as FiguraFlyer;
+    expect(numerosDe(f.linea).map((n) => n.etiqueta)).toEqual(['Puntos', 'Triples', 'Asistencias', 'Tapones']);
+    expect(lineaCorta(f.linea)).toBe('20 pts, 4 ast');
+    expect(textoFigura('Figura de la fecha', f)).toContain('ANA MERO, con 20 puntos, 3 triples, 4 asistencias y 1 tapón en 1 partido.');
   });
 });
