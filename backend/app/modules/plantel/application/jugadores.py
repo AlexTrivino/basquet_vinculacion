@@ -51,6 +51,12 @@ def buscar_por_cedula(cedula, repositorio):
     return repositorio.por_cedula(cedula)
 
 
+def en_torneo(id_jugador, id_torneo, id_categoria, repositorio):
+    """{'ya_en_torneo', 'equipo_torneo', 'id_equipo'}: si el jugador ya está en una plantilla activa del torneo (de esa
+    categoría, si se da), para que el asistente de inscripción no lo repita."""
+    return repositorio.en_torneo(id_jugador, id_torneo, id_categoria)
+
+
 def para_gestionar(id_jugador, id_usuario, rol, mensaje, repositorio, incluir_inactivos=False):
     """El jugador, si quien pide puede gestionarlo: el super_admin siempre; un delegado, si el jugador está libre
     o juega en uno de sus equipos. Si no, SinPermiso con ``mensaje``."""

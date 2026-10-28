@@ -3,7 +3,7 @@ Tests rigurosos para schemas Marshmallow y DTOs de Torneo, Partido e Inscripció
 Garantiza integridad de fechas, nesting de relaciones y prevención de errores de mapeo 422.
 """
 from datetime import date, time
-from app.schemas.inscripcion_schema import _TorneoResumenSchema, _EquipoResumenSchema, _CategoriaResumenSchema
+from app.modules.inscripciones.http.esquemas import _TorneoResumenSchema, _EquipoResumenSchema, _CategoriaResumenSchema
 from app.modules.competencia.http.esquemas import _TorneoEnPartidoSchema, PartidoPublicSchema
 
 

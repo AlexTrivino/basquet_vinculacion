@@ -37,11 +37,14 @@ class TestFase4TorneosBusiness(unittest.TestCase):
         self.ctx.pop()
 
     def test_no_acepta_inscripciones_si_no_esta_programado(self):
-        from app.services.inscripcion_service import crear_inscripcion
+        from app.modules.inscripciones.application.inscripciones import crear
+        from app.modules.inscripciones.infrastructure.repositorio import RepositorioInscripciones
+        from app.shared.domain.errores import ReglaDeNegocio
         self.torneo.estado = 'anulado'
         db.session.commit()
-        with self.assertRaises(ValueError):
-            crear_inscripcion({'id_torneo': self.t_id, 'id_equipo': 1, 'id_categoria': 1})
+        with self.assertRaises(ReglaDeNegocio):
+            crear({'id_torneo': self.t_id, 'id_equipo': 1, 'id_categoria': 1},
+                  repositorio=RepositorioInscripciones(), unidad=UnidadDeTrabajo())
 
     def test_schema_torneo_update_estado_anulado(self):
         schema = TorneoUpdateSchema()

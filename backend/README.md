@@ -141,9 +141,9 @@ Para la referencia completa de endpoints, consultar [`docs/api_referencia.md`](d
 | Torneos | `torneo.py` | `modules/torneos/http/esquemas.py` | `modules/torneos/application/casos_de_uso.py` | `modules/torneos/http/torneos.py` |
 | Categorías | `categoria.py` | `modules/torneos/http/esquemas.py` | `modules/torneos/application/casos_de_uso.py` | `modules/torneos/http/categorias.py` |
 | Equipos | `equipo.py` | `modules/plantel/http/esquemas.py` | `modules/plantel/application/equipos.py` | `modules/plantel/http/equipos.py` |
-| Inscripciones | `inscripcion.py` | `inscripcion_schema.py` | `inscripcion_service.py` | `inscripcion_bp.py` |
+| Inscripciones | `inscripcion.py` | `modules/inscripciones/http/esquemas.py` | `modules/inscripciones/application/inscripciones.py` | `modules/inscripciones/http/inscripciones.py` |
 | Jugadores | `jugador.py` | `modules/plantel/http/esquemas.py` | `modules/plantel/application/jugadores.py` | `modules/plantel/http/jugadores.py` y `visor.py` |
-| Plantillas | `plantilla.py` | `plantilla_schema.py` | `plantilla_service.py` | `plantilla_bp.py` |
+| Plantillas | `plantilla.py` | `modules/inscripciones/http/esquemas.py` | `modules/inscripciones/application/plantillas.py` | `modules/inscripciones/http/plantillas.py` |
 | Partidos | `partido.py` | `modules/competencia/http/esquemas.py` | `modules/competencia/application/partidos.py` | `modules/competencia/http/partidos.py` |
 | Estadísticas | `estadistica.py` | `stats_schema.py` | `stats_service.py` | `stats_bp.py` |
 | Sanciones | `sancion.py` | `modules/competencia/http/esquemas.py` | `modules/competencia/application/sanciones.py` | `modules/competencia/http/sanciones.py` |

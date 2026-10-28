@@ -9,7 +9,15 @@ from app.models.torneo import Torneo
 from app.models.categoria import Categoria
 from app.models.jugador import Jugador
 from app.models.plantilla import Plantilla
-from app.services import inscripcion_service
+from app.modules.inscripciones.application import inscripciones
+from app.modules.inscripciones.infrastructure.repositorio import RepositorioInscripciones
+from app.shared.infrastructure import almacenamiento
+from app.shared.infrastructure.unidad_de_trabajo import UnidadDeTrabajo
+
+
+def piezas():
+    return {'repositorio': RepositorioInscripciones(), 'almacen': almacenamiento, 'unidad': UnidadDeTrabajo()}
+
 
 class TestInscripcionRechazoPurga(unittest.TestCase):
     def setUp(self):
@@ -79,9 +87,9 @@ class TestInscripcionRechazoPurga(unittest.TestCase):
         id_jug = jug.id_jugador
 
         # Rechazamos la inscripción
-        resultado = inscripcion_service.cambiar_estado_inscripcion(id_insc, 'rechazado')
+        resultado = inscripciones.cambiar_estado(id_insc, 'rechazado', **piezas())
 
-        self.assertEqual(resultado, 'DELETED')
+        self.assertIsNone(resultado)
         self.assertIsNone(db.session.get(Inscripcion, id_insc))
         self.assertIsNone(db.session.get(Equipo, id_eq))
         self.assertEqual(Plantilla.query.filter_by(id_equipo=id_eq).count(), 0)
@@ -146,9 +154,9 @@ class TestInscripcionRechazoPurga(unittest.TestCase):
         id_insc2 = insc2.id_inscripcion
 
         # Rechazamos solo la inscripción 2
-        resultado = inscripcion_service.cambiar_estado_inscripcion(id_insc2, 'rechazado')
+        resultado = inscripciones.cambiar_estado(id_insc2, 'rechazado', **piezas())
 
-        self.assertEqual(resultado, 'DELETED')
+        self.assertIsNone(resultado)
         # El jugador NO debe ser eliminado porque pertenece también al Equipo 1
         jug_db = db.session.get(Jugador, id_jug)
         self.assertNotNull = self.assertIsNotNone(jug_db)
@@ -220,7 +228,7 @@ class TestInscripcionRechazoPurga(unittest.TestCase):
         id_aprobada = insc_aprobada.id_inscripcion
 
         # Ejecutamos purga de 30 días
-        res = inscripcion_service.purgar_inscripciones_expiradas(dias=30)
+        res = inscripciones.purgar_expiradas(30, datetime.now(timezone.utc), **piezas())
 
         self.assertGreaterEqual(res['inscripciones_purgadas'], 1)
         self.assertIsNone(db.session.get(Inscripcion, id_vieja))

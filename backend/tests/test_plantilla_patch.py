@@ -2,7 +2,7 @@ from datetime import date
 import unittest
 from marshmallow import ValidationError
 from app import create_app
-from app.schemas.plantilla_schema import (
+from app.modules.inscripciones.http.esquemas import (
     PlantillaUpdateSchema,
     PlantillaPublicSchema,
     _JugadorEnPlantillaSchema
@@ -56,15 +56,18 @@ class TestPlantillaPatchAndSchema(unittest.TestCase):
         self.assertEqual(dumped['url_acta_bachiller'], 'https://example.com/acta.pdf')
 
     def test_actualizar_numero_camiseta_signature(self):
-        from app.services.plantilla_service import actualizar_numero_camiseta
+        from app.modules.inscripciones.application.plantillas import cambiar_dorsal
+        from app.modules.inscripciones.infrastructure.repositorio import RepositorioPlantillas
+        from app.shared.domain.errores import NoEncontrado
+        from app.shared.infrastructure.unidad_de_trabajo import UnidadDeTrabajo
         app = create_app()
         with app.app_context():
-            # Non-existent entry returns None
-            res = actualizar_numero_camiseta(999999, 10)
-            self.assertIsNone(res)
+            # Una entrada que no existe: 404
+            with self.assertRaises(NoEncontrado):
+                cambiar_dorsal(999999, 10, repositorio=RepositorioPlantillas(), unidad=UnidadDeTrabajo())
 
     def test_roster_constants(self):
-        from app.services.plantilla_service import MIN_JUGADORES_PLANTILLA, MAX_JUGADORES_PLANTILLA
+        from app.shared.domain.reglas import MIN_JUGADORES_PLANTILLA, MAX_JUGADORES_PLANTILLA
         self.assertGreaterEqual(MIN_JUGADORES_PLANTILLA, 1)
         self.assertGreaterEqual(MAX_JUGADORES_PLANTILLA, MIN_JUGADORES_PLANTILLA)
 

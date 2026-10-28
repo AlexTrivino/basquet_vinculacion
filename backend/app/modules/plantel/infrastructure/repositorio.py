@@ -1,18 +1,17 @@
 """Equipos y jugadores en la base, sobre los modelos compartidos; entregan las entidades del dominio.
 
-Las consultas son las que hacían equipo_service, jugador_service, jugador_profile_service, visor_service y jugador_bp.
+Las consultas son las que hacían equipo_service, jugador_service, jugador_profile_service, visor_service, jugador_bp
+y, la de la plantilla del jugador en un torneo, plantilla_service.
 El perfil y el buscador del visor devuelven los mismos diccionarios que antes.
 """
 from datetime import date
 
 from sqlalchemy import func
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
 from app.modules.plantel.domain.equipo import CategoriaResumen, Equipo, InscripcionResumen, TorneoResumen, UsuarioResumen
 from app.modules.plantel.domain.jugador import Jugador, PlantillaDeJugador, edad, hace_anios
-from app.shared.domain.errores import Conflicto
-from app.shared.infrastructure.db import db
+from app.shared.infrastructure.db import db, enviar_cambios
 from app.shared.infrastructure.modelos.categoria import Categoria
 from app.shared.infrastructure.modelos.equipo import Equipo as FilaEquipo
 from app.shared.infrastructure.modelos.estadistica import Estadistica
@@ -22,15 +21,6 @@ from app.shared.infrastructure.modelos.partido import Partido
 from app.shared.infrastructure.modelos.plantilla import Plantilla
 from app.shared.infrastructure.modelos.torneo import Torneo
 from app.shared.infrastructure.paginacion import paginar
-
-
-def _guardar():
-    """Manda los cambios a la base; si los rechaza (cédula repetida, por ejemplo), Conflicto."""
-    # ponytail: las restricciones se revisan aquí porque ninguna es diferida; si una se difiere, traducir también al confirmar
-    try:
-        db.session.flush()
-    except IntegrityError as error:
-        raise Conflicto('La base rechazó el cambio.') from error
 
 
 # ── Equipos ───────────────────────────────────────────────────────
@@ -89,7 +79,7 @@ class RepositorioEquipos:
     def agregar(self, datos):
         fila = FilaEquipo(**datos)
         db.session.add(fila)
-        _guardar()
+        enviar_cambios()
         return fila.id_equipo
 
     def actualizar(self, id_equipo, cambios):
@@ -171,17 +161,27 @@ class RepositorioJugadores:
         )
         return [f.id_usuario for f in filas]
 
+    def en_torneo(self, id_jugador, id_torneo, id_categoria=None):
+        """Si el jugador tiene plantilla activa en el torneo (en esa categoría, si se da) y en qué equipo."""
+        filtros = [Plantilla.id_jugador == id_jugador, Plantilla.id_torneo == id_torneo]
+        if id_categoria:
+            filtros.append(Plantilla.id_categoria == id_categoria)
+        entrada = Plantilla.activos().options(joinedload(Plantilla.equipo)).filter(*filtros).first()
+        if entrada and entrada.equipo:
+            return {'ya_en_torneo': True, 'equipo_torneo': entrada.equipo.nombre_equipo, 'id_equipo': entrada.id_equipo}
+        return {'ya_en_torneo': False, 'equipo_torneo': None, 'id_equipo': None}
+
     def agregar(self, datos):
         fila = FilaJugador(**datos)
         db.session.add(fila)
-        _guardar()
+        enviar_cambios()
         return fila.id_jugador
 
     def actualizar(self, id_jugador, cambios):
         fila = db.session.get(FilaJugador, id_jugador)
         for campo, valor in cambios.items():
             setattr(fila, campo, valor)
-        _guardar()
+        enviar_cambios()
 
     def perfil(self, id_jugador):
         """Perfil consolidado de un jugador activo con todas sus participaciones y estadísticas, o None."""

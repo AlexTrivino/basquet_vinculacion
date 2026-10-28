@@ -1,6 +1,9 @@
 """Conexión a la base (Flask-SQLAlchemy) y migraciones (Flask-Migrate), compartidas por todos los módulos."""
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import IntegrityError
+
+from app.shared.domain.errores import Conflicto
 
 
 class SafeSQLAlchemy(SQLAlchemy):
@@ -28,3 +31,13 @@ class SafeSQLAlchemy(SQLAlchemy):
 
 db = SafeSQLAlchemy()
 migrate = Migrate()
+
+
+def enviar_cambios():
+    """Manda a la base los cambios de la sesión, sin confirmarlos; si una restricción los rechaza (una cédula repetida,
+    una inscripción duplicada), Conflicto."""
+    # ponytail: las restricciones se revisan aquí porque ninguna es diferida; si una se difiere, traducir también al confirmar
+    try:
+        db.session.flush()
+    except IntegrityError as error:
+        raise Conflicto('La base rechazó el cambio.') from error

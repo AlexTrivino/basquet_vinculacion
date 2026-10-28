@@ -3,7 +3,9 @@ import uuid
 from datetime import date
 from marshmallow import ValidationError
 from app import create_app, db
-from app.schemas.inscripcion_schema import InscripcionEstadoSchema
+from app.modules.inscripciones.application import plantillas
+from app.modules.inscripciones.http.esquemas import InscripcionEstadoSchema
+from app.modules.inscripciones.infrastructure.repositorio import RepositorioInscripciones, RepositorioPlantillas
 from app.models.usuario import Usuario
 from app.models.inscripcion import Inscripcion
 from app.models.equipo import Equipo
@@ -11,7 +13,7 @@ from app.models.torneo import Torneo
 from app.models.categoria import Categoria
 from app.models.jugador import Jugador
 from app.models.plantilla import Plantilla
-from app.services import plantilla_service
+from app.shared.infrastructure.unidad_de_trabajo import UnidadDeTrabajo
 
 class TestInscripcionDraftAndRoster(unittest.TestCase):
     def setUp(self):
@@ -68,13 +70,13 @@ class TestInscripcionDraftAndRoster(unittest.TestCase):
         db.session.add(j)
         db.session.flush()
 
-        p = plantilla_service.crear_plantilla({
+        p = plantillas.agregar_jugador({
             'id_equipo': eq.id_equipo,
             'id_torneo': t.id_torneo,
             'id_categoria': c.id_categoria,
             'id_jugador': j.id_jugador,
             'numero_camiseta': 7
-        })
+        }, None, None, date.today(), repositorio=RepositorioPlantillas(), unidad=UnidadDeTrabajo())
 
         self.assertIsNotNone(p)
         self.assertEqual(p.numero_camiseta, 7)
@@ -83,8 +85,6 @@ class TestInscripcionDraftAndRoster(unittest.TestCase):
         db.session.rollback()
 
     def test_listar_inscripciones_aislamiento_borrador(self):
-        from app.services import inscripcion_service
-
         user = Usuario.query.first()
         if not user:
             user = Usuario(
@@ -115,15 +115,13 @@ class TestInscripcionDraftAndRoster(unittest.TestCase):
         db.session.flush()
 
         # Query sin incluir borradores (por defecto para admin/auditoría)
-        query_admin = inscripcion_service.listar_inscripciones(id_torneo=t.id_torneo, incluir_borradores=False)
-        resultados_admin = query_admin.all()
+        resultados_admin, _ = RepositorioInscripciones().listar(1, 50, id_torneo=t.id_torneo, incluir_borradores=False)
         ids_admin = [i.id_inscripcion for i in resultados_admin]
         self.assertIn(insc_pendiente.id_inscripcion, ids_admin)
         self.assertNotIn(insc_borrador.id_inscripcion, ids_admin)
 
         # Query incluyendo borradores (para delegado)
-        query_delegado = inscripcion_service.listar_inscripciones(id_torneo=t.id_torneo, incluir_borradores=True)
-        resultados_delegado = query_delegado.all()
+        resultados_delegado, _ = RepositorioInscripciones().listar(1, 50, id_torneo=t.id_torneo, incluir_borradores=True)
         ids_delegado = [i.id_inscripcion for i in resultados_delegado]
         self.assertIn(insc_borrador.id_inscripcion, ids_delegado)
         self.assertIn(insc_pendiente.id_inscripcion, ids_delegado)

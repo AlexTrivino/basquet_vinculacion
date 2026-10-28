@@ -8,7 +8,6 @@ from app.modules.plantel.application import jugadores as casos
 from app.modules.plantel.domain.jugador import CedulaRepetida
 from app.modules.plantel.http.esquemas import JugadorAdminSchema, JugadorCreateSchema, JugadorPublicSchema, JugadorUpdateSchema
 from app.modules.plantel.infrastructure.repositorio import RepositorioJugadores
-from app.services import plantilla_service  # ponytail: pasa a la application de inscripciones en la fase 6
 from app.shared.http.autenticacion import identidad_opcional, token_required
 from app.shared.http.paginacion import pagina_pedida
 from app.shared.http.respuestas import api_error, api_response
@@ -77,12 +76,7 @@ def buscar_jugador():
         try:
             id_torneo_int = int(id_torneo)
             id_categoria_int = int(id_categoria_param) if id_categoria_param else None
-            info_torneo = plantilla_service.verificar_jugador_en_torneo(
-                id_jugador=jugador.id_jugador,
-                id_torneo=id_torneo_int,
-                id_categoria=id_categoria_int,
-            )
-            jugador_data.update(info_torneo)
+            jugador_data.update(casos.en_torneo(jugador.id_jugador, id_torneo_int, id_categoria_int, RepositorioJugadores()))
         except (ValueError, TypeError):
             return api_error('BAD_REQUEST', 'El parámetro id_torneo debe ser un número entero válido.', 400)
 

@@ -51,9 +51,9 @@ def create_app() -> Flask:
     from app.modules.torneos.http.categorias import categoria_bp
     from app.routes.lideres_bp import lideres_bp
     from app.modules.plantel.http.equipos import equipo_bp
-    from app.routes.inscripcion_bp import inscripcion_bp
+    from app.modules.inscripciones.http.inscripciones import inscripcion_bp
     from app.modules.plantel.http.jugadores import jugador_bp
-    from app.routes.plantilla_bp import plantilla_bp
+    from app.modules.inscripciones.http.plantillas import plantilla_bp
     from app.modules.competencia.http.partidos import partido_bp
     from app.routes.stats_bp import stats_bp
     from app.routes.reportes_bp import reportes_bp

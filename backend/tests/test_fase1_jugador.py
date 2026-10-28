@@ -79,11 +79,11 @@ class TestJugadorSchema(unittest.TestCase):
         self.assertNotIn('telefono', loaded_empty)
 
     def test_verificar_jugador_en_torneo_signature(self):
-        from app.services.plantilla_service import verificar_jugador_en_torneo
+        from app.modules.plantel.infrastructure.repositorio import RepositorioJugadores
         app = create_app()
         with app.app_context():
             # Non-existent player / tournament
-            res = verificar_jugador_en_torneo(999999, 999999)
+            res = RepositorioJugadores().en_torneo(999999, 999999)
             self.assertIsInstance(res, dict)
             self.assertIn('ya_en_torneo', res)
             self.assertIn('equipo_torneo', res)

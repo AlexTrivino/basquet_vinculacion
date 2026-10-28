@@ -47,7 +47,7 @@ basquet_vinculacion/
 │   │   ├── __init__.py               # Application Factory: CORS, DB, Blueprints
 │   │   ├── shared/                   # Lo común a todos los módulos (migración por fases: ver specs/)
 │   │   │   ├── domain/               # Errores de dominio (NoEncontrado, ReglaDeNegocio, Conflicto, SinPermiso), reglas de negocio y texto
-│   │   │   ├── infrastructure/       # db.py (db, migrate), almacenamiento.py (Supabase Storage)
+│   │   │   ├── infrastructure/       # db.py (db, migrate, enviar_cambios), almacenamiento.py (Supabase Storage)
 │   │   │   │   └── modelos/          # Modelos SQLAlchemy 2.0 (14 entidades)
 │   │   │   │       ├── usuario.py    # UUID PK enlazado a Supabase Auth
 │   │   │   │       ├── torneo.py     # Competiciones con fechas y estados
@@ -63,12 +63,13 @@ basquet_vinculacion/
 │   │   ├── modules/                  # Módulos migrados, cada uno con domain/, application/, infrastructure/ y http/
 │   │   │   ├── auspicios/            # Patrocinadores (/api/patrocinadores): el molde de los demás
 │   │   │   ├── competencia/          # Partidos, sanciones, tabla de posiciones FIBA y fase final (llaves y recorrido)
+│   │   │   ├── inscripciones/        # Inscripciones (borrador, revisión, retiro) y plantillas de 5 a 18 jugadores
 │   │   │   ├── plantel/              # Equipos, jugadores y buscador del visor: quién ve los datos personales y quién gestiona
 │   │   │   └── torneos/              # Torneos y categorías: estados, fechas y calendario
 │   │   ├── models/                   # Ruta vieja: reexporta shared/infrastructure/modelos
-│   │   ├── routes/                   # Controladores Blueprints (auth, torneos, inscripciones, etc.)
-│   │   ├── schemas/                  # Validación y serialización con Marshmallow 3
-│   │   ├── services/                 # Lógica de negocio de lo que falta migrar (plantillas, inscripciones, etc.)
+│   │   ├── routes/                   # Blueprints que faltan migrar (estadísticas, reportes, líderes, usuarios y configuración)
+│   │   ├── schemas/                  # Esquema de estadísticas (Marshmallow 3), hasta que se migre
+│   │   ├── services/                 # Lógica de negocio de lo que falta migrar (estadísticas, líderes, flyers y reportes)
 │   │   └── utils/                    # Ruta vieja: reexporta shared/ (reglas, texto, storage, response, pagination, auth y errores)
 │   ├── tests/                        # Suite de pruebas unitarias y de integración (pytest)
 │   ├── seed_database.py              # Script interactivo para poblar base de datos mock

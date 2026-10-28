@@ -296,6 +296,13 @@
    "success": false
   }
  },
+ "DELETE /api/plantillas/13 · admin": {
+  "codigo": 200,
+  "cuerpo": {
+   "message": "Jugador removido de la plantilla exitosamente.",
+   "success": true
+  }
+ },
  "DELETE /api/plantillas/13 · anónimo · sin token": {
   "codigo": 401,
   "cuerpo": {
@@ -4395,6 +4402,95 @@
    "success": true
   }
  },
+ "GET /api/inscripciones?estado=aprobado · del1": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": [
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 0,
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "estado_inscripcion": "aprobado",
+     "fecha_inscripcion": "2026-07-15T12:00:00",
+     "grupo": null,
+     "id_inscripcion": 1,
+     "torneo": {
+      "estado": "en_curso",
+      "fecha_fin": "2026-10-20",
+      "fecha_inicio": "2026-08-01",
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     }
+    },
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 30,
+      "genero_categoria": "femenino",
+      "id_categoria": 2,
+      "nombre_categoria": "Cadetes +30"
+     },
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "estado_inscripcion": "aprobado",
+     "fecha_inscripcion": "2026-07-15T12:00:00",
+     "grupo": null,
+     "id_inscripcion": 5,
+     "torneo": {
+      "estado": "en_curso",
+      "fecha_fin": "2026-10-20",
+      "fecha_inicio": "2026-08-01",
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     }
+    },
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 0,
+      "genero_categoria": "masculino",
+      "id_categoria": 4,
+      "nombre_categoria": "Juvenil"
+     },
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "estado_inscripcion": "aprobado",
+     "fecha_inscripcion": "2025-08-20T10:00:00",
+     "grupo": null,
+     "id_inscripcion": 11,
+     "torneo": {
+      "estado": "finalizado",
+      "fecha_fin": "2025-11-30",
+      "fecha_inicio": "2025-09-01",
+      "id_torneo": 3,
+      "nombre": "INTERCOLEGIAL 2025"
+     }
+    }
+   ],
+   "pagination": {
+    "page": 1,
+    "pages": 1,
+    "per_page": 20,
+    "total": 3
+   },
+   "success": true
+  }
+ },
  "GET /api/inscripciones?estado=borrador · admin": {
   "codigo": 200,
   "cuerpo": {
@@ -4444,6 +4540,475 @@
    "success": true
   }
  },
+ "GET /api/inscripciones?estado=cualquiera · admin · estado que no existe": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": [
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 40,
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "created_at": "2026-10-01T12:14:00",
+     "equipo": {
+      "id_equipo": 6,
+      "nombre_equipo": "4 DE NOVIEMBRE",
+      "url_logo": null,
+      "usuario": {
+       "correo": "admin@manta.test",
+       "nombre": "Admin Manta"
+      }
+     },
+     "estado_inscripcion": "aprobado",
+     "fecha_inscripcion": "2026-10-08T11:00:00",
+     "grupo": null,
+     "id_categoria": 3,
+     "id_equipo": 6,
+     "id_inscripcion": 14,
+     "id_torneo": 2,
+     "torneo": {
+      "estado": "programado",
+      "fecha_fin": "2026-10-27",
+      "fecha_inicio": "2026-10-10",
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "updated_at": "2026-10-01T12:14:00",
+     "url_comprobante_pago": null
+    },
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 40,
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "created_at": "2026-10-01T12:13:00",
+     "equipo": {
+      "id_equipo": 3,
+      "nombre_equipo": "MANTA",
+      "url_logo": null,
+      "usuario": {
+       "correo": "admin@manta.test",
+       "nombre": "Admin Manta"
+      }
+     },
+     "estado_inscripcion": "aprobado",
+     "fecha_inscripcion": "2026-10-07T11:00:00",
+     "grupo": null,
+     "id_categoria": 3,
+     "id_equipo": 3,
+     "id_inscripcion": 13,
+     "id_torneo": 2,
+     "torneo": {
+      "estado": "programado",
+      "fecha_fin": "2026-10-27",
+      "fecha_inicio": "2026-10-10",
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "updated_at": "2026-10-01T12:13:00",
+     "url_comprobante_pago": null
+    },
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 40,
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "created_at": "2026-10-01T12:10:00",
+     "equipo": {
+      "id_equipo": 4,
+      "nombre_equipo": "STELLA MARIS",
+      "url_logo": null,
+      "usuario": {
+       "correo": "admin@manta.test",
+       "nombre": "Admin Manta"
+      }
+     },
+     "estado_inscripcion": "rechazado",
+     "fecha_inscripcion": "2026-10-06T10:00:00",
+     "grupo": null,
+     "id_categoria": 3,
+     "id_equipo": 4,
+     "id_inscripcion": 10,
+     "id_torneo": 2,
+     "torneo": {
+      "estado": "programado",
+      "fecha_fin": "2026-10-27",
+      "fecha_inicio": "2026-10-10",
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "updated_at": "2026-10-01T12:10:00",
+     "url_comprobante_pago": null
+    },
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 40,
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "created_at": "2026-10-01T12:08:00",
+     "equipo": {
+      "id_equipo": 2,
+      "nombre_equipo": "FAE",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/2/logo/fae.png",
+      "usuario": {
+       "correo": "del2@manta.test",
+       "nombre": "Delegado FAE"
+      }
+     },
+     "estado_inscripcion": "pendiente",
+     "fecha_inscripcion": "2026-10-05T09:30:00",
+     "grupo": null,
+     "id_categoria": 3,
+     "id_equipo": 2,
+     "id_inscripcion": 8,
+     "id_torneo": 2,
+     "torneo": {
+      "estado": "programado",
+      "fecha_fin": "2026-10-27",
+      "fecha_inicio": "2026-10-10",
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "updated_at": "2026-10-01T12:08:00",
+     "url_comprobante_pago": "https://supabase.test/storage/v1/object/public/archivos/inscripciones/8/pago.pdf"
+    },
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 0,
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "created_at": "2026-10-01T12:01:00",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png",
+      "usuario": {
+       "correo": "del1@manta.test",
+       "nombre": "Delegado San José"
+      }
+     },
+     "estado_inscripcion": "aprobado",
+     "fecha_inscripcion": "2026-07-15T12:00:00",
+     "grupo": null,
+     "id_categoria": 1,
+     "id_equipo": 1,
+     "id_inscripcion": 1,
+     "id_torneo": 1,
+     "torneo": {
+      "estado": "en_curso",
+      "fecha_fin": "2026-10-20",
+      "fecha_inicio": "2026-08-01",
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "updated_at": "2026-10-01T12:01:00",
+     "url_comprobante_pago": "https://supabase.test/storage/v1/object/public/archivos/inscripciones/1/pago.pdf"
+    },
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 0,
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "created_at": "2026-10-01T12:02:00",
+     "equipo": {
+      "id_equipo": 2,
+      "nombre_equipo": "FAE",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/2/logo/fae.png",
+      "usuario": {
+       "correo": "del2@manta.test",
+       "nombre": "Delegado FAE"
+      }
+     },
+     "estado_inscripcion": "aprobado",
+     "fecha_inscripcion": "2026-07-15T12:00:00",
+     "grupo": null,
+     "id_categoria": 1,
+     "id_equipo": 2,
+     "id_inscripcion": 2,
+     "id_torneo": 1,
+     "torneo": {
+      "estado": "en_curso",
+      "fecha_fin": "2026-10-20",
+      "fecha_inicio": "2026-08-01",
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "updated_at": "2026-10-01T12:02:00",
+     "url_comprobante_pago": "https://supabase.test/storage/v1/object/public/archivos/inscripciones/2/pago.pdf"
+    },
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 0,
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "created_at": "2026-10-01T12:03:00",
+     "equipo": {
+      "id_equipo": 3,
+      "nombre_equipo": "MANTA",
+      "url_logo": null,
+      "usuario": {
+       "correo": "admin@manta.test",
+       "nombre": "Admin Manta"
+      }
+     },
+     "estado_inscripcion": "aprobado",
+     "fecha_inscripcion": "2026-07-15T12:00:00",
+     "grupo": null,
+     "id_categoria": 1,
+     "id_equipo": 3,
+     "id_inscripcion": 3,
+     "id_torneo": 1,
+     "torneo": {
+      "estado": "en_curso",
+      "fecha_fin": "2026-10-20",
+      "fecha_inicio": "2026-08-01",
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "updated_at": "2026-10-01T12:03:00",
+     "url_comprobante_pago": "https://supabase.test/storage/v1/object/public/archivos/inscripciones/3/pago.pdf"
+    },
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 0,
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "created_at": "2026-10-01T12:04:00",
+     "equipo": {
+      "id_equipo": 4,
+      "nombre_equipo": "STELLA MARIS",
+      "url_logo": null,
+      "usuario": {
+       "correo": "admin@manta.test",
+       "nombre": "Admin Manta"
+      }
+     },
+     "estado_inscripcion": "aprobado",
+     "fecha_inscripcion": "2026-07-15T12:00:00",
+     "grupo": null,
+     "id_categoria": 1,
+     "id_equipo": 4,
+     "id_inscripcion": 4,
+     "id_torneo": 1,
+     "torneo": {
+      "estado": "en_curso",
+      "fecha_fin": "2026-10-20",
+      "fecha_inicio": "2026-08-01",
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "updated_at": "2026-10-01T12:04:00",
+     "url_comprobante_pago": "https://supabase.test/storage/v1/object/public/archivos/inscripciones/4/pago.pdf"
+    },
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 30,
+      "genero_categoria": "femenino",
+      "id_categoria": 2,
+      "nombre_categoria": "Cadetes +30"
+     },
+     "created_at": "2026-10-01T12:05:00",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png",
+      "usuario": {
+       "correo": "del1@manta.test",
+       "nombre": "Delegado San José"
+      }
+     },
+     "estado_inscripcion": "aprobado",
+     "fecha_inscripcion": "2026-07-15T12:00:00",
+     "grupo": null,
+     "id_categoria": 2,
+     "id_equipo": 1,
+     "id_inscripcion": 5,
+     "id_torneo": 1,
+     "torneo": {
+      "estado": "en_curso",
+      "fecha_fin": "2026-10-20",
+      "fecha_inicio": "2026-08-01",
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "updated_at": "2026-10-01T12:05:00",
+     "url_comprobante_pago": null
+    },
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 30,
+      "genero_categoria": "femenino",
+      "id_categoria": 2,
+      "nombre_categoria": "Cadetes +30"
+     },
+     "created_at": "2026-10-01T12:06:00",
+     "equipo": {
+      "id_equipo": 5,
+      "nombre_equipo": "JUAN MONTALVO",
+      "url_logo": null,
+      "usuario": {
+       "correo": "admin@manta.test",
+       "nombre": "Admin Manta"
+      }
+     },
+     "estado_inscripcion": "aprobado",
+     "fecha_inscripcion": "2026-07-15T12:00:00",
+     "grupo": null,
+     "id_categoria": 2,
+     "id_equipo": 5,
+     "id_inscripcion": 6,
+     "id_torneo": 1,
+     "torneo": {
+      "estado": "en_curso",
+      "fecha_fin": "2026-10-20",
+      "fecha_inicio": "2026-08-01",
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "updated_at": "2026-10-01T12:06:00",
+     "url_comprobante_pago": null
+    },
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 30,
+      "genero_categoria": "femenino",
+      "id_categoria": 2,
+      "nombre_categoria": "Cadetes +30"
+     },
+     "created_at": "2026-10-01T12:07:00",
+     "equipo": {
+      "id_equipo": 6,
+      "nombre_equipo": "4 DE NOVIEMBRE",
+      "url_logo": null,
+      "usuario": {
+       "correo": "admin@manta.test",
+       "nombre": "Admin Manta"
+      }
+     },
+     "estado_inscripcion": "aprobado",
+     "fecha_inscripcion": "2026-07-15T12:00:00",
+     "grupo": null,
+     "id_categoria": 2,
+     "id_equipo": 6,
+     "id_inscripcion": 7,
+     "id_torneo": 1,
+     "torneo": {
+      "estado": "en_curso",
+      "fecha_fin": "2026-10-20",
+      "fecha_inicio": "2026-08-01",
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "updated_at": "2026-10-01T12:07:00",
+     "url_comprobante_pago": null
+    },
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 0,
+      "genero_categoria": "masculino",
+      "id_categoria": 4,
+      "nombre_categoria": "Juvenil"
+     },
+     "created_at": "2026-10-01T12:12:00",
+     "equipo": {
+      "id_equipo": 2,
+      "nombre_equipo": "FAE",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/2/logo/fae.png",
+      "usuario": {
+       "correo": "del2@manta.test",
+       "nombre": "Delegado FAE"
+      }
+     },
+     "estado_inscripcion": "aprobado",
+     "fecha_inscripcion": "2025-08-21T10:00:00",
+     "grupo": null,
+     "id_categoria": 4,
+     "id_equipo": 2,
+     "id_inscripcion": 12,
+     "id_torneo": 3,
+     "torneo": {
+      "estado": "finalizado",
+      "fecha_fin": "2025-11-30",
+      "fecha_inicio": "2025-09-01",
+      "id_torneo": 3,
+      "nombre": "INTERCOLEGIAL 2025"
+     },
+     "updated_at": "2026-10-01T12:12:00",
+     "url_comprobante_pago": null
+    },
+    {
+     "categoria": {
+      "edad_maxima": null,
+      "edad_minima": 0,
+      "genero_categoria": "masculino",
+      "id_categoria": 4,
+      "nombre_categoria": "Juvenil"
+     },
+     "created_at": "2026-10-01T12:11:00",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png",
+      "usuario": {
+       "correo": "del1@manta.test",
+       "nombre": "Delegado San José"
+      }
+     },
+     "estado_inscripcion": "aprobado",
+     "fecha_inscripcion": "2025-08-20T10:00:00",
+     "grupo": null,
+     "id_categoria": 4,
+     "id_equipo": 1,
+     "id_inscripcion": 11,
+     "id_torneo": 3,
+     "torneo": {
+      "estado": "finalizado",
+      "fecha_fin": "2025-11-30",
+      "fecha_inicio": "2025-09-01",
+      "id_torneo": 3,
+      "nombre": "INTERCOLEGIAL 2025"
+     },
+     "updated_at": "2026-10-01T12:11:00",
+     "url_comprobante_pago": null
+    }
+   ],
+   "pagination": {
+    "page": 1,
+    "pages": 1,
+    "per_page": 20,
+    "total": 13
+   },
+   "success": true
+  }
+ },
  "GET /api/inscripciones?id_categoria=2&id_equipo=1 · admin": {
   "codigo": 200,
   "cuerpo": {
@@ -4489,6 +5054,19 @@
     "pages": 1,
     "per_page": 20,
     "total": 1
+   },
+   "success": true
+  }
+ },
+ "GET /api/inscripciones?id_equipo=2 · del1 · equipo ajeno": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": [],
+   "pagination": {
+    "page": 1,
+    "pages": 0,
+    "per_page": 20,
+    "total": 0
    },
    "success": true
   }
@@ -8694,6 +9272,174 @@
     "pages": 1,
     "per_page": 20,
     "total": 5
+   },
+   "success": true
+  }
+ },
+ "GET /api/plantillas?id_torneo=1&per_page=500 · anónimo": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": [
+    {
+     "estado": "activo",
+     "id_categoria": 2,
+     "id_equipo": 1,
+     "id_plantilla": 9,
+     "id_torneo": 1,
+     "jugador": {
+      "genero": "femenino",
+      "id_jugador": 9,
+      "nombre": "ANA MERO VÉLEZ",
+      "url_foto": null
+     },
+     "numero_camiseta": 3
+    },
+    {
+     "estado": "activo",
+     "id_categoria": 1,
+     "id_equipo": 1,
+     "id_plantilla": 1,
+     "id_torneo": 1,
+     "jugador": {
+      "genero": "masculino",
+      "id_jugador": 1,
+      "nombre": "BRYAN CHÁVEZ VÉLEZ",
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
+     },
+     "numero_camiseta": 4
+    },
+    {
+     "estado": "activo",
+     "id_categoria": 1,
+     "id_equipo": 2,
+     "id_plantilla": 5,
+     "id_torneo": 1,
+     "jugador": {
+      "genero": "masculino",
+      "id_jugador": 5,
+      "nombre": "JORGE ZAMBRANO ALCÍVAR",
+      "url_foto": null
+     },
+     "numero_camiseta": 5
+    },
+    {
+     "estado": "activo",
+     "id_categoria": 2,
+     "id_equipo": 5,
+     "id_plantilla": 10,
+     "id_torneo": 1,
+     "jugador": {
+      "genero": "femenino",
+      "id_jugador": 10,
+      "nombre": "MARÍA LOOR CEDEÑO",
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/10/foto.jpg"
+     },
+     "numero_camiseta": 6
+    },
+    {
+     "estado": "activo",
+     "id_categoria": 1,
+     "id_equipo": 1,
+     "id_plantilla": 2,
+     "id_torneo": 1,
+     "jugador": {
+      "genero": "masculino",
+      "id_jugador": 2,
+      "nombre": "MATEO MERO PINARGOTE",
+      "url_foto": null
+     },
+     "numero_camiseta": 7
+    },
+    {
+     "estado": "activo",
+     "id_categoria": 1,
+     "id_equipo": 2,
+     "id_plantilla": 6,
+     "id_torneo": 1,
+     "jugador": {
+      "genero": "masculino",
+      "id_jugador": 6,
+      "nombre": "CARLOS MACÍAS LOOR",
+      "url_foto": null
+     },
+     "numero_camiseta": 8
+    },
+    {
+     "estado": "activo",
+     "id_categoria": 1,
+     "id_equipo": 3,
+     "id_plantilla": 7,
+     "id_torneo": 1,
+     "jugador": {
+      "genero": "masculino",
+      "id_jugador": 7,
+      "nombre": "SEBASTIÁN MACÍAS MOREIRA",
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/7/foto.jpg"
+     },
+     "numero_camiseta": 9
+    },
+    {
+     "estado": "activo",
+     "id_categoria": 1,
+     "id_equipo": 1,
+     "id_plantilla": 3,
+     "id_torneo": 1,
+     "jugador": {
+      "genero": "masculino",
+      "id_jugador": 3,
+      "nombre": "DAVID CEDEÑO ZAMBRANO",
+      "url_foto": null
+     },
+     "numero_camiseta": 10
+    },
+    {
+     "estado": "activo",
+     "id_categoria": 1,
+     "id_equipo": 4,
+     "id_plantilla": 8,
+     "id_torneo": 1,
+     "jugador": {
+      "genero": "masculino",
+      "id_jugador": 8,
+      "nombre": "JOSUÉ ALCÍVAR MACÍAS",
+      "url_foto": null
+     },
+     "numero_camiseta": 11
+    },
+    {
+     "estado": "activo",
+     "id_categoria": 1,
+     "id_equipo": 1,
+     "id_plantilla": 4,
+     "id_torneo": 1,
+     "jugador": {
+      "genero": "masculino",
+      "id_jugador": 4,
+      "nombre": "LUIS ALAVA PICO",
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/4/foto.jpg"
+     },
+     "numero_camiseta": 12
+    },
+    {
+     "estado": "activo",
+     "id_categoria": 2,
+     "id_equipo": 6,
+     "id_plantilla": 11,
+     "id_torneo": 1,
+     "jugador": {
+      "genero": "femenino",
+      "id_jugador": 11,
+      "nombre": "JULIA PICO MERO",
+      "url_foto": null
+     },
+     "numero_camiseta": 14
+    }
+   ],
+   "pagination": {
+    "page": 1,
+    "pages": 1,
+    "per_page": 200,
+    "total": 11
    },
    "success": true
   }
@@ -13451,6 +14197,56 @@
    "success": false
   }
  },
+ "PATCH /api/inscripciones/8/editar · admin · categoría de otro torneo": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "categoria": {
+     "edad_maxima": null,
+     "edad_minima": 0,
+     "genero_categoria": "masculino",
+     "id_categoria": 1,
+     "nombre_categoria": "Juvenil"
+    },
+    "created_at": "2026-10-01T12:08:00",
+    "equipo": {
+     "id_equipo": 2,
+     "nombre_equipo": "FAE",
+     "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/2/logo/fae.png",
+     "usuario": {
+      "correo": "del2@manta.test",
+      "nombre": "Delegado FAE"
+     }
+    },
+    "estado_inscripcion": "pendiente",
+    "fecha_inscripcion": "2026-10-05T09:30:00",
+    "grupo": null,
+    "id_categoria": 1,
+    "id_equipo": 2,
+    "id_inscripcion": 8,
+    "id_torneo": 2,
+    "torneo": {
+     "estado": "programado",
+     "fecha_fin": "2026-10-27",
+     "fecha_inicio": "2026-10-10",
+     "id_torneo": 2,
+     "nombre": "NACIONAL +40 2026"
+    },
+    "updated_at": "<hoy>",
+    "url_comprobante_pago": "https://supabase.test/storage/v1/object/public/archivos/inscripciones/8/pago.pdf"
+   },
+   "message": "Inscripción y plantillas actualizadas exitosamente.",
+   "success": true
+  }
+ },
+ "PATCH /api/inscripciones/8/editar · admin · categoría que no existe": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": "La nueva categoría no existe.",
+   "success": false
+  }
+ },
  "PATCH /api/inscripciones/8/editar · admin · destino en curso": {
   "codigo": 400,
   "cuerpo": {
@@ -13471,6 +14267,22 @@
      "Missing data for required field."
     ]
    },
+   "success": false
+  }
+ },
+ "PATCH /api/inscripciones/8/editar · admin · sin cuerpo": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "El cuerpo de la solicitud debe ser JSON válido.",
+   "success": false
+  }
+ },
+ "PATCH /api/inscripciones/8/editar · admin · torneo que no existe": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": "El nuevo torneo no existe.",
    "success": false
   }
  },
@@ -13541,6 +14353,14 @@
    "inscripciones": -1,
    "jugadores": -1,
    "plantillas": -1
+  }
+ },
+ "PATCH /api/inscripciones/8/estado · admin · sin cuerpo": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "El cuerpo de la solicitud debe ser JSON válido.",
+   "success": false
   }
  },
  "PATCH /api/inscripciones/8/estado · anónimo · sin token": {
@@ -13617,12 +14437,49 @@
    "success": false
   }
  },
+ "PATCH /api/inscripciones/99/editar · admin": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": "Inscripción no encontrada.",
+   "success": false
+  }
+ },
  "PATCH /api/inscripciones/99/estado · admin": {
   "codigo": 404,
   "cuerpo": {
    "error_code": "NOT_FOUND",
    "message": "Inscripción no encontrada.",
    "success": false
+  }
+ },
+ "PATCH /api/plantillas/13 · admin": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "created_at": "2026-10-01T12:13:00",
+    "estado": "activo",
+    "id_equipo": 1,
+    "id_jugador": 13,
+    "id_plantilla": 13,
+    "id_torneo": 2,
+    "jugador": {
+     "correo": "jugador13@manta.test",
+     "documento_identificacion": "1310000013",
+     "fecha_nacimiento": "1978-01-20",
+     "genero": "masculino",
+     "id_jugador": 13,
+     "nombre": "PEDRO ALAVA MERO",
+     "telefono": "0990000013",
+     "url_acta_bachiller": null,
+     "url_cedula": null,
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/13/foto.jpg"
+    },
+    "numero_camiseta": 10,
+    "updated_at": "<hoy>"
+   },
+   "message": "Número de camiseta actualizado exitosamente.",
+   "success": true
   }
  },
  "PATCH /api/plantillas/13 · anónimo · sin token": {
@@ -13667,6 +14524,14 @@
   "cuerpo": {
    "error_code": "CONFLICT",
    "message": "El número de camiseta 2 ya está en uso por otro jugador de este equipo en este torneo.",
+   "success": false
+  }
+ },
+ "PATCH /api/plantillas/13 · del1 · sin cuerpo": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "El cuerpo debe ser JSON válido.",
    "success": false
   }
  },
@@ -13979,6 +14844,14 @@
    "success": false
   }
  },
+ "POST /api/inscripciones · admin · equipo inactivo": {
+  "codigo": 422,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": "El equipo especificado no existe o está inactivo.",
+   "success": false
+  }
+ },
  "POST /api/inscripciones · anónimo · sin token": {
   "codigo": 401,
   "cuerpo": {
@@ -14100,11 +14973,27 @@
    "success": false
   }
  },
+ "POST /api/inscripciones · del2 · sin cuerpo": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "El cuerpo de la solicitud debe ser JSON válido.",
+   "success": false
+  }
+ },
  "POST /api/inscripciones · del2 · torneo en curso": {
   "codigo": 422,
   "cuerpo": {
    "error_code": "VALIDATION_ERROR",
    "message": "No se pueden registrar inscripciones en un torneo en curso, finalizado o anulado.",
+   "success": false
+  }
+ },
+ "POST /api/inscripciones · del2 · torneo que no existe": {
+  "codigo": 422,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": "El torneo especificado no existe o está inactivo.",
    "success": false
   }
  },
@@ -14122,6 +15011,19 @@
    "error_code": "UNPROCESSABLE_ENTITY",
    "message": "El equipo cuenta con 1 jugador(es). Se requiere un mínimo de 5 jugadores para enviar la inscripción.",
    "success": false
+  }
+ },
+ "POST /api/inscripciones/9/comprobante · admin": {
+  "almacenamiento": [
+   "POST archivos/inscripciones/9/<uuid>_pago.pdf"
+  ],
+  "codigo": 201,
+  "cuerpo": {
+   "data": {
+    "url_comprobante_pago": "https://supabase.test/storage/v1/object/public/archivos/inscripciones/9/<uuid>_pago.pdf"
+   },
+   "message": "Comprobante subido exitosamente.",
+   "success": true
   }
  },
  "POST /api/inscripciones/9/comprobante · anónimo · sin token": {
@@ -14150,6 +15052,14 @@
   "cuerpo": {
    "error_code": "BAD_REQUEST",
    "message": "No se encontró el campo 'archivo' en la solicitud. Usa multipart/form-data con el campo 'archivo'.",
+   "success": false
+  }
+ },
+ "POST /api/inscripciones/9/comprobante · del1 · sin nombre": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "No se seleccionó ningún archivo.",
    "success": false
   }
  },
@@ -14267,6 +15177,14 @@
    "success": false
   }
  },
+ "POST /api/inscripciones/99/finalizar-borrador · admin": {
+  "codigo": 404,
+  "cuerpo": {
+   "error_code": "NOT_FOUND",
+   "message": "Inscripción no encontrada.",
+   "success": false
+  }
+ },
  "POST /api/inscripciones/completa · anónimo · sin token": {
   "codigo": 401,
   "cuerpo": {
@@ -14341,6 +15259,14 @@
    "success": false
   }
  },
+ "POST /api/inscripciones/completa · del3 · comprobante sin nombre": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "No se seleccionó ningún archivo.",
+   "success": false
+  }
+ },
  "POST /api/inscripciones/completa · del3 · logo de texto": {
   "codigo": 415,
   "cuerpo": {
@@ -14349,11 +15275,76 @@
    "success": false
   }
  },
+ "POST /api/inscripciones/completa · del3 · sin comprobante": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "No se encontró el campo archivo.",
+   "success": false
+  }
+ },
+ "POST /api/inscripciones/completa · del3 · sin logo": {
+  "almacenamiento": [
+   "POST archivos/inscripciones/15/<uuid>_pago.pdf"
+  ],
+  "codigo": 201,
+  "cuerpo": {
+   "data": {
+    "categoria": {
+     "edad_maxima": null,
+     "edad_minima": 18,
+     "genero_categoria": "femenino",
+     "id_categoria": 7,
+     "nombre_categoria": "Libre"
+    },
+    "created_at": "<hoy>",
+    "equipo": {
+     "id_equipo": 9,
+     "nombre_equipo": "CLUB NÁUTICO",
+     "url_logo": null,
+     "usuario": {
+      "correo": "del3@manta.test",
+      "nombre": "Delegada sin equipo"
+     }
+    },
+    "estado_inscripcion": "borrador",
+    "fecha_inscripcion": "<hoy>",
+    "grupo": null,
+    "id_categoria": 7,
+    "id_equipo": 9,
+    "id_inscripcion": 15,
+    "id_torneo": 2,
+    "torneo": {
+     "estado": "programado",
+     "fecha_fin": "2026-10-27",
+     "fecha_inicio": "2026-10-10",
+     "id_torneo": 2,
+     "nombre": "NACIONAL +40 2026"
+    },
+    "updated_at": "<hoy>",
+    "url_comprobante_pago": "https://supabase.test/storage/v1/object/public/archivos/inscripciones/15/<uuid>_pago.pdf"
+   },
+   "message": "Datos del club y comprobante registrados en borrador. Procede al registro de jugadores.",
+   "success": true
+  },
+  "filas": {
+   "equipos": 1,
+   "inscripciones": 1
+  }
+ },
  "POST /api/inscripciones/completa · del3 · sin nombre": {
   "codigo": 400,
   "cuerpo": {
    "error_code": "BAD_REQUEST",
    "message": "Faltan datos obligatorios (nombre_equipo, id_torneo, id_categoria).",
+   "success": false
+  }
+ },
+ "POST /api/inscripciones/completa · del3 · torneo que no es número": {
+  "codigo": 500,
+  "cuerpo": {
+   "error_code": "SERVER_ERROR",
+   "message": "Ocurrió un error inesperado al procesar la inscripción.",
    "success": false
   }
  },
@@ -14483,6 +15474,59 @@
   "filas": {
    "inscripciones": 1,
    "plantillas": 2
+  }
+ },
+ "POST /api/inscripciones/reinscribir · del2 · sin clonar": {
+  "codigo": 201,
+  "cuerpo": {
+   "data": {
+    "categoria": {
+     "edad_maxima": null,
+     "edad_minima": 18,
+     "genero_categoria": "femenino",
+     "id_categoria": 7,
+     "nombre_categoria": "Libre"
+    },
+    "created_at": "<hoy>",
+    "equipo": {
+     "id_equipo": 2,
+     "nombre_equipo": "FAE",
+     "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/2/logo/fae.png",
+     "usuario": {
+      "correo": "del2@manta.test",
+      "nombre": "Delegado FAE"
+     }
+    },
+    "estado_inscripcion": "borrador",
+    "fecha_inscripcion": "<hoy>",
+    "grupo": null,
+    "id_categoria": 7,
+    "id_equipo": 2,
+    "id_inscripcion": 15,
+    "id_torneo": 2,
+    "torneo": {
+     "estado": "programado",
+     "fecha_fin": "2026-10-27",
+     "fecha_inicio": "2026-10-10",
+     "id_torneo": 2,
+     "nombre": "NACIONAL +40 2026"
+    },
+    "updated_at": "<hoy>",
+    "url_comprobante_pago": null
+   },
+   "message": "Equipo reinscrito exitosamente. Por favor, suba el nuevo comprobante de pago.",
+   "success": true
+  },
+  "filas": {
+   "inscripciones": 1
+  }
+ },
+ "POST /api/inscripciones/reinscribir · del2 · sin cuerpo": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "El cuerpo de la solicitud debe ser JSON válido.",
+   "success": false
   }
  },
  "POST /api/jugadores · admin · nombre completo": {
@@ -15233,11 +16277,27 @@
    "success": false
   }
  },
+ "POST /api/plantillas · del2 · jugador que no existe": {
+  "codigo": 422,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": "El jugador especificado no existe o está inactivo.",
+   "success": false
+  }
+ },
  "POST /api/plantillas · del2 · menor que la categoría": {
   "codigo": 422,
   "cuerpo": {
    "error_code": "VALIDATION_ERROR",
    "message": "El jugador tiene <edad> años y no cumple la edad mínima de 40 años para la categoría \"Senior +40\".",
+   "success": false
+  }
+ },
+ "POST /api/plantillas · del2 · sin cuerpo": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "El cuerpo debe ser JSON válido.",
    "success": false
   }
  },
