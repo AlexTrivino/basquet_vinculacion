@@ -363,6 +363,8 @@ BASE = [
     C('PUT', '/api/patrocinadores/1', 'admin', form={'nombre_patrocinador': 'FERRETERÍA MANTA S.A.'}, archivos={'logo': (PNG, 'ferreteria.png')}),
     C('PUT', '/api/patrocinadores/2', 'admin', 'sin logo', form={'nombre_patrocinador': 'CLÍNICA DEL PACÍFICO'}, archivos={}),
     C('PUT', '/api/patrocinadores/2', 'admin', 'sin nombre', form={}, archivos={}),
+    C('PUT', '/api/patrocinadores/1', 'admin', 'logo de texto', form={'nombre_patrocinador': 'FERRETERÍA MANTA S.A.'}, archivos={'logo': (TXT, 'ferreteria.png')}),
+    C('PUT', '/api/patrocinadores/2', 'admin', 'imagen promocional', form={'nombre_patrocinador': 'CLÍNICA DEL PACÍFICO', 'url_imagen_promocional': 'https://promo.test/clinica.jpg'}, archivos={}),
     C('PUT', '/api/patrocinadores/99', 'admin', form={'nombre_patrocinador': 'NADIE'}, archivos={}),
     C('DELETE', '/api/patrocinadores/1', 'admin', 'auspicia un torneo'),
     C('DELETE', '/api/patrocinadores/2', 'admin'),

@@ -14199,6 +14199,14 @@
    "success": true
   }
  },
+ "PUT /api/patrocinadores/1 · admin · logo de texto": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "INVALID_FILE",
+   "message": "Tipo de archivo no permitido. Se aceptan: image/jpeg, image/png, image/webp. El archivo fue analizado por su contenido real, no por su extensión.",
+   "success": false
+  }
+ },
  "PUT /api/patrocinadores/1 · anónimo · sin token": {
   "codigo": 401,
   "cuerpo": {
@@ -14213,6 +14221,21 @@
    "error_code": "FORBIDDEN",
    "message": "Acceso denegado. Se requiere uno de los siguientes roles para esta operación: 'super_admin'.",
    "success": false
+  }
+ },
+ "PUT /api/patrocinadores/2 · admin · imagen promocional": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "created_at": "2026-10-01T12:02:00",
+    "id_patrocinador": 2,
+    "nombre_patrocinador": "CLÍNICA DEL PACÍFICO",
+    "updated_at": "<hoy>",
+    "url_imagen_promocional": "https://promo.test/clinica.jpg",
+    "url_logo_patrocinador": null
+   },
+   "message": "Patrocinador actualizado exitosamente.",
+   "success": true
   }
  },
  "PUT /api/patrocinadores/2 · admin · sin logo": {

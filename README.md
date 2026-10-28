@@ -60,6 +60,8 @@ basquet_vinculacion/
 │   │   │   │       ├── estadistica.py # Stats individuales por partido (puntos, faltas, etc.)
 │   │   │   │       └── sancion.py    # Tarjetas y suspensiones disciplinarias
 │   │   │   └── http/                 # Respuestas API, paginador, autenticación JWT y errores a HTTP
+│   │   ├── modules/                  # Módulos migrados, cada uno con domain/, application/, infrastructure/ y http/
+│   │   │   └── auspicios/            # Patrocinadores (/api/patrocinadores): el molde de los demás
 │   │   ├── models/                   # Ruta vieja: reexporta shared/infrastructure/modelos
 │   │   ├── routes/                   # Controladores Blueprints (auth, torneos, inscripciones, etc.)
 │   │   ├── schemas/                  # Validación y serialización con Marshmallow 3

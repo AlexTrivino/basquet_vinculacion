@@ -39,9 +39,15 @@ y nunca escribir código de relleno ni sobre-diseñar.
 
 - `app/shared/` es lo que comparten todos los módulos:
   - `domain/errores.py`: `NoEncontrado`, `ReglaDeNegocio` y `Conflicto`, que `shared/http` responde con 404 `NOT_FOUND`, 422 `VALIDATION_ERROR` y 409 `CONFLICT`.
-  - `infrastructure/`: `db.py` (`db`, `migrate`), `modelos/` (los 14 modelos) y `almacenamiento.py` (Supabase Storage).
+  - `infrastructure/`: `db.py` (`db`, `migrate`), `modelos/` (los 14 modelos), `almacenamiento.py` (Supabase Storage) y `unidad_de_trabajo.py` (`confirmar`, `revertir`).
   - `http/`: `respuestas.py` (`api_response`, `api_error`), `paginacion.py`, `autenticacion.py` (`token_required`, `identidad_opcional`) y `errores.py`.
-- `app/modules/<módulo>/{domain,application,infrastructure,http}` recibe cada módulo a medida que se migra; `app/routes`, `app/services`, `app/schemas` y `app/utils` son el código viejo.
+- `app/modules/<módulo>/{domain,application,infrastructure,http}` recibe cada módulo a medida que se migra; `app/routes`, `app/services`, `app/schemas` y `app/utils` son el código viejo. Migrados: `auspicios`.
+- Molde de un módulo (`app/modules/auspicios`):
+  - `domain/`: entidades (dataclasses) y reglas en Python puro; sin Flask, SQLAlchemy ni marshmallow.
+  - `application/casos_de_uso.py`: una función por caso de uso; recibe `repositorio`, `almacen` (`subir_archivo`, `borrar_archivo`) y `unidad` (`confirmar`, `revertir`) por parámetro y devuelve entidades. Lanza `NoEncontrado`, `ReglaDeNegocio` o `Conflicto`.
+  - `infrastructure/repositorio.py`: consultas con los modelos compartidos; convierte filas en entidades.
+  - `http/`: el blueprint (mismo `url_prefix`, rutas y nombres de vista que antes) y los esquemas marshmallow; valida la entrada, arma las piezas en `_piezas()` y traduce a la respuesta exacta de antes.
+  - Pruebas: los casos de uso con piezas falsas (`tests/test_auspicios.py`) y el contrato de sus endpoints sin regrabar.
 - El código nuevo importa siempre desde `app.shared`. `app.models`, `app.utils.storage`, `app.utils.response`, `app.utils.pagination`, `app.utils.auth_middleware`, `app.utils.error_handlers` y `from app import db` solo reexportan para scripts y pruebas viejas; `tests/test_capas.py` falla si algo de `app/` vuelve a usarlas.
 
 ### Frontend (React — *en desarrollo*)

@@ -59,7 +59,7 @@ def create_app() -> Flask:
     from app.routes.usuario_bp import usuario_bp
     from app.routes.sancion_bp import sancion_bp
     from app.routes.config_bp import config_bp
-    from app.routes.patrocinador_bp import patrocinador_bp
+    from app.modules.auspicios.http.rutas import patrocinador_bp
     from app.routes.visor_bp import visor_bp
     
     app.register_blueprint(health_bp)
