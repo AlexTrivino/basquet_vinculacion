@@ -1,7 +1,7 @@
 """Desempate FIBA D.1: solo cuentan los partidos entre los empatados, y el procedimiento se reinicia."""
 import unittest
 
-from app.services.standings import desempatar
+from app.modules.competencia.domain.posiciones import desempatar
 
 G = {i: {'DIF': 0, 'PF': 0} for i in 'ABCD'}
 

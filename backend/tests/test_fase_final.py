@@ -13,7 +13,7 @@ from app.models.inscripcion import Inscripcion
 from app.models.partido import Partido
 from app.models.torneo import Torneo
 from app.models.usuario import Usuario
-from app.services.standings import calcular_tabla
+from app.modules.competencia.domain.posiciones import calcular_tabla
 
 SECRETO = 'secreto-de-prueba'
 NOMBRES = ['5 DE JUNIO', 'FAE', 'SAN JOSÉ', 'MARÍA AUXILIADORA', 'FE Y ALEGRÍA',

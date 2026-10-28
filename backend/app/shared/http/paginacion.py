@@ -17,8 +17,13 @@ Uso::
             data=[e.to_dict() for e in items],
             pagination=pagination,
         )
+
+Los módulos leen la página con ``pagina_pedida()`` y su repositorio pagina la consulta
+con ``app.shared.infrastructure.paginacion.paginar()``.
 """
 from flask import request
+
+from app.shared.infrastructure.paginacion import paginar
 
 
 def paginate_query(query, max_per_page=50):
@@ -43,21 +48,11 @@ def paginate_query(query, max_per_page=50):
                     "pages": 8
                 }
     """
+    return paginar(query, *pagina_pedida(max_per_page))
+
+
+def pagina_pedida(max_per_page=50):
+    """(page, per_page) de los query params de la petición, saneados: page desde 1 y per_page entre 1 y ``max_per_page``."""
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
-
-    # ── Sanitizar valores ─────────────────────────────────────────
-    page = max(1, page)
-    per_page = max(1, min(per_page, max_per_page))
-
-    # ── Ejecutar paginación de SQLAlchemy ─────────────────────────
-    paginated = query.paginate(page=page, per_page=per_page, error_out=False)
-
-    meta = {
-        'page': paginated.page,
-        'per_page': paginated.per_page,
-        'total': paginated.total,
-        'pages': paginated.pages,
-    }
-
-    return paginated.items, meta
+    return max(1, page), max(1, min(per_page, max_per_page))

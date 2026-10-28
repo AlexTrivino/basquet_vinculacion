@@ -14,7 +14,7 @@ from pathlib import Path
 
 APP = Path(__file__).resolve().parents[1] / 'app'
 FRAMEWORKS = {'flask', 'flask_sqlalchemy', 'flask_cors', 'flask_migrate', 'sqlalchemy', 'marshmallow', 'werkzeug', 'boto3', 'jwt'}
-ORM_EN_RUTAS = 50  # trinquete: cuando baje, bájalo aquí en el mismo commit
+ORM_EN_RUTAS = 41  # trinquete: cuando baje, bájalo aquí en el mismo commit
 RUTAS_VIEJAS = ('app.models', 'app.utils.storage', 'app.utils.response', 'app.utils.pagination', 'app.utils.auth_middleware',
                 'app.utils.error_handlers')  # hoy reexportan app/shared (fase 1)
 

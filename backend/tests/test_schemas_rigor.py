@@ -4,7 +4,7 @@ Garantiza integridad de fechas, nesting de relaciones y prevención de errores d
 """
 from datetime import date, time
 from app.schemas.inscripcion_schema import _TorneoResumenSchema, _EquipoResumenSchema, _CategoriaResumenSchema
-from app.schemas.partido_schema import _TorneoEnPartidoSchema, PartidoPublicSchema
+from app.modules.competencia.http.esquemas import _TorneoEnPartidoSchema, PartidoPublicSchema
 
 
 class TestSchemasRigor:

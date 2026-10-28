@@ -53,11 +53,12 @@ def create_app() -> Flask:
     from app.routes.inscripcion_bp import inscripcion_bp
     from app.routes.jugador_bp import jugador_bp
     from app.routes.plantilla_bp import plantilla_bp
-    from app.routes.partido_bp import partido_bp
+    from app.modules.competencia.http.partidos import partido_bp
     from app.routes.stats_bp import stats_bp
     from app.routes.reportes_bp import reportes_bp
     from app.routes.usuario_bp import usuario_bp
-    from app.routes.sancion_bp import sancion_bp
+    from app.modules.competencia.http.sanciones import sancion_bp
+    from app.modules.competencia.http.fase_final import competencia_bp
     from app.routes.config_bp import config_bp
     from app.modules.auspicios.http.rutas import patrocinador_bp
     from app.routes.visor_bp import visor_bp
@@ -65,6 +66,7 @@ def create_app() -> Flask:
     app.register_blueprint(health_bp)
     app.register_blueprint(config_bp)
     app.register_blueprint(torneo_bp)
+    app.register_blueprint(competencia_bp)
     app.register_blueprint(categoria_bp)
     app.register_blueprint(equipo_bp)
     app.register_blueprint(inscripcion_bp)
@@ -74,7 +76,7 @@ def create_app() -> Flask:
     app.register_blueprint(stats_bp)
     app.register_blueprint(reportes_bp)
     app.register_blueprint(usuario_bp)
-    app.register_blueprint(sancion_bp, url_prefix='/api/sanciones')
+    app.register_blueprint(sancion_bp)
     app.register_blueprint(patrocinador_bp)
     app.register_blueprint(visor_bp)
     # ── Manejadores de errores ─────────────────────────────────────

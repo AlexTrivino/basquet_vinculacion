@@ -1,6 +1,6 @@
 import type { FormatoFaseFinal } from '../../../types/api.types';
 
-// Espejo de services/llaves_service.FORMATOS: cuántos clasifican y cómo se cruzan
+// Espejo de FORMATOS en backend/app/modules/competencia/domain/llaves.py: cuántos clasifican y cómo se cruzan
 export const CUPOS: Record<FormatoFaseFinal, number> = { dos_grupos_cruces: 4, un_grupo_semis: 4, tres_final_directa: 3 };
 
 export const NOMBRE_FORMATO: Record<FormatoFaseFinal, string> = {

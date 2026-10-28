@@ -1,5 +1,4 @@
-"""
-Fase final: formatos, cuadro de llaves y recorrido de los grupos.
+"""Fase final, en Python puro: formatos, cuadro de llaves, grupos y recorrido de la fase de grupos.
 
 Cada formato es una lista de llaves ``(código, local, visitante)``. Las referencias:
     - ``1A``: 1.º de la tabla del grupo A; ``3``: 3.º del grupo único.
@@ -8,12 +7,10 @@ Los equipos de una referencia a la tabla solo se resuelven cuando la fase de
 grupos terminó (todos los partidos esperados jugados): antes, el cruce queda
 "por definir". Cada resultado cargado habilita las llaves siguientes.
 """
+from dataclasses import dataclass
 
-from app.shared.infrastructure.db import db
-from app.shared.infrastructure.modelos.partido import Partido
-from app.services.standings import (
-    ESTADOS_FINALES, grupos_de_categoria, marcador_efectivo, partidos_fase_grupos, tablas_por_grupo,
-)
+from app.modules.competencia.domain.posiciones import ESTADOS_FINALES, marcador_efectivo, tablas_por_grupo
+from app.shared.domain.errores import ReglaDeNegocio
 
 FORMATOS = {
     'dos_grupos_cruces': {
@@ -84,19 +81,27 @@ def _partidos_esperados(grupos, vueltas=1):
     return vueltas * sum(n * (n - 1) // 2 for n in conteo.values())
 
 
-def estado_fase_final(torneo, categoria):
-    """Estado completo de la fase final de una categoría (ver docstring del módulo)."""
+@dataclass
+class Categoria:
+    """Lo que la fase final usa de una categoría; ``formato`` es una clave de ``FORMATOS`` o None."""
+    id_categoria: int
+    id_torneo: int | None = None
+    formato: str | None = None
+
+
+def estado_fase_final(categoria, grupos, partidos_grupos, pendientes, jugados, equipos):
+    """Estado completo de la fase final de una categoría (ver docstring del módulo).
+
+    ``grupos``: {id_equipo: grupo} de las inscripciones aprobadas. ``partidos_grupos``: los finalizados de la fase
+    de grupos, como tuplas para ``calcular_tabla``. ``pendientes``: cuántos de la fase de grupos están programados o
+    en curso. ``jugados``: {llave: partido como dict} de las llaves no anuladas. ``equipos``: {id_equipo: con
+    ``nombre_equipo`` y ``url_logo``}.
+    """
     formato = FORMATOS.get(categoria.formato)
-    grupos = grupos_de_categoria(torneo.id_torneo, categoria.id_categoria)
-    partidos_grupos = partidos_fase_grupos(torneo.id_torneo, categoria.id_categoria)
     esperados = _partidos_esperados(grupos, _vueltas(formato))
-    pendientes = Partido.query.filter(
-        Partido.id_torneo == torneo.id_torneo, Partido.id_categoria == categoria.id_categoria,
-        Partido.llave.is_(None), Partido.estado.in_(('programado', 'en_curso')),
-    ).count()
     terminada = esperados > 0 and len(partidos_grupos) >= esperados and pendientes == 0
     estado = {
-        'id_torneo': torneo.id_torneo,
+        'id_torneo': categoria.id_torneo,
         'id_categoria': categoria.id_categoria,
         'formato': categoria.formato,
         'formatos': {k: {'nombre': v['nombre'], 'descripcion': v['descripcion'], 'grupos': v['grupos'], 'cupos': v['cupos']} for k, v in FORMATOS.items()},
@@ -108,18 +113,11 @@ def estado_fase_final(torneo, categoria):
         return estado
 
     tablas = tablas_por_grupo(partidos_grupos, grupos) if terminada else {}
-    jugados = {p.llave: p for p in Partido.query.filter(
-        Partido.id_torneo == torneo.id_torneo, Partido.id_categoria == categoria.id_categoria,
-        Partido.llave.isnot(None), Partido.estado != 'anulado',
-    ).all()}
     ganadores, perdedores = {}, {}
     for codigo, p in jugados.items():
-        if p.estado in ESTADOS_FINALES:
-            ml, mv = marcador_efectivo(p.estado, p.marcador_local, p.marcador_visitante)
-            ganadores[codigo], perdedores[codigo] = (p.id_equipo_local, p.id_equipo_visitante) if ml >= mv else (p.id_equipo_visitante, p.id_equipo_local)
-
-    from app.shared.infrastructure.modelos.equipo import Equipo
-    equipos = {e.id_equipo: e for e in Equipo.query.filter(Equipo.id_equipo.in_(list(grupos))).all()} if grupos else {}
+        if p['estado'] in ESTADOS_FINALES:
+            ml, mv = marcador_efectivo(p['estado'], p['marcador_local'], p['marcador_visitante'])
+            ganadores[codigo], perdedores[codigo] = (p['id_equipo_local'], p['id_equipo_visitante']) if ml >= mv else (p['id_equipo_visitante'], p['id_equipo_local'])
 
     def ficha(id_equipo):
         e = equipos.get(id_equipo)
@@ -128,8 +126,8 @@ def estado_fase_final(torneo, categoria):
     for codigo, ref_local, ref_visita in formato['llaves']:
         partido = jugados.get(codigo)
         if partido:
-            local, visitante = partido.id_equipo_local, partido.id_equipo_visitante
-            estado_llave = 'finalizado' if partido.estado in ESTADOS_FINALES else 'programado'
+            local, visitante = partido['id_equipo_local'], partido['id_equipo_visitante']
+            estado_llave = 'finalizado' if partido['estado'] in ESTADOS_FINALES else 'programado'
         else:
             local = _resolver(ref_local, tablas, ganadores, perdedores)
             visitante = _resolver(ref_visita, tablas, ganadores, perdedores)
@@ -144,63 +142,32 @@ def estado_fase_final(torneo, categoria):
             'visitante': ficha(visitante),
             'estado': estado_llave,
             'ganador': ganadores.get(codigo),
-            'partido': partido.to_dict() if partido else None,
+            'partido': partido,
         })
     return estado
 
 
-def generar_llaves(torneo, categoria, programacion):
-    """Crea los partidos de las llaves que ya tienen sus dos equipos.
+def asignar_grupos(categoria, aprobados, grupos):
+    """{id_equipo: letra o None} para cada equipo aprobado, en el orden de ``aprobados``.
 
-    ``programacion``: lista de dicts con ``llave``, ``fecha`` (date), ``hora`` (time) y, opcional, ``ubicacion``.
-    Devuelve los partidos creados. Lanza ValueError si una llave no está lista.
+    ``grupos``: lo pedido, {id_equipo (o su texto): 'A'}. Lanza ReglaDeNegocio si una letra no existe en el formato.
     """
-    from app.services import partido_service
-
-    estado = estado_fase_final(torneo, categoria)
-    listas = {l['codigo']: l for l in estado['llaves'] if l['estado'] == 'listo'}
-    creados = []
-    for item in programacion:
-        llave = listas.get(item['llave'])
-        if not llave:
-            raise ValueError(f"La llave {item['llave']} todavía no tiene definidos sus dos equipos o ya existe.")
-        datos = {
-            'id_torneo': torneo.id_torneo,
-            'id_categoria': categoria.id_categoria,
-            'id_equipo_local': llave['local']['id_equipo'],
-            'id_equipo_visitante': llave['visitante']['id_equipo'],
-            'fecha': item['fecha'],
-            'hora': item['hora'],
-            'fase': llave['ronda'],
-            'llave': llave['codigo'],
-        }
-        if item.get('ubicacion'):
-            datos['ubicacion'] = item['ubicacion']
-        creados.append(partido_service.crear_partido(datos))
-    return creados
-
-
-def asignar_grupos(torneo, categoria, grupos):
-    """Guarda el grupo (letra o None) de cada inscripción aprobada; ``grupos`` = {id_equipo: 'A'}."""
-    from app.shared.infrastructure.modelos.inscripcion import Inscripcion
-
     formato = FORMATOS.get(categoria.formato)
     permitidos = set(formato['grupos']) if formato else set()
-    inscripciones = Inscripcion.query.filter_by(
-        id_torneo=torneo.id_torneo, id_categoria=categoria.id_categoria, estado_inscripcion='aprobado'
-    ).all()
-    for ins in inscripciones:
-        letra = grupos.get(ins.id_equipo, grupos.get(str(ins.id_equipo)))
+    asignados = {}
+    for id_equipo in aprobados:
+        letra = grupos.get(id_equipo, grupos.get(str(id_equipo)))
         if letra and letra not in permitidos:
-            raise ValueError(f"El grupo {letra} no existe en el formato de la categoría.")
-        ins.grupo = letra or None
-    db.session.commit()
-    return {ins.id_equipo: ins.grupo for ins in inscripciones}
+            raise ReglaDeNegocio(f"El grupo {letra} no existe en el formato de la categoría.")
+        asignados[id_equipo] = letra or None
+    return asignados
 
 
-def recorrido(torneo, categoria):
+def recorrido(categoria, grupos, partidos, equipos):
     """Posición de cada equipo después de cada fecha de la fase de grupos y su situación.
 
+    ``partidos``: los finalizados de la fase de grupos, ordenados por fecha, como
+    (local, visitante, marcador_local, marcador_visitante, estado, fecha).
     Situación (con los puntos que todavía puede sumar cada uno, 2 por victoria):
     ``clasificado`` si ya nadie puede quitarle el cupo, ``eliminado`` si ya no alcanza,
     ``zona`` si hoy está dentro de los cupos y ``depende`` si hoy está fuera.
@@ -208,21 +175,10 @@ def recorrido(torneo, categoria):
     """
     formato = FORMATOS.get(categoria.formato)
     cupos = formato['cupos'] if formato else None
-    grupos = grupos_de_categoria(torneo.id_torneo, categoria.id_categoria)
-    partidos = Partido.query.filter(
-        Partido.id_torneo == torneo.id_torneo, Partido.id_categoria == categoria.id_categoria,
-        Partido.llave.is_(None), Partido.estado.in_(ESTADOS_FINALES),
-    ).order_by(Partido.fecha).all()
-    fechas = sorted({p.fecha for p in partidos})
-    tuplas = lambda hasta: [
-        (p.id_equipo_local, p.id_equipo_visitante, p.marcador_local, p.marcador_visitante, p.estado)
-        for p in partidos if p.fecha <= hasta
-    ]
+    fechas = sorted({p[5] for p in partidos})
+    tuplas = lambda hasta: [p[:5] for p in partidos if p[5] <= hasta]
     por_fecha = [tablas_por_grupo(tuplas(f), grupos) for f in fechas]
     final = por_fecha[-1] if por_fecha else tablas_por_grupo([], grupos)
-
-    from app.shared.infrastructure.modelos.equipo import Equipo
-    equipos = {e.id_equipo: e for e in Equipo.query.filter(Equipo.id_equipo.in_(list(grupos))).all()} if grupos else {}
 
     salida = {'fechas': [f.isoformat() for f in fechas], 'cupos': cupos, 'grupos': []}
     for letra, tabla in final.items():

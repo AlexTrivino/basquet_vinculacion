@@ -95,6 +95,8 @@ BASE = [
     G('/api/torneos/1/recorrido?id_categoria=2'),
     G('/api/torneos/1/recorrido?id_categoria=3', nota='categoría de otro torneo'),
     C('POST', '/api/torneos/1/fase-final/partidos', 'admin', json=SEMIFINAL_2),
+    C('POST', '/api/torneos/1/fase-final/partidos', 'admin', 'con ubicación',
+      json={'id_categoria': 1, 'partidos': [{**SEMIFINAL_2['partidos'][0], 'ubicacion': 'Coliseo de Manta'}]}),
     C('POST', '/api/torneos/1/fase-final/partidos', 'admin', 'llave ya creada',
       json={'id_categoria': 1, 'partidos': [{'llave': 'SF1', 'fecha': '2026-09-12', 'hora': '19:00'}]}),
     C('POST', '/api/torneos/1/fase-final/partidos', 'admin', 'llave en espera',
@@ -295,6 +297,7 @@ BASE = [
     G('/api/partidos/99'),
     G('/api/partidos/1/estadisticas'),
     G('/api/partidos/3/estadisticas', nota='con sanción activa'),
+    G('/api/partidos/8/estadisticas', nota='plantilla de todas las categorías del equipo'),
     G('/api/partidos/99/estadisticas'),
     C('POST', '/api/partidos', 'admin', json=PARTIDO_NUEVO),
     C('POST', '/api/partidos', 'admin', 'mismo equipo', json={**PARTIDO_NUEVO, 'id_equipo_visitante': 1}),
@@ -304,6 +307,8 @@ BASE = [
     C('PUT', '/api/partidos/10', 'admin', 'finalizar', json={'estado': 'finalizado', 'marcador_local': 50, 'marcador_visitante': 45}),
     C('PUT', '/api/partidos/10', 'admin', 'empate', json={'estado': 'finalizado', 'marcador_local': 50, 'marcador_visitante': 50}),
     C('PUT', '/api/partidos/1', 'admin', 'cambiar equipo de un jugado', json={'id_equipo_local': 3}),
+    C('PUT', '/api/partidos/10', 'admin', 'cambiar el local de un programado', json={'id_equipo_local': 5}),
+    C('PUT', '/api/partidos/1', 'admin', 'empate en un finalizado', json={'marcador_local': 50, 'marcador_visitante': 50}),
     C('PUT', '/api/partidos/7', 'admin', 'vacío', json={}),
     C('PUT', '/api/partidos/99', 'admin', json={'fase': 'X'}),
     C('DELETE', '/api/partidos/10', 'admin'),
@@ -313,6 +318,7 @@ BASE = [
     C('POST', '/api/partidos/2/acta', 'admin', archivos={'acta': (PDF, 'acta.pdf')}),
     C('POST', '/api/partidos/1/acta', 'admin', 'reemplazar', archivos={'acta': (PDF, 'acta.pdf')}),
     C('POST', '/api/partidos/2/acta', 'admin', 'texto', archivos={'acta': (TXT, 'acta.pdf')}),
+    C('POST', '/api/partidos/1/acta', 'admin', 'texto con acta previa', archivos={'acta': (TXT, 'acta.pdf')}),
     C('POST', '/api/partidos/2/acta', 'admin', 'sin archivo', archivos={}),
     C('POST', '/api/partidos/99/acta', 'admin', archivos={'acta': (PDF, 'acta.pdf')}),
     C('DELETE', '/api/partidos/1/acta', 'admin'),
@@ -351,6 +357,7 @@ BASE = [
     # En SQLite responde 500: el servicio pasa la fecha como texto a una columna Date. En Postgres funciona.
     C('POST', '/api/sanciones/', 'admin', json={'motivo': 'Técnica', 'fecha': '2026-08-22', 'id_jugador': 6, 'id_partido': 6}),
     C('PUT', '/api/sanciones/1', 'admin', json={'estado': 'cumplida'}),
+    C('PUT', '/api/sanciones/1', 'admin', 'motivo', json={'motivo': 'Agresión'}),
     C('PUT', '/api/sanciones/99', 'admin', json={'estado': 'cumplida'}),
 
     # ── Patrocinadores ──

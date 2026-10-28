@@ -144,9 +144,9 @@ Para la referencia completa de endpoints, consultar [`docs/api_referencia.md`](d
 | Inscripciones | `inscripcion.py` | `inscripcion_schema.py` | `inscripcion_service.py` | `inscripcion_bp.py` |
 | Jugadores | `jugador.py` | `jugador_schema.py` | `jugador_service.py` | `jugador_bp.py` |
 | Plantillas | `plantilla.py` | `plantilla_schema.py` | `plantilla_service.py` | `plantilla_bp.py` |
-| Partidos | `partido.py` | `partido_schema.py` | `partido_service.py` | `partido_bp.py` |
+| Partidos | `partido.py` | `modules/competencia/http/esquemas.py` | `modules/competencia/application/partidos.py` | `modules/competencia/http/partidos.py` |
 | Estadísticas | `estadistica.py` | `stats_schema.py` | `stats_service.py` | `stats_bp.py` |
-| Sanciones | `sancion.py` | (via `stats_schema.py`) | (via `stats_service.py`) | — |
+| Sanciones | `sancion.py` | `modules/competencia/http/esquemas.py` | `modules/competencia/application/sanciones.py` | `modules/competencia/http/sanciones.py` |
 | Reportes | — | — | `reportes_service.py` | `reportes_bp.py` |
 
 ### Módulos Transversales
@@ -158,7 +158,7 @@ Para la referencia completa de endpoints, consultar [`docs/api_referencia.md`](d
 | Paginación | `utils/pagination.py` | `paginate_query()` obligatorio |
 | Storage | `utils/storage.py` | Magic bytes + boto3 → Supabase S3 |
 | Error Handlers | `utils/error_handlers.py` | 400, 401, 404, 405, 500 globales |
-| Motor FIBA | `services/standings.py` | Tabla de posiciones (2 queries, defaultdict) |
+| Motor FIBA | `modules/competencia/domain/posiciones.py` | Tabla de posiciones y desempate FIBA, en Python puro |
 
 ---
 

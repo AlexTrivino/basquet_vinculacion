@@ -1,20 +1,6 @@
-"""
-Motor de posiciones — cálculo de tabla de clasificación por torneo (SRP).
+"""Tabla de posiciones FIBA, en Python puro.
 
-Módulo dedicado exclusivamente al recálculo de standings, siguiendo el
-principio de Responsabilidad Única (S de SOLID) y la advertencia
-arquitectónica #3: el recálculo no debe ejecutarse inline dentro de
-``partido_service``.
-
-Eficiencia garantizada:
-    - **Una sola query** a la tabla ``partidos`` para traer todos los
-      encuentros finalizados del torneo.
-    - **Procesamiento en memoria** con un ``defaultdict``: cero queries
-      adicionales durante el cálculo estadístico.
-    - **Una query de enriquecimiento** usando ``in_`` para traer los
-      nombres y logos de todos los equipos participantes de una sola vez.
-
-Reglas FIBA implementadas:
+Reglas:
     - ``finalizado``: Ganador 2 pts, Perdedor 1 pt.
     - ``finalizado_wo``: Ganador 2 pts, Perdedor 0 pts.
       Si el marcador es 0-0 (default), se asume victoria del equipo local
@@ -31,10 +17,6 @@ tiene su propia tabla y solo cuentan los partidos de la fase de grupos
 """
 from collections import defaultdict
 from itertools import groupby
-
-from app.shared.infrastructure.db import db
-from app.shared.infrastructure.modelos.inscripcion import Inscripcion
-from app.shared.infrastructure.modelos.partido import Partido
 
 ESTADOS_FINALES = ('finalizado', 'finalizado_wo')
 
@@ -136,32 +118,6 @@ def calcular_tabla(partidos, equipos=()):
     return lista
 
 
-def grupos_de_categoria(id_torneo, id_categoria):
-    """{id_equipo: grupo} de las inscripciones aprobadas de la categoría (grupo puede ser None)."""
-    filas = db.session.execute(
-        db.select(Inscripcion.id_equipo, Inscripcion.grupo).where(
-            Inscripcion.id_torneo == id_torneo,
-            Inscripcion.id_categoria == id_categoria,
-            Inscripcion.estado_inscripcion == 'aprobado',
-        )
-    ).all()
-    return {f.id_equipo: f.grupo for f in filas}
-
-
-def partidos_fase_grupos(id_torneo, id_categoria=None, hasta_fecha=None):
-    """Partidos finalizados de la fase de grupos (sin llave), como tuplas para ``calcular_tabla``."""
-    query = Partido.query.filter(
-        Partido.id_torneo == id_torneo,
-        Partido.estado.in_(ESTADOS_FINALES),
-        Partido.llave.is_(None),
-    )
-    if id_categoria is not None:
-        query = query.filter(Partido.id_categoria == id_categoria)
-    if hasta_fecha is not None:
-        query = query.filter(Partido.fecha <= hasta_fecha)
-    return [(p.id_equipo_local, p.id_equipo_visitante, p.marcador_local, p.marcador_visitante, p.estado) for p in query.all()]
-
-
 def tablas_por_grupo(partidos, grupos):
     """Una tabla por grupo. Sin grupos asignados devuelve {None: tabla única}.
 
@@ -178,55 +134,12 @@ def tablas_por_grupo(partidos, grupos):
     return tablas
 
 
-def recalcular_tabla(id_torneo: int, id_categoria: int = None) -> list[dict]:
-    """Calcula la tabla de posiciones completa para un torneo y categoría.
-
-    Algoritmo en tres pasos:
-        1. **Una query SQL** → trae partidos finalizados de la fase de grupos.
-        2. **Procesamiento en memoria** → acumula estadísticas por equipo en un dict.
-        3. **Una query de enriquecimiento** → trae nombre y logo de equipos con ``in_``.
-
-    Args:
-        id_torneo: ID del torneo a procesar.
-        id_categoria: ID de la categoría a procesar. Con categoría, los equipos
-            inscritos aparecen aunque no hayan jugado y, si hay grupos, cada
-            grupo tiene su tabla (las filas llevan ``grupo``).
-
-    Returns:
-        Lista de dicts ordenada por grupo y posición. Cada elemento contiene::
-
-            {
-                "posicion": 1, "grupo": "A",
-                "id_equipo": 42,
-                "nombre_equipo": "Delfines BC",
-                "url_logo": "https://...",
-                "PJ": 5, "PG": 4, "PP": 1,
-                "PF": 320, "PC": 280,
-                "DIF": 40,
-                "puntos": 9
-            }
-    """
-    partidos = partidos_fase_grupos(id_torneo, id_categoria)
-    grupos = grupos_de_categoria(id_torneo, id_categoria) if id_categoria is not None else {}
-    if not partidos and not grupos:
-        return []
-
-    tablas = tablas_por_grupo(partidos, grupos)
-
-    # ── Enriquecimiento con una sola query in_ ────────────────────
-    from app.shared.infrastructure.modelos.equipo import Equipo
-
-    ids_equipos = [f['id_equipo'] for tabla in tablas.values() for f in tabla]
-    equipos_db = db.session.execute(
-        db.select(Equipo.id_equipo, Equipo.nombre_equipo, Equipo.url_logo)
-        .where(Equipo.id_equipo.in_(ids_equipos))
-    ).all()
-    equipos_map = {row.id_equipo: row for row in equipos_db}
-
+def filas_con_equipo(tablas, equipos):
+    """Filas de la respuesta, por grupo y posición; ``equipos``: {id_equipo: con ``nombre_equipo`` y ``url_logo``}."""
     lista = []
     for letra, tabla in tablas.items():
         for fila in tabla:
-            equipo = equipos_map.get(fila['id_equipo'])
+            equipo = equipos.get(fila['id_equipo'])
             lista.append({
                 'posicion': fila['posicion'],
                 'grupo': letra,

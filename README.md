@@ -61,11 +61,12 @@ basquet_vinculacion/
 │   │   │   │       └── sancion.py    # Tarjetas y suspensiones disciplinarias
 │   │   │   └── http/                 # Respuestas API, paginador, autenticación JWT y errores a HTTP
 │   │   ├── modules/                  # Módulos migrados, cada uno con domain/, application/, infrastructure/ y http/
-│   │   │   └── auspicios/            # Patrocinadores (/api/patrocinadores): el molde de los demás
+│   │   │   ├── auspicios/            # Patrocinadores (/api/patrocinadores): el molde de los demás
+│   │   │   └── competencia/          # Partidos, sanciones, tabla de posiciones FIBA y fase final (llaves y recorrido)
 │   │   ├── models/                   # Ruta vieja: reexporta shared/infrastructure/modelos
 │   │   ├── routes/                   # Controladores Blueprints (auth, torneos, inscripciones, etc.)
 │   │   ├── schemas/                  # Validación y serialización con Marshmallow 3
-│   │   ├── services/                 # Lógica de negocio (standings FIBA, plantillas, etc.)
+│   │   ├── services/                 # Lógica de negocio de lo que falta migrar (plantillas, inscripciones, etc.)
 │   │   └── utils/                    # Reglas de negocio y texto; storage, response, pagination, auth y errores reexportan shared/
 │   ├── tests/                        # Suite de pruebas unitarias y de integración (pytest)
 │   ├── seed_database.py              # Script interactivo para poblar base de datos mock

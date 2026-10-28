@@ -6732,6 +6732,96 @@
    "success": true
   }
  },
+ "GET /api/partidos/8/estadisticas · anónimo · plantilla de todas las categorías del equipo": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "local": [
+     {
+      "asistencias": 3,
+      "dorsal": 3,
+      "faltas_cometidas": 2,
+      "id_jugador": 9,
+      "nombre_jugador": "ANA MERO VÉLEZ",
+      "puntos_anotados": 18,
+      "rebotes": 6,
+      "sancion_activa": false,
+      "tapones": 0,
+      "tiros_libres_anotados": 4,
+      "triples_anotados": 2
+     },
+     {
+      "asistencias": 0,
+      "dorsal": 4,
+      "faltas_cometidas": 0,
+      "id_jugador": 1,
+      "nombre_jugador": "BRYAN CHÁVEZ VÉLEZ",
+      "puntos_anotados": 0,
+      "rebotes": 0,
+      "sancion_activa": false,
+      "tapones": 0,
+      "tiros_libres_anotados": 0,
+      "triples_anotados": 0
+     },
+     {
+      "asistencias": 0,
+      "dorsal": 7,
+      "faltas_cometidas": 0,
+      "id_jugador": 2,
+      "nombre_jugador": "MATEO MERO PINARGOTE",
+      "puntos_anotados": 0,
+      "rebotes": 0,
+      "sancion_activa": false,
+      "tapones": 0,
+      "tiros_libres_anotados": 0,
+      "triples_anotados": 0
+     },
+     {
+      "asistencias": 0,
+      "dorsal": 10,
+      "faltas_cometidas": 0,
+      "id_jugador": 3,
+      "nombre_jugador": "DAVID CEDEÑO ZAMBRANO",
+      "puntos_anotados": 0,
+      "rebotes": 0,
+      "sancion_activa": false,
+      "tapones": 0,
+      "tiros_libres_anotados": 0,
+      "triples_anotados": 0
+     },
+     {
+      "asistencias": 0,
+      "dorsal": 12,
+      "faltas_cometidas": 0,
+      "id_jugador": 4,
+      "nombre_jugador": "LUIS ALAVA PICO",
+      "puntos_anotados": 0,
+      "rebotes": 0,
+      "sancion_activa": false,
+      "tapones": 0,
+      "tiros_libres_anotados": 0,
+      "triples_anotados": 0
+     }
+    ],
+    "visitante": [
+     {
+      "asistencias": 1,
+      "dorsal": 6,
+      "faltas_cometidas": 3,
+      "id_jugador": 10,
+      "nombre_jugador": "MARÍA LOOR CEDEÑO",
+      "puntos_anotados": 12,
+      "rebotes": 8,
+      "sancion_activa": false,
+      "tapones": 1,
+      "tiros_libres_anotados": 2,
+      "triples_anotados": 0
+     }
+    ]
+   },
+   "success": true
+  }
+ },
  "GET /api/partidos/99 · anónimo": {
   "codigo": 404,
   "cuerpo": {
@@ -13087,6 +13177,17 @@
    "success": true
   }
  },
+ "POST /api/partidos/1/acta · admin · texto con acta previa": {
+  "almacenamiento": [
+   "DELETE archivos/partidos/1/acta.pdf"
+  ],
+  "codigo": 422,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": "Tipo de archivo no permitido. Se aceptan: application/pdf, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet. El archivo fue analizado por su contenido real, no por su extensión.",
+   "success": false
+  }
+ },
  "POST /api/partidos/12/restaurar · admin": {
   "codigo": 200,
   "cuerpo": {
@@ -13501,6 +13602,55 @@
       "nombre": "INTERCOLEGIAL 2026"
      },
      "ubicacion": "Coliseo Pablo Delgado Álava",
+     "url_planilla_fiba": null
+    }
+   ],
+   "message": "1 partido(s) de fase final creados.",
+   "success": true
+  },
+  "filas": {
+   "partidos": 1
+  }
+ },
+ "POST /api/torneos/1/fase-final/partidos · admin · con ubicación": {
+  "codigo": 201,
+  "cuerpo": {
+   "data": [
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "equipo_local": {
+      "id_equipo": 2,
+      "nombre_equipo": "FAE",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/2/logo/fae.png"
+     },
+     "equipo_visitante": {
+      "id_equipo": 4,
+      "nombre_equipo": "STELLA MARIS",
+      "url_logo": null
+     },
+     "estado": "programado",
+     "fase": "Semifinal",
+     "fecha": "2026-09-12",
+     "hora": "20:30:00",
+     "id_categoria": 1,
+     "id_partido": 15,
+     "llave": "SF2",
+     "marcador_local": 0,
+     "marcador_visitante": 0,
+     "stats_local_procesadas": false,
+     "stats_visitante_procesadas": false,
+     "torneo": {
+      "estado": "en_curso",
+      "fecha_fin": "2026-10-20",
+      "fecha_inicio": "2026-08-01",
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "ubicacion": "Coliseo de Manta",
      "url_planilla_fiba": null
     }
    ],
@@ -14042,6 +14192,63 @@
    "success": false
   }
  },
+ "PUT /api/partidos/1 · admin · empate en un finalizado": {
+  "codigo": 422,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": "En básquet no hay empates: revisa el marcador antes de finalizar el partido.",
+   "success": false
+  }
+ },
+ "PUT /api/partidos/10 · admin · cambiar el local de un programado": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "categoria": {
+     "genero_categoria": "femenino",
+     "id_categoria": 2,
+     "nombre_categoria": "Cadetes +30"
+    },
+    "created_at": "2026-10-01T12:10:00",
+    "equipo_local": {
+     "id_equipo": 5,
+     "nombre_equipo": "JUAN MONTALVO",
+     "url_logo": null
+    },
+    "equipo_visitante": {
+     "id_equipo": 1,
+     "nombre_equipo": "SAN JOSÉ",
+     "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+    },
+    "estado": "programado",
+    "fase": "PRIMERA FASE",
+    "fecha": "2026-09-13",
+    "hora": "16:00:00",
+    "id_categoria": 2,
+    "id_equipo_local": 5,
+    "id_equipo_visitante": 1,
+    "id_partido": 10,
+    "id_torneo": 1,
+    "llave": null,
+    "marcador_local": 0,
+    "marcador_visitante": 0,
+    "stats_local_procesadas": false,
+    "stats_visitante_procesadas": false,
+    "torneo": {
+     "estado": "en_curso",
+     "fecha_fin": "2026-10-20",
+     "fecha_inicio": "2026-08-01",
+     "id_torneo": 1,
+     "nombre": "INTERCOLEGIAL 2026"
+    },
+    "ubicacion": "Coliseo Pablo Delgado Álava",
+    "updated_at": "<hoy>",
+    "url_planilla_fiba": null
+   },
+   "message": "Partido actualizado exitosamente.",
+   "success": true
+  }
+ },
  "PUT /api/partidos/10 · admin · empate": {
   "codigo": 422,
   "cuerpo": {
@@ -14289,6 +14496,30 @@
      "nombre": "SEBASTIÁN MACÍAS MOREIRA"
     },
     "motivo": "Falta descalificante",
+    "partido": {
+     "estado": "finalizado",
+     "fecha": "2026-08-15",
+     "id_partido": 3
+    }
+   },
+   "message": "Sanción actualizada"
+  }
+ },
+ "PUT /api/sanciones/1 · admin · motivo": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "created_at": "2026-10-01T12:01:00",
+    "estado": "activa",
+    "fecha": "2026-08-15",
+    "id_jugador": 7,
+    "id_partido": 3,
+    "id_sancion": 1,
+    "jugador": {
+     "id_jugador": 7,
+     "nombre": "SEBASTIÁN MACÍAS MOREIRA"
+    },
+    "motivo": "Agresión",
     "partido": {
      "estado": "finalizado",
      "fecha": "2026-08-15",

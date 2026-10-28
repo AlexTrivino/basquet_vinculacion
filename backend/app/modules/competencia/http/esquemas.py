@@ -1,5 +1,6 @@
 """
-Schemas de Marshmallow para la entidad Partido (Patrón DTO — Decisión #13).
+Esquemas marshmallow de competencia: partidos (movidos tal cual de app/schemas/partido_schema.py),
+sanciones y la programación de llaves de la fase final.
 
 Los schemas de salida usan campos ``Nested`` para incluir el nombre y
 logo de ambos equipos enfrentados directamente en el payload, eliminando
@@ -145,3 +146,41 @@ class PartidoAdminSchema(Schema):
     # Auditoría
     created_at = fields.DateTime()
     updated_at = fields.DateTime()
+
+
+# ── Sanciones ─────────────────────────────────────────────────────
+
+class _JugadorEnSancionSchema(Schema):
+    id_jugador = fields.Integer()
+    nombre = fields.String()
+
+
+class _PartidoEnSancionSchema(Schema):
+    id_partido = fields.Integer()
+    fecha = fields.Date()
+    estado = fields.String()
+
+
+class SancionSchema(Schema):
+    id_sancion = fields.Int(dump_only=True)
+    motivo = fields.Str(required=True)
+    fecha = fields.Date(required=True)
+    estado = fields.Str(dump_only=True)
+    id_jugador = fields.Int(required=True)
+    id_partido = fields.Int(required=True)
+    created_at = fields.DateTime(dump_only=True)
+
+    # Nested fields para interfaces
+    jugador = fields.Nested(_JugadorEnSancionSchema, dump_only=True)
+    partido = fields.Nested(_PartidoEnSancionSchema, dump_only=True)
+
+
+# ── Fase final ────────────────────────────────────────────────────
+
+class LlaveProgramadaSchema(Schema):
+    """Una llave a crear: {"llave": "CF1", "fecha": "2026-10-17", "hora": "19:00"} y, opcional, la ubicación."""
+
+    llave = fields.String(required=True)
+    fecha = fields.Date(required=True)
+    hora = fields.Time(required=True)
+    ubicacion = fields.String(load_default=None)
