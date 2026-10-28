@@ -10,8 +10,8 @@ al cliente con ``flask.send_file`` — ningún archivo toca el disco.
 from flask import Blueprint, send_file
 
 from app.services import reportes_service
-from app.utils.auth_middleware import token_required
-from app.utils.response import api_error
+from app.shared.http.autenticacion import token_required
+from app.shared.http.respuestas import api_error
 
 reportes_bp = Blueprint('reportes', __name__, url_prefix='/api/reportes')
 

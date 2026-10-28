@@ -12,5 +12,6 @@ Los cambios de arquitectura se hacen con Spec-Driven Development: primero la esp
 | Fase | Carpeta | Estado |
 | --- | --- | --- |
 | 0 · Red de seguridad | [00-red-de-seguridad](00-red-de-seguridad/spec.md) | terminada |
-| 1 a 8 · Backend por módulos | se crean al empezar cada fase | pendiente |
+| 1 · Backend: shared | [01-shared-backend](01-shared-backend/spec.md) | terminada |
+| 2 a 8 · Backend por módulos | se crean al empezar cada fase | pendiente |
 | 9 y 10 · Frontend por módulos | se crean al empezar cada fase | pendiente |

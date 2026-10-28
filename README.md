@@ -45,21 +45,26 @@ basquet_vinculacion/
 ├── backend/                          # API REST (Flask + SQLAlchemy)
 │   ├── app/
 │   │   ├── __init__.py               # Application Factory: CORS, DB, Blueprints
-│   │   ├── models/                   # Modelos SQLAlchemy 2.0 (14 entidades)
-│   │   │   ├── usuario.py            # UUID PK enlazado a Supabase Auth
-│   │   │   ├── torneo.py             # Competiciones con fechas y estados
-│   │   │   ├── categoria.py          # Género + rangos de edad (Sub-25, +30, etc.)
-│   │   │   ├── equipo.py             # Clubes vinculados a un delegado
-│   │   │   ├── jugador.py            # Datos personales + cédula única + URLs de documentos
-│   │   │   ├── inscripcion.py        # Pivote Torneo-Equipo-Categoría con estados
-│   │   │   ├── plantilla.py          # Roster Jugador-Equipo-Torneo con número de camiseta
-│   │   │   ├── partido.py            # Encuentros con marcadores y fases
-│   │   │   ├── estadistica.py        # Stats individuales por partido (puntos, faltas, etc.)
-│   │   │   └── sancion.py            # Tarjetas y suspensiones disciplinarias
+│   │   ├── shared/                   # Lo común a todos los módulos (migración por fases: ver specs/)
+│   │   │   ├── domain/               # Errores de dominio: NoEncontrado, ReglaDeNegocio, Conflicto
+│   │   │   ├── infrastructure/       # db.py (db, migrate), almacenamiento.py (Supabase Storage)
+│   │   │   │   └── modelos/          # Modelos SQLAlchemy 2.0 (14 entidades)
+│   │   │   │       ├── usuario.py    # UUID PK enlazado a Supabase Auth
+│   │   │   │       ├── torneo.py     # Competiciones con fechas y estados
+│   │   │   │       ├── categoria.py  # Género + rangos de edad (Sub-25, +30, etc.)
+│   │   │   │       ├── equipo.py     # Clubes vinculados a un delegado
+│   │   │   │       ├── jugador.py    # Datos personales + cédula única + URLs de documentos
+│   │   │   │       ├── inscripcion.py # Pivote Torneo-Equipo-Categoría con estados
+│   │   │   │       ├── plantilla.py  # Roster Jugador-Equipo-Torneo con número de camiseta
+│   │   │   │       ├── partido.py    # Encuentros con marcadores y fases
+│   │   │   │       ├── estadistica.py # Stats individuales por partido (puntos, faltas, etc.)
+│   │   │   │       └── sancion.py    # Tarjetas y suspensiones disciplinarias
+│   │   │   └── http/                 # Respuestas API, paginador, autenticación JWT y errores a HTTP
+│   │   ├── models/                   # Ruta vieja: reexporta shared/infrastructure/modelos
 │   │   ├── routes/                   # Controladores Blueprints (auth, torneos, inscripciones, etc.)
 │   │   ├── schemas/                  # Validación y serialización con Marshmallow 3
 │   │   ├── services/                 # Lógica de negocio (standings FIBA, plantillas, etc.)
-│   │   └── utils/                    # Middlewares JWT, boto3 storage, paginador, respuestas API
+│   │   └── utils/                    # Reglas de negocio y texto; storage, response, pagination, auth y errores reexportan shared/
 │   ├── tests/                        # Suite de pruebas unitarias y de integración (pytest)
 │   ├── seed_database.py              # Script interactivo para poblar base de datos mock
 │   ├── requirements.txt              # Dependencias fijadas

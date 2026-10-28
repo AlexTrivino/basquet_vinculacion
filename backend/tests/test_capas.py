@@ -6,6 +6,7 @@ Estricto para lo nuevo (app/modules/<módulo>/<capa> y app/shared/<capa>):
   - infrastructure y http: entran a otro módulo solo por su application.
   - shared nunca importa app.modules.
 Trinquete para lo viejo: las líneas de app/routes que usan el ORM solo pueden bajar.
+Dentro de app/ nadie importa las rutas viejas que hoy reexportan app/shared.
 """
 import ast
 import re
@@ -14,6 +15,8 @@ from pathlib import Path
 APP = Path(__file__).resolve().parents[1] / 'app'
 FRAMEWORKS = {'flask', 'flask_sqlalchemy', 'flask_cors', 'flask_migrate', 'sqlalchemy', 'marshmallow', 'werkzeug', 'boto3', 'jwt'}
 ORM_EN_RUTAS = 61  # trinquete: cuando baje, bájalo aquí en el mismo commit
+RUTAS_VIEJAS = ('app.models', 'app.utils.storage', 'app.utils.response', 'app.utils.pagination', 'app.utils.auth_middleware',
+                'app.utils.error_handlers')  # hoy reexportan app/shared (fase 1)
 
 
 def _dentro(destino, *prefijos):
@@ -54,6 +57,16 @@ def test_capas_de_lo_nuevo():
         modulo, capa = ('shared', partes[1]) if partes[0] == 'shared' else (partes[1], partes[2])
         violaciones += [f'{ruta.relative_to(APP.parent)} ({capa}) importa {d}' for d in _imports(ruta) if not _permitido(modulo, capa, d)]
     assert not violaciones, 'Imports que rompen la regla de dependencia:\n' + '\n'.join(violaciones)
+
+
+def test_app_importa_desde_shared():
+    """Las rutas viejas solo quedan como reexportaciones para pruebas, scripts y migraciones."""
+    def es_reexportacion(ruta):
+        return _dentro('.'.join(ruta.relative_to(APP.parent).with_suffix('').parts).removesuffix('.__init__'), *RUTAS_VIEJAS)
+
+    viejos = [f'{ruta.relative_to(APP.parent)} importa {d}' for ruta in sorted(APP.rglob('*.py')) if not es_reexportacion(ruta)
+              for d in _imports(ruta) if _dentro(d, *RUTAS_VIEJAS, 'app.db', 'app.migrate')]
+    assert not viejos, 'Importa desde app/shared:\n' + '\n'.join(viejos)
 
 
 def test_orm_en_rutas_viejas_no_sube():

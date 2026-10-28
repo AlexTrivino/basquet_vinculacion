@@ -15,10 +15,10 @@ from datetime import date
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
-from app import db
-from app.models.inscripcion import Inscripcion
-from app.models.jugador import Jugador
-from app.models.plantilla import Plantilla
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.inscripcion import Inscripcion
+from app.shared.infrastructure.modelos.jugador import Jugador
+from app.shared.infrastructure.modelos.plantilla import Plantilla
 
 
 # ── Constantes de Reglas de Negocio (una sola fuente: utils/business_rules) ──
@@ -140,7 +140,7 @@ def crear_plantilla(data, usuario_rol=None):
     id_torneo = data['id_torneo']
     id_categoria = data['id_categoria']
 
-    from app.models.torneo import Torneo
+    from app.shared.infrastructure.modelos.torneo import Torneo
     torneo = db.session.get(Torneo, id_torneo)
     if usuario_rol == 'delegado' and torneo and torneo.estado == 'en_curso':
         raise ValueError(

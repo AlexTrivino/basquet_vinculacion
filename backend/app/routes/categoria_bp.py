@@ -8,7 +8,7 @@ from flask import Blueprint, request
 
 from app.schemas.categoria_schema import CategoriaPublicSchema
 from app.services import categoria_service
-from app.utils.response import api_error, api_response
+from app.shared.http.respuestas import api_error, api_response
 
 categoria_bp = Blueprint('categorias', __name__, url_prefix='/api/categorias')
 

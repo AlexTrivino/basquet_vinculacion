@@ -12,8 +12,8 @@ from marshmallow import ValidationError
 
 from app.schemas.stats_schema import EstadisticasBulkSchema
 from app.services import stats_service
-from app.utils.auth_middleware import token_required
-from app.utils.response import api_error, api_response
+from app.shared.http.autenticacion import token_required
+from app.shared.http.respuestas import api_error, api_response
 
 stats_bp = Blueprint('estadisticas', __name__, url_prefix='/api/estadisticas')
 
@@ -27,8 +27,8 @@ def estadisticas_publicas():
     ``puntos_por_torneo`` los reparte por torneo ({id_torneo: puntos}).
     Los ganados por W.O. no cuentan: su marcador es administrativo, no puntos anotados.
     """
-    from app import db
-    from app.models import Partido
+    from app.shared.infrastructure.db import db
+    from app.shared.infrastructure.modelos import Partido
     from sqlalchemy import func
 
     por_torneo = dict(
@@ -64,7 +64,7 @@ def datos_flyers():
 @token_required(allowed_roles=['super_admin'])
 def dashboard_stats():
     """Retorna los contadores para el Dashboard del Admin."""
-    from app.models import Inscripcion, Partido, Equipo
+    from app.shared.infrastructure.modelos import Inscripcion, Partido, Equipo
     from sqlalchemy import or_
     
     # 1. Inscripciones pendientes
@@ -94,7 +94,7 @@ def dashboard_stats():
 @token_required(allowed_roles=['super_admin'])
 def actividad_reciente():
     """Retorna los últimos eventos relevantes en el sistema."""
-    from app.models import Inscripcion, Partido
+    from app.shared.infrastructure.modelos import Inscripcion, Partido
     
     # Obtener últimas inscripciones
     ultimas_inscripciones = Inscripcion.query.order_by(Inscripcion.updated_at.desc()).limit(5).all()

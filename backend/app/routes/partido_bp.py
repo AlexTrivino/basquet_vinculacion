@@ -14,11 +14,11 @@ from app.schemas.partido_schema import (
     PartidoUpdateSchema,
 )
 from app.services import partido_service
-from app.utils.auth_middleware import token_required
-from app.utils.pagination import paginate_query
-from app.utils.response import api_error, api_response
-from app.utils.storage import TIPOS_DOCUMENTO, MAX_COMPROBANTE, validar_archivo, subir_archivo, borrar_archivo
-from app import db
+from app.shared.http.autenticacion import token_required
+from app.shared.http.paginacion import paginate_query
+from app.shared.http.respuestas import api_error, api_response
+from app.shared.infrastructure.almacenamiento import TIPOS_DOCUMENTO, MAX_COMPROBANTE, validar_archivo, subir_archivo, borrar_archivo
+from app.shared.infrastructure.db import db
 
 partido_bp = Blueprint('partidos', __name__, url_prefix='/api/partidos')
 

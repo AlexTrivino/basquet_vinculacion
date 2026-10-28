@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.services import sancion_service
 from app.schemas.sancion_schema import SancionSchema
-from app.utils.auth_middleware import token_required
+from app.shared.http.autenticacion import token_required
 
 sancion_bp = Blueprint('sancion_bp', __name__)
 sancion_schema = SancionSchema()

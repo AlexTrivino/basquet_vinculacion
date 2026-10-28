@@ -4,11 +4,11 @@ Servicio de lógica de negocio para la entidad Torneo (Decisión #10).
 Encapsula todas las operaciones CRUD y reglas de negocio,
 manteniendo las rutas como delegadores puros.
 """
-from app import db
-from app.models.torneo import Torneo
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.torneo import Torneo
 
 
-from app.models.categoria import Categoria
+from app.shared.infrastructure.modelos.categoria import Categoria
 
 def crear_torneo(data):
     """Crea un nuevo torneo en la base de datos junto con sus categorías.

@@ -19,10 +19,10 @@ from app.schemas.inscripcion_schema import (
     InscripcionEditarSchema,
 )
 from app.services import inscripcion_service
-from app.utils.auth_middleware import token_required
-from app.utils.pagination import paginate_query
-from app.utils.response import api_error, api_response
-from app.models.inscripcion import Inscripcion as InscripcionModel
+from app.shared.http.autenticacion import token_required
+from app.shared.http.paginacion import paginate_query
+from app.shared.http.respuestas import api_error, api_response
+from app.shared.infrastructure.modelos.inscripcion import Inscripcion as InscripcionModel
 
 inscripcion_bp = Blueprint(
     'inscripciones', __name__, url_prefix='/api/inscripciones'
@@ -82,7 +82,7 @@ def listar_inscripciones():
     )
 
     if id_equipo:
-        from app.models.inscripcion import Inscripcion
+        from app.shared.infrastructure.modelos.inscripcion import Inscripcion
         query = query.filter(Inscripcion.id_equipo == id_equipo)
 
     # ── Filtro de propietario para delegados ──────────────────────
@@ -90,8 +90,8 @@ def listar_inscripciones():
     # Se aplica a nivel de query (no post-fetch) para que la
     # paginación sea siempre coherente con los datos filtrados.
     if g.usuario_rol == 'delegado':
-        from app.models.equipo import Equipo
-        from app.models.inscripcion import Inscripcion
+        from app.shared.infrastructure.modelos.equipo import Equipo
+        from app.shared.infrastructure.modelos.inscripcion import Inscripcion
         query = query.join(Equipo, Inscripcion.id_equipo == Equipo.id_equipo).filter(
             Equipo.id_usuario == g.usuario_id,
             Equipo.estado == 'activo'
@@ -310,10 +310,10 @@ def subir_comprobante(id_inscripcion):
     Para delegados: solo pueden subir comprobante de inscripciones
     de equipos propios.
     """
-    from app import db
-    from app.models.equipo import Equipo
-    from app.models.inscripcion import Inscripcion as InscripcionModel
-    from app.utils.storage import TIPOS_DOCUMENTO, TIPOS_IMAGEN, MAX_COMPROBANTE, subir_archivo, validar_archivo
+    from app.shared.infrastructure.db import db
+    from app.shared.infrastructure.modelos.equipo import Equipo
+    from app.shared.infrastructure.modelos.inscripcion import Inscripcion as InscripcionModel
+    from app.shared.infrastructure.almacenamiento import TIPOS_DOCUMENTO, TIPOS_IMAGEN, MAX_COMPROBANTE, subir_archivo, validar_archivo
 
     # ── SELECT único: verificar existencia y cargar objeto ────────
     # Este mismo objeto se muta en memoria más adelante (patrón
@@ -384,10 +384,10 @@ def subir_comprobante(id_inscripcion):
 def crear_inscripcion_completa():
     """Registra un equipo, la inscripción y sube el comprobante atómicamente.
     """
-    from app import db
-    from app.models.equipo import Equipo
-    from app.models.inscripcion import Inscripcion as InscripcionModel
-    from app.utils.storage import TIPOS_DOCUMENTO, TIPOS_IMAGEN, MAX_COMPROBANTE, MAX_LOGO_EQUIPO, subir_archivo, validar_archivo, borrar_archivo
+    from app.shared.infrastructure.db import db
+    from app.shared.infrastructure.modelos.equipo import Equipo
+    from app.shared.infrastructure.modelos.inscripcion import Inscripcion as InscripcionModel
+    from app.shared.infrastructure.almacenamiento import TIPOS_DOCUMENTO, TIPOS_IMAGEN, MAX_COMPROBANTE, MAX_LOGO_EQUIPO, subir_archivo, validar_archivo, borrar_archivo
     from app.utils.text_utils import normalizar_mayusculas
 
     nombre_equipo = request.form.get('nombre_equipo')
@@ -520,10 +520,10 @@ def finalizar_borrador_inscripcion(id_inscripcion):
     y cambia el estado de 'borrador' a 'pendiente' para revisión del Administrador.
     """
     from sqlalchemy.orm import joinedload
-    from app import db
-    from app.models.inscripcion import Inscripcion as InscripcionModel
-    from app.models.plantilla import Plantilla
-    from app.models.equipo import Equipo
+    from app.shared.infrastructure.db import db
+    from app.shared.infrastructure.modelos.inscripcion import Inscripcion as InscripcionModel
+    from app.shared.infrastructure.modelos.plantilla import Plantilla
+    from app.shared.infrastructure.modelos.equipo import Equipo
 
     from app.services.plantilla_service import MIN_JUGADORES_PLANTILLA, MAX_JUGADORES_PLANTILLA
 

@@ -5,7 +5,7 @@ Las categorías son datos estáticos gestionados por seeder.
 Este módulo expone únicamente consultas de lectura para
 poblar selects en el frontend y validar elegibilidad de jugadores.
 """
-from app.models.categoria import Categoria
+from app.shared.infrastructure.modelos.categoria import Categoria
 
 
 def listar_categorias(genero=None, id_torneo=None):
@@ -43,7 +43,7 @@ def obtener_categoria_por_id(id_categoria):
     Returns:
         Instancia de ``Categoria`` o ``None`` si no existe.
     """
-    from app import db
+    from app.shared.infrastructure.db import db
     return db.session.get(Categoria, id_categoria)
 
 
@@ -56,7 +56,7 @@ def agregar_categoria(data):
     Returns:
         Instancia Categoria creada.
     """
-    from app import db
+    from app.shared.infrastructure.db import db
     categoria = Categoria(**data)
     db.session.add(categoria)
     db.session.commit()
@@ -69,8 +69,8 @@ def eliminar_categoria(id_categoria):
     Raises:
         ValueError: Si la categoría ya tiene equipos inscritos.
     """
-    from app import db
-    from app.models.inscripcion import Inscripcion
+    from app.shared.infrastructure.db import db
+    from app.shared.infrastructure.modelos.inscripcion import Inscripcion
     
     categoria = db.session.get(Categoria, id_categoria)
     if not categoria:

@@ -13,10 +13,10 @@ Puntos críticos de implementación:
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
-from app import db
-from app.models.equipo import Equipo
-from app.models.inscripcion import Inscripcion
-from app.models.torneo import Torneo
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.equipo import Equipo
+from app.shared.infrastructure.modelos.inscripcion import Inscripcion
+from app.shared.infrastructure.modelos.torneo import Torneo
 
 
 def _base_query_con_relaciones():
@@ -165,7 +165,7 @@ def reinscribir_equipo(data):
     Returns:
         Instancia de ``Inscripcion`` recién creada con relaciones cargadas.
     """
-    from app.models.plantilla import Plantilla
+    from app.shared.infrastructure.modelos.plantilla import Plantilla
     clonar_plantilla = data.pop('clonar_plantilla', False)
     
     # Forzar estado borrador para que el delegado pueda revisar la plantilla y enviarla
@@ -221,12 +221,12 @@ def _eliminar_inscripcion_segura(inscripcion, commit=True):
     """Elimina físicamente una inscripción y sus plantillas de ese torneo.
     Solo elimina el equipo y jugadores si no tienen historial previo o en otros torneos.
     """
-    from app.models.plantilla import Plantilla
-    from app.models.jugador import Jugador
-    from app.models.sancion import Sancion
-    from app.models.estadistica import Estadistica
-    from app.models.documento_jugador import DocumentoJugador
-    from app.utils.storage import borrar_archivo
+    from app.shared.infrastructure.modelos.plantilla import Plantilla
+    from app.shared.infrastructure.modelos.jugador import Jugador
+    from app.shared.infrastructure.modelos.sancion import Sancion
+    from app.shared.infrastructure.modelos.estadistica import Estadistica
+    from app.shared.infrastructure.modelos.documento_jugador import DocumentoJugador
+    from app.shared.infrastructure.almacenamiento import borrar_archivo
 
     equipo = inscripcion.equipo
     id_equipo = equipo.id_equipo if equipo else inscripcion.id_equipo
@@ -287,7 +287,7 @@ def eliminar_borrador_delegado(id_inscripcion: int, id_usuario: int):
     """Permite a un delegado eliminar una de sus inscripciones si está en estado 'borrador'.
     Llama internamente a _eliminar_inscripcion_segura para limpiar plantillas y archivos.
     """
-    from app.models.equipo import Equipo
+    from app.shared.infrastructure.modelos.equipo import Equipo
     
     inscripcion = (
         Inscripcion.query
@@ -349,7 +349,7 @@ def retirar_equipo(id_inscripcion):
     programados futuros donde el equipo participe en ese torneo.
     Las estadísticas y partidos pasados se conservan.
     """
-    from app.models.partido import Partido
+    from app.shared.infrastructure.modelos.partido import Partido
     
     inscripcion = db.session.get(Inscripcion, id_inscripcion)
     if inscripcion is None:
@@ -422,9 +422,9 @@ def purgar_inscripciones_expiradas(dias=30):
         'dias_umbral': dias,
     }
 def editar_inscripcion_admin(id_inscripcion: int, id_torneo_nuevo: int, id_categoria_nueva: int):
-    from app.models.torneo import Torneo
-    from app.models.categoria import Categoria
-    from app.models.plantilla import Plantilla
+    from app.shared.infrastructure.modelos.torneo import Torneo
+    from app.shared.infrastructure.modelos.categoria import Categoria
+    from app.shared.infrastructure.modelos.plantilla import Plantilla
 
     inscripcion = Inscripcion.query.options(
         joinedload(Inscripcion.torneo),

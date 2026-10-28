@@ -32,9 +32,9 @@ tiene su propia tabla y solo cuentan los partidos de la fase de grupos
 from collections import defaultdict
 from itertools import groupby
 
-from app import db
-from app.models.inscripcion import Inscripcion
-from app.models.partido import Partido
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.inscripcion import Inscripcion
+from app.shared.infrastructure.modelos.partido import Partido
 
 ESTADOS_FINALES = ('finalizado', 'finalizado_wo')
 
@@ -214,7 +214,7 @@ def recalcular_tabla(id_torneo: int, id_categoria: int = None) -> list[dict]:
     tablas = tablas_por_grupo(partidos, grupos)
 
     # ── Enriquecimiento con una sola query in_ ────────────────────
-    from app.models.equipo import Equipo
+    from app.shared.infrastructure.modelos.equipo import Equipo
 
     ids_equipos = [f['id_equipo'] for tabla in tablas.values() for f in tabla]
     equipos_db = db.session.execute(

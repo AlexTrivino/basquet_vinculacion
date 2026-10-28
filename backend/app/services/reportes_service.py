@@ -19,10 +19,10 @@ from io import BytesIO
 
 from sqlalchemy.orm import joinedload, selectinload
 
-from app import db
-from app.models.estadistica import Estadistica
-from app.models.partido import Partido
-from app.models.plantilla import Plantilla
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.estadistica import Estadistica
+from app.shared.infrastructure.modelos.partido import Partido
+from app.shared.infrastructure.modelos.plantilla import Plantilla
 
 # ── ReportLab — Platypus (tablas declarativas) ────────────────────
 from reportlab.lib import colors

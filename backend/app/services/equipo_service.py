@@ -10,8 +10,8 @@ Reglas de negocio implementadas:
 from flask import g
 from sqlalchemy.exc import IntegrityError
 
-from app import db
-from app.models.equipo import Equipo
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.equipo import Equipo
 from app.utils.text_utils import normalizar_mayusculas
 
 
@@ -63,7 +63,7 @@ def crear_equipo(data):
     Raises:
         ValueError: Si ya existe un equipo con el mismo nombre exacto.
     """
-    from app.models.inscripcion import Inscripcion
+    from app.shared.infrastructure.modelos.inscripcion import Inscripcion
     
     data = normalizar_mayusculas(data, ['nombre_equipo'])
     data['id_usuario'] = g.usuario_id
@@ -159,7 +159,7 @@ def reactivar_equipo(id_equipo):
 
 def listar_equipos_admin(id_torneo=None, id_categoria=None, search_query=None, estado=None):
     from sqlalchemy.orm import joinedload
-    from app.models.inscripcion import Inscripcion
+    from app.shared.infrastructure.modelos.inscripcion import Inscripcion
     
     query = Equipo.query.options(
         joinedload(Equipo.usuario),

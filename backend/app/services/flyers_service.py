@@ -11,8 +11,8 @@ from collections import Counter, defaultdict
 
 from sqlalchemy.orm import joinedload
 
-from app import db
-from app.models import Categoria, Equipo, Estadistica, Partido, Plantilla, Torneo
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos import Categoria, Equipo, Estadistica, Partido, Plantilla, Torneo
 
 FINALES = ('finalizado', 'finalizado_wo')
 CAMPOS = ('puntos', 'rebotes', 'asistencias', 'tapones', 'triples', 'tiros_libres')

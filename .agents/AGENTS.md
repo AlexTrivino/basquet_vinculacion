@@ -21,7 +21,7 @@ y nunca escribir código de relleno ni sobre-diseñar.
 
 ## Stack Tecnológico
 
-### Backend (Flask — *completado, no modificar estructura*)
+### Backend (Flask — *en migración a Clean Architecture por fases: ver `specs/`*)
 
 | Capa | Tecnología |
 |------|-----------|
@@ -34,6 +34,15 @@ y nunca escribir código de relleno ni sobre-diseñar.
 | Storage | Supabase Storage via boto3 (magic bytes, cero disco) |
 | PDF | ReportLab Platypus (BytesIO en memoria) |
 | Servidor | Gunicorn |
+
+### Estructura del backend
+
+- `app/shared/` es lo que comparten todos los módulos:
+  - `domain/errores.py`: `NoEncontrado`, `ReglaDeNegocio` y `Conflicto`, que `shared/http` responde con 404 `NOT_FOUND`, 422 `VALIDATION_ERROR` y 409 `CONFLICT`.
+  - `infrastructure/`: `db.py` (`db`, `migrate`), `modelos/` (los 14 modelos) y `almacenamiento.py` (Supabase Storage).
+  - `http/`: `respuestas.py` (`api_response`, `api_error`), `paginacion.py`, `autenticacion.py` (`token_required`, `identidad_opcional`) y `errores.py`.
+- `app/modules/<módulo>/{domain,application,infrastructure,http}` recibe cada módulo a medida que se migra; `app/routes`, `app/services`, `app/schemas` y `app/utils` son el código viejo.
+- El código nuevo importa siempre desde `app.shared`. `app.models`, `app.utils.storage`, `app.utils.response`, `app.utils.pagination`, `app.utils.auth_middleware`, `app.utils.error_handlers` y `from app import db` solo reexportan para scripts y pruebas viejas; `tests/test_capas.py` falla si algo de `app/` vuelve a usarlas.
 
 ### Frontend (React — *en desarrollo*)
 
@@ -275,7 +284,7 @@ Consulta `Docs/03_plan_integracion.md` para el roadmap exacto. El enfoque actual
 **IMPORTANTE: Prevención de errores de Mapeo (422 Unprocessable Entity & Errores Visuales)**
 Durante cualquier proceso de conexión entre el Frontend (React) y el Backend (Flask), se **prohíbe** asumir los nombres de las columnas o las propiedades. Antes de escribir una interfaz de TypeScript, de crear el payload para Axios o de leer un dato devuelto por la API, se **deben** revisar obligatoriamente:
 1. El Schema de Marshmallow correspondiente (`backend/app/schemas/`).
-2. El Modelo de SQLAlchemy (`backend/app/models/`).
+2. El Modelo de SQLAlchemy (`backend/app/shared/infrastructure/modelos/`).
 
 *Ejemplo de contexto:* Nombres como `estado` o `id` podrían ser en realidad `estado_inscripcion` o `id_equipo` dependiendo del Schema. Los objetos anidados devueltos por `fields.Nested` en Flask no desempaquetan sus IDs en la raíz, sino dentro de objetos hijos (ej. `equipo.id_equipo`). El agente **debe** verificar esto antes de escribir el código frontend que lee dichas variables para evitar que las variables devuelvan `undefined`.
 

@@ -19,9 +19,9 @@ from app.schemas.jugador_schema import (
 from app.services import jugador_service
 from app.services import jugador_profile_service
 from app.services import plantilla_service
-from app.utils.auth_middleware import identidad_opcional, token_required
-from app.utils.pagination import paginate_query
-from app.utils.response import api_error, api_response
+from app.shared.http.autenticacion import identidad_opcional, token_required
+from app.shared.http.paginacion import paginate_query
+from app.shared.http.respuestas import api_error, api_response
 
 jugador_bp = Blueprint('jugadores', __name__, url_prefix='/api/jugadores')
 
@@ -40,9 +40,9 @@ def _delegado_tiene_acceso_jugador(id_jugador: int, id_usuario: str) -> bool:
     1. El jugador está activo en alguna plantilla de un equipo del delegado, Ó
     2. El jugador no está registrado en ninguna plantilla activa de ningún equipo (jugador libre o nuevo).
     """
-    from app import db
-    from app.models.plantilla import Plantilla
-    from app.models.equipo import Equipo
+    from app.shared.infrastructure.db import db
+    from app.shared.infrastructure.modelos.plantilla import Plantilla
+    from app.shared.infrastructure.modelos.equipo import Equipo
 
     plantillas = (
         db.session.query(Plantilla.id_plantilla, Equipo.id_usuario)
@@ -66,9 +66,9 @@ CAMPOS_PRIVADOS = (
 
 def _delegados_del_jugador(id_jugador: int) -> set:
     """IDs de los delegados de los equipos donde el jugador tiene plantilla activa."""
-    from app import db
-    from app.models.plantilla import Plantilla
-    from app.models.equipo import Equipo
+    from app.shared.infrastructure.db import db
+    from app.shared.infrastructure.modelos.plantilla import Plantilla
+    from app.shared.infrastructure.modelos.equipo import Equipo
 
     filas = (
         db.session.query(Equipo.id_usuario)
@@ -243,7 +243,7 @@ def actualizar_jugador(id_jugador):
 @token_required(allowed_roles=['super_admin', 'delegado'])
 def eliminar_jugador(id_jugador):
     """Soft delete de un jugador."""
-    from app.utils.storage import borrar_archivo
+    from app.shared.infrastructure.almacenamiento import borrar_archivo
     
     jugador = jugador_service.obtener_jugador_por_id(id_jugador)
     if not jugador:
@@ -278,7 +278,7 @@ def subir_foto_jugador(id_jugador):
 
     Acepta: JPEG, PNG, WebP. Máximo 4 MB.
     """
-    from app.utils.storage import TIPOS_IMAGEN, MAX_FOTO_JUGADOR, subir_archivo, validar_archivo, borrar_archivo
+    from app.shared.infrastructure.almacenamiento import TIPOS_IMAGEN, MAX_FOTO_JUGADOR, subir_archivo, validar_archivo, borrar_archivo
 
     jugador = jugador_service.obtener_jugador_por_id(id_jugador)
     if jugador is None:
@@ -339,7 +339,7 @@ def subir_cedula_jugador(id_jugador):
 
     Acepta: JPEG, PNG, WebP, PDF. Máximo 4 MB.
     """
-    from app.utils.storage import TIPOS_PERMITIDOS, MAX_DOCUMENTO_JUGADOR, subir_archivo, validar_archivo, borrar_archivo
+    from app.shared.infrastructure.almacenamiento import TIPOS_PERMITIDOS, MAX_DOCUMENTO_JUGADOR, subir_archivo, validar_archivo, borrar_archivo
 
     jugador = jugador_service.obtener_jugador_por_id(id_jugador)
     if jugador is None:
@@ -400,7 +400,7 @@ def subir_acta_jugador(id_jugador):
 
     Acepta: JPEG, PNG, WebP, PDF. Máximo 4 MB.
     """
-    from app.utils.storage import TIPOS_PERMITIDOS, MAX_DOCUMENTO_JUGADOR, subir_archivo, validar_archivo, borrar_archivo
+    from app.shared.infrastructure.almacenamiento import TIPOS_PERMITIDOS, MAX_DOCUMENTO_JUGADOR, subir_archivo, validar_archivo, borrar_archivo
 
     jugador = jugador_service.obtener_jugador_por_id(id_jugador)
     if jugador is None:

@@ -1,12 +1,12 @@
 from flask import Blueprint, request
 from marshmallow import ValidationError
 
-from app import db
-from app.models.patrocinador import Patrocinador
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.patrocinador import Patrocinador
 from app.schemas.patrocinador_schema import patrocinador_schema, patrocinadores_schema
-from app.utils.auth_middleware import token_required
-from app.utils.storage import subir_archivo, validar_archivo, borrar_archivo, TIPOS_IMAGEN, MAX_LOGO_PATROCINADOR
-from app.utils.response import api_response, api_error
+from app.shared.http.autenticacion import token_required
+from app.shared.infrastructure.almacenamiento import subir_archivo, validar_archivo, borrar_archivo, TIPOS_IMAGEN, MAX_LOGO_PATROCINADOR
+from app.shared.http.respuestas import api_response, api_error
 
 patrocinador_bp = Blueprint('patrocinadores', __name__, url_prefix='/api/patrocinadores')
 

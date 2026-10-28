@@ -18,10 +18,10 @@ from app.schemas.torneo_schema import (
     TorneoUpdateSchema,
 )
 from app.services import torneo_service
-from app.utils.auth_middleware import token_required
-from app.utils.pagination import paginate_query
-from app.utils.response import api_error, api_response
-from app.utils.storage import subir_archivo, TIPOS_DOCUMENTO, validar_archivo, MAX_CALENDARIO_TORNEO
+from app.shared.http.autenticacion import token_required
+from app.shared.http.paginacion import paginate_query
+from app.shared.http.respuestas import api_error, api_response
+from app.shared.infrastructure.almacenamiento import subir_archivo, TIPOS_DOCUMENTO, validar_archivo, MAX_CALENDARIO_TORNEO
 
 torneo_bp = Blueprint('torneos', __name__, url_prefix='/api/torneos')
 
@@ -60,7 +60,7 @@ def listar_torneos_admin():
     
     Query params opcionales: ``page`` (default 1), ``per_page`` (default 20).
     """
-    from app.models.torneo import Torneo
+    from app.shared.infrastructure.modelos.torneo import Torneo
     query = Torneo.query.order_by(Torneo.fecha_inicio.desc())
     items, pagination = paginate_query(query)
     return api_response(
@@ -75,7 +75,7 @@ def listar_torneos_admin():
 @token_required(allowed_roles=['delegado'])
 def torneos_disponibles_reinscripcion():
     """Obtiene todos los torneos que están en estado 'programado' (disponibles para inscribirse)."""
-    from app.models.torneo import Torneo
+    from app.shared.infrastructure.modelos.torneo import Torneo
     torneos = Torneo.query.filter_by(estado='programado').order_by(Torneo.fecha_inicio.desc()).all()
     return api_response(data=_public_many.dump(torneos))
 
@@ -325,8 +325,8 @@ def lideres_torneo(id_torneo):
 
 def _torneo_y_categoria(id_torneo, id_categoria):
     """Carga torneo y categoría (de ese torneo) o devuelve el error listo para responder."""
-    from app import db
-    from app.models.categoria import Categoria
+    from app.shared.infrastructure.db import db
+    from app.shared.infrastructure.modelos.categoria import Categoria
 
     torneo = torneo_service.obtener_torneo_por_id(id_torneo)
     if torneo is None:
@@ -368,8 +368,8 @@ def recorrido_route(id_torneo):
 @token_required(allowed_roles=['super_admin'])
 def formato_categoria_route(id_categoria):
     """Guarda el formato de la fase final de la categoría (o null para quitarlo)."""
-    from app import db
-    from app.models.categoria import Categoria
+    from app.shared.infrastructure.db import db
+    from app.shared.infrastructure.modelos.categoria import Categoria
     from app.services.llaves_service import FORMATOS
 
     categoria = db.session.get(Categoria, id_categoria)

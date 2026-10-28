@@ -6,8 +6,8 @@ incluyen datos personales sensibles (ver ``visor_service``).
 from flask import Blueprint, request
 
 from app.services import visor_service
-from app.utils.auth_middleware import token_required
-from app.utils.response import api_error, api_response
+from app.shared.http.autenticacion import token_required
+from app.shared.http.respuestas import api_error, api_response
 
 visor_bp = Blueprint('visor', __name__, url_prefix='/api/visor')
 ROLES = ['visor', 'super_admin']

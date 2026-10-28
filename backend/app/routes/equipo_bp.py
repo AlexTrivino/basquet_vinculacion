@@ -19,11 +19,11 @@ from app.schemas.equipo_schema import (
     EquipoUpdateSchema,
 )
 from app.services import equipo_service
-from app.utils.auth_middleware import token_required
-from app.utils.pagination import paginate_query
-from app.utils.response import api_error, api_response
-from app.utils.storage import subir_archivo, borrar_archivo, validar_archivo, TIPOS_IMAGEN, MAX_LOGO_EQUIPO, MAX_BANNER_EQUIPO
-from app import db
+from app.shared.http.autenticacion import token_required
+from app.shared.http.paginacion import paginate_query
+from app.shared.http.respuestas import api_error, api_response
+from app.shared.infrastructure.almacenamiento import subir_archivo, borrar_archivo, validar_archivo, TIPOS_IMAGEN, MAX_LOGO_EQUIPO, MAX_BANNER_EQUIPO
+from app.shared.infrastructure.db import db
 
 equipo_bp = Blueprint('equipos', __name__, url_prefix='/api/equipos')
 

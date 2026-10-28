@@ -19,9 +19,9 @@ from app.schemas.plantilla_schema import (
     PlantillaUpdateSchema,
 )
 from app.services import plantilla_service
-from app.utils.auth_middleware import identidad_opcional, token_required
-from app.utils.pagination import paginate_query
-from app.utils.response import api_error, api_response
+from app.shared.http.autenticacion import identidad_opcional, token_required
+from app.shared.http.paginacion import paginate_query
+from app.shared.http.respuestas import api_error, api_response
 
 plantilla_bp = Blueprint('plantillas', __name__, url_prefix='/api/plantillas')
 
@@ -91,8 +91,8 @@ def agregar_jugador():
 
     # ── Verificación de propiedad para delegados ─────────────────
     if g.usuario_rol == 'delegado':
-        from app import db
-        from app.models.equipo import Equipo
+        from app.shared.infrastructure.db import db
+        from app.shared.infrastructure.modelos.equipo import Equipo
         equipo = db.session.get(Equipo, data['id_equipo'])
         if equipo is None or equipo.id_usuario != g.usuario_id:
             return api_error(
@@ -137,8 +137,8 @@ def actualizar_camiseta(id_plantilla):
         return api_error('NOT_FOUND', 'Entrada de plantilla no encontrada.', 404)
 
     if g.usuario_rol == 'delegado':
-        from app import db
-        from app.models.equipo import Equipo
+        from app.shared.infrastructure.db import db
+        from app.shared.infrastructure.modelos.equipo import Equipo
         equipo = db.session.get(Equipo, entrada.id_equipo)
         if equipo is None or equipo.id_usuario != g.usuario_id:
             return api_error(
@@ -181,8 +181,8 @@ def remover_jugador(id_plantilla):
         if entrada is None:
             return api_error('NOT_FOUND', 'Entrada de plantilla no encontrada.', 404)
 
-        from app import db
-        from app.models.equipo import Equipo
+        from app.shared.infrastructure.db import db
+        from app.shared.infrastructure.modelos.equipo import Equipo
         equipo = db.session.get(Equipo, entrada.id_equipo)
         if equipo is None or equipo.id_usuario != g.usuario_id:
             return api_error(

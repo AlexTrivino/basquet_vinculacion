@@ -6,9 +6,9 @@ Captura ``IntegrityError`` al crear para manejar cédulas duplicadas.
 """
 from sqlalchemy.exc import IntegrityError
 
-from app import db
-from app.models.jugador import Jugador
-from app.models.plantilla import Plantilla
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.jugador import Jugador
+from app.shared.infrastructure.modelos.plantilla import Plantilla
 from app.utils.text_utils import normalizar_mayusculas
 
 class JugadorDuplicadoError(Exception):

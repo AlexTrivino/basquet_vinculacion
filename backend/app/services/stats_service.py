@@ -16,11 +16,11 @@ from datetime import date
 from sqlalchemy import insert, delete
 from sqlalchemy.exc import IntegrityError
 
-from app import db
-from app.models.estadistica import Estadistica
-from app.models.partido import Partido
-from app.models.plantilla import Plantilla
-from app.models.sancion import Sancion
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.estadistica import Estadistica
+from app.shared.infrastructure.modelos.partido import Partido
+from app.shared.infrastructure.modelos.plantilla import Plantilla
+from app.shared.infrastructure.modelos.sancion import Sancion
 
 
 def procesar_estadisticas_bulk(data: dict, usuario_id: str, usuario_rol: str) -> dict:

@@ -1,15 +1,15 @@
 from datetime import date
 
 from sqlalchemy import func
-from app import db
-from app.models.jugador import Jugador
-from app.models.plantilla import Plantilla
-from app.models.estadistica import Estadistica
-from app.models.equipo import Equipo
-from app.models.torneo import Torneo
-from app.models.inscripcion import Inscripcion
-from app.models.categoria import Categoria
-from app.models.partido import Partido
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.jugador import Jugador
+from app.shared.infrastructure.modelos.plantilla import Plantilla
+from app.shared.infrastructure.modelos.estadistica import Estadistica
+from app.shared.infrastructure.modelos.equipo import Equipo
+from app.shared.infrastructure.modelos.torneo import Torneo
+from app.shared.infrastructure.modelos.inscripcion import Inscripcion
+from app.shared.infrastructure.modelos.categoria import Categoria
+from app.shared.infrastructure.modelos.partido import Partido
 
 
 def _edad(nacimiento):

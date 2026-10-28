@@ -9,8 +9,8 @@ grupos terminó (todos los partidos esperados jugados): antes, el cruce queda
 "por definir". Cada resultado cargado habilita las llaves siguientes.
 """
 
-from app import db
-from app.models.partido import Partido
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.partido import Partido
 from app.services.standings import (
     ESTADOS_FINALES, grupos_de_categoria, marcador_efectivo, partidos_fase_grupos, tablas_por_grupo,
 )
@@ -118,7 +118,7 @@ def estado_fase_final(torneo, categoria):
             ml, mv = marcador_efectivo(p.estado, p.marcador_local, p.marcador_visitante)
             ganadores[codigo], perdedores[codigo] = (p.id_equipo_local, p.id_equipo_visitante) if ml >= mv else (p.id_equipo_visitante, p.id_equipo_local)
 
-    from app.models.equipo import Equipo
+    from app.shared.infrastructure.modelos.equipo import Equipo
     equipos = {e.id_equipo: e for e in Equipo.query.filter(Equipo.id_equipo.in_(list(grupos))).all()} if grupos else {}
 
     def ficha(id_equipo):
@@ -182,7 +182,7 @@ def generar_llaves(torneo, categoria, programacion):
 
 def asignar_grupos(torneo, categoria, grupos):
     """Guarda el grupo (letra o None) de cada inscripción aprobada; ``grupos`` = {id_equipo: 'A'}."""
-    from app.models.inscripcion import Inscripcion
+    from app.shared.infrastructure.modelos.inscripcion import Inscripcion
 
     formato = FORMATOS.get(categoria.formato)
     permitidos = set(formato['grupos']) if formato else set()
@@ -221,7 +221,7 @@ def recorrido(torneo, categoria):
     por_fecha = [tablas_por_grupo(tuplas(f), grupos) for f in fechas]
     final = por_fecha[-1] if por_fecha else tablas_por_grupo([], grupos)
 
-    from app.models.equipo import Equipo
+    from app.shared.infrastructure.modelos.equipo import Equipo
     equipos = {e.id_equipo: e for e in Equipo.query.filter(Equipo.id_equipo.in_(list(grupos))).all()} if grupos else {}
 
     salida = {'fechas': [f.isoformat() for f in fechas], 'cupos': cupos, 'grupos': []}

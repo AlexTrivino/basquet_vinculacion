@@ -2,7 +2,7 @@
 from flask import Blueprint, jsonify
 from sqlalchemy import text
 
-from app import db
+from app.shared.infrastructure.db import db
 
 health_bp = Blueprint('health', __name__, url_prefix='/api')
 

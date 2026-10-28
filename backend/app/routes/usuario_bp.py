@@ -1,8 +1,8 @@
 from flask import Blueprint, request, g
-from app import db
-from app.models.usuario import Usuario
-from app.utils.auth_middleware import token_required
-from app.utils.response import api_response, api_error
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.usuario import Usuario
+from app.shared.http.autenticacion import token_required
+from app.shared.http.respuestas import api_response, api_error
 
 usuario_bp = Blueprint('usuarios', __name__, url_prefix='/api/usuarios')
 

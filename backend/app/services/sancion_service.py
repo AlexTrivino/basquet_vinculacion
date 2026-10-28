@@ -1,5 +1,5 @@
-from app import db
-from app.models.sancion import Sancion
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.sancion import Sancion
 
 def listar_sanciones(id_jugador=None, estado=None):
     query = Sancion.query.order_by(Sancion.fecha.desc())

@@ -18,9 +18,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy import or_
 
-from app import db
-from app.models.inscripcion import Inscripcion
-from app.models.partido import Partido
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.inscripcion import Inscripcion
+from app.shared.infrastructure.modelos.partido import Partido
 
 
 # ── Query base con eager loading ──────────────────────────────────
@@ -68,8 +68,8 @@ def listar_partidos(id_torneo=None, estados=None, id_equipo=None, id_categoria=N
         Query de SQLAlchemy lista para ``paginate_query()``.
     """
     from sqlalchemy import desc
-    from app.models.equipo import Equipo
-    from app.models.torneo import Torneo
+    from app.shared.infrastructure.modelos.equipo import Equipo
+    from app.shared.infrastructure.modelos.torneo import Torneo
 
     query = _base_query_con_relaciones()
 
@@ -245,9 +245,9 @@ def actualizar_partido(partido, data):
 
 def obtener_box_score(partido):
     """Genera el box score del partido con todos los jugadores activos."""
-    from app.models.plantilla import Plantilla
-    from app.models.estadistica import Estadistica
-    from app.models.sancion import Sancion
+    from app.shared.infrastructure.modelos.plantilla import Plantilla
+    from app.shared.infrastructure.modelos.estadistica import Estadistica
+    from app.shared.infrastructure.modelos.sancion import Sancion
     from sqlalchemy.orm import joinedload
     
     # 1. Obtener todas las plantillas para los equipos del partido
