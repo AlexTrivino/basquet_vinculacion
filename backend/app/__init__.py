@@ -50,9 +50,9 @@ def create_app() -> Flask:
     from app.modules.torneos.http.torneos import torneo_bp
     from app.modules.torneos.http.categorias import categoria_bp
     from app.routes.lideres_bp import lideres_bp
-    from app.routes.equipo_bp import equipo_bp
+    from app.modules.plantel.http.equipos import equipo_bp
     from app.routes.inscripcion_bp import inscripcion_bp
-    from app.routes.jugador_bp import jugador_bp
+    from app.modules.plantel.http.jugadores import jugador_bp
     from app.routes.plantilla_bp import plantilla_bp
     from app.modules.competencia.http.partidos import partido_bp
     from app.routes.stats_bp import stats_bp
@@ -62,7 +62,7 @@ def create_app() -> Flask:
     from app.modules.competencia.http.fase_final import competencia_bp
     from app.routes.config_bp import config_bp
     from app.modules.auspicios.http.rutas import patrocinador_bp
-    from app.routes.visor_bp import visor_bp
+    from app.modules.plantel.http.visor import visor_bp
     
     app.register_blueprint(health_bp)
     app.register_blueprint(config_bp)

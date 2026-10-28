@@ -1,14 +1,130 @@
 """
-Schemas de Marshmallow para la entidad Jugador (Patrón DTO — Decisión #13).
+Esquemas marshmallow de equipos y jugadores, movidos tal cual de app/schemas/equipo_schema.py
+y app/schemas/jugador_schema.py. Serializan las entidades del dominio.
 
-Validaciones de negocio en schemas de entrada:
-    - Cédula ecuatoriana: exactamente 10 dígitos numéricos.
-    - ``fecha_nacimiento``: debe ser una fecha en el pasado.
+Equipos:
+    - ``EquipoCreateSchema``: Validación de entrada para delegados (POST).
+    - ``EquipoUpdateSchema``: Validación de actualización parcial (PUT).
+    - ``EquipoPublicSchema``: Serialización para vistas públicas.
+    - ``EquipoAdminSchema``: Serialización completa para panel de administración.
+Jugadores (cédula ecuatoriana de 10 dígitos y fecha de nacimiento en el pasado):
+    - ``JugadorCreateSchema`` y ``JugadorUpdateSchema``: entrada.
+    - ``JugadorPublicSchema``: sin datos personales.
+    - ``JugadorAdminSchema``: completo, para el super_admin y el delegado del jugador.
 """
 from datetime import date
 
-from marshmallow import Schema, ValidationError, fields, validate, validates, validates_schema, post_load
+from marshmallow import Schema, ValidationError, fields, post_load, validate, validates, validates_schema
 
+
+# ══ Equipos ═══════════════════════════════════════════════════════
+
+# ── Schemas auxiliares anidados ───────────────────────────────────
+
+class _UsuarioResumenSchema(Schema):
+    id_usuario = fields.String()
+    nombre = fields.String()
+    correo = fields.String()
+
+class _TorneoResumenSchema(Schema):
+    id_torneo = fields.Integer()
+    nombre = fields.String()
+
+class _CategoriaResumenSchema(Schema):
+    id_categoria = fields.Integer()
+    nombre_categoria = fields.String()
+
+class _InscripcionResumenSchema(Schema):
+    id_inscripcion = fields.Integer()
+    estado_inscripcion = fields.String()
+    torneo = fields.Nested(_TorneoResumenSchema)
+    categoria = fields.Nested(_CategoriaResumenSchema)
+
+
+# ── Schemas de entrada ────────────────────────────────────────────
+
+class EquipoCreateSchema(Schema):
+    """Validación de entrada para registrar un equipo.
+
+    El campo ``id_usuario`` NO se recibe del cliente — se extrae de
+    ``flask.g.usuario_id`` (JWT) en la capa de rutas/servicio
+    para garantizar que un delegado solo cree equipos a su nombre.
+    """
+
+    nombre_equipo = fields.String(
+        required=True,
+        validate=validate.Length(
+            min=2, max=100,
+            error='El nombre del equipo debe tener entre 2 y 100 caracteres.',
+        ),
+    )
+
+
+class EquipoUpdateSchema(Schema):
+    """Validación de actualización parcial de un equipo.
+
+    Todos los campos son opcionales. Las URLs de archivos
+    (logo, foto) se actualizan mediante el servicio de Storage S3
+    en la Fase 4; aquí solo se acepta el nombre.
+    """
+
+    nombre_equipo = fields.String(
+        validate=validate.Length(
+            min=2, max=100,
+            error='El nombre del equipo debe tener entre 2 y 100 caracteres.',
+        ),
+    )
+    estado = fields.String(
+        validate=validate.OneOf(
+            ['activo', 'inactivo', 'aprobado', 'rechazado', 'pendiente'],
+            error='Estado de equipo inválido.',
+        ),
+    )
+
+
+# ── Schemas de salida (DTO) ───────────────────────────────────────
+
+class EquipoPublicSchema(Schema):
+    """Serialización para vistas públicas (tablas de posición, calendario).
+
+    Excluye ``id_usuario`` (FK sensible al delegado) y timestamps
+    de auditoría internos.
+    """
+
+    id_equipo = fields.Integer(dump_only=True)
+    nombre_equipo = fields.String()
+    estado = fields.String()
+    url_logo = fields.String(allow_none=True)
+    url_foto_equipo = fields.String(allow_none=True)
+    id_usuario = fields.String()
+
+
+class EquipoAdminSchema(Schema):
+    """Serialización completa para el panel de administración.
+
+    Incluye la FK al delegado propietario y timestamps de auditoría
+    para trazabilidad completa.
+    """
+
+    id_equipo = fields.Integer(dump_only=True)
+    nombre_equipo = fields.String()
+    estado = fields.String()
+    url_logo = fields.String(allow_none=True)
+    url_foto_equipo = fields.String(allow_none=True)
+    id_usuario = fields.String()
+    usuario = fields.Nested(
+        _UsuarioResumenSchema,
+        dump_only=True
+    )
+    inscripciones = fields.List(
+        fields.Nested(_InscripcionResumenSchema),
+        dump_only=True
+    )
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()
+
+
+# ══ Jugadores ═════════════════════════════════════════════════════
 
 # ── Schemas de entrada ────────────────────────────────────────────
 
@@ -209,21 +325,11 @@ class JugadorAdminSchema(Schema):
 
     def get_plantillas_info(self, obj):
         """Retorna la lista resumida de asignaciones en plantillas activas."""
-        if not hasattr(obj, 'plantillas') or not obj.plantillas:
-            return []
-        res = []
-        for p in obj.plantillas:
-            if getattr(p, 'estado', 'activo') == 'activo':
-                torneo_obj = getattr(p, 'torneo', None)
-                nombre_tor = getattr(torneo_obj, 'nombre', getattr(torneo_obj, 'nombre_torneo', None)) if torneo_obj else None
-                equipo_obj = getattr(p, 'equipo', None)
-                nombre_eq = getattr(equipo_obj, 'nombre_equipo', getattr(equipo_obj, 'nombre', None)) if equipo_obj else None
-                res.append({
-                    'id_plantilla': p.id_plantilla,
-                    'numero_camiseta': p.numero_camiseta,
-                    'id_equipo': p.id_equipo,
-                    'nombre_equipo': nombre_eq,
-                    'id_torneo': p.id_torneo,
-                    'nombre_torneo': nombre_tor,
-                })
-        return res
+        return [{
+            'id_plantilla': p.id_plantilla,
+            'numero_camiseta': p.numero_camiseta,
+            'id_equipo': p.id_equipo,
+            'nombre_equipo': p.nombre_equipo,
+            'id_torneo': p.id_torneo,
+            'nombre_torneo': p.nombre_torneo,
+        } for p in obj.plantillas if p.estado == 'activo']

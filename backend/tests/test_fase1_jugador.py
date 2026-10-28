@@ -2,7 +2,7 @@ import unittest
 from datetime import date
 from marshmallow import ValidationError
 from app import create_app
-from app.schemas.jugador_schema import JugadorCreateSchema, JugadorUpdateSchema
+from app.modules.plantel.http.esquemas import JugadorCreateSchema, JugadorUpdateSchema
 
 class TestJugadorSchema(unittest.TestCase):
     def test_schema_telefono_required(self):

@@ -388,7 +388,7 @@ def crear_inscripcion_completa():
     from app.shared.infrastructure.modelos.equipo import Equipo
     from app.shared.infrastructure.modelos.inscripcion import Inscripcion as InscripcionModel
     from app.shared.infrastructure.almacenamiento import TIPOS_DOCUMENTO, TIPOS_IMAGEN, MAX_COMPROBANTE, MAX_LOGO_EQUIPO, subir_archivo, validar_archivo, borrar_archivo
-    from app.utils.text_utils import normalizar_mayusculas
+    from app.shared.domain.textos import normalizar_mayusculas
 
     nombre_equipo = request.form.get('nombre_equipo')
     id_torneo = request.form.get('id_torneo')
@@ -428,7 +428,7 @@ def crear_inscripcion_completa():
     url_archivo = None
     url_logo = None
     try:
-        from app.utils.business_rules import MAX_EQUIPOS_POR_DELEGADO
+        from app.shared.domain.reglas import MAX_EQUIPOS_POR_DELEGADO
         # ── Validación de Límite de Equipos ──────────────────────────
         equipos_activos = Equipo.query.filter_by(
             id_usuario=g.usuario_id, estado='activo'
@@ -515,7 +515,7 @@ def crear_inscripcion_completa():
 @inscripcion_bp.route('/<int:id_inscripcion>/finalizar-borrador', methods=['POST'])
 @token_required(allowed_roles=['super_admin', 'delegado'])
 def finalizar_borrador_inscripcion(id_inscripcion):
-    """Valida que la plantilla cumpla con el mínimo y el máximo de jugadores (``utils/business_rules``)
+    """Valida que la plantilla cumpla con el mínimo y el máximo de jugadores (``shared/domain/reglas``)
 
     y cambia el estado de 'borrador' a 'pendiente' para revisión del Administrador.
     """

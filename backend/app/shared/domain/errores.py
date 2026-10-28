@@ -15,3 +15,7 @@ class ReglaDeNegocio(ErrorDeDominio):
 
 class Conflicto(ErrorDeDominio):
     """La operación choca con datos que ya existen."""
+
+
+class SinPermiso(ErrorDeDominio):
+    """Quien lo pide no puede hacerlo sobre ese recurso (por ejemplo, el equipo de otro delegado)."""

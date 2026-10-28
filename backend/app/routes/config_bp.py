@@ -1,7 +1,7 @@
 """Blueprint para exponer configuración global y reglas de negocio al frontend."""
 from flask import Blueprint
 from app.shared.http.respuestas import api_response
-from app.utils.business_rules import MAX_EQUIPOS_POR_DELEGADO, MAX_JUGADORES_PLANTILLA, MIN_JUGADORES_PLANTILLA
+from app.shared.domain.reglas import MAX_EQUIPOS_POR_DELEGADO, MAX_JUGADORES_PLANTILLA, MIN_JUGADORES_PLANTILLA
 
 config_bp = Blueprint('config', __name__, url_prefix='/api')
 

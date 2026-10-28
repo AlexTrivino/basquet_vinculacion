@@ -51,8 +51,8 @@ def paginate_query(query, max_per_page=50):
     return paginar(query, *pagina_pedida(max_per_page))
 
 
-def pagina_pedida(max_per_page=50):
+def pagina_pedida(max_per_page=50, por_defecto=20):
     """(page, per_page) de los query params de la petición, saneados: page desde 1 y per_page entre 1 y ``max_per_page``."""
     page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 20, type=int)
+    per_page = request.args.get('per_page', por_defecto, type=int)
     return max(1, page), max(1, min(per_page, max_per_page))

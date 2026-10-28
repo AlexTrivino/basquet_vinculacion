@@ -25,6 +25,7 @@ Variables de entorno requeridas:
     el archivo con 415 Unsupported Media Type antes de que llegue a S3.
 """
 import os
+import threading
 import uuid
 import urllib.request
 import urllib.error
@@ -215,3 +216,8 @@ def borrar_archivo(ruta_objeto: str):
         current_app.logger.exception('Error al borrar en Storage (REST API):')
         # Silenciamos el error para no bloquear transacciones
         pass
+
+
+def borrar_en_segundo_plano(ruta_objeto: str):
+    """Borra el archivo en otro hilo, para no hacer esperar la respuesta (se usa con los archivos viejos de un jugador)."""
+    threading.Thread(target=borrar_archivo, args=(ruta_objeto,)).start()

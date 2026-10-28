@@ -7,7 +7,7 @@ devolviendo respuestas JSON con formato estandarizado (RNF-MAN-02).
 from flask import Flask, jsonify, current_app
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.shared.domain.errores import Conflicto, NoEncontrado, ReglaDeNegocio
+from app.shared.domain.errores import Conflicto, NoEncontrado, ReglaDeNegocio, SinPermiso
 from app.shared.http.respuestas import api_error
 from app.shared.infrastructure.db import db
 
@@ -17,6 +17,7 @@ ERRORES_DE_DOMINIO = {
     NoEncontrado: ('NOT_FOUND', 404),
     ReglaDeNegocio: ('VALIDATION_ERROR', 422),
     Conflicto: ('CONFLICT', 409),
+    SinPermiso: ('FORBIDDEN', 403),
 }
 
 

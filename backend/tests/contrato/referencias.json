@@ -35,6 +35,14 @@
    "success": true
   }
  },
+ "DELETE /api/equipos/1/logo · del2 · equipo ajeno": {
+  "codigo": 403,
+  "cuerpo": {
+   "error_code": "FORBIDDEN",
+   "message": "No tienes permiso para modificar este equipo.",
+   "success": false
+  }
+ },
  "DELETE /api/equipos/2 · anónimo · sin token": {
   "codigo": 401,
   "cuerpo": {
@@ -75,6 +83,14 @@
   }
  },
  "DELETE /api/equipos/7 · admin · ya inactivo": {
+  "codigo": 404,
+  "cuerpo": {
+   "error_code": "NOT_FOUND",
+   "message": "Equipo no encontrado.",
+   "success": false
+  }
+ },
+ "DELETE /api/equipos/99 · admin": {
   "codigo": 404,
   "cuerpo": {
    "error_code": "NOT_FOUND",
@@ -156,6 +172,13 @@
    "error_code": "FORBIDDEN",
    "message": "No tienes permiso para eliminar a este jugador.",
    "success": false
+  }
+ },
+ "DELETE /api/jugadores/18 · del2 · jugador sin equipo": {
+  "codigo": 200,
+  "cuerpo": {
+   "message": "Jugador eliminado exitosamente.",
+   "success": true
   }
  },
  "DELETE /api/jugadores/99 · admin": {
@@ -1006,6 +1029,290 @@
    "error_code": "FORBIDDEN",
    "message": "Acceso denegado. Se requiere uno de los siguientes roles para esta operación: 'super_admin'.",
    "success": false
+  }
+ },
+ "GET /api/equipos/admin/list?id_torneo=1 · admin · equipo inscrito en dos categorías": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": [
+    {
+     "created_at": "2026-10-01T12:06:00",
+     "estado": "activo",
+     "id_equipo": 6,
+     "id_usuario": "u-admin",
+     "inscripciones": [
+      {
+       "categoria": {
+        "id_categoria": 2,
+        "nombre_categoria": "Cadetes +30"
+       },
+       "estado_inscripcion": "aprobado",
+       "id_inscripcion": 7,
+       "torneo": {
+        "id_torneo": 1,
+        "nombre": "INTERCOLEGIAL 2026"
+       }
+      },
+      {
+       "categoria": {
+        "id_categoria": 3,
+        "nombre_categoria": "Senior +40"
+       },
+       "estado_inscripcion": "aprobado",
+       "id_inscripcion": 14,
+       "torneo": {
+        "id_torneo": 2,
+        "nombre": "NACIONAL +40 2026"
+       }
+      }
+     ],
+     "nombre_equipo": "4 DE NOVIEMBRE",
+     "updated_at": "2026-10-01T12:06:00",
+     "url_foto_equipo": null,
+     "url_logo": null,
+     "usuario": {
+      "correo": "admin@manta.test",
+      "id_usuario": "u-admin",
+      "nombre": "Admin Manta"
+     }
+    },
+    {
+     "created_at": "2026-10-01T12:02:00",
+     "estado": "activo",
+     "id_equipo": 2,
+     "id_usuario": "u-del-2",
+     "inscripciones": [
+      {
+       "categoria": {
+        "id_categoria": 1,
+        "nombre_categoria": "Juvenil"
+       },
+       "estado_inscripcion": "aprobado",
+       "id_inscripcion": 2,
+       "torneo": {
+        "id_torneo": 1,
+        "nombre": "INTERCOLEGIAL 2026"
+       }
+      },
+      {
+       "categoria": {
+        "id_categoria": 3,
+        "nombre_categoria": "Senior +40"
+       },
+       "estado_inscripcion": "pendiente",
+       "id_inscripcion": 8,
+       "torneo": {
+        "id_torneo": 2,
+        "nombre": "NACIONAL +40 2026"
+       }
+      },
+      {
+       "categoria": {
+        "id_categoria": 4,
+        "nombre_categoria": "Juvenil"
+       },
+       "estado_inscripcion": "aprobado",
+       "id_inscripcion": 12,
+       "torneo": {
+        "id_torneo": 3,
+        "nombre": "INTERCOLEGIAL 2025"
+       }
+      }
+     ],
+     "nombre_equipo": "FAE",
+     "updated_at": "2026-10-01T12:02:00",
+     "url_foto_equipo": null,
+     "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/2/logo/fae.png",
+     "usuario": {
+      "correo": "del2@manta.test",
+      "id_usuario": "u-del-2",
+      "nombre": "Delegado FAE"
+     }
+    },
+    {
+     "created_at": "2026-10-01T12:05:00",
+     "estado": "activo",
+     "id_equipo": 5,
+     "id_usuario": "u-admin",
+     "inscripciones": [
+      {
+       "categoria": {
+        "id_categoria": 2,
+        "nombre_categoria": "Cadetes +30"
+       },
+       "estado_inscripcion": "aprobado",
+       "id_inscripcion": 6,
+       "torneo": {
+        "id_torneo": 1,
+        "nombre": "INTERCOLEGIAL 2026"
+       }
+      }
+     ],
+     "nombre_equipo": "JUAN MONTALVO",
+     "updated_at": "2026-10-01T12:05:00",
+     "url_foto_equipo": null,
+     "url_logo": null,
+     "usuario": {
+      "correo": "admin@manta.test",
+      "id_usuario": "u-admin",
+      "nombre": "Admin Manta"
+     }
+    },
+    {
+     "created_at": "2026-10-01T12:03:00",
+     "estado": "activo",
+     "id_equipo": 3,
+     "id_usuario": "u-admin",
+     "inscripciones": [
+      {
+       "categoria": {
+        "id_categoria": 1,
+        "nombre_categoria": "Juvenil"
+       },
+       "estado_inscripcion": "aprobado",
+       "id_inscripcion": 3,
+       "torneo": {
+        "id_torneo": 1,
+        "nombre": "INTERCOLEGIAL 2026"
+       }
+      },
+      {
+       "categoria": {
+        "id_categoria": 3,
+        "nombre_categoria": "Senior +40"
+       },
+       "estado_inscripcion": "aprobado",
+       "id_inscripcion": 13,
+       "torneo": {
+        "id_torneo": 2,
+        "nombre": "NACIONAL +40 2026"
+       }
+      }
+     ],
+     "nombre_equipo": "MANTA",
+     "updated_at": "2026-10-01T12:03:00",
+     "url_foto_equipo": null,
+     "url_logo": null,
+     "usuario": {
+      "correo": "admin@manta.test",
+      "id_usuario": "u-admin",
+      "nombre": "Admin Manta"
+     }
+    },
+    {
+     "created_at": "2026-10-01T12:01:00",
+     "estado": "activo",
+     "id_equipo": 1,
+     "id_usuario": "u-del-1",
+     "inscripciones": [
+      {
+       "categoria": {
+        "id_categoria": 1,
+        "nombre_categoria": "Juvenil"
+       },
+       "estado_inscripcion": "aprobado",
+       "id_inscripcion": 1,
+       "torneo": {
+        "id_torneo": 1,
+        "nombre": "INTERCOLEGIAL 2026"
+       }
+      },
+      {
+       "categoria": {
+        "id_categoria": 2,
+        "nombre_categoria": "Cadetes +30"
+       },
+       "estado_inscripcion": "aprobado",
+       "id_inscripcion": 5,
+       "torneo": {
+        "id_torneo": 1,
+        "nombre": "INTERCOLEGIAL 2026"
+       }
+      },
+      {
+       "categoria": {
+        "id_categoria": 3,
+        "nombre_categoria": "Senior +40"
+       },
+       "estado_inscripcion": "borrador",
+       "id_inscripcion": 9,
+       "torneo": {
+        "id_torneo": 2,
+        "nombre": "NACIONAL +40 2026"
+       }
+      },
+      {
+       "categoria": {
+        "id_categoria": 4,
+        "nombre_categoria": "Juvenil"
+       },
+       "estado_inscripcion": "aprobado",
+       "id_inscripcion": 11,
+       "torneo": {
+        "id_torneo": 3,
+        "nombre": "INTERCOLEGIAL 2025"
+       }
+      }
+     ],
+     "nombre_equipo": "SAN JOSÉ",
+     "updated_at": "2026-10-01T12:01:00",
+     "url_foto_equipo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/banner/sanjose.jpg",
+     "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png",
+     "usuario": {
+      "correo": "del1@manta.test",
+      "id_usuario": "u-del-1",
+      "nombre": "Delegado San José"
+     }
+    },
+    {
+     "created_at": "2026-10-01T12:04:00",
+     "estado": "activo",
+     "id_equipo": 4,
+     "id_usuario": "u-admin",
+     "inscripciones": [
+      {
+       "categoria": {
+        "id_categoria": 1,
+        "nombre_categoria": "Juvenil"
+       },
+       "estado_inscripcion": "aprobado",
+       "id_inscripcion": 4,
+       "torneo": {
+        "id_torneo": 1,
+        "nombre": "INTERCOLEGIAL 2026"
+       }
+      },
+      {
+       "categoria": {
+        "id_categoria": 3,
+        "nombre_categoria": "Senior +40"
+       },
+       "estado_inscripcion": "rechazado",
+       "id_inscripcion": 10,
+       "torneo": {
+        "id_torneo": 2,
+        "nombre": "NACIONAL +40 2026"
+       }
+      }
+     ],
+     "nombre_equipo": "STELLA MARIS",
+     "updated_at": "2026-10-01T12:04:00",
+     "url_foto_equipo": null,
+     "url_logo": null,
+     "usuario": {
+      "correo": "admin@manta.test",
+      "id_usuario": "u-admin",
+      "nombre": "Admin Manta"
+     }
+    }
+   ],
+   "pagination": {
+    "page": 1,
+    "pages": 1,
+    "per_page": 20,
+    "total": 7
+   },
+   "success": true
   }
  },
  "GET /api/equipos/admin/list?id_torneo=1&id_categoria=2 · admin": {
@@ -5552,6 +5859,45 @@
    "success": false
   }
  },
+ "GET /api/jugadores/buscar?cedula=%201310000001%20 · del1 · con espacios": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "correo": "jugador1@manta.test",
+    "created_at": "2026-10-01T12:01:00",
+    "documento_identificacion": "1310000001",
+    "estado": "activo",
+    "fecha_nacimiento": "2008-03-10",
+    "genero": "masculino",
+    "id_jugador": 1,
+    "nombre": "BRYAN CHÁVEZ VÉLEZ",
+    "plantillas": [
+     {
+      "id_equipo": 1,
+      "id_plantilla": 1,
+      "id_torneo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "nombre_torneo": "INTERCOLEGIAL 2026",
+      "numero_camiseta": 4
+     },
+     {
+      "id_equipo": 1,
+      "id_plantilla": 18,
+      "id_torneo": 3,
+      "nombre_equipo": "SAN JOSÉ",
+      "nombre_torneo": "INTERCOLEGIAL 2025",
+      "numero_camiseta": 4
+     }
+    ],
+    "telefono": "0990000001",
+    "updated_at": "2026-10-01T12:01:00",
+    "url_acta_bachiller": null,
+    "url_cedula": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/cedula.pdf",
+    "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
+   },
+   "success": true
+  }
+ },
  "GET /api/jugadores/buscar?cedula=0000000000 · admin": {
   "codigo": 200,
   "cuerpo": {
@@ -5604,6 +5950,14 @@
     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
    },
    "success": true
+  }
+ },
+ "GET /api/jugadores/buscar?cedula=1310000001&id_torneo=1&id_categoria=x · del1": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "El parámetro id_torneo debe ser un número entero válido.",
+   "success": false
   }
  },
  "GET /api/jugadores/buscar?cedula=1310000001&id_torneo=x · del1": {
@@ -5694,6 +6048,159 @@
     "url_cedula": null,
     "url_foto": null,
     "ya_en_torneo": false
+   },
+   "success": true
+  }
+ },
+ "GET /api/jugadores?estado=inactivo · admin": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": [],
+   "pagination": {
+    "page": 1,
+    "pages": 0,
+    "per_page": 20,
+    "total": 0
+   },
+   "success": true
+  }
+ },
+ "GET /api/jugadores?estado=inactivo · anónimo · el público solo ve activos": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": [
+    {
+     "estado": "activo",
+     "genero": "femenino",
+     "id_jugador": 9,
+     "nombre": "ANA MERO VÉLEZ",
+     "url_foto": null
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 1,
+     "nombre": "BRYAN CHÁVEZ VÉLEZ",
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 6,
+     "nombre": "CARLOS MACÍAS LOOR",
+     "url_foto": null
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 3,
+     "nombre": "DAVID CEDEÑO ZAMBRANO",
+     "url_foto": null
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 5,
+     "nombre": "JORGE ZAMBRANO ALCÍVAR",
+     "url_foto": null
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 8,
+     "nombre": "JOSUÉ ALCÍVAR MACÍAS",
+     "url_foto": null
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 14,
+     "nombre": "JUAN PICO VERA",
+     "url_foto": null
+    },
+    {
+     "estado": "activo",
+     "genero": "femenino",
+     "id_jugador": 11,
+     "nombre": "JULIA PICO MERO",
+     "url_foto": null
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 4,
+     "nombre": "LUIS ALAVA PICO",
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/4/foto.jpg"
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 15,
+     "nombre": "LUIS VERA LOOR",
+     "url_foto": null
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 18,
+     "nombre": "MANUEL VERA PICO",
+     "url_foto": null
+    },
+    {
+     "estado": "activo",
+     "genero": "femenino",
+     "id_jugador": 10,
+     "nombre": "MARÍA LOOR CEDEÑO",
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/10/foto.jpg"
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 2,
+     "nombre": "MATEO MERO PINARGOTE",
+     "url_foto": null
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 13,
+     "nombre": "PEDRO ALAVA MERO",
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/13/foto.jpg"
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 12,
+     "nombre": "RAMÓN ZAMBRANO VERA",
+     "url_foto": null
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 17,
+     "nombre": "RAÚL LOOR ALAVA",
+     "url_foto": null
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 7,
+     "nombre": "SEBASTIÁN MACÍAS MOREIRA",
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/7/foto.jpg"
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 16,
+     "nombre": "ÁNGEL MERO PICO",
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/16/foto.jpg"
+    }
+   ],
+   "pagination": {
+    "page": 1,
+    "pages": 1,
+    "per_page": 20,
+    "total": 18
    },
    "success": true
   }
@@ -5919,6 +6426,55 @@
     "pages": 1,
     "per_page": 20,
     "total": 3
+   },
+   "success": true
+  }
+ },
+ "GET /api/jugadores?q=mero · anónimo": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": [
+    {
+     "estado": "activo",
+     "genero": "femenino",
+     "id_jugador": 9,
+     "nombre": "ANA MERO VÉLEZ",
+     "url_foto": null
+    },
+    {
+     "estado": "activo",
+     "genero": "femenino",
+     "id_jugador": 11,
+     "nombre": "JULIA PICO MERO",
+     "url_foto": null
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 2,
+     "nombre": "MATEO MERO PINARGOTE",
+     "url_foto": null
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 13,
+     "nombre": "PEDRO ALAVA MERO",
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/13/foto.jpg"
+    },
+    {
+     "estado": "activo",
+     "genero": "masculino",
+     "id_jugador": 16,
+     "nombre": "ÁNGEL MERO PICO",
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/16/foto.jpg"
+    }
+   ],
+   "pagination": {
+    "page": 1,
+    "pages": 1,
+    "per_page": 20,
+    "total": 5
    },
    "success": true
   }
@@ -11564,6 +12120,459 @@
    "success": true
   }
  },
+ "GET /api/visor/jugadores?genero=otro&orden=raro · visor": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": [
+    {
+     "categoria": {
+      "genero_categoria": "femenino",
+      "id_categoria": 2,
+      "nombre_categoria": "Cadetes +30"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "femenino",
+     "id_jugador": 9,
+     "nombre": "ANA MERO VÉLEZ",
+     "numero_camiseta": 3,
+     "partidos_jugados": 1,
+     "promedio_puntos": 18.0,
+     "puntos_totales": 18,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 1,
+     "nombre": "BRYAN CHÁVEZ VÉLEZ",
+     "numero_camiseta": 4,
+     "partidos_jugados": 2,
+     "promedio_puntos": 18.5,
+     "puntos_totales": 37,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 2,
+      "nombre_equipo": "FAE",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/2/logo/fae.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 6,
+     "nombre": "CARLOS MACÍAS LOOR",
+     "numero_camiseta": 8,
+     "partidos_jugados": 1,
+     "promedio_puntos": 12.0,
+     "puntos_totales": 12,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 3,
+     "nombre": "DAVID CEDEÑO ZAMBRANO",
+     "numero_camiseta": 10,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 2,
+      "nombre_equipo": "FAE",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/2/logo/fae.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 5,
+     "nombre": "JORGE ZAMBRANO ALCÍVAR",
+     "numero_camiseta": 5,
+     "partidos_jugados": 1,
+     "promedio_puntos": 18.0,
+     "puntos_totales": 18,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 4,
+      "nombre_equipo": "STELLA MARIS",
+      "url_logo": null
+     },
+     "genero": "masculino",
+     "id_jugador": 8,
+     "nombre": "JOSUÉ ALCÍVAR MACÍAS",
+     "numero_camiseta": 11,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 14,
+     "nombre": "JUAN PICO VERA",
+     "numero_camiseta": 2,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "femenino",
+      "id_categoria": 2,
+      "nombre_categoria": "Cadetes +30"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 6,
+      "nombre_equipo": "4 DE NOVIEMBRE",
+      "url_logo": null
+     },
+     "genero": "femenino",
+     "id_jugador": 11,
+     "nombre": "JULIA PICO MERO",
+     "numero_camiseta": 14,
+     "partidos_jugados": 1,
+     "promedio_puntos": 7.0,
+     "puntos_totales": 7,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 4,
+     "nombre": "LUIS ALAVA PICO",
+     "numero_camiseta": 12,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/4/foto.jpg"
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 15,
+     "nombre": "LUIS VERA LOOR",
+     "numero_camiseta": 3,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": null,
+     "edad": "<edad>",
+     "equipo": null,
+     "genero": "masculino",
+     "id_jugador": 18,
+     "nombre": "MANUEL VERA PICO",
+     "numero_camiseta": null,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": null,
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "femenino",
+      "id_categoria": 2,
+      "nombre_categoria": "Cadetes +30"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 5,
+      "nombre_equipo": "JUAN MONTALVO",
+      "url_logo": null
+     },
+     "genero": "femenino",
+     "id_jugador": 10,
+     "nombre": "MARÍA LOOR CEDEÑO",
+     "numero_camiseta": 6,
+     "partidos_jugados": 2,
+     "promedio_puntos": 10.5,
+     "puntos_totales": 21,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/10/foto.jpg"
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 2,
+     "nombre": "MATEO MERO PINARGOTE",
+     "numero_camiseta": 7,
+     "partidos_jugados": 1,
+     "promedio_puntos": 10.0,
+     "puntos_totales": 10,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 13,
+     "nombre": "PEDRO ALAVA MERO",
+     "numero_camiseta": 1,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/13/foto.jpg"
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 2,
+      "nombre_equipo": "FAE",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/2/logo/fae.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 12,
+     "nombre": "RAMÓN ZAMBRANO VERA",
+     "numero_camiseta": 23,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 17,
+     "nombre": "RAÚL LOOR ALAVA",
+     "numero_camiseta": 5,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 3,
+      "nombre_equipo": "MANTA",
+      "url_logo": null
+     },
+     "genero": "masculino",
+     "id_jugador": 7,
+     "nombre": "SEBASTIÁN MACÍAS MOREIRA",
+     "numero_camiseta": 9,
+     "partidos_jugados": 1,
+     "promedio_puntos": 20.0,
+     "puntos_totales": 20,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/7/foto.jpg"
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 16,
+     "nombre": "ÁNGEL MERO PICO",
+     "numero_camiseta": 4,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/16/foto.jpg"
+    }
+   ],
+   "pagination": {
+    "page": 1,
+    "pages": 1,
+    "per_page": 24,
+    "total": 18
+   },
+   "success": true
+  }
+ },
  "GET /api/visor/jugadores?id_equipo=1&page=2&per_page=2 · visor": {
   "codigo": 200,
   "cuerpo": {
@@ -11838,6 +12847,459 @@
     "pages": 1,
     "per_page": 24,
     "total": 8
+   },
+   "success": true
+  }
+ },
+ "GET /api/visor/jugadores?per_page=100 · visor": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": [
+    {
+     "categoria": {
+      "genero_categoria": "femenino",
+      "id_categoria": 2,
+      "nombre_categoria": "Cadetes +30"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "femenino",
+     "id_jugador": 9,
+     "nombre": "ANA MERO VÉLEZ",
+     "numero_camiseta": 3,
+     "partidos_jugados": 1,
+     "promedio_puntos": 18.0,
+     "puntos_totales": 18,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 1,
+     "nombre": "BRYAN CHÁVEZ VÉLEZ",
+     "numero_camiseta": 4,
+     "partidos_jugados": 2,
+     "promedio_puntos": 18.5,
+     "puntos_totales": 37,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 2,
+      "nombre_equipo": "FAE",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/2/logo/fae.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 6,
+     "nombre": "CARLOS MACÍAS LOOR",
+     "numero_camiseta": 8,
+     "partidos_jugados": 1,
+     "promedio_puntos": 12.0,
+     "puntos_totales": 12,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 3,
+     "nombre": "DAVID CEDEÑO ZAMBRANO",
+     "numero_camiseta": 10,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 2,
+      "nombre_equipo": "FAE",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/2/logo/fae.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 5,
+     "nombre": "JORGE ZAMBRANO ALCÍVAR",
+     "numero_camiseta": 5,
+     "partidos_jugados": 1,
+     "promedio_puntos": 18.0,
+     "puntos_totales": 18,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 4,
+      "nombre_equipo": "STELLA MARIS",
+      "url_logo": null
+     },
+     "genero": "masculino",
+     "id_jugador": 8,
+     "nombre": "JOSUÉ ALCÍVAR MACÍAS",
+     "numero_camiseta": 11,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 14,
+     "nombre": "JUAN PICO VERA",
+     "numero_camiseta": 2,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "femenino",
+      "id_categoria": 2,
+      "nombre_categoria": "Cadetes +30"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 6,
+      "nombre_equipo": "4 DE NOVIEMBRE",
+      "url_logo": null
+     },
+     "genero": "femenino",
+     "id_jugador": 11,
+     "nombre": "JULIA PICO MERO",
+     "numero_camiseta": 14,
+     "partidos_jugados": 1,
+     "promedio_puntos": 7.0,
+     "puntos_totales": 7,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 4,
+     "nombre": "LUIS ALAVA PICO",
+     "numero_camiseta": 12,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/4/foto.jpg"
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 15,
+     "nombre": "LUIS VERA LOOR",
+     "numero_camiseta": 3,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": null,
+     "edad": "<edad>",
+     "equipo": null,
+     "genero": "masculino",
+     "id_jugador": 18,
+     "nombre": "MANUEL VERA PICO",
+     "numero_camiseta": null,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": null,
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "femenino",
+      "id_categoria": 2,
+      "nombre_categoria": "Cadetes +30"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 5,
+      "nombre_equipo": "JUAN MONTALVO",
+      "url_logo": null
+     },
+     "genero": "femenino",
+     "id_jugador": 10,
+     "nombre": "MARÍA LOOR CEDEÑO",
+     "numero_camiseta": 6,
+     "partidos_jugados": 2,
+     "promedio_puntos": 10.5,
+     "puntos_totales": 21,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/10/foto.jpg"
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 2,
+     "nombre": "MATEO MERO PINARGOTE",
+     "numero_camiseta": 7,
+     "partidos_jugados": 1,
+     "promedio_puntos": 10.0,
+     "puntos_totales": 10,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 13,
+     "nombre": "PEDRO ALAVA MERO",
+     "numero_camiseta": 1,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/13/foto.jpg"
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 2,
+      "nombre_equipo": "FAE",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/2/logo/fae.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 12,
+     "nombre": "RAMÓN ZAMBRANO VERA",
+     "numero_camiseta": 23,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 17,
+     "nombre": "RAÚL LOOR ALAVA",
+     "numero_camiseta": 5,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "url_foto": null
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 1,
+      "nombre_categoria": "Juvenil"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 3,
+      "nombre_equipo": "MANTA",
+      "url_logo": null
+     },
+     "genero": "masculino",
+     "id_jugador": 7,
+     "nombre": "SEBASTIÁN MACÍAS MOREIRA",
+     "numero_camiseta": 9,
+     "partidos_jugados": 1,
+     "promedio_puntos": 20.0,
+     "puntos_totales": 20,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/7/foto.jpg"
+    },
+    {
+     "categoria": {
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     "edad": "<edad>",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "genero": "masculino",
+     "id_jugador": 16,
+     "nombre": "ÁNGEL MERO PICO",
+     "numero_camiseta": 4,
+     "partidos_jugados": 0,
+     "promedio_puntos": 0.0,
+     "puntos_totales": 0,
+     "torneo": {
+      "id_torneo": 2,
+      "nombre": "NACIONAL +40 2026"
+     },
+     "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/16/foto.jpg"
+    }
+   ],
+   "pagination": {
+    "page": 1,
+    "pages": 1,
+    "per_page": 60,
+    "total": 18
    },
    "success": true
   }
@@ -12236,6 +13698,14 @@
    "success": false
   }
  },
+ "POST /api/equipos · admin · del admin": {
+  "codigo": 409,
+  "cuerpo": {
+   "error_code": "CONFLICT",
+   "message": "Límite alcanzado: Un delegado solo puede administrar 1 equipo(s).",
+   "success": false
+  }
+ },
  "POST /api/equipos · anónimo · sin token": {
   "codigo": 401,
   "cuerpo": {
@@ -12287,6 +13757,14 @@
      "El nombre del equipo debe tener entre 2 y 100 caracteres."
     ]
    },
+   "success": false
+  }
+ },
+ "POST /api/equipos · del3 · sin cuerpo": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "El cuerpo de la solicitud debe ser JSON válido.",
    "success": false
   }
  },
@@ -12369,6 +13847,22 @@
    "success": false
   }
  },
+ "POST /api/equipos/2/banner · admin · sin archivo": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "No se proporcionó un archivo.",
+   "success": false
+  }
+ },
+ "POST /api/equipos/2/banner · admin · texto": {
+  "codigo": 422,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": "Tipo de archivo no permitido. Se aceptan: image/jpeg, image/png, image/webp. El archivo fue analizado por su contenido real, no por su extensión.",
+   "success": false
+  }
+ },
  "POST /api/equipos/2/logo · del2 · campo logo": {
   "almacenamiento": [
    "DELETE archivos/equipos/2/logo/fae.png",
@@ -12381,6 +13875,14 @@
    },
    "message": "Logo subido exitosamente.",
    "success": true
+  }
+ },
+ "POST /api/equipos/7/logo · admin · equipo inactivo": {
+  "codigo": 404,
+  "cuerpo": {
+   "error_code": "NOT_FOUND",
+   "message": "Equipo no encontrado.",
+   "success": false
   }
  },
  "POST /api/estadisticas/bulk · admin": {
@@ -12983,6 +14485,40 @@
    "plantillas": 2
   }
  },
+ "POST /api/jugadores · admin · nombre completo": {
+  "codigo": 201,
+  "cuerpo": {
+   "data": {
+    "correo": null,
+    "created_at": "<hoy>",
+    "documento_identificacion": "1310000098",
+    "estado": "activo",
+    "fecha_nacimiento": "2008-04-04",
+    "genero": "masculino",
+    "id_jugador": 19,
+    "nombre": "KEVIN MERO",
+    "plantillas": [],
+    "telefono": "0990000098",
+    "updated_at": "<hoy>",
+    "url_acta_bachiller": null,
+    "url_cedula": null,
+    "url_foto": null
+   },
+   "message": "Jugador registrado exitosamente.",
+   "success": true
+  },
+  "filas": {
+   "jugadores": 1
+  }
+ },
+ "POST /api/jugadores · admin · sin cuerpo": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "El cuerpo debe ser JSON válido.",
+   "success": false
+  }
+ },
  "POST /api/jugadores · anónimo · sin token": {
   "codigo": 401,
   "cuerpo": {
@@ -13202,6 +14738,22 @@
    "success": true
   }
  },
+ "POST /api/jugadores/1/cedula · del1 · texto": {
+  "codigo": 415,
+  "cuerpo": {
+   "error_code": "UNSUPPORTED_MEDIA_TYPE",
+   "message": "Tipo de archivo no permitido. Se aceptan: application/pdf, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, image/jpeg, image/png, image/webp. El archivo fue analizado por su contenido real, no por su extensión.",
+   "success": false
+  }
+ },
+ "POST /api/jugadores/1/cedula · del2 · jugador ajeno": {
+  "codigo": 403,
+  "cuerpo": {
+   "error_code": "FORBIDDEN",
+   "message": "No tienes permiso para modificar los documentos de este jugador.",
+   "success": false
+  }
+ },
  "POST /api/jugadores/1/foto · anónimo · sin token": {
   "codigo": 401,
   "cuerpo": {
@@ -13254,6 +14806,22 @@
    "success": true
   }
  },
+ "POST /api/jugadores/1/foto · del1 · sin archivo": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "No se encontró el campo 'archivo'. Usa multipart/form-data.",
+   "success": false
+  }
+ },
+ "POST /api/jugadores/1/foto · del1 · sin nombre": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "No se seleccionó ningún archivo.",
+   "success": false
+  }
+ },
  "POST /api/jugadores/1/foto · del1 · texto": {
   "codigo": 415,
   "cuerpo": {
@@ -13267,6 +14835,40 @@
   "cuerpo": {
    "error_code": "FORBIDDEN",
    "message": "No tienes permiso para modificar los documentos de este jugador.",
+   "success": false
+  }
+ },
+ "POST /api/jugadores/18/acta · del2 · jugador sin equipo": {
+  "almacenamiento": [
+   "POST archivos/jugadores/18/actas/<uuid>_acta.pdf"
+  ],
+  "codigo": 201,
+  "cuerpo": {
+   "data": {
+    "correo": "jugador18@manta.test",
+    "created_at": "2026-10-01T12:18:00",
+    "documento_identificacion": "1310000018",
+    "estado": "activo",
+    "fecha_nacimiento": "1975-09-09",
+    "genero": "masculino",
+    "id_jugador": 18,
+    "nombre": "MANUEL VERA PICO",
+    "plantillas": [],
+    "telefono": "0990000018",
+    "updated_at": "<hoy>",
+    "url_acta_bachiller": "https://supabase.test/storage/v1/object/public/archivos/jugadores/18/actas/<uuid>_acta.pdf",
+    "url_cedula": null,
+    "url_foto": null
+   },
+   "message": "Acta de bachiller actualizada exitosamente.",
+   "success": true
+  }
+ },
+ "POST /api/jugadores/99/foto · admin": {
+  "codigo": 404,
+  "cuerpo": {
+   "error_code": "NOT_FOUND",
+   "message": "Jugador no encontrado.",
    "success": false
   }
  },
@@ -14087,6 +15689,14 @@
    "success": false
   }
  },
+ "PUT /api/equipos/1 · admin · estado aprobado": {
+  "codigo": 500,
+  "cuerpo": {
+   "error_code": "DATABASE_ERROR",
+   "message": "Ocurrió un error de integridad de datos. Verifique que la acción no rompa relaciones existentes.",
+   "success": false
+  }
+ },
  "PUT /api/equipos/1 · anónimo · sin token": {
   "codigo": 401,
   "cuerpo": {
@@ -14165,6 +15775,14 @@
    },
    "message": "Equipo actualizado exitosamente.",
    "success": true
+  }
+ },
+ "PUT /api/equipos/1 · del1 · sin cuerpo": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "El cuerpo de la solicitud debe ser JSON válido.",
+   "success": false
   }
  },
  "PUT /api/equipos/1 · del1 · vacío": {
@@ -14251,6 +15869,14 @@
    "success": true
   }
  },
+ "PUT /api/equipos/7 · admin · inactivo": {
+  "codigo": 404,
+  "cuerpo": {
+   "error_code": "NOT_FOUND",
+   "message": "Equipo no encontrado.",
+   "success": false
+  }
+ },
  "PUT /api/equipos/7/reactivar · admin": {
   "codigo": 200,
   "cuerpo": {
@@ -14287,6 +15913,14 @@
   "cuerpo": {
    "error_code": "NOT_FOUND",
    "message": "Equipo no encontrado.",
+   "success": false
+  }
+ },
+ "PUT /api/equipos/99/reactivar · admin": {
+  "codigo": 404,
+  "cuerpo": {
+   "error_code": "NOT_FOUND",
+   "message": "Equipo no encontrado o ya activo.",
    "success": false
   }
  },
@@ -14375,6 +16009,58 @@
    "success": false
   }
  },
+ "PUT /api/jugadores/1 · admin · nombres sin apellidos": {
+  "codigo": 422,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": {
+    "_schema": [
+     "Debe enviar nombres y apellidos juntos si desea actualizar el nombre."
+    ]
+   },
+   "success": false
+  }
+ },
+ "PUT /api/jugadores/1 · admin · nombres y apellidos": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "correo": "jugador1@manta.test",
+    "created_at": "2026-10-01T12:01:00",
+    "documento_identificacion": "1310000001",
+    "estado": "activo",
+    "fecha_nacimiento": "2008-03-10",
+    "genero": "masculino",
+    "id_jugador": 1,
+    "nombre": "BRYAN ANDRÉS CHÁVEZ VÉLEZ",
+    "plantillas": [
+     {
+      "id_equipo": 1,
+      "id_plantilla": 1,
+      "id_torneo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "nombre_torneo": "INTERCOLEGIAL 2026",
+      "numero_camiseta": 4
+     },
+     {
+      "id_equipo": 1,
+      "id_plantilla": 18,
+      "id_torneo": 3,
+      "nombre_equipo": "SAN JOSÉ",
+      "nombre_torneo": "INTERCOLEGIAL 2025",
+      "numero_camiseta": 4
+     }
+    ],
+    "telefono": "0990000001",
+    "updated_at": "<hoy>",
+    "url_acta_bachiller": null,
+    "url_cedula": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/cedula.pdf",
+    "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
+   },
+   "message": "Jugador actualizado exitosamente.",
+   "success": true
+  }
+ },
  "PUT /api/jugadores/1 · admin · vacío": {
   "codigo": 422,
   "cuerpo": {
@@ -14429,6 +16115,14 @@
    },
    "message": "Jugador actualizado exitosamente.",
    "success": true
+  }
+ },
+ "PUT /api/jugadores/1 · del1 · sin cuerpo": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "El cuerpo debe ser JSON válido.",
+   "success": false
   }
  },
  "PUT /api/jugadores/1 · del2 · jugador ajeno": {
