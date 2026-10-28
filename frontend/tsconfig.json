@@ -18,7 +18,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+
+    /* Alias: los módulos se importan como @/modules/<nombre> */
+    "paths": { "@/*": ["./src/*"] }
   },
   "include": ["src", "vitest.setup.ts"]
 }

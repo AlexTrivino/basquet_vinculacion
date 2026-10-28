@@ -318,6 +318,7 @@ Durante cualquier proceso de conexión entre el Frontend (React) y el Backend (F
    - Validación rigurosa de DTOs/Schemas Marshmallow y modelos SQLAlchemy.
    - Pruebas de integridad transaccional (rollback en fallo, prevención de duplicados vía `UniqueConstraint`).
    - Pruebas de reglas de negocio (límite de 3 equipos por delegado, rango de 5-18 jugadores por plantilla, deshabilitación de equipos).
+   - Pruebas de contrato (`tests/contrato`): toda ruta nueva o cambiada necesita su caso en `casos.py`. `referencias.json` solo se regraba (`ACTUALIZAR_CONTRATO=1 pytest tests/contrato`) cuando una especificación de `specs/` aprueba el cambio de comportamiento.
 
 ---
 

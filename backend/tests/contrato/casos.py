@@ -1,0 +1,412 @@
+"""Casos de contrato: una petición por caso (método, ruta con su query, rol y cuerpo).
+
+`rol` es una clave de ROLES; sin rol, la petición va sin token. Al final se agregan solas, por cada
+ruta, una variante sin token (401 en las protegidas) y, si la ruta solo tiene casos de admin, otra
+con un delegado (403). Los ids son los de datos.py.
+"""
+import re
+
+from tests.contrato.datos import USUARIOS
+
+# 'fantasma' firma bien pero no existe en la base; 'vencido' y 'firma_mala' son tokens rotos del delegado 1
+ROLES = {**USUARIOS, 'fantasma': 'u-fantasma', 'vencido': 'u-del-1', 'firma_mala': 'u-del-1'}
+
+# Archivos falsos: Storage solo mira los primeros bytes
+PNG = b'\x89PNG\r\n\x1a\n' + bytes(24)
+JPG = b'\xff\xd8\xff\xe0' + bytes(24)
+PDF = b'%PDF-1.4\n%%EOF\n'
+XLSX = b'PK\x03\x04' + bytes(24)
+TXT = b'#!/bin/sh\necho hola\n'
+
+
+def C(metodo, ruta, rol=None, nota='', json=None, form=None, archivos=None):
+    nombre = f"{metodo} {ruta} · {rol or 'anónimo'}" + (f' · {nota}' if nota else '')
+    return {'nombre': nombre, 'metodo': metodo, 'ruta': ruta, 'rol': rol, 'json': json, 'form': form, 'archivos': archivos}
+
+
+def G(ruta, rol=None, nota=''):
+    return C('GET', ruta, rol, nota)
+
+
+JUGADOR_NUEVO = {'nombres': 'kevin andrés', 'apellidos': 'mero loor', 'genero': 'masculino', 'documento_identificacion': '1310000099',
+                 'fecha_nacimiento': '2008-04-04', 'correo': 'kevin@manta.test', 'telefono': '0990000099'}
+PARTIDO_NUEVO = {'fecha': '2026-09-19', 'hora': '18:00', 'fase': 'PRIMERA FASE', 'id_torneo': 1, 'id_categoria': 2,
+                 'id_equipo_local': 1, 'id_equipo_visitante': 5}
+ESTADISTICAS_FAE = {'id_partido': 6, 'id_equipo': 2, 'estadisticas_jugadores': [
+    {'id_jugador': 5, 'puntos': 30, 'triples': 2, 'faltas': 1, 'rebotes': 3, 'asistencias': 2, 'tiros_libres': 4},
+    {'id_jugador': 6, 'puntos': 21, 'triples': 1, 'faltas': 2, 'rebotes': 8, 'asistencias': 1, 'tapones': 1, 'sancion_tipo': 'tecnica'},
+]}
+SENIOR_FAE = {'id_jugador': 18, 'id_torneo': 2, 'id_equipo': 2, 'id_categoria': 3, 'numero_camiseta': 24}
+SEMIFINAL_2 = {'id_categoria': 1, 'partidos': [{'llave': 'SF2', 'fecha': '2026-09-12', 'hora': '20:30'}]}
+
+BASE = [
+    # ── Salud y configuración ──
+    G('/api/health'),
+    G('/api/config/reglas-negocio'),
+
+    # ── Torneos ──
+    G('/api/torneos'),
+    G('/api/torneos?anio=2025'),
+    G('/api/torneos/1'),
+    G('/api/torneos/4', nota='anulado'),
+    G('/api/torneos/99'),
+    G('/api/torneos/admin', 'admin'),
+    G('/api/torneos/disponibles-reinscripcion', 'del1'),
+    G('/api/torneos/disponibles-reinscripcion', 'admin'),
+    C('POST', '/api/torneos', 'admin', json={'nombre': 'COPA DE VERANO', 'fecha_inicio': '2026-06-01', 'fecha_fin': '2026-06-30',
+                                             'categorias': [{'nombre_categoria': 'Libre', 'genero_categoria': 'masculino', 'edad_minima': 18}]}),
+    C('POST', '/api/torneos', 'admin', 'fechas al revés', json={'nombre': 'MAL', 'fecha_inicio': '2026-06-30', 'fecha_fin': '2026-06-01'}),
+    C('POST', '/api/torneos', 'admin', 'sin cuerpo'),
+    C('PUT', '/api/torneos/2', 'admin', json={'nombre': 'NACIONAL +40'}),
+    C('PUT', '/api/torneos/2', 'admin', 'fin antes del inicio', json={'fecha_fin': '2026-01-01'}),
+    C('PUT', '/api/torneos/2', 'admin', 'vacío', json={}),
+    C('PUT', '/api/torneos/4', 'admin', json={'nombre': 'COMERCIAL'}),
+    C('DELETE', '/api/torneos/3', 'admin'),
+    C('DELETE', '/api/torneos/99', 'admin'),
+    C('PUT', '/api/torneos/2/anular', 'admin'),
+    C('PUT', '/api/torneos/4/anular', 'admin'),
+    C('POST', '/api/torneos/2/categorias', 'admin', json={'nombre_categoria': 'Libre', 'genero_categoria': 'masculino', 'edad_minima': 18}),
+    C('POST', '/api/torneos/2/categorias', 'admin', 'incompleta', json={'nombre_categoria': 'X'}),
+    C('POST', '/api/torneos/2/categorias', 'admin', 'sin cuerpo'),
+    C('POST', '/api/torneos/4/categorias', 'admin', json={'nombre_categoria': 'Libre', 'genero_categoria': 'masculino', 'edad_minima': 18}),
+    C('DELETE', '/api/torneos/categorias/6', 'admin'),
+    C('DELETE', '/api/torneos/categorias/3', 'admin', 'con inscripciones'),
+    C('DELETE', '/api/torneos/categorias/99', 'admin'),
+    C('PUT', '/api/torneos/categorias/1/formato', 'admin', json={'formato': 'dos_grupos_cruces'}),
+    C('PUT', '/api/torneos/categorias/1/formato', 'admin', 'quitar', json={'formato': None}),
+    C('PUT', '/api/torneos/categorias/1/formato', 'admin', 'desconocido', json={'formato': 'otro'}),
+    C('PUT', '/api/torneos/categorias/99/formato', 'admin', json={'formato': None}),
+    C('POST', '/api/torneos/1/calendario', 'admin', archivos={'file': (XLSX, 'calendario.xlsx')}),
+    C('POST', '/api/torneos/1/calendario', 'admin', 'texto', archivos={'file': (TXT, 'calendario.xlsx')}),
+    C('POST', '/api/torneos/1/calendario', 'admin', 'sin archivo', archivos={}),
+    C('POST', '/api/torneos/4/calendario', 'admin', archivos={'file': (XLSX, 'calendario.xlsx')}),
+    G('/api/torneos/1/posiciones'),
+    G('/api/torneos/1/posiciones?id_categoria=1'),
+    G('/api/torneos/1/posiciones?id_categoria=2'),
+    G('/api/torneos/4/posiciones'),
+    G('/api/torneos/1/lideres'),
+    G('/api/torneos/1/lideres?id_categoria=2'),
+    G('/api/torneos/99/lideres'),
+    G('/api/torneos/1/fase-final?id_categoria=1'),
+    G('/api/torneos/1/fase-final?id_categoria=2'),
+    G('/api/torneos/2/fase-final?id_categoria=3'),
+    G('/api/torneos/1/fase-final', nota='sin categoría'),
+    G('/api/torneos/1/recorrido?id_categoria=1'),
+    G('/api/torneos/1/recorrido?id_categoria=2'),
+    G('/api/torneos/1/recorrido?id_categoria=3', nota='categoría de otro torneo'),
+    C('POST', '/api/torneos/1/fase-final/partidos', 'admin', json=SEMIFINAL_2),
+    C('POST', '/api/torneos/1/fase-final/partidos', 'admin', 'llave ya creada',
+      json={'id_categoria': 1, 'partidos': [{'llave': 'SF1', 'fecha': '2026-09-12', 'hora': '19:00'}]}),
+    C('POST', '/api/torneos/1/fase-final/partidos', 'admin', 'llave en espera',
+      json={'id_categoria': 1, 'partidos': [{'llave': 'F', 'fecha': '2026-09-19', 'hora': '19:00'}]}),
+    C('POST', '/api/torneos/1/fase-final/partidos', 'admin', 'grupos sin terminar',
+      json={'id_categoria': 2, 'partidos': [{'llave': 'R', 'fecha': '2026-09-19', 'hora': '19:00'}]}),
+    C('POST', '/api/torneos/1/fase-final/partidos', 'admin', 'sin partidos', json={'id_categoria': 1, 'partidos': []}),
+    C('POST', '/api/torneos/1/fase-final/partidos', 'admin', 'sin fecha', json={'id_categoria': 1, 'partidos': [{'llave': 'SF2'}]}),
+    C('PUT', '/api/torneos/2/grupos', 'admin', json={'id_categoria': 3, 'grupos': {'3': 'A', '6': 'B'}}),
+    C('PUT', '/api/torneos/2/grupos', 'admin', 'grupo inexistente', json={'id_categoria': 3, 'grupos': {'3': 'C'}}),
+    C('PUT', '/api/torneos/2/grupos', 'admin', 'sin grupos', json={'id_categoria': 3}),
+    C('PUT', '/api/torneos/2/grupos', 'admin', 'categoría de otro torneo', json={'id_categoria': 1, 'grupos': {}}),
+
+    # ── Categorías ──
+    G('/api/categorias'),
+    G('/api/categorias?genero=femenino'),
+    G('/api/categorias?id_torneo=2'),
+    G('/api/categorias?genero=otro'),
+    G('/api/categorias/1'),
+    G('/api/categorias/99'),
+
+    # ── Equipos ──
+    G('/api/equipos'),
+    G('/api/equipos?page=2&per_page=3'),
+    G('/api/equipos/1'),
+    G('/api/equipos/7', nota='inactivo'),
+    G('/api/equipos/99'),
+    G('/api/equipos/admin/list', 'admin'),
+    G('/api/equipos/admin/list?id_torneo=1&id_categoria=2', 'admin'),
+    G('/api/equipos/admin/list?search=san&estado=activo', 'admin'),
+    C('POST', '/api/equipos', 'del3', json={'nombre_equipo': 'club náutico'}),
+    C('POST', '/api/equipos', 'del1', 'ya tiene equipo', json={'nombre_equipo': 'otro club'}),
+    C('POST', '/api/equipos', 'del3', 'nombre corto', json={'nombre_equipo': 'x'}),
+    C('PUT', '/api/equipos/1', 'del1', json={'nombre_equipo': 'san josé de manta'}),
+    C('PUT', '/api/equipos/1', 'del2', 'equipo ajeno', json={'nombre_equipo': 'robado'}),
+    C('PUT', '/api/equipos/2', 'admin', json={'estado': 'inactivo'}),
+    C('PUT', '/api/equipos/1', 'del1', 'vacío', json={}),
+    C('PUT', '/api/equipos/99', 'admin', json={'nombre_equipo': 'NADIE'}),
+    C('DELETE', '/api/equipos/2', 'del2'),
+    C('DELETE', '/api/equipos/2', 'del1', 'equipo ajeno'),
+    C('DELETE', '/api/equipos/7', 'admin', 'ya inactivo'),
+    C('PUT', '/api/equipos/7/reactivar', 'admin'),
+    C('PUT', '/api/equipos/8/reactivar', 'admin', 'dueño con equipos activos'),
+    C('PUT', '/api/equipos/1/reactivar', 'admin', 'ya activo'),
+    C('POST', '/api/equipos/1/logo', 'del1', archivos={'file': (PNG, 'logo.png')}),
+    C('POST', '/api/equipos/2/logo', 'del2', 'campo logo', archivos={'logo': (PNG, 'fae.png')}),
+    C('POST', '/api/equipos/1/logo', 'del2', 'equipo ajeno', archivos={'file': (PNG, 'logo.png')}),
+    C('POST', '/api/equipos/1/logo', 'del1', 'texto', archivos={'file': (TXT, 'logo.png')}),
+    C('POST', '/api/equipos/1/logo', 'del1', 'sin archivo', archivos={}),
+    C('DELETE', '/api/equipos/1/logo', 'del1'),
+    C('DELETE', '/api/equipos/3/logo', 'admin', 'sin logo'),
+    C('POST', '/api/equipos/1/banner', 'del1', archivos={'banner': (JPG, 'banner.jpg')}),
+    C('POST', '/api/equipos/1/banner', 'del2', 'equipo ajeno', archivos={'banner': (JPG, 'banner.jpg')}),
+    C('DELETE', '/api/equipos/1/banner', 'del1'),
+    C('DELETE', '/api/equipos/2/banner', 'del2', 'sin banner'),
+
+    # ── Inscripciones ──
+    G('/api/inscripciones/publicas'),
+    G('/api/inscripciones/publicas?id_torneo=1'),
+    G('/api/inscripciones/publicas?id_equipo=1'),
+    G('/api/inscripciones', 'admin'),
+    G('/api/inscripciones?estado=borrador', 'admin'),
+    G('/api/inscripciones?id_torneo=2', 'admin'),
+    G('/api/inscripciones?id_categoria=2&id_equipo=1', 'admin'),
+    G('/api/inscripciones', 'del1'),
+    G('/api/inscripciones', 'del3', nota='sin equipo'),
+    G('/api/inscripciones', 'inactivo'),
+    G('/api/inscripciones', 'fantasma'),
+    C('POST', '/api/inscripciones', 'del2', json={'id_torneo': 2, 'id_equipo': 2, 'id_categoria': 6}),
+    C('POST', '/api/inscripciones', 'del2', 'equipo ajeno', json={'id_torneo': 2, 'id_equipo': 3, 'id_categoria': 6}),
+    C('POST', '/api/inscripciones', 'del2', 'torneo en curso', json={'id_torneo': 1, 'id_equipo': 2, 'id_categoria': 2}),
+    C('POST', '/api/inscripciones', 'admin', 'duplicada', json={'id_torneo': 2, 'id_equipo': 2, 'id_categoria': 3}),
+    C('POST', '/api/inscripciones', 'del1', 'con borrador abierto', json={'id_torneo': 2, 'id_equipo': 1, 'id_categoria': 6}),
+    C('POST', '/api/inscripciones', 'del2', 'incompleta', json={'id_torneo': 2}),
+    C('POST', '/api/inscripciones/completa', 'del3', form={'nombre_equipo': 'club náutico', 'id_torneo': '2', 'id_categoria': '7'},
+      archivos={'archivo': (PDF, 'pago.pdf'), 'logo': (PNG, 'logo.png')}),
+    C('POST', '/api/inscripciones/completa', 'del1', 'ya tiene equipo', form={'nombre_equipo': 'otro club', 'id_torneo': '2', 'id_categoria': '7'},
+      archivos={'archivo': (PDF, 'pago.pdf')}),
+    C('POST', '/api/inscripciones/completa', 'del3', 'sin nombre', form={'id_torneo': '2', 'id_categoria': '7'}, archivos={'archivo': (PDF, 'pago.pdf')}),
+    C('POST', '/api/inscripciones/completa', 'del3', 'comprobante de texto', form={'nombre_equipo': 'club náutico', 'id_torneo': '2', 'id_categoria': '7'},
+      archivos={'archivo': (TXT, 'pago.pdf')}),
+    C('POST', '/api/inscripciones/completa', 'del3', 'logo de texto', form={'nombre_equipo': 'club náutico', 'id_torneo': '2', 'id_categoria': '7'},
+      archivos={'archivo': (PDF, 'pago.pdf'), 'logo': (TXT, 'logo.png')}),
+    C('POST', '/api/inscripciones/reinscribir', 'del2', json={'id_torneo': 2, 'id_equipo': 2, 'id_categoria': 7, 'clonar_plantilla': True}),
+    C('POST', '/api/inscripciones/reinscribir', 'del1', 'con borrador abierto', json={'id_torneo': 2, 'id_equipo': 1, 'id_categoria': 6}),
+    C('POST', '/api/inscripciones/reinscribir', 'admin', 'duplicada', json={'id_torneo': 2, 'id_equipo': 4, 'id_categoria': 3}),
+    C('POST', '/api/inscripciones/9/comprobante', 'del1', archivos={'archivo': (PDF, 'pago.pdf')}),
+    C('POST', '/api/inscripciones/9/comprobante', 'del2', 'inscripción ajena', archivos={'archivo': (PDF, 'pago.pdf')}),
+    C('POST', '/api/inscripciones/9/comprobante', 'del1', 'texto', archivos={'archivo': (TXT, 'pago.pdf')}),
+    C('POST', '/api/inscripciones/9/comprobante', 'del1', 'sin archivo', archivos={}),
+    C('POST', '/api/inscripciones/99/comprobante', 'admin', archivos={'archivo': (PDF, 'pago.pdf')}),
+    C('POST', '/api/inscripciones/9/finalizar-borrador', 'del1'),
+    C('POST', '/api/inscripciones/9/finalizar-borrador', 'admin'),
+    C('POST', '/api/inscripciones/9/finalizar-borrador', 'del2', 'inscripción ajena'),
+    C('POST', '/api/inscripciones/8/finalizar-borrador', 'admin', 'un solo jugador'),
+    C('POST', '/api/inscripciones/1/finalizar-borrador', 'admin', 'ya aprobada'),
+    C('DELETE', '/api/inscripciones/9', 'del1'),
+    C('DELETE', '/api/inscripciones/9', 'del2', 'inscripción ajena'),
+    C('DELETE', '/api/inscripciones/1', 'del1', 'no es borrador'),
+    C('DELETE', '/api/inscripciones/9', 'admin'),
+    C('PATCH', '/api/inscripciones/8/estado', 'admin', json={'estado_inscripcion': 'aprobado'}),
+    C('PATCH', '/api/inscripciones/8/estado', 'admin', 'rechazar', json={'estado_inscripcion': 'rechazado'}),
+    C('PATCH', '/api/inscripciones/8/estado', 'admin', 'estado inválido', json={'estado_inscripcion': 'cualquiera'}),
+    C('PATCH', '/api/inscripciones/99/estado', 'admin', json={'estado_inscripcion': 'aprobado'}),
+    C('PATCH', '/api/inscripciones/9/editar', 'admin', json={'id_torneo': 2, 'id_categoria': 6}),
+    C('PATCH', '/api/inscripciones/1/editar', 'admin', 'torneo en curso', json={'id_torneo': 2, 'id_categoria': 6}),
+    C('PATCH', '/api/inscripciones/8/editar', 'admin', 'destino en curso', json={'id_torneo': 1, 'id_categoria': 1}),
+    C('PATCH', '/api/inscripciones/8/editar', 'admin', 'incompleta', json={}),
+    C('PUT', '/api/inscripciones/1/retirar', 'admin'),
+    C('PUT', '/api/inscripciones/8/retirar', 'admin', 'pendiente'),
+    C('PUT', '/api/inscripciones/99/retirar', 'admin'),
+    C('POST', '/api/inscripciones/purgar-expiradas?dias=1', 'admin'),
+    C('POST', '/api/inscripciones/purgar-expiradas?dias=0', 'admin'),
+    C('POST', '/api/inscripciones/purgar-expiradas?dias=36500', 'admin'),
+
+    # ── Jugadores ──
+    G('/api/jugadores'),
+    G('/api/jugadores', 'admin'),
+    G('/api/jugadores', 'del1'),
+    G('/api/jugadores?search=mero'),
+    G('/api/jugadores?search=1310000005', 'admin', nota='por cédula'),
+    G('/api/jugadores?search=1310000005', nota='cédula sin permiso'),
+    G('/api/jugadores?id_torneo=1&id_categoria=2'),
+    G('/api/jugadores?id_equipo=2&genero=masculino'),
+    G('/api/jugadores?estado=todos&per_page=5', 'admin'),
+    G('/api/jugadores/1'),
+    G('/api/jugadores/1', 'del1', nota='su delegado'),
+    G('/api/jugadores/1', 'del2', nota='otro delegado'),
+    G('/api/jugadores/1', 'admin'),
+    G('/api/jugadores/1', 'visor'),
+    G('/api/jugadores/99'),
+    G('/api/jugadores/1/perfil'),
+    G('/api/jugadores/1/perfil', 'del1'),
+    G('/api/jugadores/1/perfil', 'admin'),
+    G('/api/jugadores/10/perfil', nota='con partido anulado'),
+    G('/api/jugadores/99/perfil'),
+    G('/api/jugadores/buscar?cedula=1310000001', 'del1'),
+    G('/api/jugadores/buscar?cedula=1310000005&id_torneo=1', 'del1'),
+    G('/api/jugadores/buscar?cedula=1310000005&id_torneo=1&id_categoria=2', 'del1'),
+    G('/api/jugadores/buscar?cedula=0000000000', 'admin'),
+    G('/api/jugadores/buscar', 'del1', nota='sin cédula'),
+    G('/api/jugadores/buscar?cedula=1310000001&id_torneo=x', 'del1'),
+    C('POST', '/api/jugadores', 'del1', json=JUGADOR_NUEVO),
+    C('POST', '/api/jugadores', 'del1', 'cédula repetida', json={**JUGADOR_NUEVO, 'documento_identificacion': '1310000001'}),
+    C('POST', '/api/jugadores', 'del1', 'incompleto', json={'nombre': 'X'}),
+    C('POST', '/api/jugadores', 'del1', 'nacimiento futuro', json={**JUGADOR_NUEVO, 'fecha_nacimiento': '2999-01-01'}),
+    C('PUT', '/api/jugadores/1', 'del1', json={'telefono': '0991112233'}),
+    C('PUT', '/api/jugadores/1', 'del2', 'jugador ajeno', json={'telefono': '0991112233'}),
+    C('PUT', '/api/jugadores/18', 'del2', 'jugador sin equipo', json={'telefono': '0991112233'}),
+    C('PUT', '/api/jugadores/1', 'admin', 'cédula repetida', json={'documento_identificacion': '1310000002'}),
+    C('PUT', '/api/jugadores/1', 'admin', 'vacío', json={}),
+    C('PUT', '/api/jugadores/99', 'admin', json={'telefono': '0991112233'}),
+    C('DELETE', '/api/jugadores/1', 'del1'),
+    C('DELETE', '/api/jugadores/1', 'del2', 'jugador ajeno'),
+    C('DELETE', '/api/jugadores/99', 'admin'),
+    C('POST', '/api/jugadores/1/foto', 'del1', archivos={'archivo': (JPG, 'foto.jpg')}),
+    C('POST', '/api/jugadores/1/foto', 'del1', 'texto', archivos={'archivo': (TXT, 'foto.jpg')}),
+    C('POST', '/api/jugadores/1/foto', 'del2', 'jugador ajeno', archivos={'archivo': (JPG, 'foto.jpg')}),
+    C('POST', '/api/jugadores/1/cedula', 'del1', archivos={'archivo': (PDF, 'cedula.pdf')}),
+    C('POST', '/api/jugadores/1/acta', 'del1', archivos={'archivo': (PDF, 'acta.pdf')}),
+    C('POST', '/api/jugadores/1/acta', 'del1', 'sin archivo', archivos={}),
+
+    # ── Plantillas ──
+    G('/api/plantillas?id_torneo=1&id_equipo=1'),
+    G('/api/plantillas?id_torneo=1&id_equipo=1', 'del1', nota='su delegado'),
+    G('/api/plantillas?id_torneo=1&id_equipo=1', 'del2', nota='otro delegado'),
+    G('/api/plantillas?id_torneo=1&id_equipo=1', 'admin'),
+    G('/api/plantillas?id_torneo=2&id_categoria=3'),
+    G('/api/plantillas/1'),
+    G('/api/plantillas/1', 'del1'),
+    G('/api/plantillas/1', 'admin'),
+    G('/api/plantillas/99'),
+    C('POST', '/api/plantillas', 'del2', json=SENIOR_FAE),
+    C('POST', '/api/plantillas', 'del1', 'equipo ajeno', json=SENIOR_FAE),
+    C('POST', '/api/plantillas', 'del2', 'menor que la categoría', json={**SENIOR_FAE, 'id_jugador': 1, 'numero_camiseta': 30}),
+    C('POST', '/api/plantillas', 'del1', 'torneo en curso', json={'id_jugador': 18, 'id_torneo': 1, 'id_equipo': 1, 'id_categoria': 1}),
+    C('POST', '/api/plantillas', 'del2', 'dorsal ocupado', json={**SENIOR_FAE, 'numero_camiseta': 23}),
+    C('POST', '/api/plantillas', 'del2', 'sin inscripción', json={**SENIOR_FAE, 'id_categoria': 6}),
+    C('POST', '/api/plantillas', 'admin', 'ya juega la categoría', json={'id_jugador': 1, 'id_torneo': 1, 'id_equipo': 2, 'id_categoria': 1, 'numero_camiseta': 30}),
+    C('PATCH', '/api/plantillas/13', 'del1', json={'numero_camiseta': 10}),
+    C('PATCH', '/api/plantillas/13', 'del1', 'dorsal ocupado', json={'numero_camiseta': 2}),
+    C('PATCH', '/api/plantillas/13', 'del1', 'vacío', json={}),
+    C('PATCH', '/api/plantillas/13', 'del2', 'equipo ajeno', json={'numero_camiseta': 10}),
+    C('PATCH', '/api/plantillas/99', 'admin', json={'numero_camiseta': 10}),
+    C('DELETE', '/api/plantillas/13', 'del1'),
+    C('DELETE', '/api/plantillas/13', 'del2', 'equipo ajeno'),
+    C('DELETE', '/api/plantillas/99', 'admin'),
+    C('DELETE', '/api/plantillas/99', 'del1'),
+
+    # ── Partidos ──
+    G('/api/partidos'),
+    G('/api/partidos?id_torneo=1&id_categoria=1'),
+    G('/api/partidos?estados=anulado,suspendido'),
+    G('/api/partidos?pendientes_stats=true'),
+    G('/api/partidos?search=fae&sort_order=desc'),
+    G('/api/partidos?id_equipo=5&per_page=2&page=2'),
+    G('/api/partidos/1'),
+    G('/api/partidos/99'),
+    G('/api/partidos/1/estadisticas'),
+    G('/api/partidos/3/estadisticas', nota='con sanción activa'),
+    G('/api/partidos/99/estadisticas'),
+    C('POST', '/api/partidos', 'admin', json=PARTIDO_NUEVO),
+    C('POST', '/api/partidos', 'admin', 'mismo equipo', json={**PARTIDO_NUEVO, 'id_equipo_visitante': 1}),
+    C('POST', '/api/partidos', 'admin', 'equipo no inscrito', json={**PARTIDO_NUEVO, 'id_equipo_visitante': 2}),
+    C('POST', '/api/partidos', 'admin', 'incompleto', json={}),
+    C('PUT', '/api/partidos/7', 'admin', json={'fecha': '2026-09-13', 'hora': '20:00'}),
+    C('PUT', '/api/partidos/10', 'admin', 'finalizar', json={'estado': 'finalizado', 'marcador_local': 50, 'marcador_visitante': 45}),
+    C('PUT', '/api/partidos/10', 'admin', 'empate', json={'estado': 'finalizado', 'marcador_local': 50, 'marcador_visitante': 50}),
+    C('PUT', '/api/partidos/1', 'admin', 'cambiar equipo de un jugado', json={'id_equipo_local': 3}),
+    C('PUT', '/api/partidos/7', 'admin', 'vacío', json={}),
+    C('PUT', '/api/partidos/99', 'admin', json={'fase': 'X'}),
+    C('DELETE', '/api/partidos/10', 'admin'),
+    C('DELETE', '/api/partidos/99', 'admin'),
+    C('POST', '/api/partidos/12/restaurar', 'admin'),
+    C('POST', '/api/partidos/99/restaurar', 'admin'),
+    C('POST', '/api/partidos/2/acta', 'admin', archivos={'acta': (PDF, 'acta.pdf')}),
+    C('POST', '/api/partidos/1/acta', 'admin', 'reemplazar', archivos={'acta': (PDF, 'acta.pdf')}),
+    C('POST', '/api/partidos/2/acta', 'admin', 'texto', archivos={'acta': (TXT, 'acta.pdf')}),
+    C('POST', '/api/partidos/2/acta', 'admin', 'sin archivo', archivos={}),
+    C('POST', '/api/partidos/99/acta', 'admin', archivos={'acta': (PDF, 'acta.pdf')}),
+    C('DELETE', '/api/partidos/1/acta', 'admin'),
+    C('DELETE', '/api/partidos/2/acta', 'admin', 'sin acta'),
+    G('/api/reportes/partido/1/planilla', 'admin'),
+    G('/api/reportes/partido/4/planilla', 'del1', nota='W.O.'),
+    G('/api/reportes/partido/7/planilla', 'del1', nota='programado'),
+    G('/api/reportes/partido/99/planilla', 'admin'),
+
+    # ── Estadísticas ──
+    G('/api/estadisticas/publicas'),
+    G('/api/estadisticas/dashboard', 'admin'),
+    G('/api/estadisticas/dashboard/actividad-reciente', 'admin'),
+    G('/api/estadisticas/flyers?id_torneo=1', 'admin'),
+    G('/api/estadisticas/flyers?id_torneo=1&fecha=2026-08-08', 'admin'),
+    G('/api/estadisticas/flyers?id_torneo=1&fecha=2026-08-23', 'admin', nota='fecha con partido anulado'),
+    G('/api/estadisticas/flyers', 'admin', nota='sin torneo'),
+    G('/api/estadisticas/flyers?id_torneo=99', 'admin'),
+    G('/api/estadisticas/flyers?id_torneo=1&fecha=ayer', 'admin'),
+    C('POST', '/api/estadisticas/bulk', 'admin', json=ESTADISTICAS_FAE),
+    C('POST', '/api/estadisticas/bulk', 'del2', json=ESTADISTICAS_FAE),
+    C('POST', '/api/estadisticas/bulk', 'admin', 'reemplaza las cargadas', json={'id_partido': 1, 'id_equipo': 1, 'estadisticas_jugadores': [
+        {'id_jugador': 1, 'puntos': 40}, {'id_jugador': 2, 'puntos': 20}]}),
+    C('POST', '/api/estadisticas/bulk', 'admin', 'suma distinta al marcador', json={**ESTADISTICAS_FAE, 'estadisticas_jugadores': [
+        {'id_jugador': 5, 'puntos': 30}, {'id_jugador': 6, 'puntos': 20}]}),
+    C('POST', '/api/estadisticas/bulk', 'admin', 'jugador rival', json={**ESTADISTICAS_FAE, 'estadisticas_jugadores': [
+        {'id_jugador': 5, 'puntos': 30}, {'id_jugador': 7, 'puntos': 21}]}),
+    C('POST', '/api/estadisticas/bulk', 'admin', 'partido programado', json={**ESTADISTICAS_FAE, 'id_partido': 7, 'id_equipo': 1}),
+    C('POST', '/api/estadisticas/bulk', 'admin', 'faltas de más', json={**ESTADISTICAS_FAE, 'estadisticas_jugadores': [
+        {'id_jugador': 5, 'puntos': 51, 'faltas': 7}]}),
+
+    # ── Sanciones ──
+    G('/api/sanciones/'),
+    G('/api/sanciones/?estado=activa'),
+    G('/api/sanciones/?id_jugador=6'),
+    # En SQLite responde 500: el servicio pasa la fecha como texto a una columna Date. En Postgres funciona.
+    C('POST', '/api/sanciones/', 'admin', json={'motivo': 'Técnica', 'fecha': '2026-08-22', 'id_jugador': 6, 'id_partido': 6}),
+    C('PUT', '/api/sanciones/1', 'admin', json={'estado': 'cumplida'}),
+    C('PUT', '/api/sanciones/99', 'admin', json={'estado': 'cumplida'}),
+
+    # ── Patrocinadores ──
+    G('/api/patrocinadores'),
+    C('POST', '/api/patrocinadores', 'admin', form={'nombre_patrocinador': 'PANADERÍA LA MANTEÑA', 'url_imagen_promocional': 'https://promo.test/pan.jpg'},
+      archivos={'logo': (PNG, 'pan.png')}),
+    C('POST', '/api/patrocinadores', 'admin', 'sin logo', form={'nombre_patrocinador': 'PANADERÍA LA MANTEÑA'}, archivos={}),
+    C('POST', '/api/patrocinadores', 'admin', 'sin nombre', form={}, archivos={'logo': (PNG, 'pan.png')}),
+    C('POST', '/api/patrocinadores', 'admin', 'logo de texto', form={'nombre_patrocinador': 'PANADERÍA LA MANTEÑA'}, archivos={'logo': (TXT, 'pan.png')}),
+    C('PUT', '/api/patrocinadores/1', 'admin', form={'nombre_patrocinador': 'FERRETERÍA MANTA S.A.'}, archivos={'logo': (PNG, 'ferreteria.png')}),
+    C('PUT', '/api/patrocinadores/2', 'admin', 'sin logo', form={'nombre_patrocinador': 'CLÍNICA DEL PACÍFICO'}, archivos={}),
+    C('PUT', '/api/patrocinadores/2', 'admin', 'sin nombre', form={}, archivos={}),
+    C('PUT', '/api/patrocinadores/99', 'admin', form={'nombre_patrocinador': 'NADIE'}, archivos={}),
+    C('DELETE', '/api/patrocinadores/1', 'admin', 'auspicia un torneo'),
+    C('DELETE', '/api/patrocinadores/2', 'admin'),
+    C('DELETE', '/api/patrocinadores/99', 'admin'),
+
+    # ── Usuarios y autenticación ──
+    G('/api/usuarios/me', 'del1'),
+    G('/api/usuarios/me', 'inactivo'),
+    G('/api/usuarios/me', 'fantasma'),
+    G('/api/usuarios/me', 'vencido'),
+    G('/api/usuarios/me', 'firma_mala'),
+    C('PUT', '/api/usuarios/me', 'del1', json={'nombre': 'Delegado de San José'}),
+    C('PUT', '/api/usuarios/me', 'del1', 'sin nombre', json={}),
+
+    # ── Visor ──
+    G('/api/visor/jugadores', 'visor'),
+    G('/api/visor/jugadores?q=mero&orden=puntos', 'visor'),
+    G('/api/visor/jugadores?genero=femenino&edad_min=30&edad_max=60', 'visor'),
+    G('/api/visor/jugadores?id_torneo=1&id_categoria=1&orden=promedio', 'visor'),
+    G('/api/visor/jugadores?id_equipo=1&page=2&per_page=2', 'visor'),
+    G('/api/visor/jugadores', 'admin'),
+    G('/api/visor/jugadores', 'del1'),
+    G('/api/visor/jugadores/1/partidos', 'visor'),
+    G('/api/visor/jugadores/10/partidos', 'visor', nota='con partido anulado'),
+    G('/api/visor/jugadores/99/partidos', 'visor'),
+    G('/api/visor/jugadores/1/partidos', 'del1'),
+]
+
+
+def _con_variantes(base):
+    """Agrega, por ruta y método, la variante sin token y la de delegado donde falten."""
+    grupos = {}
+    for caso in base:
+        patron = re.sub(r'/\d+', '/<id>', caso['ruta'].split('?')[0])
+        grupos.setdefault((caso['metodo'], patron), []).append(caso)
+    extra = []
+    for casos in grupos.values():
+        primero = casos[0]
+        if all(c['rol'] for c in casos):
+            extra.append({**primero, 'rol': None, 'nombre': C(primero['metodo'], primero['ruta'], None, 'sin token')['nombre']})
+        if all(c['rol'] == 'admin' for c in casos):
+            extra.append({**primero, 'rol': 'del1', 'nombre': C(primero['metodo'], primero['ruta'], 'del1', 'sin permiso')['nombre']})
+    return base + extra
+
+
+CASOS = _con_variantes(BASE)
+assert len({c['nombre'] for c in CASOS}) == len(CASOS), 'Hay casos con el mismo nombre'

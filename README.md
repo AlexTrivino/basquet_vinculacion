@@ -173,14 +173,19 @@ npm run dev
 El proyecto cuenta con suites de pruebas unitarias y de integración tanto en Backend como en Frontend:
 
 ```bash
-# Ejecutar tests del Backend (24 tests de schemas, endpoints, filtros y storage)
+# Backend: pruebas unitarias, de contrato (las 86 rutas de /api) y de capas
 cd backend
 pytest
 
-# Ejecutar tests del Frontend con Vitest (21 tests de componentes, modales y auth)
+# Regrabar las referencias de contrato (solo con un cambio de comportamiento aprobado en specs/)
+ACTUALIZAR_CONTRATO=1 pytest tests/contrato
+
+# Frontend: tipos, componentes y fronteras entre módulos
 cd frontend
-npm test -- --run
+npm test
 ```
+
+La migración de arquitectura se hace por fases con Spec-Driven Development: ver [specs/](specs/README.md).
 
 ---
 
