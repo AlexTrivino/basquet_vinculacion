@@ -335,6 +335,13 @@
    "success": false
   }
  },
+ "DELETE /api/torneos/4 · admin · anulado": {
+  "codigo": 200,
+  "cuerpo": {
+   "message": "Torneo eliminado exitosamente.",
+   "success": true
+  }
+ },
  "DELETE /api/torneos/99 · admin": {
   "codigo": 404,
   "cuerpo": {
@@ -490,6 +497,30 @@
      "genero_categoria": "femenino",
      "id_categoria": 2,
      "nombre_categoria": "Cadetes +30"
+    }
+   ],
+   "success": true
+  }
+ },
+ "GET /api/categorias?genero=masculino&id_torneo=2 · anónimo": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": [
+    {
+     "edad_maxima": null,
+     "edad_minima": 40,
+     "formato": "dos_grupos_cruces",
+     "genero_categoria": "masculino",
+     "id_categoria": 3,
+     "nombre_categoria": "Senior +40"
+    },
+    {
+     "edad_maxima": null,
+     "edad_minima": 50,
+     "formato": null,
+     "genero_categoria": "masculino",
+     "id_categoria": 6,
+     "nombre_categoria": "Senior +50"
     }
    ],
    "success": true
@@ -9834,6 +9865,30 @@
    "success": true
   }
  },
+ "GET /api/torneos/3 · anónimo · finalizado": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "categorias": [
+     {
+      "edad_maxima": null,
+      "edad_minima": 0,
+      "formato": null,
+      "genero_categoria": "masculino",
+      "id_categoria": 4,
+      "nombre_categoria": "Juvenil"
+     }
+    ],
+    "estado": "finalizado",
+    "fecha_fin": "2025-11-30",
+    "fecha_inicio": "2025-09-01",
+    "id_torneo": 3,
+    "nombre": "INTERCOLEGIAL 2025",
+    "url_calendario_excel": null
+   },
+   "success": true
+  }
+ },
  "GET /api/torneos/4 · anónimo · anulado": {
   "codigo": 404,
   "cuerpo": {
@@ -10000,6 +10055,40 @@
    "success": false
   }
  },
+ "GET /api/torneos/admin?per_page=3&page=2 · admin": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": [
+    {
+     "categorias": [
+      {
+       "edad_maxima": null,
+       "edad_minima": 0,
+       "formato": null,
+       "genero_categoria": "masculino",
+       "id_categoria": 4,
+       "nombre_categoria": "Juvenil"
+      }
+     ],
+     "created_at": "2026-10-01T12:03:00",
+     "estado": "finalizado",
+     "fecha_fin": "2025-11-30",
+     "fecha_inicio": "2025-09-01",
+     "id_torneo": 3,
+     "nombre": "INTERCOLEGIAL 2025",
+     "updated_at": "2026-10-01T12:03:00",
+     "url_calendario_excel": null
+    }
+   ],
+   "pagination": {
+    "page": 2,
+    "pages": 2,
+    "per_page": 3,
+    "total": 4
+   },
+   "success": true
+  }
+ },
  "GET /api/torneos/disponibles-reinscripcion · admin": {
   "codigo": 403,
   "cuerpo": {
@@ -10086,6 +10175,138 @@
     "pages": 1,
     "per_page": 20,
     "total": 1
+   },
+   "success": true
+  }
+ },
+ "GET /api/torneos?anio=abc · anónimo · año que no es número": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": [
+    {
+     "categorias": [
+      {
+       "edad_maxima": null,
+       "edad_minima": 40,
+       "formato": "dos_grupos_cruces",
+       "genero_categoria": "masculino",
+       "id_categoria": 3,
+       "nombre_categoria": "Senior +40"
+      },
+      {
+       "edad_maxima": null,
+       "edad_minima": 50,
+       "formato": null,
+       "genero_categoria": "masculino",
+       "id_categoria": 6,
+       "nombre_categoria": "Senior +50"
+      },
+      {
+       "edad_maxima": null,
+       "edad_minima": 18,
+       "formato": null,
+       "genero_categoria": "femenino",
+       "id_categoria": 7,
+       "nombre_categoria": "Libre"
+      }
+     ],
+     "estado": "programado",
+     "fecha_fin": "2026-10-27",
+     "fecha_inicio": "2026-10-10",
+     "id_torneo": 2,
+     "nombre": "NACIONAL +40 2026",
+     "url_calendario_excel": null
+    },
+    {
+     "categorias": [
+      {
+       "edad_maxima": null,
+       "edad_minima": 0,
+       "formato": "un_grupo_semis",
+       "genero_categoria": "masculino",
+       "id_categoria": 1,
+       "nombre_categoria": "Juvenil"
+      },
+      {
+       "edad_maxima": null,
+       "edad_minima": 30,
+       "formato": "tres_final_directa",
+       "genero_categoria": "femenino",
+       "id_categoria": 2,
+       "nombre_categoria": "Cadetes +30"
+      }
+     ],
+     "estado": "en_curso",
+     "fecha_fin": "2026-10-20",
+     "fecha_inicio": "2026-08-01",
+     "id_torneo": 1,
+     "nombre": "INTERCOLEGIAL 2026",
+     "url_calendario_excel": "https://supabase.test/storage/v1/object/public/archivos/torneos/1/calendario.xlsx"
+    },
+    {
+     "categorias": [
+      {
+       "edad_maxima": null,
+       "edad_minima": 0,
+       "formato": null,
+       "genero_categoria": "masculino",
+       "id_categoria": 4,
+       "nombre_categoria": "Juvenil"
+      }
+     ],
+     "estado": "finalizado",
+     "fecha_fin": "2025-11-30",
+     "fecha_inicio": "2025-09-01",
+     "id_torneo": 3,
+     "nombre": "INTERCOLEGIAL 2025",
+     "url_calendario_excel": null
+    }
+   ],
+   "pagination": {
+    "page": 1,
+    "pages": 1,
+    "per_page": 20,
+    "total": 3
+   },
+   "success": true
+  }
+ },
+ "GET /api/torneos?per_page=1&page=2 · anónimo": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": [
+    {
+     "categorias": [
+      {
+       "edad_maxima": null,
+       "edad_minima": 0,
+       "formato": "un_grupo_semis",
+       "genero_categoria": "masculino",
+       "id_categoria": 1,
+       "nombre_categoria": "Juvenil"
+      },
+      {
+       "edad_maxima": null,
+       "edad_minima": 30,
+       "formato": "tres_final_directa",
+       "genero_categoria": "femenino",
+       "id_categoria": 2,
+       "nombre_categoria": "Cadetes +30"
+      }
+     ],
+     "estado": "en_curso",
+     "fecha_fin": "2026-10-20",
+     "fecha_inicio": "2026-08-01",
+     "id_torneo": 1,
+     "nombre": "INTERCOLEGIAL 2026",
+     "url_calendario_excel": "https://supabase.test/storage/v1/object/public/archivos/torneos/1/calendario.xlsx"
+    }
+   ],
+   "pagination": {
+    "page": 2,
+    "pages": 3,
+    "per_page": 1,
+    "total": 3
    },
    "success": true
   }
@@ -13481,6 +13702,26 @@
    "torneos": 1
   }
  },
+ "POST /api/torneos · admin · categoría incompleta": {
+  "codigo": 422,
+  "cuerpo": {
+   "data": {
+    "categorias": {
+     "0": {
+      "edad_minima": [
+       "Missing data for required field."
+      ],
+      "genero_categoria": [
+       "Missing data for required field."
+      ]
+     }
+    }
+   },
+   "error_code": "VALIDATION_ERROR",
+   "message": "Datos de torneo inválidos",
+   "success": false
+  }
+ },
  "POST /api/torneos · admin · fechas al revés": {
   "codigo": 422,
   "cuerpo": {
@@ -13491,6 +13732,14 @@
    },
    "error_code": "VALIDATION_ERROR",
    "message": "Datos de torneo inválidos",
+   "success": false
+  }
+ },
+ "POST /api/torneos · admin · género inválido": {
+  "codigo": 500,
+  "cuerpo": {
+   "error_code": "DATABASE_ERROR",
+   "message": "Ocurrió un error de integridad de datos. Verifique que la acción no rompa relaciones existentes.",
    "success": false
   }
  },
@@ -13536,6 +13785,14 @@
   "cuerpo": {
    "error_code": "BAD_REQUEST",
    "message": "No se proporcionó ningún archivo.",
+   "success": false
+  }
+ },
+ "POST /api/torneos/1/calendario · admin · sin nombre": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "El archivo no tiene nombre.",
    "success": false
   }
  },
@@ -13745,6 +14002,27 @@
    "categorias": 1
   }
  },
+ "POST /api/torneos/2/categorias · admin · campo desconocido": {
+  "codigo": 422,
+  "cuerpo": {
+   "data": {
+    "formato": [
+     "Unknown field."
+    ]
+   },
+   "error_code": "VALIDATION_ERROR",
+   "message": "Datos inválidos",
+   "success": false
+  }
+ },
+ "POST /api/torneos/2/categorias · admin · género inválido": {
+  "codigo": 500,
+  "cuerpo": {
+   "error_code": "DATABASE_ERROR",
+   "message": "Ocurrió un error de integridad de datos. Verifique que la acción no rompa relaciones existentes.",
+   "success": false
+  }
+ },
  "POST /api/torneos/2/categorias · admin · incompleta": {
   "codigo": 422,
   "cuerpo": {
@@ -13758,6 +14036,14 @@
    },
    "error_code": "VALIDATION_ERROR",
    "message": "Datos inválidos",
+   "success": false
+  }
+ },
+ "POST /api/torneos/2/categorias · admin · objeto vacío": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "El cuerpo debe ser JSON válido.",
    "success": false
   }
  },
@@ -14596,11 +14882,74 @@
    "success": true
   }
  },
+ "PUT /api/torneos/2 · admin · anular por estado": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "categorias": [
+     {
+      "edad_maxima": null,
+      "edad_minima": 40,
+      "formato": "dos_grupos_cruces",
+      "genero_categoria": "masculino",
+      "id_categoria": 3,
+      "nombre_categoria": "Senior +40"
+     },
+     {
+      "edad_maxima": null,
+      "edad_minima": 50,
+      "formato": null,
+      "genero_categoria": "masculino",
+      "id_categoria": 6,
+      "nombre_categoria": "Senior +50"
+     },
+     {
+      "edad_maxima": null,
+      "edad_minima": 18,
+      "formato": null,
+      "genero_categoria": "femenino",
+      "id_categoria": 7,
+      "nombre_categoria": "Libre"
+     }
+    ],
+    "created_at": "2026-10-01T12:02:00",
+    "estado": "anulado",
+    "fecha_fin": "2026-10-27",
+    "fecha_inicio": "2026-10-10",
+    "id_torneo": 2,
+    "nombre": "NACIONAL +40 2026",
+    "updated_at": "<hoy>",
+    "url_calendario_excel": null
+   },
+   "message": "Torneo actualizado exitosamente.",
+   "success": true
+  }
+ },
+ "PUT /api/torneos/2 · admin · estado inválido": {
+  "codigo": 422,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": {
+    "estado": [
+     "Estado inválido. Valores permitidos: programado, en_curso, finalizado, anulado."
+    ]
+   },
+   "success": false
+  }
+ },
  "PUT /api/torneos/2 · admin · fin antes del inicio": {
   "codigo": 422,
   "cuerpo": {
    "error_code": "VALIDATION_ERROR",
    "message": "La fecha de fin debe ser igual o posterior a la fecha de inicio.",
+   "success": false
+  }
+ },
+ "PUT /api/torneos/2 · admin · sin cuerpo": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "El cuerpo de la solicitud debe ser JSON válido.",
    "success": false
   }
  },

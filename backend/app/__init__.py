@@ -47,8 +47,9 @@ def create_app() -> Flask:
 
     # ── Blueprints ─────────────────────────────────────────────────
     from app.routes.health_bp import health_bp
-    from app.routes.torneo_bp import torneo_bp
-    from app.routes.categoria_bp import categoria_bp
+    from app.modules.torneos.http.torneos import torneo_bp
+    from app.modules.torneos.http.categorias import categoria_bp
+    from app.routes.lideres_bp import lideres_bp
     from app.routes.equipo_bp import equipo_bp
     from app.routes.inscripcion_bp import inscripcion_bp
     from app.routes.jugador_bp import jugador_bp
@@ -66,6 +67,7 @@ def create_app() -> Flask:
     app.register_blueprint(health_bp)
     app.register_blueprint(config_bp)
     app.register_blueprint(torneo_bp)
+    app.register_blueprint(lideres_bp)
     app.register_blueprint(competencia_bp)
     app.register_blueprint(categoria_bp)
     app.register_blueprint(equipo_bp)

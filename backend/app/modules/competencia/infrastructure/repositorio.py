@@ -10,7 +10,7 @@ from app.modules.competencia.domain.llaves import Categoria
 from app.modules.competencia.domain.partido import ESTADISTICAS, CategoriaEnPartido, EquipoEnPartido, Partido, TorneoEnPartido
 from app.modules.competencia.domain.posiciones import ESTADOS_FINALES
 from app.modules.competencia.domain.sancion import JugadorEnSancion, PartidoEnSancion, Sancion
-from app.services import torneo_service  # ponytail: pasa a la application del módulo de torneos en la fase 4
+from app.modules.torneos.application import casos_de_uso as torneos
 from app.shared.domain.errores import Conflicto
 from app.shared.infrastructure.db import db
 from app.shared.infrastructure.modelos.categoria import Categoria as FilaCategoria
@@ -185,9 +185,9 @@ class RepositorioPartidos:
         return {s.id_jugador for s in FilaSancion.query.filter_by(id_partido=id_partido, estado='activa').all()}
 
     def nombre_del_torneo(self, id_torneo):
-        """Nombre del torneo, o None si no existe o está inactivo o anulado."""
-        torneo = torneo_service.obtener_torneo_por_id(id_torneo)
-        return torneo.nombre if torneo else None
+        """Nombre del torneo, o None si no existe o no está vigente (la regla es del módulo de torneos)."""
+        fila = db.session.get(Torneo, id_torneo)
+        return fila.nombre if fila and torneos.vigente(fila.estado) else None
 
     def categoria(self, id_categoria):
         fila = db.session.get(FilaCategoria, id_categoria)

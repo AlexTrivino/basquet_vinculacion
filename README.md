@@ -62,7 +62,8 @@ basquet_vinculacion/
 │   │   │   └── http/                 # Respuestas API, paginador, autenticación JWT y errores a HTTP
 │   │   ├── modules/                  # Módulos migrados, cada uno con domain/, application/, infrastructure/ y http/
 │   │   │   ├── auspicios/            # Patrocinadores (/api/patrocinadores): el molde de los demás
-│   │   │   └── competencia/          # Partidos, sanciones, tabla de posiciones FIBA y fase final (llaves y recorrido)
+│   │   │   ├── competencia/          # Partidos, sanciones, tabla de posiciones FIBA y fase final (llaves y recorrido)
+│   │   │   └── torneos/              # Torneos y categorías: estados, fechas y calendario
 │   │   ├── models/                   # Ruta vieja: reexporta shared/infrastructure/modelos
 │   │   ├── routes/                   # Controladores Blueprints (auth, torneos, inscripciones, etc.)
 │   │   ├── schemas/                  # Validación y serialización con Marshmallow 3

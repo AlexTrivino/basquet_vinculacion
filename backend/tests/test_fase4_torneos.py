@@ -7,9 +7,11 @@ from marshmallow import ValidationError
 from app import create_app, db
 from app.models.torneo import Torneo
 from app.models.categoria import Categoria
-from app.services.torneo_service import anular_torneo, obtener_torneo_por_id
-from app.services.categoria_service import agregar_categoria, eliminar_categoria
-from app.schemas.torneo_schema import TorneoUpdateSchema
+from app.modules.torneos.application import casos_de_uso as torneos
+from app.modules.torneos.http.esquemas import TorneoUpdateSchema
+from app.modules.torneos.infrastructure.repositorio import RepositorioTorneos
+from app.shared.domain.errores import NoEncontrado
+from app.shared.infrastructure.unidad_de_trabajo import UnidadDeTrabajo
 
 class TestFase4TorneosBusiness(unittest.TestCase):
     @classmethod
@@ -52,22 +54,19 @@ class TestFase4TorneosBusiness(unittest.TestCase):
             schema.load({'estado': 'inventado'})
 
     def test_anular_torneo_service(self):
-        # Service normal
-        torneo_mod = anular_torneo(self.t_id)
-        self.assertIsNotNone(torneo_mod)
-        self.assertEqual(torneo_mod.estado, 'anulado')
+        repositorio = RepositorioTorneos()
+        torneos.anular(self.t_id, repositorio=repositorio, unidad=UnidadDeTrabajo())
 
         # Verificar DB
         t_db = db.session.get(Torneo, self.t_id)
         self.assertEqual(t_db.estado, 'anulado')
 
-        # Obtener public no debe traer anulados
-        t_pub = obtener_torneo_por_id(self.t_id, incluir_inactivos=False)
-        self.assertIsNone(t_pub)
+        # La vista pública no trae anulados
+        with self.assertRaises(NoEncontrado):
+            torneos.obtener(self.t_id, repositorio)
 
-        # Obtener admin debe traer anulados
-        t_adm = obtener_torneo_por_id(self.t_id, incluir_inactivos=True)
-        self.assertIsNotNone(t_adm)
+        # El repositorio (lo que usa la administración) sí
+        self.assertEqual(repositorio.obtener(self.t_id).estado, 'anulado')
 
     def test_crud_categorias_service(self):
         cat_data = {
@@ -75,10 +74,10 @@ class TestFase4TorneosBusiness(unittest.TestCase):
             "genero_categoria": "masculino",
             "edad_minima": 15,
             "edad_maxima": 20,
-            "id_torneo": self.t_id
         }
+        piezas = {'repositorio': RepositorioTorneos(), 'unidad': UnidadDeTrabajo()}
         # Agregar
-        nueva_cat = agregar_categoria(cat_data)
+        nueva_cat = torneos.agregar_categoria(self.t_id, cat_data, **piezas)
         self.assertIsNotNone(nueva_cat)
         self.assertEqual(nueva_cat.nombre_categoria, "Sub-20")
         c_id = nueva_cat.id_categoria
@@ -88,8 +87,7 @@ class TestFase4TorneosBusiness(unittest.TestCase):
         self.assertEqual(cat_db.id_torneo, self.t_id)
 
         # Eliminar
-        res = eliminar_categoria(c_id)
-        self.assertTrue(res)
+        torneos.eliminar_categoria(c_id, **piezas)
 
         cat_deleted = db.session.get(Categoria, c_id)
         self.assertIsNone(cat_deleted)

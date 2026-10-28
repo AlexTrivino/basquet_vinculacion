@@ -138,8 +138,8 @@ Para la referencia completa de endpoints, consultar [`docs/api_referencia.md`](d
 
 | Entidad | Modelo | Schema | Servicio | Ruta |
 |---------|--------|--------|----------|------|
-| Torneos | `torneo.py` | `torneo_schema.py` | `torneo_service.py` | `torneo_bp.py` |
-| Categorías | `categoria.py` | `categoria_schema.py` | `categoria_service.py` | `categoria_bp.py` |
+| Torneos | `torneo.py` | `modules/torneos/http/esquemas.py` | `modules/torneos/application/casos_de_uso.py` | `modules/torneos/http/torneos.py` |
+| Categorías | `categoria.py` | `modules/torneos/http/esquemas.py` | `modules/torneos/application/casos_de_uso.py` | `modules/torneos/http/categorias.py` |
 | Equipos | `equipo.py` | `equipo_schema.py` | `equipo_service.py` | `equipo_bp.py` |
 | Inscripciones | `inscripcion.py` | `inscripcion_schema.py` | `inscripcion_service.py` | `inscripcion_bp.py` |
 | Jugadores | `jugador.py` | `jugador_schema.py` | `jugador_service.py` | `jugador_bp.py` |

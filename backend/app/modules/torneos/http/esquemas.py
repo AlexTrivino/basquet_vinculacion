@@ -1,14 +1,39 @@
 """
-Schemas de Marshmallow para la entidad Torneo (Patrón DTO — Decisión #13).
+Esquemas marshmallow de torneos y categorías, movidos tal cual de app/schemas/torneo_schema.py
+y app/schemas/categoria_schema.py.
 
-Define schemas diferenciados según el consumidor:
+Torneos:
     - ``TorneoCreateSchema``: Validación de entrada (POST).
     - ``TorneoUpdateSchema``: Validación de actualización parcial (PUT).
     - ``TorneoPublicSchema``: Serialización para vistas públicas.
     - ``TorneoAdminSchema``: Serialización para el panel de administración.
+Categorías: ``CategoriaPublicSchema`` (lectura) y ``CategoriaCreateSchema`` (alta, sola o dentro del torneo).
 """
 from marshmallow import Schema, fields, validate, validates_schema, ValidationError, EXCLUDE
-from app.schemas.categoria_schema import CategoriaCreateSchema, CategoriaPublicSchema
+
+
+class CategoriaPublicSchema(Schema):
+    """Serialización para la selección de categoría en formularios.
+
+    Expone todos los campos relevantes para que el frontend
+    pueda poblar selects y aplicar validaciones de edad en cliente.
+    """
+
+    id_categoria = fields.Integer(dump_only=True)
+    nombre_categoria = fields.String()
+    genero_categoria = fields.String()
+    edad_minima = fields.Integer()
+    edad_maxima = fields.Integer(allow_none=True)
+    formato = fields.String(allow_none=True)
+
+
+class CategoriaCreateSchema(Schema):
+    """Esquema de creación anidada de categoría."""
+    nombre_categoria = fields.String(required=True)
+    genero_categoria = fields.String(required=True)
+    edad_minima = fields.Integer(required=True)
+    edad_maxima = fields.Integer(allow_none=True)
+
 
 # ── Schemas de entrada (carga / validación) ───────────────────────
 

@@ -15,5 +15,6 @@ Los cambios de arquitectura se hacen con Spec-Driven Development: primero la esp
 | 1 · Backend: shared | [01-shared-backend](01-shared-backend/spec.md) | terminada |
 | 2 · Backend: auspicios (piloto) | [02-auspicios](02-auspicios/spec.md) | terminada |
 | 3 · Backend: competencia | [03-competencia](03-competencia/spec.md) | terminada |
-| 4 a 8 · Backend por módulos | se crean al empezar cada fase | pendiente |
+| 4 · Backend: torneos | [04-torneos](04-torneos/spec.md) | terminada |
+| 5 a 8 · Backend por módulos | se crean al empezar cada fase | pendiente |
 | 9 y 10 · Frontend por módulos | se crean al empezar cada fase | pendiente |
