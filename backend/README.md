@@ -119,10 +119,10 @@ backend/
 ├── migrations/               # Migraciones Alembic
 └── app/
     ├── __init__.py            # Fábrica Flask (create_app)
-    ├── models/                # 14 modelos SQLAlchemy
-    ├── schemas/               # DTOs Marshmallow (Create, Update, Public, Admin)
-    ├── services/              # Lógica de negocio (SRP)
-    ├── routes/                # Blueprints (rutas delgadas)
+    ├── shared/                # Lo común: errores de dominio, los 14 modelos, db, storage y utilidades HTTP
+    ├── modules/               # Módulos con domain/, application/, infrastructure/ y http/
+    ├── models/                # Ruta vieja: reexporta shared/infrastructure/modelos
+    ├── routes/                # Blueprints que faltan migrar (salud, configuración y usuarios)
     └── utils/                 # Middleware, helpers, storage
 ```
 
@@ -145,9 +145,9 @@ Para la referencia completa de endpoints, consultar [`docs/api_referencia.md`](d
 | Jugadores | `jugador.py` | `modules/plantel/http/esquemas.py` | `modules/plantel/application/jugadores.py` | `modules/plantel/http/jugadores.py` y `visor.py` |
 | Plantillas | `plantilla.py` | `modules/inscripciones/http/esquemas.py` | `modules/inscripciones/application/plantillas.py` | `modules/inscripciones/http/plantillas.py` |
 | Partidos | `partido.py` | `modules/competencia/http/esquemas.py` | `modules/competencia/application/partidos.py` | `modules/competencia/http/partidos.py` |
-| Estadísticas | `estadistica.py` | `stats_schema.py` | `stats_service.py` | `stats_bp.py` |
+| Estadísticas | `estadistica.py` | `modules/estadisticas/http/esquemas.py` | `modules/estadisticas/application/estadisticas.py` | `modules/estadisticas/http/estadisticas.py` y `lideres.py` |
 | Sanciones | `sancion.py` | `modules/competencia/http/esquemas.py` | `modules/competencia/application/sanciones.py` | `modules/competencia/http/sanciones.py` |
-| Reportes | — | — | `reportes_service.py` | `reportes_bp.py` |
+| Reportes | — | — | `modules/estadisticas/application/estadisticas.py` | `modules/estadisticas/http/reportes.py` (el PDF, en `planilla_pdf.py`) |
 
 ### Módulos Transversales
 

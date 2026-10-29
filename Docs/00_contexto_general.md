@@ -16,7 +16,7 @@ Desarrollado como parte del programa de vinculación con la comunidad de la Univ
 1. **YAGNI y SOLID:** Prohibida la sobre-ingeniería. Todo código responde a un requerimiento funcional real.
 2. **Feature-Driven (Frontend):** El dominio de negocio se encapsula en `src/features/<dominio>/`. Prohibido almacenar lógica pesada en `src/pages/`.
 3. **Validaciones en Espejo:** Los esquemas de validación del frontend (Zod) deben ser idénticos a los del backend (Marshmallow).
-4. **No Asumir Datos:** Nunca asumir la forma de un JSON. Siempre contrastar con `backend/app/schemas/` antes de escribir código frontend.
+4. **No Asumir Datos:** Nunca asumir la forma de un JSON. Siempre contrastar con los esquemas del módulo (`backend/app/modules/<módulo>/http/esquemas.py`) antes de escribir código frontend.
 5. **Cero Cambios Destructivos:** El backend tiene protecciones activas contra operaciones destructivas en la base de datos de producción.
 
 ## Para Empezar

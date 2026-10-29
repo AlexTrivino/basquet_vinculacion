@@ -1,26 +1,14 @@
 """
-Schemas de Marshmallow para el Bulk DTO de Estadísticas y Sanciones (Fase 7).
+Esquema marshmallow de la carga de estadísticas (movido tal cual de app/schemas/stats_schema.py).
 
-Diseño de payload:
-    El frontend envía las estadísticas de TODOS los jugadores de un equipo
-    en UNA sola petición (Bulk DTO), evitando N requests individuales
-    y saturación de la red en el momento de cierre de partido.
-
-Estructura del payload esperado::
+El frontend envía las estadísticas de TODOS los jugadores de un equipo en UNA sola petición::
 
     {
         "id_partido": 12,
         "id_equipo": 3,
         "estadisticas_jugadores": [
-            {
-                "id_jugador": 45,
-                "puntos": 18,
-                "triples": 2,
-                "faltas": 3,
-                "rebotes": 5,
-                "asistencias": 4,
-                "sancion_tipo": "descalificante"   ← opcional
-            },
+            {"id_jugador": 45, "puntos": 18, "triples": 2, "faltas": 3, "rebotes": 5, "asistencias": 4,
+             "sancion_tipo": "descalificante"},   ← la sanción es opcional
             ...
         ]
     }
@@ -105,41 +93,3 @@ class EstadisticasBulkSchema(Schema):
             error='El array de estadísticas no puede estar vacío.',
         ),
     )
-
-
-# ── Schemas de salida (respuesta de confirmación) ─────────────────
-
-class EstadisticaPublicSchema(Schema):
-    """Serialización de una estadística individual para confirmación de bulk."""
-
-    id_estadistica = fields.Integer(dump_only=True)
-    id_partido = fields.Integer()
-    id_jugador = fields.Integer()
-    puntos_anotados = fields.Integer()
-    triples_anotados = fields.Integer()
-    faltas_cometidas = fields.Integer()
-    rebotes = fields.Integer()
-    asistencias = fields.Integer()
-    tiros_libres_anotados = fields.Integer()
-    valoracion = fields.Integer()
-    tapones = fields.Integer()
-    robos = fields.Integer()
-    created_at = fields.DateTime()
-
-
-class BoxScoreItemSchema(Schema):
-    """Serialización de una estadística individual para el Box Score público."""
-
-    id_jugador = fields.Integer()
-    nombre_jugador = fields.String(attribute='jugador.nombre')
-    apellido_jugador = fields.String(attribute='jugador.apellido')
-    dorsal = fields.String(attribute='jugador.dorsal')
-    puntos_anotados = fields.Integer()
-    triples_anotados = fields.Integer()
-    faltas_cometidas = fields.Integer()
-    rebotes = fields.Integer()
-    asistencias = fields.Integer()
-    tiros_libres_anotados = fields.Integer()
-    valoracion = fields.Integer()
-    tapones = fields.Integer()
-    robos = fields.Integer()

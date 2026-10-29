@@ -49,14 +49,14 @@ def create_app() -> Flask:
     from app.routes.health_bp import health_bp
     from app.modules.torneos.http.torneos import torneo_bp
     from app.modules.torneos.http.categorias import categoria_bp
-    from app.routes.lideres_bp import lideres_bp
+    from app.modules.estadisticas.http.lideres import lideres_bp
     from app.modules.plantel.http.equipos import equipo_bp
     from app.modules.inscripciones.http.inscripciones import inscripcion_bp
     from app.modules.plantel.http.jugadores import jugador_bp
     from app.modules.inscripciones.http.plantillas import plantilla_bp
     from app.modules.competencia.http.partidos import partido_bp
-    from app.routes.stats_bp import stats_bp
-    from app.routes.reportes_bp import reportes_bp
+    from app.modules.estadisticas.http.estadisticas import stats_bp
+    from app.modules.estadisticas.http.reportes import reportes_bp
     from app.routes.usuario_bp import usuario_bp
     from app.modules.competencia.http.sanciones import sancion_bp
     from app.modules.competencia.http.fase_final import competencia_bp

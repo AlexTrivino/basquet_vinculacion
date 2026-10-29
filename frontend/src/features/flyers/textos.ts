@@ -113,7 +113,7 @@ export function textoLideres(encabezado: string, lideres: { estadistica: Estadis
   return [`📊 ${encabezado}`, lineas.join('\n'), ENLACE, ETIQUETAS].join('\n\n');
 }
 
-// 'Juvenil (masculino)'; si el nombre ya dice el género no se repite (igual que flyers_service._etiqueta)
+// 'Juvenil (masculino)'; si el nombre ya dice el género no se repite (igual que etiqueta_categoria en el dominio de estadísticas)
 export function etiquetaCategoria(c?: { nombre_categoria?: string; genero_categoria?: string } | null) {
   if (!c?.nombre_categoria) return null;
   const genero = (c.genero_categoria ?? '').trim();

@@ -18,5 +18,6 @@ Los cambios de arquitectura se hacen con Spec-Driven Development: primero la esp
 | 4 · Backend: torneos | [04-torneos](04-torneos/spec.md) | terminada |
 | 5 · Backend: plantel | [05-plantel](05-plantel/spec.md) | terminada |
 | 6 · Backend: inscripciones | [06-inscripciones](06-inscripciones/spec.md) | terminada |
-| 7 y 8 · Backend por módulos | se crean al empezar cada fase | pendiente |
+| 7 · Backend: estadísticas | [07-estadisticas](07-estadisticas/spec.md) | terminada |
+| 8 · Backend: identidad y cierre | se crea al empezar la fase | pendiente |
 | 9 y 10 · Frontend por módulos | se crean al empezar cada fase | pendiente |

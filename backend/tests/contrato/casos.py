@@ -104,6 +104,8 @@ BASE = [
     G('/api/torneos/1/lideres'),
     G('/api/torneos/1/lideres?id_categoria=2'),
     G('/api/torneos/99/lideres'),
+    G('/api/torneos/1/lideres?id_categoria=x', nota='categoría que no es número'),  # desde la fase 7
+    G('/api/torneos/4/lideres', nota='anulado'),
     G('/api/torneos/1/fase-final?id_categoria=1'),
     G('/api/torneos/1/fase-final?id_categoria=2'),
     G('/api/torneos/2/fase-final?id_categoria=3'),
@@ -419,6 +421,8 @@ BASE = [
     G('/api/estadisticas/flyers', 'admin', nota='sin torneo'),
     G('/api/estadisticas/flyers?id_torneo=99', 'admin'),
     G('/api/estadisticas/flyers?id_torneo=1&fecha=ayer', 'admin'),
+    G('/api/estadisticas/flyers?id_torneo=2', 'admin', nota='sin partidos jugados'),  # desde la fase 7
+    G('/api/estadisticas/flyers?id_torneo=1&fecha=2026-10-01', 'admin', nota='fecha sin partidos'),
     C('POST', '/api/estadisticas/bulk', 'admin', json=ESTADISTICAS_FAE),
     C('POST', '/api/estadisticas/bulk', 'del2', json=ESTADISTICAS_FAE),
     C('POST', '/api/estadisticas/bulk', 'admin', 'reemplaza las cargadas', json={'id_partido': 1, 'id_equipo': 1, 'estadisticas_jugadores': [
@@ -430,6 +434,14 @@ BASE = [
     C('POST', '/api/estadisticas/bulk', 'admin', 'partido programado', json={**ESTADISTICAS_FAE, 'id_partido': 7, 'id_equipo': 1}),
     C('POST', '/api/estadisticas/bulk', 'admin', 'faltas de más', json={**ESTADISTICAS_FAE, 'estadisticas_jugadores': [
         {'id_jugador': 5, 'puntos': 51, 'faltas': 7}]}),
+    # desde la fase 7
+    C('POST', '/api/estadisticas/bulk', 'admin', 'sin cuerpo'),
+    C('POST', '/api/estadisticas/bulk', 'admin', 'partido que no existe', json={**ESTADISTICAS_FAE, 'id_partido': 99}),
+    C('POST', '/api/estadisticas/bulk', 'admin', 'equipo que no jugó', json={**ESTADISTICAS_FAE, 'id_equipo': 1}),
+    C('POST', '/api/estadisticas/bulk', 'admin', 'del visitante', json={'id_partido': 6, 'id_equipo': 3, 'estadisticas_jugadores': [
+        {'id_jugador': 7, 'puntos': 49, 'triples': 3, 'rebotes': 6, 'asistencias': 2, 'faltas': 2}]}),
+    C('POST', '/api/estadisticas/bulk', 'admin', 'jugador repetido', json={**ESTADISTICAS_FAE, 'estadisticas_jugadores': [
+        {'id_jugador': 5, 'puntos': 30}, {'id_jugador': 5, 'puntos': 21}]}),
 
     # ── Sanciones ──
     G('/api/sanciones/'),

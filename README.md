@@ -63,13 +63,12 @@ basquet_vinculacion/
 │   │   ├── modules/                  # Módulos migrados, cada uno con domain/, application/, infrastructure/ y http/
 │   │   │   ├── auspicios/            # Patrocinadores (/api/patrocinadores): el molde de los demás
 │   │   │   ├── competencia/          # Partidos, sanciones, tabla de posiciones FIBA y fase final (llaves y recorrido)
+│   │   │   ├── estadisticas/         # Carga por partido, líderes, flyers, tablero y planilla oficial en PDF
 │   │   │   ├── inscripciones/        # Inscripciones (borrador, revisión, retiro) y plantillas de 5 a 18 jugadores
 │   │   │   ├── plantel/              # Equipos, jugadores y buscador del visor: quién ve los datos personales y quién gestiona
 │   │   │   └── torneos/              # Torneos y categorías: estados, fechas y calendario
 │   │   ├── models/                   # Ruta vieja: reexporta shared/infrastructure/modelos
-│   │   ├── routes/                   # Blueprints que faltan migrar (estadísticas, reportes, líderes, usuarios y configuración)
-│   │   ├── schemas/                  # Esquema de estadísticas (Marshmallow 3), hasta que se migre
-│   │   ├── services/                 # Lógica de negocio de lo que falta migrar (estadísticas, líderes, flyers y reportes)
+│   │   ├── routes/                   # Blueprints que faltan migrar (salud, configuración y usuarios)
 │   │   └── utils/                    # Ruta vieja: reexporta shared/ (reglas, texto, storage, response, pagination, auth y errores)
 │   ├── tests/                        # Suite de pruebas unitarias y de integración (pytest)
 │   ├── seed_database.py              # Script interactivo para poblar base de datos mock
