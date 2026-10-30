@@ -147,6 +147,15 @@ def estado_fase_final(categoria, grupos, partidos_grupos, pendientes, jugados, e
     return estado
 
 
+def grupos_del_formato(formato, grupos):
+    """Los grupos que cuentan con el formato de la categoría: la letra que el formato no tiene (la A y la B que quedan
+    al pasar de dos grupos a uno) no cuenta, y se recupera si se vuelve al formato anterior. Sin formato, las guardadas."""
+    if formato not in FORMATOS:
+        return grupos
+    letras = FORMATOS[formato]['grupos']
+    return {e: g if g in letras else None for e, g in grupos.items()}
+
+
 def asignar_grupos(categoria, aprobados, grupos):
     """{id_equipo: letra o None} para cada equipo aprobado, en el orden de ``aprobados``.
 

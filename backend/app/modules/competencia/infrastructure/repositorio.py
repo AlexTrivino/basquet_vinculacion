@@ -6,7 +6,7 @@ from sqlalchemy import desc, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
-from app.modules.competencia.domain.llaves import Categoria
+from app.modules.competencia.domain.llaves import Categoria, grupos_del_formato
 from app.modules.competencia.domain.partido import ESTADISTICAS, CategoriaEnPartido, EquipoEnPartido, Partido, TorneoEnPartido
 from app.modules.competencia.domain.posiciones import ESTADOS_FINALES
 from app.modules.competencia.domain.sancion import JugadorEnSancion, PartidoEnSancion, Sancion
@@ -121,7 +121,8 @@ class RepositorioPartidos:
             setattr(fila, campo, valor)
 
     def grupos_de_categoria(self, id_torneo, id_categoria):
-        """{id_equipo: grupo} de las inscripciones aprobadas de la categoría (grupo puede ser None)."""
+        """{id_equipo: grupo} de las inscripciones aprobadas de la categoría (grupo puede ser None), con los grupos que
+        tiene su formato de hoy (``grupos_del_formato``)."""
         filas = db.session.execute(
             db.select(Inscripcion.id_equipo, Inscripcion.grupo).where(
                 Inscripcion.id_torneo == id_torneo,
@@ -129,7 +130,8 @@ class RepositorioPartidos:
                 Inscripcion.estado_inscripcion == 'aprobado',
             )
         ).all()
-        return {f.id_equipo: f.grupo for f in filas}
+        categoria = db.session.get(FilaCategoria, id_categoria)
+        return grupos_del_formato(categoria.formato if categoria else None, {f.id_equipo: f.grupo for f in filas})
 
     def guardar_grupos(self, id_torneo, id_categoria, asignados):
         """Escribe en cada inscripción aprobada su grupo de ``asignados`` ({id_equipo: letra o None})."""

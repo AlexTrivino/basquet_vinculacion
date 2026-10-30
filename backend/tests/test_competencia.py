@@ -79,6 +79,14 @@ def test_asignar_grupos():
         llaves.asignar_grupos(SEMIS, [1], {'1': 'A'})
 
 
+def test_las_letras_que_el_formato_no_tiene_no_cuentan():
+    guardados = {1: 'A', 2: 'B', 3: 'C', 4: None}
+    assert llaves.grupos_del_formato('un_grupo_semis', guardados) == CUATRO  # de dos grupos a uno: todos juntos
+    assert llaves.grupos_del_formato('tres_final_directa', {1: 'A'}) == {1: None}
+    assert llaves.grupos_del_formato('dos_grupos_cruces', guardados) == {1: 'A', 2: 'B', 3: None, 4: None}
+    assert llaves.grupos_del_formato(None, guardados) is guardados  # sin formato, como siempre
+
+
 def _cuadro(jugados_grupos, pendientes=0, jugados=None):
     finalizados = [(a, b, 70, 60, 'finalizado') for a, b in jugados_grupos]
     estado = llaves.estado_fase_final(SEMIS, CUATRO, finalizados, pendientes, jugados or {}, {})

@@ -175,6 +175,22 @@ class TestFaseFinal(unittest.TestCase):
         cat = next(c for c in self.client.get('/api/torneos/1').get_json()['data']['categorias'] if c['id_categoria'] == 3)
         self.assertEqual(cat['formato'], 'dos_grupos_cruces')
 
+    def test_al_pasar_a_un_grupo_no_cuentan_las_letras_del_formato_anterior(self):
+        """Ticket del 30-10: un equipo se retiró y la categoría pasa de dos grupos a uno; los que estaban en A y en B
+        tienen que poder jugar entre sí, y volver a dos grupos recupera la asignación de antes."""
+        base = {'id_torneo': 1, 'id_categoria': 3, 'fecha': '2026-09-20', 'hora': '19:00', 'fase': 'Primera fase', 'ubicacion': 'Coliseo'}
+        self._admin('put', '/api/torneos/categorias/3/formato', {'formato': 'un_grupo_semis'})
+        st, cuerpo = self._admin('post', '/api/partidos', {**base, 'id_equipo_local': 1, 'id_equipo_visitante': 6})
+        self.assertEqual(st, 201, cuerpo)
+        filas = self.client.get('/api/torneos/1/posiciones?id_categoria=3').get_json()['data']
+        self.assertEqual({f['grupo'] for f in filas}, {None})  # una sola tabla con los diez
+        self.assertEqual(self.client.get('/api/torneos/1/fase-final?id_categoria=3').get_json()['data']['fase_grupos']['esperados'], 45)
+        self._admin('put', '/api/torneos/categorias/3/formato', {'formato': 'dos_grupos_cruces'})
+        grupos = self.client.get('/api/torneos/1/fase-final?id_categoria=3').get_json()['data']['grupos']
+        self.assertEqual((grupos['1'], grupos['6']), ('A', 'B'))
+        st, _ = self._admin('post', '/api/partidos', {**base, 'id_equipo_local': 2, 'id_equipo_visitante': 7})
+        self.assertEqual(st, 422)
+
     # ── recorrido ──
     def test_recorrido_posiciones_por_fecha_y_situacion(self):
         self._jugar(1, 2, 70, 60, fecha=date(2026, 9, 16))
