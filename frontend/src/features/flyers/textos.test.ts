@@ -45,6 +45,15 @@ describe('textos de los flyers', () => {
     expect(topJugadores(jugadores, 'triples', 3).map((x) => x.jugador.id_jugador)).toEqual([3, 2, 1]);
   });
 
+  it('un empate en el tercer puesto entra entero (tiros libres de Juvenil masculino, 30-10)', () => {
+    const j = (id: number, tiros_libres: number, valoracion: number) =>
+      ({ jugador: { id_jugador: id }, id_categoria: 3, valoracion, linea: { tiros_libres } }) as unknown as FiguraFlyer;
+    const jugadores = [j(1, 13, 100), j(2, 12, 68), j(3, 12, 108), j(4, 12, 52), j(5, 11, 83)];
+    // antes salían 1, 3 y 2: el 4 quedaba fuera con 12, lo mismo que el 2 y el 3
+    expect(topJugadores(jugadores, 'tiros_libres').map((x) => x.jugador.id_jugador)).toEqual([1, 3, 2, 4]);
+    expect(topJugadores(jugadores.slice(0, 3), 'tiros_libres').map((x) => x.jugador.id_jugador)).toEqual([1, 3, 2]);
+  });
+
   it('la figura suma los triples y no muestra los números en cero', () => {
     const f = {
       jugador: { id_jugador: 9, nombre: 'ANA MERO' }, equipo: null, valoracion: 25, partidos: 1,

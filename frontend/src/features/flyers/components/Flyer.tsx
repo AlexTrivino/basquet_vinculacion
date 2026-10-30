@@ -275,12 +275,16 @@ export function FichaFigura({ figura }: { figura: FiguraFlyer }) {
 }
 
 // ── Un líder (mayor encestador, triplista…): la cifra gigante en oro y, al lado, quiénes le siguen ──
+// Caben tres filas: si el empate del último puesto trae más jugadores, se nombran dos y el resto se cuenta
+const FILAS_SIGUEN = 3;
 export function FichaLider({ lider, valor, unidad, siguen }: {
   lider: FiguraFlyer;
   valor: number;
   unidad: string;
   siguen: { figura: FiguraFlyer; valor: number }[];
 }) {
+  const nombrados = siguen.length > FILAS_SIGUEN ? siguen.slice(0, FILAS_SIGUEN - 1) : siguen;
+  const empatados = siguen.length - nombrados.length;
   return (
     <div className="flex h-full flex-col justify-center">
       <Identidad figura={lider} />
@@ -293,13 +297,20 @@ export function FichaLider({ lider, valor, unidad, siguen }: {
           <div className="min-w-0 border-l border-crema/15 pl-[36px]">
             <p className="text-[20px] font-semibold uppercase tracking-[0.2em] text-oro">Le siguen</p>
             <ol className="mt-[10px] space-y-[8px]">
-              {siguen.map(({ figura, valor: v }, i) => (
+              {nombrados.map(({ figura, valor: v }, i) => (
                 <li key={`${figura.id_categoria}-${figura.jugador.id_jugador}`} className="flex items-baseline gap-[16px] text-[24px]">
                   <span className="font-display font-bold text-crema/55">{i + 2}.º</span>
                   <span className="min-w-0 flex-1 truncate font-semibold text-crema">{figura.jugador.nombre}</span>
                   <span className="font-display text-[32px] font-bold tabular-nums text-crema">{v}</span>
                 </li>
               ))}
+              {empatados > 0 && (
+                <li className="flex items-baseline gap-[16px] text-[24px]">
+                  <span className="font-display font-bold text-crema/55">+{empatados}</span>
+                  <span className="min-w-0 flex-1 truncate font-semibold text-crema">EMPATADOS</span>
+                  <span className="font-display text-[32px] font-bold tabular-nums text-crema">{siguen[siguen.length - 1].valor}</span>
+                </li>
+              )}
             </ol>
           </div>
         )}

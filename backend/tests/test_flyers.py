@@ -55,6 +55,20 @@ class TestFlyers(unittest.TestCase):
         db.session.commit()
         return p
 
+    def test_lideres_de_la_pagina_sin_sumar_doble_y_desempatados_como_el_flyer(self):
+        """Ticket del 30-10: quien fue removido y vuelto a agregar a la plantilla sumaba doble en la pestaña Estadísticas,
+        y un empate salía en el orden de la consulta mientras el flyer lo desempata por valoración."""
+        vieja = Plantilla.query.filter_by(id_jugador=10).one()
+        vieja.id_equipo, vieja.estado = 2, 'inactivo'  # estuvo en San José y lo removieron; la fila queda
+        db.session.add(Plantilla(id_jugador=10, id_torneo=1, id_equipo=1, id_categoria=3, numero_camiseta=7))  # y lo agregaron a FAE
+        p = self._partido(1, 2, 70, 60, date(2026, 10, 4), stats=[(10, 30, 5, 2), (20, 8, 0, 0), (21, 20, 10, 4)])
+        for jugador, tiros in ((10, 4), (20, 6), (21, 6)):
+            Estadistica.query.filter_by(id_partido=p.id_partido, id_jugador=jugador).update({'tiros_libres_anotados': tiros})
+        db.session.commit()
+        lideres = self.client.get('/api/torneos/1/lideres?id_categoria=3').get_json()['data']
+        self.assertEqual([(t['id_jugador'], t['tiros_libres']) for t in lideres['tiros_libres']], [(21, 6), (20, 6), (10, 4)])
+        self.assertEqual([(t['id_jugador'], t['puntos'], t['nombre_equipo']) for t in lideres['puntos']][0], (10, 30, 'FAE'))
+
     def test_resultados_y_figuras(self):
         self._partido(1, 2, 70, 60, date(2026, 10, 4), stats=[(10, 30, 5, 2), (20, 25, 2, 1)])
         self._partido(2, 1, 66, 64, date(2026, 10, 11), a_las=19, stats=[(20, 10, 3, 1), (21, 20, 10, 4), (10, 22, 4, 1)])

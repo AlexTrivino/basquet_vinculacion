@@ -68,8 +68,10 @@ def etiqueta_categoria(nombre, genero):
 
 
 def lideres(totales, limite=10):
-    """Los ``limite`` primeros de cada rubro, sin los que tienen 0 en él. ``totales``: uno por jugador, con un valor por rubro."""
-    return {rubro: sorted([t for t in totales if t[rubro] > 0], key=lambda t: t[rubro], reverse=True)[:limite] for rubro in RUBROS}
+    """Los ``limite`` primeros de cada rubro, sin los que tienen 0 en él; en empate, la mayor valoración, como en el
+    flyer. ``totales``: uno por jugador, con un valor por rubro."""
+    return {rubro: sorted([t for t in totales if t[rubro] > 0], key=lambda t: (t[rubro], valoracion(t)), reverse=True)[:limite]
+            for rubro in RUBROS}
 
 
 def validar_carga(partido, id_equipo, puntos):

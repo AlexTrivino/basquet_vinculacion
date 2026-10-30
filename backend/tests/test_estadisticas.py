@@ -32,9 +32,11 @@ def test_valoracion_figura_y_etiqueta_de_la_categoria():
 
 
 def test_lideres_sin_ceros_y_con_tope():
-    totales = [{'id_jugador': j, **linea(puntos=p, triples=t)} for j, p, t in ((1, 10, 0), (2, 30, 2), (3, 30, 1), (4, 0, 5))]
+    totales = [{'id_jugador': j, **linea(puntos=p, triples=t, rebotes=r)} for j, p, t, r in ((1, 10, 0, 0), (2, 30, 2, 0), (3, 30, 1, 0), (4, 0, 5, 0))]
     primeros = lideres(totales, limite=2)
-    assert [t['id_jugador'] for t in primeros['puntos']] == [2, 3]  # el empate respeta el orden de la consulta
+    assert [t['id_jugador'] for t in primeros['puntos']] == [2, 3]  # empate también en valoración: el orden de la consulta
+    totales[2]['rebotes'] = 4
+    assert [t['id_jugador'] for t in lideres(totales, limite=2)['puntos']] == [3, 2]  # en empate, la mayor valoración (como el flyer)
     assert [t['id_jugador'] for t in primeros['triples']] == [4, 2]
     assert primeros['rebotes'] == [] and set(primeros) == {'puntos', 'triples', 'rebotes', 'asistencias', 'tapones', 'tiros_libres'}
 

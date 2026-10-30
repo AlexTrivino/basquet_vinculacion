@@ -97,12 +97,14 @@ const CORTA = { puntos: 'pts', rebotes: 'reb', asistencias: 'ast' } as const;
 export const lineaCorta = (linea: FiguraFlyer['linea']) =>
   (Object.keys(CORTA) as (keyof typeof CORTA)[]).filter((k) => linea[k] > 0).map((k) => `${linea[k]} ${CORTA[k]}`).join(', ');
 
-// Los n mejores en una estadística (sin ceros); en empate, la mejor valoración
+// Los n mejores en una estadística (sin ceros); en empate, la mejor valoración. Un empate en el último puesto no se
+// corta: entran todos los que tienen esa cifra (si no, queda fuera alguien con lo mismo que el último que sale).
 export function topJugadores(jugadores: FiguraFlyer[], clave: EstadisticaLider['clave'], idCategoria?: number, n = 3) {
-  return jugadores
+  const orden = jugadores
     .filter((j) => (idCategoria === undefined || j.id_categoria === idCategoria) && j.linea[clave] > 0)
-    .sort((a, b) => b.linea[clave] - a.linea[clave] || b.valoracion - a.valoracion)
-    .slice(0, n);
+    .sort((a, b) => b.linea[clave] - a.linea[clave] || b.valoracion - a.valoracion);
+  const corte = orden[n - 1]?.linea[clave];
+  return orden.filter((j, i) => i < n || j.linea[clave] === corte);
 }
 
 export function textoLideres(encabezado: string, lideres: { estadistica: EstadisticaLider; figura: FiguraFlyer }[]) {

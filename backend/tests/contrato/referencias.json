@@ -10469,19 +10469,6 @@
      },
      {
       "asistencias": 2,
-      "id_jugador": 5,
-      "nombre": "JORGE ZAMBRANO ALCÍVAR",
-      "nombre_equipo": "FAE",
-      "partidos_jugados": 1,
-      "puntos": 18,
-      "rebotes": 4,
-      "tapones": 0,
-      "tiros_libres": 3,
-      "triples": 3,
-      "url_foto": null
-     },
-     {
-      "asistencias": 2,
       "id_jugador": 7,
       "nombre": "SEBASTIÁN MACÍAS MOREIRA",
       "nombre_equipo": "MANTA",
@@ -10494,16 +10481,16 @@
       "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/7/foto.jpg"
      },
      {
-      "asistencias": 1,
-      "id_jugador": 2,
-      "nombre": "MATEO MERO PINARGOTE",
-      "nombre_equipo": "SAN JOSÉ",
+      "asistencias": 2,
+      "id_jugador": 5,
+      "nombre": "JORGE ZAMBRANO ALCÍVAR",
+      "nombre_equipo": "FAE",
       "partidos_jugados": 1,
-      "puntos": 10,
-      "rebotes": 7,
+      "puntos": 18,
+      "rebotes": 4,
       "tapones": 0,
-      "tiros_libres": 2,
-      "triples": 0,
+      "tiros_libres": 3,
+      "triples": 3,
       "url_foto": null
      },
      {
@@ -10518,6 +10505,19 @@
       "tiros_libres": 2,
       "triples": 0,
       "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/10/foto.jpg"
+     },
+     {
+      "asistencias": 1,
+      "id_jugador": 2,
+      "nombre": "MATEO MERO PINARGOTE",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 1,
+      "puntos": 10,
+      "rebotes": 7,
+      "tapones": 0,
+      "tiros_libres": 2,
+      "triples": 0,
+      "url_foto": null
      }
     ],
     "puntos": [
@@ -10548,19 +10548,6 @@
       "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/7/foto.jpg"
      },
      {
-      "asistencias": 2,
-      "id_jugador": 5,
-      "nombre": "JORGE ZAMBRANO ALCÍVAR",
-      "nombre_equipo": "FAE",
-      "partidos_jugados": 1,
-      "puntos": 18,
-      "rebotes": 4,
-      "tapones": 0,
-      "tiros_libres": 3,
-      "triples": 3,
-      "url_foto": null
-     },
-     {
       "asistencias": 3,
       "id_jugador": 9,
       "nombre": "ANA MERO VÉLEZ",
@@ -10571,6 +10558,19 @@
       "tapones": 0,
       "tiros_libres": 4,
       "triples": 2,
+      "url_foto": null
+     },
+     {
+      "asistencias": 2,
+      "id_jugador": 5,
+      "nombre": "JORGE ZAMBRANO ALCÍVAR",
+      "nombre_equipo": "FAE",
+      "partidos_jugados": 1,
+      "puntos": 18,
+      "rebotes": 4,
+      "tapones": 0,
+      "tiros_libres": 3,
+      "triples": 3,
       "url_foto": null
      },
      {
@@ -10801,19 +10801,6 @@
       "url_foto": null
      },
      {
-      "asistencias": 1,
-      "id_jugador": 2,
-      "nombre": "MATEO MERO PINARGOTE",
-      "nombre_equipo": "SAN JOSÉ",
-      "partidos_jugados": 1,
-      "puntos": 10,
-      "rebotes": 7,
-      "tapones": 0,
-      "tiros_libres": 2,
-      "triples": 0,
-      "url_foto": null
-     },
-     {
       "asistencias": 2,
       "id_jugador": 7,
       "nombre": "SEBASTIÁN MACÍAS MOREIRA",
@@ -10838,6 +10825,19 @@
       "tiros_libres": 2,
       "triples": 0,
       "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/10/foto.jpg"
+     },
+     {
+      "asistencias": 1,
+      "id_jugador": 2,
+      "nombre": "MATEO MERO PINARGOTE",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 1,
+      "puntos": 10,
+      "rebotes": 7,
+      "tapones": 0,
+      "tiros_libres": 2,
+      "triples": 0,
+      "url_foto": null
      },
      {
       "asistencias": 0,
@@ -11109,19 +11109,6 @@
      },
      {
       "asistencias": 2,
-      "id_jugador": 5,
-      "nombre": "JORGE ZAMBRANO ALCÍVAR",
-      "nombre_equipo": "FAE",
-      "partidos_jugados": 1,
-      "puntos": 18,
-      "rebotes": 4,
-      "tapones": 0,
-      "tiros_libres": 3,
-      "triples": 3,
-      "url_foto": null
-     },
-     {
-      "asistencias": 2,
       "id_jugador": 7,
       "nombre": "SEBASTIÁN MACÍAS MOREIRA",
       "nombre_equipo": "MANTA",
@@ -11134,16 +11121,16 @@
       "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/7/foto.jpg"
      },
      {
-      "asistencias": 1,
-      "id_jugador": 2,
-      "nombre": "MATEO MERO PINARGOTE",
-      "nombre_equipo": "SAN JOSÉ",
+      "asistencias": 2,
+      "id_jugador": 5,
+      "nombre": "JORGE ZAMBRANO ALCÍVAR",
+      "nombre_equipo": "FAE",
       "partidos_jugados": 1,
-      "puntos": 10,
-      "rebotes": 7,
+      "puntos": 18,
+      "rebotes": 4,
       "tapones": 0,
-      "tiros_libres": 2,
-      "triples": 0,
+      "tiros_libres": 3,
+      "triples": 3,
       "url_foto": null
      },
      {
@@ -11158,6 +11145,19 @@
       "tiros_libres": 2,
       "triples": 0,
       "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/10/foto.jpg"
+     },
+     {
+      "asistencias": 1,
+      "id_jugador": 2,
+      "nombre": "MATEO MERO PINARGOTE",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 1,
+      "puntos": 10,
+      "rebotes": 7,
+      "tapones": 0,
+      "tiros_libres": 2,
+      "triples": 0,
+      "url_foto": null
      }
     ],
     "puntos": [
@@ -11188,19 +11188,6 @@
       "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/7/foto.jpg"
      },
      {
-      "asistencias": 2,
-      "id_jugador": 5,
-      "nombre": "JORGE ZAMBRANO ALCÍVAR",
-      "nombre_equipo": "FAE",
-      "partidos_jugados": 1,
-      "puntos": 18,
-      "rebotes": 4,
-      "tapones": 0,
-      "tiros_libres": 3,
-      "triples": 3,
-      "url_foto": null
-     },
-     {
       "asistencias": 3,
       "id_jugador": 9,
       "nombre": "ANA MERO VÉLEZ",
@@ -11211,6 +11198,19 @@
       "tapones": 0,
       "tiros_libres": 4,
       "triples": 2,
+      "url_foto": null
+     },
+     {
+      "asistencias": 2,
+      "id_jugador": 5,
+      "nombre": "JORGE ZAMBRANO ALCÍVAR",
+      "nombre_equipo": "FAE",
+      "partidos_jugados": 1,
+      "puntos": 18,
+      "rebotes": 4,
+      "tapones": 0,
+      "tiros_libres": 3,
+      "triples": 3,
       "url_foto": null
      },
      {
@@ -11441,19 +11441,6 @@
       "url_foto": null
      },
      {
-      "asistencias": 1,
-      "id_jugador": 2,
-      "nombre": "MATEO MERO PINARGOTE",
-      "nombre_equipo": "SAN JOSÉ",
-      "partidos_jugados": 1,
-      "puntos": 10,
-      "rebotes": 7,
-      "tapones": 0,
-      "tiros_libres": 2,
-      "triples": 0,
-      "url_foto": null
-     },
-     {
       "asistencias": 2,
       "id_jugador": 7,
       "nombre": "SEBASTIÁN MACÍAS MOREIRA",
@@ -11478,6 +11465,19 @@
       "tiros_libres": 2,
       "triples": 0,
       "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/10/foto.jpg"
+     },
+     {
+      "asistencias": 1,
+      "id_jugador": 2,
+      "nombre": "MATEO MERO PINARGOTE",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 1,
+      "puntos": 10,
+      "rebotes": 7,
+      "tapones": 0,
+      "tiros_libres": 2,
+      "triples": 0,
+      "url_foto": null
      },
      {
       "asistencias": 0,

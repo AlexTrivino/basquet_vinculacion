@@ -59,7 +59,7 @@ function armarLideres(datos: DatosFlyers, alcance: Alcance, categoria: string, f
     titulo: e.titulo,
     dato,
     cifra: ['Valoración', lider.valoracion],
-    formula: siguen.some((f) => f.linea[e.clave] === lider.linea[e.clave]) ? DESEMPATE : VALORACION,
+    formula: siguen.some((f, i) => f.linea[e.clave] === (i ? siguen[i - 1] : lider).linea[e.clave]) ? DESEMPATE : VALORACION,
     suelta: true,
     heroe: <HeroeFigura figura={lider} formato={formato} />,
     cuerpo: (

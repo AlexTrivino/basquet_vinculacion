@@ -74,6 +74,13 @@ class RepositorioEstadisticas:
 
     def totales_por_jugador(self, id_torneo, id_categoria=None):
         """Los totales de cada jugador (con el equipo de su plantilla en la categoría) en los partidos que cuentan."""
+        # Una sola fila de plantilla por jugador y categoría, la más nueva: quien fue removido y vuelto a agregar tiene
+        # dos (la inactiva queda), y unirse con las dos le sumaba todo doble
+        ultima = (
+            db.session.query(func.max(Plantilla.id_plantilla).label('id_plantilla'))
+            .group_by(Plantilla.id_jugador, Plantilla.id_torneo, Plantilla.id_categoria)
+            .subquery()
+        )
         query = (
             db.session.query(
                 Estadistica.id_jugador,
@@ -92,6 +99,7 @@ class RepositorioEstadisticas:
             .join(Jugador, Estadistica.id_jugador == Jugador.id_jugador)
             .join(Plantilla, (Plantilla.id_jugador == Jugador.id_jugador) & (Plantilla.id_torneo == Partido.id_torneo)
                   & (Plantilla.id_categoria == Partido.id_categoria))
+            .join(ultima, ultima.c.id_plantilla == Plantilla.id_plantilla)
             .join(Equipo, Plantilla.id_equipo == Equipo.id_equipo)
             .filter(Partido.id_torneo == id_torneo)
             .filter(Partido.estado.in_(JUGADOS))
