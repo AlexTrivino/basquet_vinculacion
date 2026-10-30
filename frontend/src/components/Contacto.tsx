@@ -24,7 +24,7 @@ export const REDES = [
 ] as const;
 
 // ponytail: el número vive solo en el enlace; en pantalla nunca se muestra (el botón es el único contacto)
-const ENLACE_WHATSAPP = `https://wa.me/593989629870?text=${encodeURIComponent('Hola, quiero información sobre los torneos.')}`;
+const ENLACE_WHATSAPP = `https://wa.me/593995568942?text=${encodeURIComponent('Hola, quiero información sobre los torneos.')}`;
 
 // Botón flotante de WhatsApp: único canal de contacto en todo el sitio (el panel de admin no lo necesita)
 export function BotonWhatsApp() {
