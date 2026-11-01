@@ -175,6 +175,11 @@ html {
   caret-color: var(--color-celeste);
   accent-color: var(--color-celeste);
 }
+/* Las opciones heredan la tinta clara del select: sin fondo propio, la lista sale blanca en Windows y no se leen */
+option {
+  background-color: var(--color-marino-claro);
+  color: var(--color-crema);
+}
 ::selection {
   background-color: var(--color-oro);
   color: var(--color-marino);

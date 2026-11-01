@@ -110,7 +110,7 @@ export default function FaseFinal() {
           </div>
           <div>
             <h1 className="font-display text-2xl font-black tracking-tight text-crema">Llaves</h1>
-            <p className="mt-0.5 text-sm text-slate-500">Formato de la fase final, grupos y partidos de las llaves de cada categoría.</p>
+            <p className="mt-0.5 text-sm text-slate-400">Formato de la fase final, grupos y partidos de las llaves de cada categoría.</p>
           </div>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 xl:min-w-[34rem]">
@@ -135,7 +135,7 @@ export default function FaseFinal() {
         </div>
       </div>
 
-      {!fase && <p className={`${TARJETA} text-sm text-slate-500`}>{isLoading ? 'Cargando…' : 'Elige un torneo y una categoría.'}</p>}
+      {!fase && <p className={`${TARJETA} text-sm text-slate-400`}>{isLoading ? 'Cargando…' : 'Elige un torneo y una categoría.'}</p>}
 
       {fase && (
         <>
@@ -146,7 +146,7 @@ export default function FaseFinal() {
                   <input type="radio" name="formato" className="mt-1" checked={(fase.formato ?? '') === clave} disabled={guardarFormato.isPending} onChange={() => guardarFormato.mutate((clave || null) as FormatoFaseFinal | null)} />
                   <span>
                     <span className="block text-sm font-bold text-crema">{f.nombre}</span>
-                    <span className="block text-xs text-slate-500">{f.descripcion}</span>
+                    <span className="block text-xs text-slate-400">{f.descripcion}</span>
                   </span>
                 </label>
               ))}
@@ -189,14 +189,14 @@ export default function FaseFinal() {
 
           {formato && (
             <Paso n={letras.length ? 3 : 2} titulo="Cruces">
-              <p className="mb-4 text-sm text-slate-500">
+              <p className="mb-4 text-sm text-slate-400">
                 {fase.fase_grupos.terminada
                   ? 'Fase de grupos finalizada: las llaves con dos equipos definidos se pueden crear como partidos.'
                   : `Fase de grupos: ${fase.fase_grupos.jugados} de ${fase.fase_grupos.esperados} partidos jugados. Las llaves se habilitan cuando termine.`}
               </p>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="text-left text-xs uppercase tracking-wider text-slate-500">
+                  <thead className="text-left text-xs uppercase tracking-wider text-slate-400">
                     <tr>
                       <th className="px-3 py-2">Llave</th><th className="px-3 py-2">Ronda</th><th className="px-3 py-2">Local</th><th className="px-3 py-2">Visitante</th><th className="px-3 py-2">Estado</th><th className="px-3 py-2">Fecha y hora</th>
                     </tr>
