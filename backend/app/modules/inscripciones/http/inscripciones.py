@@ -79,7 +79,7 @@ def crear_inscripcion():
     data, error = _cuerpo(_create_schema)
     if error:
         return error
-    inscripcion = casos.crear(data, **_piezas())
+    inscripcion = casos.crear(data, id_usuario=g.usuario_id, rol=g.usuario_rol, **_piezas())
     return api_response(data=_admin_schema.dump(inscripcion), message='Inscripción registrada exitosamente.', status=201)
 
 
@@ -91,7 +91,7 @@ def reinscribir_equipo():
     if error:
         return error
     clonar = data.pop('clonar_plantilla', False)
-    inscripcion = casos.reinscribir(data, clonar, **_piezas())
+    inscripcion = casos.reinscribir(data, clonar, id_usuario=g.usuario_id, rol=g.usuario_rol, **_piezas())
     return api_response(data=_admin_schema.dump(inscripcion),
                         message='Equipo reinscrito exitosamente. Por favor, suba el nuevo comprobante de pago.', status=201)
 
@@ -186,6 +186,8 @@ def crear_inscripcion_completa():
     id_categoria = request.form.get('id_categoria')
     if not all([nombre_equipo, id_torneo, id_categoria]):
         return api_error('BAD_REQUEST', 'Faltan datos obligatorios (nombre_equipo, id_torneo, id_categoria).', 400)
+    if not (id_torneo.strip().isdecimal() and id_categoria.strip().isdecimal()):
+        return api_error('BAD_REQUEST', 'id_torneo e id_categoria deben ser números enteros.', 400)
     if 'archivo' not in request.files:
         return api_error('BAD_REQUEST', 'No se encontró el campo archivo.', 400)
     archivo = request.files['archivo']
@@ -208,6 +210,8 @@ def crear_inscripcion_completa():
                                            g.usuario_id, almacen=almacenamiento, **_piezas())
     except SinCupoParaClubNuevo as e:
         return api_error('CONFLICT', str(e), 409)
+    except ErrorDeDominio:
+        raise  # el torneo que no acepta inscripciones: 422, como en el alta normal
     except Exception as e:
         current_app.logger.exception(f'Error en inscripción: {e}')
         return api_error('SERVER_ERROR', 'Ocurrió un error inesperado al procesar la inscripción.', 500)

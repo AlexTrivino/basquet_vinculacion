@@ -6,7 +6,9 @@ from marshmallow import ValidationError
 
 from app.modules.plantel.application import jugadores as casos
 from app.modules.plantel.domain.jugador import CedulaRepetida
-from app.modules.plantel.http.esquemas import JugadorAdminSchema, JugadorCreateSchema, JugadorPublicSchema, JugadorUpdateSchema
+from app.modules.plantel.http.esquemas import (
+    JugadorAdminSchema, JugadorCreateSchema, JugadorParaVincularSchema, JugadorPublicSchema, JugadorUpdateSchema,
+)
 from app.modules.plantel.infrastructure.repositorio import RepositorioJugadores
 from app.shared.http.autenticacion import identidad_opcional, token_required
 from app.shared.http.paginacion import pagina_pedida
@@ -23,6 +25,7 @@ _public_schema = JugadorPublicSchema()
 _public_many = JugadorPublicSchema(many=True)
 _admin_schema = JugadorAdminSchema()
 _admin_many = JugadorAdminSchema(many=True)
+_vincular_schema = JugadorParaVincularSchema()
 _create_schema = JugadorCreateSchema()
 _update_schema = JugadorUpdateSchema()
 
@@ -36,6 +39,12 @@ DOCUMENTOS = {
 
 def _piezas():
     return {'repositorio': RepositorioJugadores(), 'unidad': UnidadDeTrabajo()}
+
+
+def _para_quien_pide(jugador, repositorio):
+    """El jugador completo para el super_admin o su delegado; para otro delegado, lo justo para vincularlo."""
+    completo = casos.ve_privados(jugador.id_jugador, g.usuario_id, g.usuario_rol, repositorio)
+    return (_admin_schema if completo else _vincular_schema).dump(jugador)
 
 
 @jugador_bp.route('', methods=['GET'])
@@ -59,16 +68,18 @@ def listar_jugadores():
 @token_required(allowed_roles=['super_admin', 'delegado'])
 def buscar_jugador():
     """Busca un jugador activo por su cédula (``cedula``, requerido). Con ``id_torneo`` (y ``id_categoria``, opcional)
-    dice además si ya está en una plantilla activa de ese torneo."""
+    dice además si ya está en una plantilla activa de ese torneo. Los datos personales, solo para el super_admin o su
+    delegado."""
     cedula = request.args.get('cedula', '').strip()
     if not cedula:
         return api_error('BAD_REQUEST', 'El parámetro cedula es requerido.', 400)
 
-    jugador = casos.buscar_por_cedula(cedula, RepositorioJugadores())
+    repositorio = RepositorioJugadores()
+    jugador = casos.buscar_por_cedula(cedula, repositorio)
     if jugador is None:
         return api_response(data=None, message='Jugador no registrado.')
 
-    jugador_data = _admin_schema.dump(jugador)
+    jugador_data = _para_quien_pide(jugador, repositorio)
 
     id_torneo = request.args.get('id_torneo')
     id_categoria_param = request.args.get('id_categoria')
@@ -93,7 +104,8 @@ def obtener_jugador(id_jugador):
 @jugador_bp.route('', methods=['POST'])
 @token_required(allowed_roles=['super_admin', 'delegado'])
 def crear_jugador():
-    """Registra un jugador. Si la cédula ya existe, 409 con el jugador que la tiene."""
+    """Registra un jugador. Si la cédula ya existe, 409 con el jugador que la tiene (sus datos personales, solo para
+    el super_admin o su delegado)."""
     json_data = request.get_json(silent=True)
     if json_data is None:
         return api_error('BAD_REQUEST', 'El cuerpo debe ser JSON válido.', 400)
@@ -101,10 +113,11 @@ def crear_jugador():
         data = _create_schema.load(json_data)
     except ValidationError as err:
         return api_error('VALIDATION_ERROR', err.messages, 422)
+    piezas = _piezas()
     try:
-        jugador = casos.crear(data, **_piezas())
+        jugador = casos.crear(data, **piezas)
     except CedulaRepetida as e:
-        return api_error('CONFLICT', str(e), 409, data=_admin_schema.dump(e.jugador) if e.jugador else None)
+        return api_error('CONFLICT', str(e), 409, data=_para_quien_pide(e.jugador, piezas['repositorio']) if e.jugador else None)
     return api_response(data=_admin_schema.dump(jugador), message='Jugador registrado exitosamente.', status=201)
 
 

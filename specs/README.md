@@ -22,3 +22,4 @@ Los cambios de arquitectura se hacen con Spec-Driven Development: primero la esp
 | 8 · Backend: identidad y cierre | [08-identidad-y-cierre](08-identidad-y-cierre/spec.md) | terminada |
 | 9 · Frontend: app y shared | [09-app-y-shared](09-app-y-shared/spec.md) | terminada |
 | 10 · Frontend: módulos y cierre | [10-modulos-frontend](10-modulos-frontend/spec.md) | terminada |
+| 11 · Seguridad: OWASP Top 10:2025 | [11-seguridad-owasp](11-seguridad-owasp/spec.md) | terminada |

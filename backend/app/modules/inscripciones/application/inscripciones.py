@@ -46,12 +46,14 @@ def para_gestionar(id_inscripcion, id_usuario, rol, mensaje, repositorio):
     return inscripcion
 
 
-def crear(datos, *, repositorio, unidad):
-    """Inscribe un equipo activo en una categoría de un torneo programado. Como hoy, toda alta revisa el borrador
-    abierto del dueño del equipo, aunque la nueva entre como pendiente."""
+def crear(datos, *, repositorio, unidad, id_usuario=None, rol=None):
+    """Inscribe un equipo activo en una categoría de un torneo programado; un delegado, solo un equipo suyo. Como
+    hoy, toda alta revisa el borrador abierto del dueño del equipo, aunque la nueva entre como pendiente."""
     validar_torneo_para_inscribir(repositorio.estado_del_torneo(datos['id_torneo']))
     equipo = repositorio.equipo(datos['id_equipo'])
     validar_equipo_para_inscribir(equipo)
+    if rol == 'delegado' and equipo.id_usuario != id_usuario:
+        raise SinPermiso('No tienes permiso para inscribir este equipo.')
     validar_un_borrador(repositorio.borradores_de(equipo.id_usuario))
     try:
         id_inscripcion = repositorio.agregar(datos)
@@ -63,10 +65,11 @@ def crear(datos, *, repositorio, unidad):
     return repositorio.obtener(id_inscripcion)
 
 
-def reinscribir(datos, clonar_plantilla, *, repositorio, unidad):
-    """Inscribe en borrador un equipo que ya jugó; con ``clonar_plantilla``, copia la plantilla de su inscripción
-    más reciente en otro torneo (salvo los jugadores que ya están en este torneo)."""
-    inscripcion = crear({**datos, 'estado_inscripcion': 'borrador'}, repositorio=repositorio, unidad=unidad)
+def reinscribir(datos, clonar_plantilla, *, repositorio, unidad, id_usuario=None, rol=None):
+    """Inscribe en borrador un equipo que ya jugó (un delegado, uno suyo); con ``clonar_plantilla``, copia la
+    plantilla de su inscripción más reciente en otro torneo (salvo los jugadores que ya están en este torneo)."""
+    inscripcion = crear({**datos, 'estado_inscripcion': 'borrador'}, repositorio=repositorio, unidad=unidad,
+                        id_usuario=id_usuario, rol=rol)
     anterior = repositorio.anterior_en_otro_torneo(datos['id_equipo'], datos['id_torneo']) if clonar_plantilla else None
     if anterior:
         for id_jugador, numero_camiseta in repositorio.plantilla_de(datos['id_equipo'], *anterior):
@@ -156,10 +159,11 @@ def crear_completa(nombre_equipo, id_torneo, id_categoria, comprobante, logo, id
     """Abre el club del delegado con su inscripción en borrador, el comprobante y, si viene, el logo; todo o nada:
     si algo falla después del cupo, se revierte y se borra de Storage lo que ya se subió.
 
-    ``comprobante`` y ``logo``: (stream, nombre, mime); ``logo`` puede ser None. El torneo y la categoría llegan
-    como texto del formulario: como hoy, si no son número, falla aquí, después de revisar el cupo.
+    ``comprobante`` y ``logo``: (stream, nombre, mime); ``logo`` puede ser None. El torneo tiene que estar
+    programado, como en el alta normal.
     """
     validar_club_nuevo(repositorio.equipos_activos_de(id_usuario), repositorio.borradores_de(id_usuario))
+    validar_torneo_para_inscribir(repositorio.estado_del_torneo(int(id_torneo)))
     subidos = []
     try:
         nombre = normalizar_mayusculas({'nombre_equipo': nombre_equipo}, ['nombre_equipo'])['nombre_equipo']

@@ -4,6 +4,7 @@ Genera usuarios, torneos (con 2 categorías cada uno), equipos con logos, compro
 jugadores reglamentarios (>=10 por plantilla con fotos y documentos), plantillas, partidos y sanciones
 de forma determinística e idempotente.
 """
+import getpass
 import uuid
 import sys
 from datetime import datetime, timedelta
@@ -822,6 +823,16 @@ def seed_tablas():
     print("========================================", flush=True)
 
 
+def _pedir_clave(correo):
+    """La contraseña de un usuario de producción, escrita al correr el seed: no queda en el código ni en el historial."""
+    if not sys.stdin.isatty():
+        sys.exit('La opción 4 pide las contraseñas por teclado: córrela en una terminal. No se cambió nada.')
+    clave = getpass.getpass(f'Contraseña para {correo} (mínimo 12 caracteres): ')
+    if len(clave) < 12:
+        sys.exit('Contraseña demasiado corta. No se cambió nada.')
+    return clave
+
+
 def seed_usuarios_produccion():
     print("========================================", flush=True)
     print(" INICIANDO SEED DE USUARIOS PRODUCCION ", flush=True)
@@ -834,18 +845,17 @@ def seed_usuarios_produccion():
             "id": ADMIN_ID,
             "nombre": "Super Admin",
             "correo": "admin@test.com",
-            "password": "sadmin",
             "rol": "super_admin"
         },
         {
             "id": PJCEDENO_ID,
             "nombre": "Pedro Cedeño",
             "correo": "pjcedeno87@gmail.com",
-            "password": "Elianc12",
             "rol": "super_admin"
         }
     ]
 
+    claves = {u["correo"]: _pedir_clave(u["correo"]) for u in usuarios_prod}  # antes de tocar la base
     for u in usuarios_prod:
         # Verificar si el usuario ya existe en auth.users por email
         res_auth = db.session.execute(
@@ -867,7 +877,7 @@ def seed_usuarios_produccion():
             try:
                 db.session.execute(query_update_auth, {
                     "id": user_id,
-                    "password": u["password"],
+                    "password": claves[u["correo"]],
                     "meta_data": f'{{"rol":"{u["rol"]}"}}'
                 })
             except Exception:
@@ -896,7 +906,7 @@ def seed_usuarios_produccion():
                 db.session.execute(query_insert_auth, {
                     "id": user_id,
                     "correo": u["correo"],
-                    "password": u["password"],
+                    "password": claves[u["correo"]],
                     "meta_data": f'{{"rol":"{u["rol"]}"}}'
                 })
 
@@ -940,6 +950,8 @@ def main():
         print("========================================")
         print("       SEED DE BASE DE DATOS MOCK       ")
         print("========================================")
+        print("Las opciones 1 y 3 crean usuarios de prueba (un super_admin incluido) con una contraseña conocida:")
+        print("solo en una base de desarrollo, nunca en producción.")
         print("1. Hacer seed SOLO de usuarios (Crea 5 usuarios base)")
         print("2. Hacer seed de TODAS LAS DEMAS TABLAS (Excluye usuarios)")
         print("3. Hacer seed COMPLETO (Usuarios + Tablas)")
@@ -954,8 +966,8 @@ def main():
             try:
                 opcion = input("Elige una opcion (1, 2, 3 o 4): ").strip()
             except (EOFError, KeyboardInterrupt):
-                print("Ejecución no interactiva detectada. Ejecutando seed completo...")
-                opcion = "3"
+                print("Sin terminal ni opción: no se hace nada. Uso: python seed_database.py <1|2|3|4>")
+                return
             
         if opcion == "1":
             seed_usuarios()

@@ -204,6 +204,14 @@ Posiciones, Calendario, Stats        la línea gráfica de cada torneo
 | **Datos del backend** | React escapa JSX por defecto — texto plano no requiere sanitización adicional |
 | **Tokens en storage** | `localStorage` aceptable para MVP (Supabase Auth lo usa internamente) |
 
+### Reglas de seguridad del backend (fase 11, `specs/11-seguridad-owasp`)
+
+- El registro es público y deja la cuenta como delegado activo: todo lo que puede hacer un delegado lo puede hacer cualquiera. Cada ruta de delegado revisa que el recurso sea suyo (equipo, inscripción, jugador).
+- Las `url_*` de archivos solo las escriben las rutas de subida; ningún esquema de entrada de un delegado las acepta. `borrar_archivo` solo borra claves del bucket propio (`clave_del_bucket`).
+- Los datos personales de un jugador (teléfono, correo, cédula escaneada, acta) solo los ven el super_admin y el delegado de un equipo donde juega (`ve_privados` en `plantel/application/jugadores.py`).
+- Los textos que van a un `Paragraph` de reportlab se escapan (`xml.sax.saxutils.escape`): el párrafo interpreta marcado.
+- Los 401 y 403 quedan en el log (`app/shared/http/seguridad.py`); las dependencias se revisan con `pip-audit` y `npm audit` antes de cada entrega.
+
 ---
 
 ## Manejo de Errores Resiliente

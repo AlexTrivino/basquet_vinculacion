@@ -16,7 +16,7 @@ competencia_bp = Blueprint('competencia', __name__, url_prefix='/api/torneos')
 
 def _id_categoria_param():
     valor = request.args.get('id_categoria', '')
-    return int(valor) if valor.isdigit() else None
+    return int(valor) if valor.isdecimal() else None
 
 
 @competencia_bp.route('/<int:id_torneo>/posiciones', methods=['GET'])

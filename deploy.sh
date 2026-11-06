@@ -19,7 +19,8 @@ git pull --ff-only origin main
 echo ""
 echo "2. Compilando el Frontend (React)..."
 cd frontend
-npm install
+# ci instala exactamente lo del package-lock.json (las versiones revisadas), no lo último que acepte cada rango
+npm ci
 # Se compila en otra carpeta y se cambia al final: mientras compila, nginx sigue sirviendo
 # la versión anterior completa, y si el build falla el sitio queda como estaba.
 # La versión anterior queda en dist-viejo (para volver atrás: mv dist dist-roto && mv dist-viejo dist).

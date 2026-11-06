@@ -9,6 +9,7 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 load_dotenv()
 
@@ -18,6 +19,8 @@ def create_app() -> Flask:
     from app.shared.infrastructure.db import db, migrate
 
     app = Flask(__name__)
+    # Detrás de nginx: la IP y el esquema del cliente vienen en X-Forwarded-For y X-Forwarded-Proto (un proxy)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
     # ── Configuración ──────────────────────────────────────────────
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
@@ -83,6 +86,8 @@ def create_app() -> Flask:
     app.register_blueprint(visor_bp)
     # ── Manejadores de errores ─────────────────────────────────────
     from app.shared.http.errores import register_error_handlers
+    from app.shared.http.seguridad import registrar_seguridad
     register_error_handlers(app)
+    registrar_seguridad(app)
 
     return app

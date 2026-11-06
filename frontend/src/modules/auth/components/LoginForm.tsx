@@ -66,6 +66,7 @@ export function LoginForm() {
       const message =
         error.response?.data?.error_description ||
         error.response?.data?.msg ||
+        error.response?.data?.message || // la API: por ejemplo, una cuenta inactiva
         'Credenciales inválidas o error de conexión';
       toast.error(message);
     }

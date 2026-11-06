@@ -15,11 +15,10 @@ def reset_database():
     app = create_app()
     with app.app_context():
         print("ADVERTENCIA: ESTAS A PUNTO DE BORRAR TODA LA BASE DE DATOS Y USUARIOS.")
-        # confirmacion = input("Escribe 'BORRAR TODO' para continuar: ")
-        # 
-        # if confirmacion.strip() != 'BORRAR TODO':
-        #     print("Operacion cancelada.")
-        #     sys.exit(0)
+        print(f"Base: {db.engine.url.render_as_string(hide_password=True)}")
+        if not sys.stdin.isatty() or input("Escribe 'BORRAR TODO' para continuar: ").strip() != 'BORRAR TODO':
+            print("Operacion cancelada.")
+            sys.exit(0)
             
         print("\nIniciando limpieza profunda...")
         

@@ -168,20 +168,18 @@ class JugadorCreateSchema(Schema):
             error='El teléfono debe tener exactamente 10 dígitos.',
         ),
     )
-    url_foto = fields.String(allow_none=True, load_default=None)
-    url_cedula = fields.String(allow_none=True, load_default=None)
-    url_acta_bachiller = fields.String(allow_none=True, load_default=None)
+    # Las url_* no se aceptan: solo las escriben las rutas de subida (/foto, /cedula, /acta).
 
     @validates('documento_identificacion')
     def validar_cedula(self, valor):
         """Verifica que la cédula contenga solo dígitos."""
-        if not valor.isdigit():
+        if not (valor.isascii() and valor.isdigit()):
             raise ValidationError('La cédula debe contener solo dígitos numéricos.')
 
     @validates('telefono')
     def validar_telefono(self, valor):
         """Verifica que el teléfono contenga solo dígitos."""
-        if valor is not None and not valor.isdigit():
+        if valor is not None and not (valor.isascii() and valor.isdigit()):
             raise ValidationError('El teléfono debe contener solo dígitos numéricos.')
 
     @validates('fecha_nacimiento')
@@ -244,9 +242,7 @@ class JugadorUpdateSchema(Schema):
             error='El teléfono debe tener exactamente 10 dígitos.',
         ),
     )
-    url_foto = fields.String(allow_none=True)
-    url_cedula = fields.String(allow_none=True)
-    url_acta_bachiller = fields.String(allow_none=True)
+    # Las url_* no se aceptan: solo las escriben las rutas de subida (/foto, /cedula, /acta).
     estado = fields.String(
         allow_none=True,
         validate=validate.OneOf(
@@ -258,13 +254,13 @@ class JugadorUpdateSchema(Schema):
     @validates('documento_identificacion')
     def validar_cedula(self, valor):
         """Verifica que la cédula contenga solo dígitos."""
-        if not valor.isdigit():
+        if not (valor.isascii() and valor.isdigit()):
             raise ValidationError('La cédula debe contener solo dígitos numéricos.')
 
     @validates('telefono')
     def validar_telefono(self, valor):
         """Verifica que el teléfono contenga solo dígitos."""
-        if valor is not None and not valor.isdigit():
+        if valor is not None and not (valor.isascii() and valor.isdigit()):
             raise ValidationError('El teléfono debe contener solo dígitos numéricos.')
 
     @validates('fecha_nacimiento')
@@ -303,6 +299,14 @@ class JugadorPublicSchema(Schema):
     genero = fields.String()
     url_foto = fields.String(allow_none=True)
     estado = fields.String()
+
+
+class JugadorParaVincularSchema(JugadorPublicSchema):
+    """Lo que ve, al buscarlo por cédula, un delegado que no dirige al jugador: lo justo para sumarlo a su plantilla
+    (la cédula la escribió él y la fecha de nacimiento define la categoría). Sin teléfono, correo ni documentos."""
+
+    documento_identificacion = fields.String()
+    fecha_nacimiento = fields.Date()
 
 
 class JugadorAdminSchema(Schema):

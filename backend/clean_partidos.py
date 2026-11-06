@@ -11,6 +11,9 @@ from sqlalchemy import text
 app = create_app()
 
 with app.app_context():
+    print(f"Base: {db.engine.url.render_as_string(hide_password=True)}")
+    if not sys.stdin.isatty() or input("Se borran TODOS los partidos y estadísticas. Escribe 'BORRAR PARTIDOS': ").strip() != 'BORRAR PARTIDOS':
+        sys.exit("Operación cancelada.")
     db.session.execute(text('TRUNCATE TABLE estadisticas CASCADE;'))
     db.session.execute(text('TRUNCATE TABLE partidos CASCADE;'))
     db.session.commit()

@@ -34,7 +34,7 @@ def _piezas():
 def listar_torneos():
     """Torneos vigentes con paginación. Query params opcionales: ``page``, ``per_page`` y ``anio``."""
     anio_param = request.args.get('anio')
-    anio = int(anio_param) if anio_param and anio_param.isdigit() else None
+    anio = int(anio_param) if anio_param and anio_param.isdecimal() else None
     items, pagination = casos.listar(anio, *pagina_pedida(), RepositorioTorneos())
     return api_response(data=_public_many.dump(items), pagination=pagination)
 

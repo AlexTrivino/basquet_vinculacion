@@ -4,6 +4,7 @@ Movida de app/services/reportes_service.py; arma el documento con la planilla qu
 """
 from datetime import datetime
 from io import BytesIO
+from xml.sax.saxutils import escape  # Paragraph interpreta marcado: los textos de la base van escapados
 
 # ── ReportLab — Platypus (tablas declarativas) ────────────────────
 from reportlab.lib import colors
@@ -166,21 +167,21 @@ def generar(planilla):
 
     # ── BLOQUE 1: Encabezado del documento ────────────────────────
     elementos.append(Paragraph(
-        f'PLANILLA OFICIAL DE PARTIDO — {planilla.torneo.upper()}',
+        f'PLANILLA OFICIAL DE PARTIDO — {escape(planilla.torneo.upper())}',
         estilos['titulo'],
     ))
     fecha_str = planilla.fecha.strftime('%d de %B de %Y') if planilla.fecha else 'Sin fecha'
     hora_str = planilla.hora.strftime('%H:%M') if planilla.hora else ''
     elementos.append(Paragraph(
-        f'Fase: {planilla.fase}  ·  Fecha: {fecha_str} {hora_str}  ·  '
-        f'Ubicación: {planilla.ubicacion}',
+        f'Fase: {escape(str(planilla.fase))}  ·  Fecha: {fecha_str} {hora_str}  ·  '
+        f'Ubicación: {escape(str(planilla.ubicacion))}',
         estilos['subtitulo'],
     ))
     elementos.append(Spacer(1, 0.3*cm))
 
     # ── BLOQUE 2: Marcador final ──────────────────────────────────
-    nombre_local = planilla.local.upper()
-    nombre_visitante = planilla.visitante.upper()
+    nombre_local = escape(planilla.local.upper())
+    nombre_visitante = escape(planilla.visitante.upper())
     elementos.append(Paragraph(
         f'{nombre_local}  {planilla.marcador_local} — {planilla.marcador_visitante}  {nombre_visitante}',
         estilos['marcador'],

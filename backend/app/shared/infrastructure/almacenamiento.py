@@ -5,16 +5,17 @@ Responsabilidades:
     1. Validación del tipo MIME real del archivo mediante **inspección de
        magic bytes** (primeros bytes del stream) — sin confiar en la
        extensión del nombre enviado por el cliente.
-    2. Subida directa en memoria a Supabase Storage via ``boto3``
+    2. Subida directa en memoria a Supabase Storage por su API REST
        (sin escribir al disco del servidor).
     3. Construcción de la URL pública del archivo subido.
+    4. Borrado, solo de claves del propio bucket.
 
-Variables de entorno requeridas:
+Variables de entorno:
     - ``SUPABASE_URL``: URL base del proyecto Supabase
       (ej. ``https://xyz.supabase.co``).
-    - ``SUPABASE_STORAGE_KEY``: Access Key ID para el bucket S3.
-    - ``SUPABASE_STORAGE_SECRET``: Secret Access Key para el bucket S3.
+    - ``SUPABASE_SERVICE_ROLE_KEY``: llave del servidor para escribir en Storage.
     - ``SUPABASE_STORAGE_BUCKET``: Nombre del bucket de Storage.
+    - ``SUPABASE_PUBLIC_URL`` (opcional): base de las URL públicas, si no es ``SUPABASE_URL``.
 
 ¿Cómo se detecta un archivo malicioso renombrado?
     Los formatos de archivo tienen una "firma" en sus primeros bytes llamada
@@ -24,15 +25,21 @@ Variables de entorno requeridas:
     que **no** coinciden con ninguna firma válida. El validador rechaza
     el archivo con 415 Unsupported Media Type antes de que llegue a S3.
 """
+import logging
 import os
+import re
 import threading
 import uuid
 import urllib.request
-import urllib.error
 from typing import IO
 
 from werkzeug.utils import secure_filename
 from flask import current_app
+
+_log = logging.getLogger(__name__)  # sirve también en el hilo de borrado, sin contexto de Flask
+_ESPERA = 30  # segundos que se espera a Storage antes de dar el pedido por fallido
+# Una clave del bucket: los caracteres que deja secure_filename, separados por '/'
+_CLAVE = re.compile(r'[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*')
 
 # ── Firmas de magic bytes soportadas ──────────────────────────────
 # Formato: {magic_bytes_prefix: mime_type}
@@ -179,9 +186,9 @@ def subir_archivo(
             },
             method='POST'
         )
-        with urllib.request.urlopen(req) as response:
+        with urllib.request.urlopen(req, timeout=_ESPERA):
             pass
-    except urllib.error.URLError as e:
+    except (OSError, ValueError):  # URLError, HTTPError y los timeouts son OSError
         current_app.logger.exception('Error de Storage (REST API):')
         raise RuntimeError(
             'No se pudo establecer conexión con el servidor de almacenamiento. Intente de nuevo más tarde.'
@@ -192,30 +199,42 @@ def subir_archivo(
     return url_publica
 
 
+def clave_del_bucket(url: str, bucket: str):
+    """La clave del objeto dentro del bucket (de su URL pública o la clave suelta), o None si no es un archivo
+    del bucket: otra web, ``..``, una consulta o caracteres que ``secure_filename`` no deja."""
+    marca = f'/storage/v1/object/public/{bucket}/'
+    clave = url.split(marca, 1)[1] if marca in url else url
+    if not _CLAVE.fullmatch(clave) or any(parte in ('.', '..') for parte in clave.split('/')):
+        return None
+    return clave
+
+
 def borrar_archivo(ruta_objeto: str):
-    """Elimina un objeto de Supabase Storage."""
+    """Elimina un objeto de Supabase Storage. Lo que no es un archivo del bucket no se borra (queda en el log):
+    el pedido va con la llave service_role, que en otra ruta de Supabase podría borrar cualquier cosa."""
+    if not ruta_objeto:
+        return
     bucket = os.getenv('SUPABASE_STORAGE_BUCKET', 'archivos')
     supabase_url = os.getenv('SUPABASE_URL', '').rstrip('/')
     service_role_key = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
-    
-    prefijo_url = f"/storage/v1/object/public/{bucket}/"
-    if prefijo_url in ruta_objeto:
-        ruta_objeto = ruta_objeto.split(prefijo_url)[-1]
-        
-    delete_url = f'{supabase_url}/storage/v1/object/{bucket}/{ruta_objeto}'
-        
+
+    clave = clave_del_bucket(ruta_objeto, bucket)
+    if clave is None:
+        _log.warning('Storage: no se borra %r, no es un archivo del bucket.', ruta_objeto)
+        return
+    delete_url = f'{supabase_url}/storage/v1/object/{bucket}/{clave}'
+
     try:
         req = urllib.request.Request(
             delete_url,
             headers={'Authorization': f'Bearer {service_role_key}'},
             method='DELETE'
         )
-        with urllib.request.urlopen(req) as response:
+        with urllib.request.urlopen(req, timeout=_ESPERA):
             pass
-    except urllib.error.URLError as e:
-        current_app.logger.exception('Error al borrar en Storage (REST API):')
-        # Silenciamos el error para no bloquear transacciones
-        pass
+    except (OSError, ValueError):
+        # Se registra y se sigue, para no bloquear la transacción
+        _log.exception('Error al borrar en Storage (REST API):')
 
 
 def borrar_en_segundo_plano(ruta_objeto: str):

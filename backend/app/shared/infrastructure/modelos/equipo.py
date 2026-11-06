@@ -23,7 +23,7 @@ class Equipo(db.Model):
 
     # ── Relaciones ─────────────────────────────────────────────────
     usuario = db.relationship('Usuario', back_populates='equipos', lazy='select')
-    inscripciones = db.relationship('Inscripcion', back_populates='equipo', lazy='select')
+    inscripciones = db.relationship('Inscripcion', back_populates='equipo', lazy='select', order_by='Inscripcion.id_inscripcion')
     plantillas = db.relationship('Plantilla', back_populates='equipo', lazy='select')
     partidos_local = db.relationship(
         'Partido',

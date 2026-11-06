@@ -13,7 +13,8 @@ Seguridad aplicada:
     - **Fallback HS256:** Si el JWKS no contiene la clave del token
       (ej. API Keys legacy de Supabase que usan HS256 con secreto
       simétrico), se intenta la verificación con ``SUPABASE_JWT_SECRET``.
-    - Algoritmos permitidos: ``['ES256', 'RS256', 'HS256']``.
+    - Algoritmos permitidos: ES256 y RS256 con la clave del JWKS; HS256
+      solo con el secreto simétrico.
     - Claims ``sub`` y ``exp`` requeridos explícitamente.
     - Inyección de identidad en ``flask.g`` para trazabilidad.
     - Verificación de roles (RBAC) con lista ``allowed_roles`` contra
@@ -28,8 +29,8 @@ from flask import g, jsonify, request
 
 from app.shared.infrastructure.db import db
 
-# ── Algoritmos aceptados (orden de preferencia) ──────────────────
-_ALGORITHMS = ['ES256', 'RS256', 'HS256']
+# ── Algoritmos aceptados con la clave del JWKS (HS256 va solo con el secreto) ──
+_ALGORITHMS = ['ES256', 'RS256']
 
 # ── Cliente JWKS (singleton lazy con caché) ──────────────────────
 # Se inicializa en el primer request y reutiliza la caché de claves
@@ -52,7 +53,7 @@ def _get_jwks_client():
     if _jwks_client is None:
         supabase_url = os.getenv('SUPABASE_URL', '').rstrip('/')
         jwks_url = f'{supabase_url}/auth/v1/.well-known/jwks.json'
-        _jwks_client = PyJWKClient(jwks_url, cache_keys=True)
+        _jwks_client = PyJWKClient(jwks_url, cache_keys=True, timeout=5)  # sin esperar 30 s si Supabase no responde
 
     return _jwks_client
 

@@ -6,6 +6,7 @@ devolviendo respuestas JSON con formato estandarizado (RNF-MAN-02).
 """
 from flask import Flask, jsonify, current_app
 from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.exceptions import HTTPException
 
 from app.shared.domain.errores import Conflicto, NoEncontrado, ReglaDeNegocio, SinPermiso
 from app.shared.http.respuestas import api_error
@@ -73,9 +74,17 @@ def register_error_handlers(app_instance: Flask) -> None:
             'message': 'El método HTTP utilizado no está permitido para esta ruta.',
         }), 405
 
+    @app_instance.errorhandler(413)
+    def payload_too_large(error):
+        """Cuerpo más grande que MAX_CONTENT_LENGTH."""
+        maximo = current_app.config['MAX_CONTENT_LENGTH'] // (1024 * 1024)
+        return api_error('PAYLOAD_TOO_LARGE', f'El archivo o los datos superan el tamaño máximo permitido ({maximo} MB).', 413)
+
     @app_instance.errorhandler(Exception)
     def internal_server_error(error):
         """Error interno del servidor (captura cualquier excepción no manejada)."""
+        if isinstance(error, HTTPException):  # los demás errores HTTP (415, 429…) salen con su código, no como 500
+            return api_error(error.name.upper().replace(' ', '_'), error.description, error.code)
         db.session.rollback()
         current_app.logger.exception('Error no manejado:')
         return jsonify({

@@ -52,7 +52,7 @@ import { FotoJugador } from '@/shared/ui/FotoJugador';
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB
 
 
-const jugadorSchema = z.object({
+export const jugadorSchema = z.object({
   documento_identificacion: z.string()
     .length(10, 'La cédula debe tener exactamente 10 dígitos')
     .regex(/^\d+$/, 'Solo se permiten dígitos numéricos'),
@@ -64,9 +64,8 @@ const jugadorSchema = z.object({
     .int('Debe ser un número entero')
     .min(0, 'Mínimo 0')
     .max(99, 'Máximo 99'),
-  telefono: z.string()
-    .length(10, 'El teléfono debe tener exactamente 10 dígitos')
-    .regex(/^\d+$/, 'Solo se permiten dígitos numéricos'),
+  // Vacío solo al vincular un jugador que ya existe: el backend no le da el teléfono a otro delegado (ver faltaTelefono)
+  telefono: z.string().regex(/^(\d{10})?$/, 'El teléfono debe tener exactamente 10 dígitos'),
   correo: z.string().email('Correo inválido').optional().or(z.literal('')),
 });
 type JugadorFormValues = z.infer<typeof jugadorSchema>;
@@ -214,7 +213,7 @@ export function GestorPlantilla({
     correo: '',
   };
 
-  const { register, handleSubmit, reset, setValue, watch, formState: { errors, isValid } } = useForm<JugadorFormValues>({
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors, isValid, dirtyFields } } = useForm<JugadorFormValues>({
     resolver: zodResolver(jugadorSchema),
     mode: 'onChange',
     defaultValues: defaultFormValues,
@@ -223,6 +222,7 @@ export function GestorPlantilla({
   const fechaNacimientoWatch = watch('fecha_nacimiento');
   const documentoWatch = watch('documento_identificacion');
   const numeroCamisetaWatch = watch('numero_camiseta');
+  const faltaTelefono = !isExistingPlayer && (watch('telefono') ?? '').length !== 10;
 
   const dorsalDuplicado = useMemo(() => {
     if (numeroCamisetaWatch === undefined || numeroCamisetaWatch === null || isNaN(numeroCamisetaWatch)) return null;
@@ -1205,7 +1205,9 @@ export function GestorPlantilla({
                         : 'border-white/15 focus:border-celeste focus:ring-2 focus:ring-celeste/25'
                     }`} 
                   />
-                  {errors.telefono && <p className="mt-1 text-xs text-red-300">{errors.telefono.message}</p>}
+                  {(errors.telefono || (faltaTelefono && dirtyFields.telefono)) && (
+                    <p className="mt-1 text-xs text-red-300">{errors.telefono?.message ?? 'El teléfono debe tener exactamente 10 dígitos'}</p>
+                  )}
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-semibold text-slate-300">Correo (Opcional)</label>
@@ -1336,9 +1338,9 @@ export function GestorPlantilla({
               <div className="pt-2">
                 <AsyncButton 
                   onClickAction={handleSubmit(onSubmit)} 
-                  disabled={!isValid || !!errorEdad || isCheckingCedula || !!dorsalDuplicado}
+                  disabled={!isValid || faltaTelefono || !!errorEdad || isCheckingCedula || !!dorsalDuplicado}
                   className={`w-full py-3 rounded-xl font-bold shadow-sm transition-all text-sm ${
-                    isValid && !errorEdad && !isCheckingCedula && !dorsalDuplicado
+                    isValid && !faltaTelefono && !errorEdad && !isCheckingCedula && !dorsalDuplicado
                       ? 'bg-celeste text-marino hover:bg-white cursor-pointer' 
                       : 'bg-white/20 cursor-not-allowed opacity-60'
                   }`}

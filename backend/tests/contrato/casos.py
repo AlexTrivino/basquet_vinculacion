@@ -105,6 +105,7 @@ BASE = [
     G('/api/torneos/1/lideres?id_categoria=2'),
     G('/api/torneos/99/lideres'),
     G('/api/torneos/1/lideres?id_categoria=x', nota='categoría que no es número'),  # desde la fase 7
+    G('/api/torneos/1/lideres?id_categoria=%C2%B2', nota='superíndice'),  # desde la fase 11: '²'.isdigit() daba 500
     G('/api/torneos/4/lideres', nota='anulado'),
     G('/api/torneos/1/fase-final?id_categoria=1'),
     G('/api/torneos/1/fase-final?id_categoria=2'),
@@ -215,6 +216,10 @@ BASE = [
     C('POST', '/api/inscripciones/reinscribir', 'del2', json={'id_torneo': 2, 'id_equipo': 2, 'id_categoria': 7, 'clonar_plantilla': True}),
     C('POST', '/api/inscripciones/reinscribir', 'del1', 'con borrador abierto', json={'id_torneo': 2, 'id_equipo': 1, 'id_categoria': 6}),
     C('POST', '/api/inscripciones/reinscribir', 'admin', 'duplicada', json={'id_torneo': 2, 'id_equipo': 4, 'id_categoria': 3}),
+    # desde la fase 11
+    C('POST', '/api/inscripciones/reinscribir', 'del2', 'equipo ajeno', json={'id_torneo': 2, 'id_equipo': 3, 'id_categoria': 7}),
+    C('POST', '/api/inscripciones/completa', 'del3', 'torneo en curso', form={'nombre_equipo': 'club náutico', 'id_torneo': '1', 'id_categoria': '7'},
+      archivos={'archivo': (PDF, 'pago.pdf')}),
     C('POST', '/api/inscripciones/9/comprobante', 'del1', archivos={'archivo': (PDF, 'pago.pdf')}),
     C('POST', '/api/inscripciones/9/comprobante', 'del2', 'inscripción ajena', archivos={'archivo': (PDF, 'pago.pdf')}),
     C('POST', '/api/inscripciones/9/comprobante', 'del1', 'texto', archivos={'archivo': (TXT, 'pago.pdf')}),
@@ -304,6 +309,11 @@ BASE = [
     G('/api/jugadores/buscar?cedula=%201310000001%20', 'del1', nota='con espacios'),
     C('POST', '/api/jugadores', 'del1', json=JUGADOR_NUEVO),
     C('POST', '/api/jugadores', 'del1', 'cédula repetida', json={**JUGADOR_NUEVO, 'documento_identificacion': '1310000001'}),
+    # desde la fase 11: los datos personales del 409 y del buscador, solo para su delegado; las url_* no se escriben por JSON
+    C('POST', '/api/jugadores', 'del2', 'cédula repetida de un jugador ajeno', json={**JUGADOR_NUEVO, 'documento_identificacion': '1310000001'}),
+    C('POST', '/api/jugadores', 'del1', 'con url_cedula', json={**JUGADOR_NUEVO, 'url_cedula': '../../../auth/v1/admin/users/u-admin'}),
+    C('PUT', '/api/jugadores/1', 'del1', 'con url_cedula', json={'url_cedula': 'https://supabase.test/storage/v1/object/public/archivos/equipos/2/logo/fae.png'}),
+    G('/api/jugadores/buscar?cedula=1310000001', 'del2', 'jugador ajeno'),
     C('POST', '/api/jugadores', 'del1', 'incompleto', json={'nombre': 'X'}),
     C('POST', '/api/jugadores', 'del1', 'nacimiento futuro', json={**JUGADOR_NUEVO, 'fecha_nacimiento': '2999-01-01'}),
     C('POST', '/api/jugadores', 'admin', 'sin cuerpo'),
@@ -482,6 +492,7 @@ BASE = [
     C('PUT', '/api/usuarios/me', 'del1', 'sin cuerpo'),
     C('PUT', '/api/usuarios/me', 'del1', 'nombre vacío', json={'nombre': ''}),
     C('PUT', '/api/usuarios/me', 'del1', 'con rol', json={'nombre': 'Delegado de San José', 'rol': 'super_admin'}),
+    C('PUT', '/api/usuarios/me', 'del1', 'nombre muy largo', json={'nombre': 'x' * 101}),  # desde la fase 11
 
     # ── Visor ──
     G('/api/visor/jugadores', 'visor'),

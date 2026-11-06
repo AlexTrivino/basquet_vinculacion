@@ -143,7 +143,8 @@ cp .env.example .env
 # Aplicar migraciones de base de datos
 flask db upgrade
 
-# (Opcional) Poblar base de datos con datos de prueba
+# (Opcional) Poblar base de datos con datos de prueba. Solo en una base de desarrollo:
+# crea usuarios de prueba (un super_admin incluido) con una contraseña conocida
 python seed_database.py
 
 # Iniciar servidor de desarrollo
@@ -213,7 +214,7 @@ En la carpeta [`documentacion/`](documentacion/) se encuentran disponibles las e
 ### Automatización de Despliegue (Deploy Script)
 Para facilitar la actualización del servidor en producción, se incluye el script `deploy.sh` en la raíz del proyecto. Este script ejecuta la secuencia estándar de actualización:
 1. Descarga el código desde la rama `main` en GitHub.
-2. Compila la versión de producción de React (`npm run build`).
+2. Instala exactamente las versiones del `package-lock.json` (`npm ci`) y compila la versión de producción de React (`npm run build`).
 3. Instala dependencias nuevas del backend y ejecuta las migraciones de Base de Datos.
 4. Reinicia el servicio de Gunicorn/SystemD.
 
@@ -222,6 +223,9 @@ Para facilitar la actualización del servidor en producción, se incluye el scri
 chmod +x deploy.sh
 ./deploy.sh
 ```
+
+### Seguridad
+La revisión contra el OWASP Top 10:2025 está en [specs/11-seguridad-owasp](specs/11-seguridad-owasp/spec.md); su [informe](specs/11-seguridad-owasp/informe.md) lista lo que hay que revisar fuera del repositorio (Supabase, nginx y el servidor). `reset_database.py` y `clean_partidos.py` piden confirmación y la opción 4 del seed pide las contraseñas por teclado.
 
 ### Operaciones Manuales y Scripts de Base de Datos
 En un entorno productivo es común enfrentarse a problemas que requieren la modificación directa de la base de datos sin afectar la UI o generar nuevas vistas. Para ello, se utilizan **Scripts de Contexto (Application Context)** en Flask.

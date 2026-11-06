@@ -38,12 +38,17 @@ def ficha(id_jugador, id_usuario, rol, repositorio):
     """(jugador, completo): con sus datos personales para el super_admin o su delegado, aunque esté inactivo;
     para el resto, sin ellos y solo si está activo."""
     jugador = obtener(id_jugador, repositorio, incluir_inactivos=True)
-    delegados = repositorio.delegados_del_jugador(id_jugador) if rol == 'delegado' else []
-    if puede_ver_privados(rol, id_usuario, delegados):
+    if ve_privados(id_jugador, id_usuario, rol, repositorio):
         return jugador, True
     if jugador.estado != 'activo':
         raise NoEncontrado('Jugador no encontrado.')
     return jugador, False
+
+
+def ve_privados(id_jugador, id_usuario, rol, repositorio):
+    """Si quien pide ve los datos personales del jugador: el super_admin o el delegado de un equipo donde juega."""
+    delegados = repositorio.delegados_del_jugador(id_jugador) if rol == 'delegado' else []
+    return puede_ver_privados(rol, id_usuario, delegados)
 
 
 def buscar_por_cedula(cedula, repositorio):

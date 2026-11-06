@@ -6957,6 +6957,21 @@
    "success": true
   }
  },
+ "GET /api/jugadores/buscar?cedula=1310000001 · del2 · jugador ajeno": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "documento_identificacion": "1310000001",
+    "estado": "activo",
+    "fecha_nacimiento": "2008-03-10",
+    "genero": "masculino",
+    "id_jugador": 1,
+    "nombre": "BRYAN CHÁVEZ VÉLEZ",
+    "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
+   },
+   "success": true
+  }
+ },
  "GET /api/jugadores/buscar?cedula=1310000001&id_torneo=1&id_categoria=x · del1": {
   "codigo": 400,
   "cuerpo": {
@@ -6977,8 +6992,6 @@
   "codigo": 200,
   "cuerpo": {
    "data": {
-    "correo": "jugador5@manta.test",
-    "created_at": "2026-10-01T12:05:00",
     "documento_identificacion": "1310000005",
     "equipo_torneo": "FAE",
     "estado": "activo",
@@ -6987,28 +7000,6 @@
     "id_equipo": 2,
     "id_jugador": 5,
     "nombre": "JORGE ZAMBRANO ALCÍVAR",
-    "plantillas": [
-     {
-      "id_equipo": 2,
-      "id_plantilla": 5,
-      "id_torneo": 1,
-      "nombre_equipo": "FAE",
-      "nombre_torneo": "INTERCOLEGIAL 2026",
-      "numero_camiseta": 5
-     },
-     {
-      "id_equipo": 2,
-      "id_plantilla": 19,
-      "id_torneo": 3,
-      "nombre_equipo": "FAE",
-      "nombre_torneo": "INTERCOLEGIAL 2025",
-      "numero_camiseta": 5
-     }
-    ],
-    "telefono": "0990000005",
-    "updated_at": "2026-10-01T12:05:00",
-    "url_acta_bachiller": null,
-    "url_cedula": null,
     "url_foto": null,
     "ya_en_torneo": true
    },
@@ -7019,8 +7010,6 @@
   "codigo": 200,
   "cuerpo": {
    "data": {
-    "correo": "jugador5@manta.test",
-    "created_at": "2026-10-01T12:05:00",
     "documento_identificacion": "1310000005",
     "equipo_torneo": null,
     "estado": "activo",
@@ -7029,28 +7018,6 @@
     "id_equipo": null,
     "id_jugador": 5,
     "nombre": "JORGE ZAMBRANO ALCÍVAR",
-    "plantillas": [
-     {
-      "id_equipo": 2,
-      "id_plantilla": 5,
-      "id_torneo": 1,
-      "nombre_equipo": "FAE",
-      "nombre_torneo": "INTERCOLEGIAL 2026",
-      "numero_camiseta": 5
-     },
-     {
-      "id_equipo": 2,
-      "id_plantilla": 19,
-      "id_torneo": 3,
-      "nombre_equipo": "FAE",
-      "nombre_torneo": "INTERCOLEGIAL 2025",
-      "numero_camiseta": 5
-     }
-    ],
-    "telefono": "0990000005",
-    "updated_at": "2026-10-01T12:05:00",
-    "url_acta_bachiller": null,
-    "url_cedula": null,
     "url_foto": null,
     "ya_en_torneo": false
    },
@@ -10925,6 +10892,495 @@
    "success": true
   }
  },
+ "GET /api/torneos/1/lideres?id_categoria=%C2%B2 · anónimo · superíndice": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "asistencias": [
+     {
+      "asistencias": 7,
+      "id_jugador": 1,
+      "nombre": "BRYAN CHÁVEZ VÉLEZ",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 2,
+      "puntos": 37,
+      "rebotes": 11,
+      "tapones": 1,
+      "tiros_libres": 6,
+      "triples": 3,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
+     },
+     {
+      "asistencias": 3,
+      "id_jugador": 9,
+      "nombre": "ANA MERO VÉLEZ",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 1,
+      "puntos": 18,
+      "rebotes": 6,
+      "tapones": 0,
+      "tiros_libres": 4,
+      "triples": 2,
+      "url_foto": null
+     },
+     {
+      "asistencias": 2,
+      "id_jugador": 7,
+      "nombre": "SEBASTIÁN MACÍAS MOREIRA",
+      "nombre_equipo": "MANTA",
+      "partidos_jugados": 1,
+      "puntos": 20,
+      "rebotes": 3,
+      "tapones": 1,
+      "tiros_libres": 2,
+      "triples": 4,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/7/foto.jpg"
+     },
+     {
+      "asistencias": 2,
+      "id_jugador": 5,
+      "nombre": "JORGE ZAMBRANO ALCÍVAR",
+      "nombre_equipo": "FAE",
+      "partidos_jugados": 1,
+      "puntos": 18,
+      "rebotes": 4,
+      "tapones": 0,
+      "tiros_libres": 3,
+      "triples": 3,
+      "url_foto": null
+     },
+     {
+      "asistencias": 1,
+      "id_jugador": 10,
+      "nombre": "MARÍA LOOR CEDEÑO",
+      "nombre_equipo": "JUAN MONTALVO",
+      "partidos_jugados": 1,
+      "puntos": 12,
+      "rebotes": 8,
+      "tapones": 1,
+      "tiros_libres": 2,
+      "triples": 0,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/10/foto.jpg"
+     },
+     {
+      "asistencias": 1,
+      "id_jugador": 2,
+      "nombre": "MATEO MERO PINARGOTE",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 1,
+      "puntos": 10,
+      "rebotes": 7,
+      "tapones": 0,
+      "tiros_libres": 2,
+      "triples": 0,
+      "url_foto": null
+     }
+    ],
+    "puntos": [
+     {
+      "asistencias": 7,
+      "id_jugador": 1,
+      "nombre": "BRYAN CHÁVEZ VÉLEZ",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 2,
+      "puntos": 37,
+      "rebotes": 11,
+      "tapones": 1,
+      "tiros_libres": 6,
+      "triples": 3,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
+     },
+     {
+      "asistencias": 2,
+      "id_jugador": 7,
+      "nombre": "SEBASTIÁN MACÍAS MOREIRA",
+      "nombre_equipo": "MANTA",
+      "partidos_jugados": 1,
+      "puntos": 20,
+      "rebotes": 3,
+      "tapones": 1,
+      "tiros_libres": 2,
+      "triples": 4,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/7/foto.jpg"
+     },
+     {
+      "asistencias": 3,
+      "id_jugador": 9,
+      "nombre": "ANA MERO VÉLEZ",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 1,
+      "puntos": 18,
+      "rebotes": 6,
+      "tapones": 0,
+      "tiros_libres": 4,
+      "triples": 2,
+      "url_foto": null
+     },
+     {
+      "asistencias": 2,
+      "id_jugador": 5,
+      "nombre": "JORGE ZAMBRANO ALCÍVAR",
+      "nombre_equipo": "FAE",
+      "partidos_jugados": 1,
+      "puntos": 18,
+      "rebotes": 4,
+      "tapones": 0,
+      "tiros_libres": 3,
+      "triples": 3,
+      "url_foto": null
+     },
+     {
+      "asistencias": 0,
+      "id_jugador": 6,
+      "nombre": "CARLOS MACÍAS LOOR",
+      "nombre_equipo": "FAE",
+      "partidos_jugados": 1,
+      "puntos": 12,
+      "rebotes": 9,
+      "tapones": 2,
+      "tiros_libres": 1,
+      "triples": 1,
+      "url_foto": null
+     },
+     {
+      "asistencias": 1,
+      "id_jugador": 10,
+      "nombre": "MARÍA LOOR CEDEÑO",
+      "nombre_equipo": "JUAN MONTALVO",
+      "partidos_jugados": 1,
+      "puntos": 12,
+      "rebotes": 8,
+      "tapones": 1,
+      "tiros_libres": 2,
+      "triples": 0,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/10/foto.jpg"
+     },
+     {
+      "asistencias": 1,
+      "id_jugador": 2,
+      "nombre": "MATEO MERO PINARGOTE",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 1,
+      "puntos": 10,
+      "rebotes": 7,
+      "tapones": 0,
+      "tiros_libres": 2,
+      "triples": 0,
+      "url_foto": null
+     }
+    ],
+    "rebotes": [
+     {
+      "asistencias": 7,
+      "id_jugador": 1,
+      "nombre": "BRYAN CHÁVEZ VÉLEZ",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 2,
+      "puntos": 37,
+      "rebotes": 11,
+      "tapones": 1,
+      "tiros_libres": 6,
+      "triples": 3,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
+     },
+     {
+      "asistencias": 0,
+      "id_jugador": 6,
+      "nombre": "CARLOS MACÍAS LOOR",
+      "nombre_equipo": "FAE",
+      "partidos_jugados": 1,
+      "puntos": 12,
+      "rebotes": 9,
+      "tapones": 2,
+      "tiros_libres": 1,
+      "triples": 1,
+      "url_foto": null
+     },
+     {
+      "asistencias": 1,
+      "id_jugador": 10,
+      "nombre": "MARÍA LOOR CEDEÑO",
+      "nombre_equipo": "JUAN MONTALVO",
+      "partidos_jugados": 1,
+      "puntos": 12,
+      "rebotes": 8,
+      "tapones": 1,
+      "tiros_libres": 2,
+      "triples": 0,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/10/foto.jpg"
+     },
+     {
+      "asistencias": 1,
+      "id_jugador": 2,
+      "nombre": "MATEO MERO PINARGOTE",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 1,
+      "puntos": 10,
+      "rebotes": 7,
+      "tapones": 0,
+      "tiros_libres": 2,
+      "triples": 0,
+      "url_foto": null
+     },
+     {
+      "asistencias": 3,
+      "id_jugador": 9,
+      "nombre": "ANA MERO VÉLEZ",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 1,
+      "puntos": 18,
+      "rebotes": 6,
+      "tapones": 0,
+      "tiros_libres": 4,
+      "triples": 2,
+      "url_foto": null
+     },
+     {
+      "asistencias": 2,
+      "id_jugador": 5,
+      "nombre": "JORGE ZAMBRANO ALCÍVAR",
+      "nombre_equipo": "FAE",
+      "partidos_jugados": 1,
+      "puntos": 18,
+      "rebotes": 4,
+      "tapones": 0,
+      "tiros_libres": 3,
+      "triples": 3,
+      "url_foto": null
+     },
+     {
+      "asistencias": 2,
+      "id_jugador": 7,
+      "nombre": "SEBASTIÁN MACÍAS MOREIRA",
+      "nombre_equipo": "MANTA",
+      "partidos_jugados": 1,
+      "puntos": 20,
+      "rebotes": 3,
+      "tapones": 1,
+      "tiros_libres": 2,
+      "triples": 4,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/7/foto.jpg"
+     }
+    ],
+    "tapones": [
+     {
+      "asistencias": 0,
+      "id_jugador": 6,
+      "nombre": "CARLOS MACÍAS LOOR",
+      "nombre_equipo": "FAE",
+      "partidos_jugados": 1,
+      "puntos": 12,
+      "rebotes": 9,
+      "tapones": 2,
+      "tiros_libres": 1,
+      "triples": 1,
+      "url_foto": null
+     },
+     {
+      "asistencias": 7,
+      "id_jugador": 1,
+      "nombre": "BRYAN CHÁVEZ VÉLEZ",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 2,
+      "puntos": 37,
+      "rebotes": 11,
+      "tapones": 1,
+      "tiros_libres": 6,
+      "triples": 3,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
+     },
+     {
+      "asistencias": 2,
+      "id_jugador": 7,
+      "nombre": "SEBASTIÁN MACÍAS MOREIRA",
+      "nombre_equipo": "MANTA",
+      "partidos_jugados": 1,
+      "puntos": 20,
+      "rebotes": 3,
+      "tapones": 1,
+      "tiros_libres": 2,
+      "triples": 4,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/7/foto.jpg"
+     },
+     {
+      "asistencias": 1,
+      "id_jugador": 10,
+      "nombre": "MARÍA LOOR CEDEÑO",
+      "nombre_equipo": "JUAN MONTALVO",
+      "partidos_jugados": 1,
+      "puntos": 12,
+      "rebotes": 8,
+      "tapones": 1,
+      "tiros_libres": 2,
+      "triples": 0,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/10/foto.jpg"
+     }
+    ],
+    "tiros_libres": [
+     {
+      "asistencias": 7,
+      "id_jugador": 1,
+      "nombre": "BRYAN CHÁVEZ VÉLEZ",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 2,
+      "puntos": 37,
+      "rebotes": 11,
+      "tapones": 1,
+      "tiros_libres": 6,
+      "triples": 3,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
+     },
+     {
+      "asistencias": 3,
+      "id_jugador": 9,
+      "nombre": "ANA MERO VÉLEZ",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 1,
+      "puntos": 18,
+      "rebotes": 6,
+      "tapones": 0,
+      "tiros_libres": 4,
+      "triples": 2,
+      "url_foto": null
+     },
+     {
+      "asistencias": 2,
+      "id_jugador": 5,
+      "nombre": "JORGE ZAMBRANO ALCÍVAR",
+      "nombre_equipo": "FAE",
+      "partidos_jugados": 1,
+      "puntos": 18,
+      "rebotes": 4,
+      "tapones": 0,
+      "tiros_libres": 3,
+      "triples": 3,
+      "url_foto": null
+     },
+     {
+      "asistencias": 2,
+      "id_jugador": 7,
+      "nombre": "SEBASTIÁN MACÍAS MOREIRA",
+      "nombre_equipo": "MANTA",
+      "partidos_jugados": 1,
+      "puntos": 20,
+      "rebotes": 3,
+      "tapones": 1,
+      "tiros_libres": 2,
+      "triples": 4,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/7/foto.jpg"
+     },
+     {
+      "asistencias": 1,
+      "id_jugador": 10,
+      "nombre": "MARÍA LOOR CEDEÑO",
+      "nombre_equipo": "JUAN MONTALVO",
+      "partidos_jugados": 1,
+      "puntos": 12,
+      "rebotes": 8,
+      "tapones": 1,
+      "tiros_libres": 2,
+      "triples": 0,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/10/foto.jpg"
+     },
+     {
+      "asistencias": 1,
+      "id_jugador": 2,
+      "nombre": "MATEO MERO PINARGOTE",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 1,
+      "puntos": 10,
+      "rebotes": 7,
+      "tapones": 0,
+      "tiros_libres": 2,
+      "triples": 0,
+      "url_foto": null
+     },
+     {
+      "asistencias": 0,
+      "id_jugador": 6,
+      "nombre": "CARLOS MACÍAS LOOR",
+      "nombre_equipo": "FAE",
+      "partidos_jugados": 1,
+      "puntos": 12,
+      "rebotes": 9,
+      "tapones": 2,
+      "tiros_libres": 1,
+      "triples": 1,
+      "url_foto": null
+     }
+    ],
+    "triples": [
+     {
+      "asistencias": 2,
+      "id_jugador": 7,
+      "nombre": "SEBASTIÁN MACÍAS MOREIRA",
+      "nombre_equipo": "MANTA",
+      "partidos_jugados": 1,
+      "puntos": 20,
+      "rebotes": 3,
+      "tapones": 1,
+      "tiros_libres": 2,
+      "triples": 4,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/7/foto.jpg"
+     },
+     {
+      "asistencias": 7,
+      "id_jugador": 1,
+      "nombre": "BRYAN CHÁVEZ VÉLEZ",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 2,
+      "puntos": 37,
+      "rebotes": 11,
+      "tapones": 1,
+      "tiros_libres": 6,
+      "triples": 3,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
+     },
+     {
+      "asistencias": 2,
+      "id_jugador": 5,
+      "nombre": "JORGE ZAMBRANO ALCÍVAR",
+      "nombre_equipo": "FAE",
+      "partidos_jugados": 1,
+      "puntos": 18,
+      "rebotes": 4,
+      "tapones": 0,
+      "tiros_libres": 3,
+      "triples": 3,
+      "url_foto": null
+     },
+     {
+      "asistencias": 3,
+      "id_jugador": 9,
+      "nombre": "ANA MERO VÉLEZ",
+      "nombre_equipo": "SAN JOSÉ",
+      "partidos_jugados": 1,
+      "puntos": 18,
+      "rebotes": 6,
+      "tapones": 0,
+      "tiros_libres": 4,
+      "triples": 2,
+      "url_foto": null
+     },
+     {
+      "asistencias": 0,
+      "id_jugador": 6,
+      "nombre": "CARLOS MACÍAS LOOR",
+      "nombre_equipo": "FAE",
+      "partidos_jugados": 1,
+      "puntos": 12,
+      "rebotes": 9,
+      "tapones": 2,
+      "tiros_libres": 1,
+      "triples": 1,
+      "url_foto": null
+     }
+    ]
+   },
+   "message": "Líderes estadísticos del torneo \"INTERCOLEGIAL 2026\".",
+   "success": true
+  }
+ },
  "GET /api/torneos/1/lideres?id_categoria=2 · anónimo": {
   "codigo": 200,
   "cuerpo": {
@@ -12576,10 +13032,10 @@
   }
  },
  "GET /api/usuarios/me · fantasma": {
-  "codigo": 404,
+  "codigo": 401,
   "cuerpo": {
-   "error_code": "NOT_FOUND",
-   "message": "Usuario no encontrado.",
+   "error_code": "USER_NOT_FOUND",
+   "message": "El usuario asociado al token no existe en el sistema.",
    "success": false
   }
  },
@@ -12592,18 +13048,11 @@
   }
  },
  "GET /api/usuarios/me · inactivo": {
-  "codigo": 200,
+  "codigo": 403,
   "cuerpo": {
-   "data": {
-    "correo": "inactivo@manta.test",
-    "created_at": "2026-10-01T12:06:00",
-    "estado": "inactivo",
-    "id_usuario": "u-inactivo",
-    "nombre": "Cuenta inactiva",
-    "rol": "delegado",
-    "updated_at": "2026-10-01T12:06:00"
-   },
-   "success": true
+   "error_code": "USER_INACTIVE",
+   "message": "La cuenta del usuario está inactiva.",
+   "success": false
   }
  },
  "GET /api/usuarios/me · vencido": {
@@ -15901,48 +16350,11 @@
   }
  },
  "POST /api/inscripciones · del2 · equipo ajeno": {
-  "codigo": 201,
+  "codigo": 403,
   "cuerpo": {
-   "data": {
-    "categoria": {
-     "edad_maxima": null,
-     "edad_minima": 50,
-     "genero_categoria": "masculino",
-     "id_categoria": 6,
-     "nombre_categoria": "Senior +50"
-    },
-    "created_at": "<hoy>",
-    "equipo": {
-     "id_equipo": 3,
-     "nombre_equipo": "MANTA",
-     "url_logo": null,
-     "usuario": {
-      "correo": "admin@manta.test",
-      "nombre": "Admin Manta"
-     }
-    },
-    "estado_inscripcion": "pendiente",
-    "fecha_inscripcion": "<hoy>",
-    "grupo": null,
-    "id_categoria": 6,
-    "id_equipo": 3,
-    "id_inscripcion": 15,
-    "id_torneo": 2,
-    "torneo": {
-     "estado": "programado",
-     "fecha_fin": "2026-10-27",
-     "fecha_inicio": "2026-10-10",
-     "id_torneo": 2,
-     "nombre": "NACIONAL +40 2026"
-    },
-    "updated_at": "<hoy>",
-    "url_comprobante_pago": null
-   },
-   "message": "Inscripción registrada exitosamente.",
-   "success": true
-  },
-  "filas": {
-   "inscripciones": 1
+   "error_code": "FORBIDDEN",
+   "message": "No tienes permiso para inscribir este equipo.",
+   "success": false
   }
  },
  "POST /api/inscripciones · del2 · incompleta": {
@@ -16327,11 +16739,19 @@
    "success": false
   }
  },
- "POST /api/inscripciones/completa · del3 · torneo que no es número": {
-  "codigo": 500,
+ "POST /api/inscripciones/completa · del3 · torneo en curso": {
+  "codigo": 422,
   "cuerpo": {
-   "error_code": "SERVER_ERROR",
-   "message": "Ocurrió un error inesperado al procesar la inscripción.",
+   "error_code": "VALIDATION_ERROR",
+   "message": "No se pueden registrar inscripciones en un torneo en curso, finalizado o anulado.",
+   "success": false
+  }
+ },
+ "POST /api/inscripciones/completa · del3 · torneo que no es número": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "id_torneo e id_categoria deben ser números enteros.",
    "success": false
   }
  },
@@ -16463,6 +16883,14 @@
    "plantillas": 2
   }
  },
+ "POST /api/inscripciones/reinscribir · del2 · equipo ajeno": {
+  "codigo": 403,
+  "cuerpo": {
+   "error_code": "FORBIDDEN",
+   "message": "No tienes permiso para inscribir este equipo.",
+   "success": false
+  }
+ },
  "POST /api/inscripciones/reinscribir · del2 · sin clonar": {
   "codigo": 201,
   "cuerpo": {
@@ -16584,6 +17012,18 @@
    "jugadores": 1
   }
  },
+ "POST /api/jugadores · del1 · con url_cedula": {
+  "codigo": 422,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": {
+    "url_cedula": [
+     "Unknown field."
+    ]
+   },
+   "success": false
+  }
+ },
  "POST /api/jugadores · del1 · cédula repetida": {
   "codigo": 409,
   "cuerpo": {
@@ -16655,6 +17095,23 @@
      "La fecha de nacimiento debe ser una fecha en el pasado."
     ]
    },
+   "success": false
+  }
+ },
+ "POST /api/jugadores · del2 · cédula repetida de un jugador ajeno": {
+  "codigo": 409,
+  "cuerpo": {
+   "data": {
+    "documento_identificacion": "1310000001",
+    "estado": "activo",
+    "fecha_nacimiento": "2008-03-10",
+    "genero": "masculino",
+    "id_jugador": 1,
+    "nombre": "BRYAN CHÁVEZ VÉLEZ",
+    "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
+   },
+   "error_code": "CONFLICT",
+   "message": "Ya existe un jugador registrado con ese número de documento.",
    "success": false
   }
  },
@@ -18164,6 +18621,18 @@
    "success": true
   }
  },
+ "PUT /api/jugadores/1 · del1 · con url_cedula": {
+  "codigo": 422,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": {
+    "url_cedula": [
+     "Unknown field."
+    ]
+   },
+   "success": false
+  }
+ },
  "PUT /api/jugadores/1 · del1 · sin cuerpo": {
   "codigo": 400,
   "cuerpo": {
@@ -18911,20 +19380,20 @@
    "success": true
   }
  },
- "PUT /api/usuarios/me · del1 · nombre vacío": {
-  "codigo": 200,
+ "PUT /api/usuarios/me · del1 · nombre muy largo": {
+  "codigo": 422,
   "cuerpo": {
-   "data": {
-    "correo": "del1@manta.test",
-    "created_at": "2026-10-01T12:02:00",
-    "estado": "activo",
-    "id_usuario": "u-del-1",
-    "nombre": "",
-    "rol": "delegado",
-    "updated_at": "<hoy>"
-   },
-   "message": "Perfil actualizado exitosamente.",
-   "success": true
+   "error_code": "VALIDATION_ERROR",
+   "message": "El nombre debe ser un texto de 1 a 100 caracteres.",
+   "success": false
+  }
+ },
+ "PUT /api/usuarios/me · del1 · nombre vacío": {
+  "codigo": 422,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": "El nombre debe ser un texto de 1 a 100 caracteres.",
+   "success": false
   }
  },
  "PUT /api/usuarios/me · del1 · sin cuerpo": {

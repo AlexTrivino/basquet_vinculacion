@@ -12,6 +12,6 @@ lideres_bp = Blueprint('lideres', __name__, url_prefix='/api/torneos')
 def lideres_torneo(id_torneo):
     """Los primeros de cada rubro en un torneo vigente ('Torneo no encontrado.' si no), en ``id_categoria`` o en todas."""
     cat_param = request.args.get('id_categoria')
-    id_categoria = int(cat_param) if cat_param and cat_param.isdigit() else None
+    id_categoria = int(cat_param) if cat_param and cat_param.isdecimal() else None
     nombre, lideres = casos.lideres(id_torneo, id_categoria, RepositorioEstadisticas())
     return api_response(data=lideres, message=f'Líderes estadísticos del torneo "{nombre}".')
