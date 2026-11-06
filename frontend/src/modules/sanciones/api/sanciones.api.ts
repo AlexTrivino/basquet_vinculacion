@@ -1,5 +1,6 @@
 import api from '@/shared/api/axios.config';
-import type { ApiResponse, Sancion } from '@/shared/api/tipos';
+import type { ApiResponse } from '@/shared/api/tipos';
+import type { Sancion } from '../types';
 
 export const getSanciones = async (idJugador?: number, estado?: string) => {
   return (await api.get<ApiResponse<Sancion[]>>('/sanciones/', { params: { id_jugador: idJugador, estado } })).data;

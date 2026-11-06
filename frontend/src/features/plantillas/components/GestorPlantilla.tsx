@@ -39,7 +39,7 @@ import {
   updateNumeroCamiseta
 } from '../api/plantillas.api';
 import { getInscripciones } from '../../equipos/api/equipos.api';
-import { getSanciones } from '../../sanciones/api/sanciones.api';
+import { getSanciones } from '@/modules/sanciones';
 import type { Plantilla, Jugador, Categoria } from '@/shared/api/tipos';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { EmptyState } from '@/shared/ui/EmptyState';

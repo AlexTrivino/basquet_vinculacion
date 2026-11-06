@@ -5,7 +5,7 @@ Cada módulo es un commit. Comprobación de cada uno: `npm test` (con la prueba 
 - [x] `specs/10-modulos-frontend`: spec, plan y tareas.
 - [x] auth, y `"sideEffects": ["*.css"]` en `package.json`: sin eso, lo que un `index.ts` reexporta para otros módulos termina en el chunk inicial cuando `app` importa sus `rutas` (medido: react-router y `AuthContext` salían a dos chunks precargados, y con auspicios el carrusel y su API entraban al `index`). En `src` solo `main.tsx` (la entrada) y `index.css` tienen efectos al importarse; `axios.config.ts` configura su propia instancia, que siempre se usa.
 - [x] auspicios.
-- [ ] sanciones.
+- [x] sanciones, con `Sancion` en su `types.ts`. Trinquete 19 → 18.
 - [ ] partidos, con `getPartidosByTorneo`, `postEstadisticasBulk` y `clavesPartidos`.
 - [ ] torneos, con `clavesTorneos` y `CalendarioTorneo`.
 - [ ] inscripciones, con sus llamadas fuera de `equipos.api.ts`.

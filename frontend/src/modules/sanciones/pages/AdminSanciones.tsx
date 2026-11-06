@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { getSanciones, updateSancion } from '../../features/sanciones/api/sanciones.api';
+import { getSanciones, updateSancion } from '../api/sanciones.api';
 import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
 import { AlertTriangle } from 'lucide-react';
-import type { Sancion } from '@/shared/api/tipos';
+import type { Sancion } from '../types';
 
 export default function AdminSanciones() {
   const queryClient = useQueryClient();
