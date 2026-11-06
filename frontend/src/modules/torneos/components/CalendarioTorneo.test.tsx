@@ -6,7 +6,7 @@ import { CalendarioTorneo } from './CalendarioTorneo';
 
 const auth = vi.hoisted(() => ({ rol: null as string | null }));
 vi.mock('@/modules/auth/AuthContext', () => ({ useAuth: () => ({ userRole: auth.rol }) }));
-vi.mock('@/features/flyers/components/FlyerFecha', () => ({ default: () => <p>flyer de la fecha</p> }));
+vi.mock('@/modules/flyers/components/FlyerFecha', () => ({ default: () => <p>flyer de la fecha</p> }));
 vi.mock('@/modules/partidos/api/partidos.api', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   getPartidosByTorneo: async () => ({

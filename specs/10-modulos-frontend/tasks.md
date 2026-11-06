@@ -12,7 +12,7 @@ Cada módulo es un commit. Comprobación de cada uno: `npm test` (con la prueba 
 - [x] equipos, con el panel del delegado y `BannerNuevosTorneos`. Trinquete 3 → 2.
 - [x] jugadores, con `types.ts` (el perfil del jugador).
 - [x] visor.
-- [ ] flyers.
+- [x] flyers: `FlyerFecha` se exporta con `lazy` desde `components/FlyerFechaDiferido.ts`. Medido: si el `lazy` está en el `index.ts`, el index deja de ser solo reexportaciones y la vista pública del torneo descarga los 45 KB del estudio de flyers.
 - [ ] estadísticas, con `LideresEstadisticos` y el panel del admin.
 - [ ] portada, con el Footer y Contacto.
 - [ ] Cierre: carpetas viejas borradas, fronteras estrictas sin trinquete (comprobación: falla con un import interno, con un ciclo y con un archivo suelto), `.agents/AGENTS.md`, README, `DESIGN.md` y `Docs/04_estructura_carpetas.md`.

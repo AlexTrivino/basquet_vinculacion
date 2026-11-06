@@ -95,7 +95,8 @@ Imports: relativos dentro de la misma zona (un módulo, `app/` o `shared/`) y co
 
 Cada módulo tiene `api/`, `components/`, `pages/`, `types.ts` si tiene tipos propios, `routes.tsx` con sus
 `rutas` (`publicas` dentro del layout, `delegado` y `admin` bajo su guarda, `sueltas` fuera del layout), que junta
-`app/router.tsx`, e `index.ts` con lo único que usan los demás. Migrados (fase 10):
+`app/router.tsx`, e `index.ts` con lo único que usan los demás. El `index.ts` solo reexporta: con código propio
+(un `lazy`, una constante) Vite mete en el chunk de quien lo importa todo lo que el index reexporta. Migrados (fase 10):
 - `auth`: la sesión (`AuthContext`), `ProtectedRoute`, login, registro, recuperación de la clave y perfil.
 - `auspicios`: los patrocinadores: el carrusel de la portada (`SponsorsCarousel`) y su administración.
 - `sanciones`: las sanciones de los jugadores (`getSanciones`, que también consulta la plantilla) y su administración.
@@ -105,6 +106,7 @@ Cada módulo tiene `api/`, `components/`, `pages/`, `types.ts` si tiene tipos pr
 - `equipos`: el directorio y el perfil público de los equipos, su administración (con la auditoría de inscripciones y la baja) y el panel del delegado (`Dashboard`, con `BannerNuevosTorneos`).
 - `jugadores`: el perfil público del jugador y la administración de los jugadores, con `types.ts` (el perfil con sus participaciones y métricas).
 - `visor`: el buscador de jugadores del rol visor (`/visor`, con su guarda) y `PartidosJugador`, que también usa el perfil del jugador.
+- `flyers`: el estudio de flyers del panel del admin (`EstudioFlyers`) y el flyer de la fecha del calendario (`FlyerFecha`, que el `index.ts` exporta con `lazy` para que html-to-image no pese en la vista del torneo).
 
 **Prohibido:** estructura plana, `useState` múltiples en formularios complejos,
 componentes controlados puros donde aplique React Hook Form.

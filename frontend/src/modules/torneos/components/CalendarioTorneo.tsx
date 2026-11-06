@@ -4,12 +4,10 @@ import { getPartidosByTorneo, BoxScoreModal, clavesPartidos } from '@/modules/pa
 import { Calendar as CalendarIcon, FileText, Activity, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { Escudo } from '@/shared/ui/Escudo';
 import { useAuth } from '@/modules/auth';
-import { lazy, Suspense, useState, useMemo } from 'react';
+import { Suspense, useState, useMemo } from 'react';
+import { FlyerFecha } from '@/modules/flyers';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, isToday, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-
-// El flyer de la fecha (y html-to-image) solo se descarga cuando el admin elige una fecha
-const FlyerFecha = lazy(() => import('@/features/flyers/components/FlyerFecha'));
 
 interface CalendarioTorneoProps {
   torneoId: string;

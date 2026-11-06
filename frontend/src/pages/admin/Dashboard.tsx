@@ -6,7 +6,7 @@ import { AlertCircle, ArrowRight, FileText, Trophy } from 'lucide-react';
 import { useAuth } from '@/modules/auth';
 import { getDashboardStats, getActividadReciente } from '../../features/estadisticas/api/estadisticas.api';
 import { getPartidos, clavesPartidos } from '@/modules/partidos';
-import { EstudioFlyers } from '../../features/flyers/components/EstudioFlyers';
+import { EstudioFlyers } from '@/modules/flyers';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import type { Partido } from '@/shared/api/tipos';
 
