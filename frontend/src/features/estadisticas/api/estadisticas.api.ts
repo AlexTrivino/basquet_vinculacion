@@ -26,6 +26,14 @@ export async function getActividadReciente(): Promise<ApiResponse<ActividadRecie
   return response.data;
 }
 
+// Líderes de un torneo (pestaña Estadísticas del torneo)
+export async function getLideresEstadisticos(idTorneo: string | number, idCategoria?: number): Promise<ApiResponse<any>> {
+  const params: any = {};
+  if (idCategoria) params.id_categoria = idCategoria;
+  const response = await axiosInstance.get(`/torneos/${idTorneo}/lideres`, { params });
+  return response.data;
+}
+
 // Totales públicos de la portada (sin autenticación)
 export async function getEstadisticasPublicas(): Promise<
   ApiResponse<{ puntos_totales: number; puntos_por_torneo?: Record<string, number> }>

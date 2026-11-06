@@ -5,6 +5,7 @@ import { ProtectedRoute, rutas as auth } from '@/modules/auth';
 import { rutas as auspicios } from '@/modules/auspicios';
 import { rutas as sanciones } from '@/modules/sanciones';
 import { rutas as partidos } from '@/modules/partidos';
+import { rutas as torneos } from '@/modules/torneos';
 import { MainLayout } from './MainLayout';
 import NotFound from './NotFound';
 import Unauthorized from './Unauthorized';
@@ -13,7 +14,6 @@ import { withSuspense } from '@/shared/ui/withSuspense';
 // --- Lazy loaded pages (Code Splitting) ---
 // Público
 const Home = lazy(() => import('@/pages/public/Home'));
-const TorneoDetail = lazy(() => import('@/pages/public/TorneoDetail'));
 const EquipoProfile = lazy(() => import('@/pages/public/EquipoProfile'));
 const DirectorioEquipos = lazy(() => import('@/pages/public/DirectorioEquipos'));
 const JugadorProfile = lazy(() => import('@/pages/public/JugadorProfile'));
@@ -28,12 +28,10 @@ const DelegadoReinscripcion = lazy(() => import('@/pages/delegado/Reinscripcion'
 const DelegadoPlantilla = lazy(() => import('@/pages/delegado/Plantilla'));
 
 // Admin
-const AdminTorneos = lazy(() => import('@/pages/admin/TorneosAdmin'));
 const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
 const AdminAuditoria = lazy(() => import('@/pages/admin/Auditoria'));
 const AdminEquipos = lazy(() => import('@/pages/admin/AdminEquipos'));
 const AdminJugadores = lazy(() => import('@/pages/admin/AdminJugadores'));
-const AdminFaseFinal = lazy(() => import('@/pages/admin/FaseFinal'));
 
 export const router = createBrowserRouter([
   {
@@ -44,10 +42,7 @@ export const router = createBrowserRouter([
         path: '/',
         element: withSuspense(Home),
       },
-      {
-        path: '/torneos/:id',
-        element: withSuspense(TorneoDetail),
-      },
+      ...torneos.publicas,
       {
         path: '/equipos',
         element: withSuspense(DirectorioEquipos),
@@ -81,7 +76,7 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute allowedRoles={['super_admin']} />,
         children: [
           { index: true, element: <Navigate to="torneos" replace /> },
-          { path: 'torneos', element: withSuspense(AdminTorneos) },
+          ...torneos.admin,
           { path: 'dashboard', element: withSuspense(AdminDashboard) },
           { path: 'auditoria', element: withSuspense(AdminAuditoria) },
           { path: 'equipos', element: withSuspense(AdminEquipos) },
@@ -89,7 +84,6 @@ export const router = createBrowserRouter([
           ...partidos.admin,
           ...sanciones.admin,
           ...auspicios.admin,
-          { path: 'fase-final', element: withSuspense(AdminFaseFinal) },
         ],
       },
     ],

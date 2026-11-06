@@ -10,8 +10,9 @@ import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
 import { AsyncButton } from '@/shared/ui/AsyncButton';
 import { FileUploadButton } from '@/shared/ui/FileUploadButton';
 import { getTorneosAdmin } from '@/shared/api/catalogo';
-import { createTorneo, updateTorneo, anularTorneo, addCategoria, deleteCategoria, uploadCalendario } from '../../features/torneos/api/torneos.api';
+import { createTorneo, updateTorneo, anularTorneo, addCategoria, deleteCategoria, uploadCalendario } from '../api/torneos.api';
 import type { Torneo } from '@/shared/api/tipos';
+import { clavesTorneos } from '../api/claves';
 
 const torneoSchema = z.object({
   nombre: z.string().min(1, 'El nombre es obligatorio').max(100, 'Máximo 100 caracteres'),
@@ -173,7 +174,7 @@ export default function TorneosAdmin() {
     onSuccess: () => {
       toast.success('Torneo creado exitosamente');
       queryClient.invalidateQueries({ queryKey: ['torneos_admin'] });
-      queryClient.invalidateQueries({ queryKey: ['torneos'] });
+      queryClient.invalidateQueries({ queryKey: clavesTorneos.todos });
       closeModal();
     },
     onError: (error: any) => {
@@ -186,7 +187,7 @@ export default function TorneosAdmin() {
     onSuccess: () => {
       toast.success('Torneo actualizado exitosamente');
       queryClient.invalidateQueries({ queryKey: ['torneos_admin'] });
-      queryClient.invalidateQueries({ queryKey: ['torneos'] });
+      queryClient.invalidateQueries({ queryKey: clavesTorneos.todos });
       closeModal();
     },
     onError: () => {
@@ -199,7 +200,7 @@ export default function TorneosAdmin() {
     onSuccess: () => {
       toast.success('Torneo anulado exitosamente');
       queryClient.invalidateQueries({ queryKey: ['torneos_admin'] });
-      queryClient.invalidateQueries({ queryKey: ['torneos'] });
+      queryClient.invalidateQueries({ queryKey: clavesTorneos.todos });
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || 'Error al anular el torneo');

@@ -4,11 +4,13 @@ import { GitBranch, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { AsyncButton } from '@/shared/ui/AsyncButton';
-import { generarLlaves, getFaseFinal, setFormatoCategoria, setGrupos } from '../../features/torneos/api/torneos.api';
+import { generarLlaves, getFaseFinal, setFormatoCategoria, setGrupos } from '../api/torneos.api';
 import { getTorneosAdmin } from '@/shared/api/catalogo';
-import { getInscripcionesPublicas } from '../../features/equipos/api/equipos.api';
-import type { Categoria, FormatoFaseFinal, Llave } from '@/shared/api/tipos';
+import { getInscripcionesPublicas } from '@/features/equipos/api/equipos.api';
+import type { Categoria, FormatoFaseFinal } from '@/shared/api/tipos';
+import type { Llave } from '../types';
 import { clavesPartidos } from '@/modules/partidos';
+import { clavesTorneos } from '../api/claves';
 
 const TARJETA = 'bg-marino-claro p-6 rounded-2xl border border-white/10 shadow-sm';
 const SELECT = 'w-full rounded-md border border-white/15 bg-marino-claro px-3 py-2 text-sm focus:border-celeste focus:outline-none';
@@ -56,7 +58,7 @@ export default function FaseFinal() {
   const categorias = torneo?.categorias || [];
 
   const { data: faseRes, isLoading } = useQuery({
-    queryKey: ['torneos', String(idTorneo), 'fase-final', idCategoria],
+    queryKey: clavesTorneos.faseFinal(String(idTorneo), idCategoria),
     queryFn: () => getFaseFinal(idTorneo, idCategoria),
     enabled: idTorneo > 0 && idCategoria > 0,
   });
@@ -76,7 +78,7 @@ export default function FaseFinal() {
   useEffect(() => { setAsignacion(fase?.grupos || {}); setProgramacion({}); }, [fase]);
 
   const refrescar = () => {
-    queryClient.invalidateQueries({ queryKey: ['torneos'] });
+    queryClient.invalidateQueries({ queryKey: clavesTorneos.todos });
     queryClient.invalidateQueries({ queryKey: ['torneos_admin'] });
   };
   const guardarFormato = useMutation({

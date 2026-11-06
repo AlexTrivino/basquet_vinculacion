@@ -9,9 +9,9 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMont
 import { es } from 'date-fns/locale';
 
 // El flyer de la fecha (y html-to-image) solo se descarga cuando el admin elige una fecha
-const FlyerFecha = lazy(() => import('../../flyers/components/FlyerFecha'));
+const FlyerFecha = lazy(() => import('@/features/flyers/components/FlyerFecha'));
 
-interface PartidosListProps {
+interface CalendarioTorneoProps {
   torneoId: string;
   idCategoria?: number;
   urlCalendario?: string;
@@ -45,7 +45,7 @@ function Equipo({ equipo, defecto, lado, atenuado }: { equipo: any; defecto: str
   );
 }
 
-export function PartidosList({ torneoId, idCategoria, urlCalendario, categorias = [] }: PartidosListProps) {
+export function CalendarioTorneo({ torneoId, idCategoria, urlCalendario, categorias = [] }: CalendarioTorneoProps) {
   const [selectedMatch, setSelectedMatch] = useState<any | null>(null);
   const [currentMonth, setCurrentMonth] = useState<Date | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);

@@ -2,11 +2,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { PartidosList } from './PartidosList';
+import { CalendarioTorneo } from './CalendarioTorneo';
 
 const auth = vi.hoisted(() => ({ rol: null as string | null }));
 vi.mock('@/modules/auth/AuthContext', () => ({ useAuth: () => ({ userRole: auth.rol }) }));
-vi.mock('../../flyers/components/FlyerFecha', () => ({ default: () => <p>flyer de la fecha</p> }));
+vi.mock('@/features/flyers/components/FlyerFecha', () => ({ default: () => <p>flyer de la fecha</p> }));
 vi.mock('@/modules/partidos/api/partidos.api', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   getPartidosByTorneo: async () => ({
@@ -23,7 +23,7 @@ async function elegirFecha(rol: string | null) {
   render(
     <QueryClientProvider client={new QueryClient()}>
       <MemoryRouter>
-        <PartidosList torneoId="2" />
+        <CalendarioTorneo torneoId="2" />
       </MemoryRouter>
     </QueryClientProvider>
   );

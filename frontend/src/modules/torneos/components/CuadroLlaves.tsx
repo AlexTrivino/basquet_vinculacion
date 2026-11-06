@@ -4,7 +4,8 @@ import { ArrowRight, Trophy } from 'lucide-react';
 import { getFaseFinal } from '../api/torneos.api';
 import { Escudo } from '@/shared/ui/Escudo';
 import { fechaCorta } from './faseFinal';
-import type { Llave } from '@/shared/api/tipos';
+import type { Llave } from '../types';
+import { clavesTorneos } from '../api/claves';
 
 const PLACA = 'font-display text-xs font-semibold uppercase tracking-[0.25em] text-oro/80';
 
@@ -67,7 +68,7 @@ function Tarjeta({ llave }: { llave: Llave }) {
 // Cuadro de llaves de la fase final: una columna por ronda, el tercer puesto bajo la final
 export function CuadroLlaves({ torneoId, idCategoria, onVerPosiciones }: { torneoId: string; idCategoria: number; onVerPosiciones?: () => void }) {
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['torneos', torneoId, 'fase-final', idCategoria],
+    queryKey: clavesTorneos.faseFinal(torneoId, idCategoria),
     queryFn: () => getFaseFinal(torneoId, idCategoria),
   });
   const fase = data?.data;

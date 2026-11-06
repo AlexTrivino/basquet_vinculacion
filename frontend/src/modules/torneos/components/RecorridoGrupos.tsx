@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { getRecorrido } from '../api/torneos.api';
 import { Escudo } from '@/shared/ui/Escudo';
 import { COLORES_LINEA, SITUACION, fechaCorta } from './faseFinal';
-import type { Recorrido } from '@/shared/api/tipos';
+import type { Recorrido } from '../types';
+import { clavesTorneos } from '../api/claves';
 
 // Sigla para rotular cada línea: iniciales de hasta dos palabras ("5 DE JUNIO" → "5J")
 const sigla = (nombre: string) =>
@@ -72,7 +73,7 @@ function Grafico({ grupo, fechas, cupos }: { grupo: Recorrido['grupos'][number];
 // Recorrido de cada grupo: el gráfico y la situación de cada equipo
 export function RecorridoGrupos({ torneoId, idCategoria }: { torneoId: string; idCategoria: number }) {
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['torneos', torneoId, 'recorrido', idCategoria],
+    queryKey: clavesTorneos.recorrido(torneoId, idCategoria),
     queryFn: () => getRecorrido(torneoId, idCategoria),
   });
   const recorrido = data?.data;

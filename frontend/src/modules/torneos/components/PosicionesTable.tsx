@@ -6,7 +6,9 @@ import { getPosicionesByTorneo } from '../api/torneos.api';
 import { Escudo } from '@/shared/ui/Escudo';
 import { RecorridoGrupos } from './RecorridoGrupos';
 import { CUPOS, LEYENDA_CRUCES } from './faseFinal';
-import type { FormatoFaseFinal, PosicionFIBA } from '@/shared/api/tipos';
+import type { FormatoFaseFinal } from '@/shared/api/tipos';
+import type { PosicionFIBA } from '../types';
+import { clavesTorneos } from '../api/claves';
 
 interface PosicionesTableProps {
   torneoId: string;
@@ -110,7 +112,7 @@ function Tabla({ filas, grupo, cupos, compacta }: { filas: PosicionFIBA[]; grupo
 export function PosicionesTable({ torneoId, idCategoria, formato, onVerLlaves }: PosicionesTableProps) {
   const [vista, setVista] = useState<'tabla' | 'recorrido'>('tabla');
   const { data: response, isLoading, isError } = useQuery({
-    queryKey: ['torneos', torneoId, 'posiciones', idCategoria],
+    queryKey: clavesTorneos.posiciones(torneoId, idCategoria),
     queryFn: () => getPosicionesByTorneo(torneoId, idCategoria),
   });
   const posiciones = response?.data || [];

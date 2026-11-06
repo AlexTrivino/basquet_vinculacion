@@ -1,5 +1,6 @@
 import axiosInstance from '@/shared/api/axios.config';
-import type { FaseFinal, FormatoFaseFinal, Recorrido, ApiResponse, Torneo, Partido, PosicionFIBA } from '@/shared/api/tipos';
+import type { FormatoFaseFinal, ApiResponse, Torneo, Partido } from '@/shared/api/tipos';
+import type { FaseFinal, Recorrido, PosicionFIBA } from '../types';
 
 // Ojo: axiosInstance (importado arriba) ya inyecta el baseUrl y el token.
 
@@ -12,13 +13,6 @@ export async function getPosicionesByTorneo(id: string | number, idCategoria?: n
   const params: any = {};
   if (idCategoria) params.id_categoria = idCategoria;
   const response = await axiosInstance.get(`/torneos/${id}/posiciones`, { params });
-  return response.data;
-}
-
-export async function getLideresEstadisticos(idTorneo: string | number, idCategoria?: number): Promise<ApiResponse<any>> {
-  const params: any = {};
-  if (idCategoria) params.id_categoria = idCategoria;
-  const response = await axiosInstance.get(`/torneos/${idTorneo}/lideres`, { params });
   return response.data;
 }
 

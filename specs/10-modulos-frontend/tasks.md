@@ -7,7 +7,7 @@ Cada módulo es un commit. Comprobación de cada uno: `npm test` (con la prueba 
 - [x] auspicios.
 - [x] sanciones, con `Sancion` en su `types.ts`. Trinquete 19 → 18.
 - [x] partidos, con `getPartidosByTorneo`, `postEstadisticasBulk` y `clavesPartidos` (18 claves escritas a mano en 11 archivos pasan a la fábrica). Trinquete 18 → 11.
-- [ ] torneos, con `clavesTorneos` y `CalendarioTorneo`.
+- [x] torneos, con `clavesTorneos` (9 claves en 6 archivos), `CalendarioTorneo` y `types.ts` (posiciones, llaves y recorrido); `LideresEstadisticos` y `getLideresEstadisticos` esperan en `features/estadisticas`. Trinquete 11 → 10.
 - [ ] inscripciones, con sus llamadas fuera de `equipos.api.ts`.
 - [ ] equipos.
 - [ ] jugadores.

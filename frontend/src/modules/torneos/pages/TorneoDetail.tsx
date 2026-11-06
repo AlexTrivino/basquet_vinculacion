@@ -4,12 +4,13 @@ import { useQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ArrowLeft } from 'lucide-react';
-import { getTorneoById } from '../../features/torneos/api/torneos.api';
+import { getTorneoById } from '../api/torneos.api';
 import { getPartidosByTorneo, clavesPartidos } from '@/modules/partidos';
-import { PosicionesTable } from '../../features/torneos/components/PosicionesTable';
-import { PartidosList, colorCategoria } from '../../features/torneos/components/PartidosList';
-import { LideresEstadisticos } from '../../features/torneos/components/LideresEstadisticos';
-import { CuadroLlaves } from '../../features/torneos/components/CuadroLlaves';
+import { PosicionesTable } from '../components/PosicionesTable';
+import { CalendarioTorneo, colorCategoria } from '../components/CalendarioTorneo';
+import { LideresEstadisticos } from '@/features/estadisticas/components/LideresEstadisticos';
+import { CuadroLlaves } from '../components/CuadroLlaves';
+import { clavesTorneos } from '../api/claves';
 
 type Tab = 'calendario' | 'posiciones' | 'llaves' | 'estadisticas';
 const TABS: { id: Tab; texto: string }[] = [
@@ -35,11 +36,11 @@ export default function TorneoDetail() {
   const [activeCategoriaId, setActiveCategoriaId] = useState<number | undefined>(undefined);
 
   const { data: response, isLoading, isError } = useQuery({
-    queryKey: ['torneos', id],
+    queryKey: clavesTorneos.detalle(id),
     queryFn: () => getTorneoById(id as string),
     enabled: !!id,
   });
-  // Misma clave que PartidosList: una sola petición alimenta el marcador y el calendario
+  // Misma clave que CalendarioTorneo: una sola petición alimenta el marcador y el calendario
   const { data: partidosRes } = useQuery({
     queryKey: clavesPartidos.delTorneo(id),
     queryFn: () => getPartidosByTorneo(id as string, 1, 1000),
@@ -201,7 +202,7 @@ export default function TorneoDetail() {
           </p>
         )}
         {id && activeTab === 'calendario' && (
-          <PartidosList torneoId={id} urlCalendario={torneo?.url_calendario_excel} categorias={categorias} />
+          <CalendarioTorneo torneoId={id} urlCalendario={torneo?.url_calendario_excel} categorias={categorias} />
         )}
         {id && categoriaFiltro && activeTab === 'posiciones' && (
           <PosicionesTable torneoId={id} idCategoria={categoriaFiltro} formato={categoriaActiva?.formato} onVerLlaves={() => setActiveTab('llaves')} />

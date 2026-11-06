@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Trophy } from 'lucide-react';
-import { getLideresEstadisticos } from '../api/torneos.api';
+import { getLideresEstadisticos } from '../api/estadisticas.api';
 
 type StatTab = 'puntos' | 'triples' | 'rebotes' | 'asistencias' | 'tapones' | 'tiros_libres';
 
