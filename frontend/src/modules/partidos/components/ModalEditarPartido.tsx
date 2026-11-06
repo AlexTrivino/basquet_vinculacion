@@ -6,11 +6,12 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { X, Edit } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { getInscripciones } from '../../equipos/api/equipos.api';
+import { getInscripciones } from '@/features/equipos/api/equipos.api';
 import { actualizarPartido } from '../api/partidos.api';
 import { SearchableSelect, type Option } from '@/shared/ui/SearchableSelect';
 import { AsyncButton } from '@/shared/ui/AsyncButton';
 import type { Partido } from '@/shared/api/tipos';
+import { clavesPartidos } from '../api/claves';
 
 const partidoUpdateSchema = z.object({
   fecha: z.string().min(1, 'Fecha requerida'),
@@ -100,7 +101,7 @@ export function ModalEditarPartido({ partido, onClose }: ModalEditarPartidoProps
       
       await actualizarPartido(partido.id_partido!, data);
       toast.success('Partido actualizado correctamente');
-      queryClient.invalidateQueries({ queryKey: ['partidos'] });
+      queryClient.invalidateQueries({ queryKey: clavesPartidos.todos });
       onClose();
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Error al actualizar partido');

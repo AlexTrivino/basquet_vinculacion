@@ -7,7 +7,8 @@ import { PartidosList } from './PartidosList';
 const auth = vi.hoisted(() => ({ rol: null as string | null }));
 vi.mock('@/modules/auth/AuthContext', () => ({ useAuth: () => ({ userRole: auth.rol }) }));
 vi.mock('../../flyers/components/FlyerFecha', () => ({ default: () => <p>flyer de la fecha</p> }));
-vi.mock('../api/torneos.api', () => ({
+vi.mock('@/modules/partidos/api/partidos.api', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
   getPartidosByTorneo: async () => ({
     data: [{
       id_partido: 1, fecha: '2026-10-22', hora: '16:00:00', estado: 'programado', fase: 'PRIMERA FASE', marcador_local: 0, marcador_visitante: 0,

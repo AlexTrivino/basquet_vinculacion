@@ -4,6 +4,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ProtectedRoute, rutas as auth } from '@/modules/auth';
 import { rutas as auspicios } from '@/modules/auspicios';
 import { rutas as sanciones } from '@/modules/sanciones';
+import { rutas as partidos } from '@/modules/partidos';
 import { MainLayout } from './MainLayout';
 import NotFound from './NotFound';
 import Unauthorized from './Unauthorized';
@@ -31,7 +32,6 @@ const AdminTorneos = lazy(() => import('@/pages/admin/TorneosAdmin'));
 const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
 const AdminAuditoria = lazy(() => import('@/pages/admin/Auditoria'));
 const AdminEquipos = lazy(() => import('@/pages/admin/AdminEquipos'));
-const AdminPartidos = lazy(() => import('@/pages/admin/AdminPartidos'));
 const AdminJugadores = lazy(() => import('@/pages/admin/AdminJugadores'));
 const AdminFaseFinal = lazy(() => import('@/pages/admin/FaseFinal'));
 
@@ -86,7 +86,7 @@ export const router = createBrowserRouter([
           { path: 'auditoria', element: withSuspense(AdminAuditoria) },
           { path: 'equipos', element: withSuspense(AdminEquipos) },
           { path: 'jugadores', element: withSuspense(AdminJugadores) },
-          { path: 'partidos', element: withSuspense(AdminPartidos) },
+          ...partidos.admin,
           ...sanciones.admin,
           ...auspicios.admin,
           { path: 'fase-final', element: withSuspense(AdminFaseFinal) },

@@ -4,12 +4,12 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import EquipoProfile from './EquipoProfile';
 import * as equiposApi from '../../features/equipos/api/equipos.api';
-import * as partidosApi from '../../features/partidos/api/partidos.api';
+import * as partidosApi from '@/modules/partidos';
 import * as plantillasApi from '../../features/plantillas/api/plantillas.api';
 
 // Mocks de APIs
 vi.mock('../../features/equipos/api/equipos.api');
-vi.mock('../../features/partidos/api/partidos.api');
+vi.mock('@/modules/partidos/api/partidos.api');
 vi.mock('../../features/plantillas/api/plantillas.api');
 vi.mock('@/modules/auth/AuthContext', () => ({
   useAuth: () => ({

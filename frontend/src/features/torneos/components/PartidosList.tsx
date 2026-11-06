@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { getPartidosByTorneo } from '../api/torneos.api';
+import { getPartidosByTorneo, BoxScoreModal, clavesPartidos } from '@/modules/partidos';
 import { Calendar as CalendarIcon, FileText, Activity, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { Escudo } from '@/shared/ui/Escudo';
-import { BoxScoreModal } from '../../partidos/components/BoxScoreModal';
 import { useAuth } from '@/modules/auth';
 import { lazy, Suspense, useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, isToday, parseISO } from 'date-fns';
@@ -53,7 +52,7 @@ export function PartidosList({ torneoId, idCategoria, urlCalendario, categorias 
   const esAdmin = useAuth().userRole === 'super_admin';
 
   const { data: response, isLoading, isError } = useQuery({
-    queryKey: ['torneos', torneoId, 'partidos', idCategoria],
+    queryKey: clavesPartidos.delTorneo(torneoId, idCategoria),
     queryFn: () => getPartidosByTorneo(torneoId, 1, 1000, idCategoria),
   });
 

@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { X, Activity } from 'lucide-react';
 import { getBoxScore } from '../api/partidos.api';
+import { clavesPartidos } from '../api/claves';
 
 interface BoxScoreModalProps {
   idPartido: number;
@@ -88,7 +89,7 @@ function TablaEquipo({ nombre, filas, gano }: { nombre: string; filas: any[]; ga
 export function BoxScoreModal({ idPartido, equipoLocal, equipoVisitante, marcadorLocal, marcadorVisitante, onClose }: BoxScoreModalProps) {
   const titulo = useId();
   const { data: response, isLoading, isError } = useQuery({
-    queryKey: ['partido', idPartido, 'box-score'],
+    queryKey: clavesPartidos.boxScore(idPartido),
     queryFn: () => getBoxScore(idPartido),
   });
   const stats = response?.data;

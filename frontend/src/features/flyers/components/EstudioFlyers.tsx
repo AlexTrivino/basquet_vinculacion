@@ -4,7 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ChevronDown, Copy } from 'lucide-react';
 import { toast } from 'sonner';
-import { getPartidosByTorneo } from '../../torneos/api/torneos.api';
+import { getPartidosByTorneo, clavesPartidos } from '@/modules/partidos';
 import { getTorneosAdmin } from '@/shared/api/catalogo';
 import { getDatosFlyers, type DatosFlyers, type FiguraFlyer } from '../api/flyers.api';
 import {
@@ -191,7 +191,7 @@ export function EstudioFlyers() {
   });
   // El calendario del torneo (misma clave que la vista pública): de ahí salen los partidos por jugar
   const calendario = useQuery({
-    queryKey: ['torneos', String(idTorneo), 'partidos', undefined],
+    queryKey: clavesPartidos.delTorneo(String(idTorneo)),
     queryFn: () => getPartidosByTorneo(idTorneo, 1, 1000),
     enabled: idTorneo > 0 && tipo === 'partidos',
   });

@@ -5,16 +5,17 @@ import { Calendar, Plus, Filter, Search, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { getTorneos } from '@/shared/api/catalogo';
-import { getPartidos, anularPartido, restaurarPartido } from '../../features/partidos/api/partidos.api';
+import { getPartidos, anularPartido, restaurarPartido } from '../api/partidos.api';
 import { SearchableSelect, type Option } from '@/shared/ui/SearchableSelect';
 import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { EmptyState } from '@/shared/ui/EmptyState';
-import { ModalCrearPartido } from '../../features/partidos/components/ModalCrearPartido';
-import { ModalEditarPartido } from '../../features/partidos/components/ModalEditarPartido';
-import { ModalFinalizarPartido } from '../../features/partidos/components/ModalFinalizarPartido';
+import { ModalCrearPartido } from '../components/ModalCrearPartido';
+import { ModalEditarPartido } from '../components/ModalEditarPartido';
+import { ModalFinalizarPartido } from '../components/ModalFinalizarPartido';
 import type { Partido } from '@/shared/api/tipos';
+import { clavesPartidos } from '../api/claves';
 
 export default function AdminPartidos() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -118,7 +119,7 @@ export default function AdminPartidos() {
 
   // Carga de Partidos
   const { data: partidosRes, isLoading: loadingPartidos, isFetching } = useQuery({
-    queryKey: ['partidos', page, selectedTorneo, selectedCategoria, selectedEquipo, selectedEstados, pendientesStats, searchTerm, sortOrder],
+    queryKey: clavesPartidos.lista(page, selectedTorneo, selectedCategoria, selectedEquipo, selectedEstados, pendientesStats, searchTerm, sortOrder),
     queryFn: () => getPartidos({
       page,
       per_page: perPage,
@@ -143,7 +144,7 @@ export default function AdminPartidos() {
     try {
       await anularPartido(id);
       toast.success('Partido anulado');
-      queryClient.invalidateQueries({ queryKey: ['partidos'] });
+      queryClient.invalidateQueries({ queryKey: clavesPartidos.todos });
     } catch (e: any) {
       toast.error(e.response?.data?.message || 'Error al anular');
     }
@@ -154,7 +155,7 @@ export default function AdminPartidos() {
     try {
       await restaurarPartido(id);
       toast.success('Partido restaurado');
-      queryClient.invalidateQueries({ queryKey: ['partidos'] });
+      queryClient.invalidateQueries({ queryKey: clavesPartidos.todos });
     } catch (e: any) {
       toast.error(e.response?.data?.message || 'Error al restaurar');
     }
@@ -288,7 +289,7 @@ export default function AdminPartidos() {
         </div>
         <div className="flex items-center gap-3 w-full sm:w-auto">
           <button 
-            onClick={() => queryClient.invalidateQueries({ queryKey: ['partidos'] })}
+            onClick={() => queryClient.invalidateQueries({ queryKey: clavesPartidos.todos })}
             className="flex items-center justify-center p-2 rounded-lg border border-white/15 text-slate-300 hover:bg-white/5 transition-colors"
             title="Actualizar tabla"
           >

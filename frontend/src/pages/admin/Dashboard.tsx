@@ -5,7 +5,7 @@ import { es } from 'date-fns/locale';
 import { AlertCircle, ArrowRight, FileText, Trophy } from 'lucide-react';
 import { useAuth } from '@/modules/auth';
 import { getDashboardStats, getActividadReciente } from '../../features/estadisticas/api/estadisticas.api';
-import { getPartidos } from '../../features/partidos/api/partidos.api';
+import { getPartidos, clavesPartidos } from '@/modules/partidos';
 import { EstudioFlyers } from '../../features/flyers/components/EstudioFlyers';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import type { Partido } from '@/shared/api/tipos';
@@ -59,11 +59,11 @@ export default function Dashboard() {
     queryFn: getActividadReciente,
   });
   const { data: partidosResponse, isLoading: isLoadingPartidos } = useQuery({
-    queryKey: ['partidos', 'pendientes_stats'],
+    queryKey: clavesPartidos.pendientesDeEstadisticas,
     queryFn: () => getPartidos({ pendientes_stats: true, per_page: 5 }),
   });
   const { data: programadosRes, isLoading: isLoadingProgramados } = useQuery({
-    queryKey: ['partidos', 'programados'],
+    queryKey: clavesPartidos.programados,
     queryFn: () => getPartidos({ estados: 'programado', per_page: 50 }),
   });
 

@@ -26,12 +26,6 @@ export async function getActividadReciente(): Promise<ApiResponse<ActividadRecie
   return response.data;
 }
 
-export async function postEstadisticasBulk(data: any): Promise<ApiResponse<any>> {
-  const response = await axiosInstance.post('/estadisticas/bulk', data);
-  return response.data;
-}
-
-
 // Totales públicos de la portada (sin autenticación)
 export async function getEstadisticasPublicas(): Promise<
   ApiResponse<{ puntos_totales: number; puntos_por_torneo?: Record<string, number> }>

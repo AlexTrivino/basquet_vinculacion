@@ -4,7 +4,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, Shield, Trophy } from 'lucide-react';
-import { getPartidos } from '../partidos/api/partidos.api';
+import { getPartidos } from '@/modules/partidos';
 import { Esquinas } from '@/shared/ui/Esquinas';
 import type { Equipo, Partido } from '@/shared/api/tipos';
 

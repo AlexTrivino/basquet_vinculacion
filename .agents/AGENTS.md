@@ -99,6 +99,7 @@ Cada módulo tiene `api/`, `components/`, `pages/`, `types.ts` si tiene tipos pr
 - `auth`: la sesión (`AuthContext`), `ProtectedRoute`, login, registro, recuperación de la clave y perfil.
 - `auspicios`: los patrocinadores: el carrusel de la portada (`SponsorsCarousel`) y su administración.
 - `sanciones`: las sanciones de los jugadores (`getSanciones`, que también consulta la plantilla) y su administración.
+- `partidos`: la programación y el cierre de los partidos (estadísticas y acta), el box score público y las listas de partidos que leen el calendario, la portada, los flyers y el perfil del equipo, con sus claves de React Query en `api/claves.ts` (`clavesPartidos`).
 
 **Prohibido:** estructura plana, `useState` múltiples en formularios complejos,
 componentes controlados puros donde aplique React Hook Form.

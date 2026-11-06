@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ArrowLeft } from 'lucide-react';
-import { getTorneoById, getPartidosByTorneo } from '../../features/torneos/api/torneos.api';
+import { getTorneoById } from '../../features/torneos/api/torneos.api';
+import { getPartidosByTorneo, clavesPartidos } from '@/modules/partidos';
 import { PosicionesTable } from '../../features/torneos/components/PosicionesTable';
 import { PartidosList, colorCategoria } from '../../features/torneos/components/PartidosList';
 import { LideresEstadisticos } from '../../features/torneos/components/LideresEstadisticos';
@@ -40,7 +41,7 @@ export default function TorneoDetail() {
   });
   // Misma clave que PartidosList: una sola petición alimenta el marcador y el calendario
   const { data: partidosRes } = useQuery({
-    queryKey: ['torneos', id, 'partidos', undefined],
+    queryKey: clavesPartidos.delTorneo(id),
     queryFn: () => getPartidosByTorneo(id as string, 1, 1000),
     enabled: !!id,
   });

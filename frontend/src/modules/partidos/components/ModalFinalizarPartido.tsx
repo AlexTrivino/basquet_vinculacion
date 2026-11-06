@@ -6,10 +6,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { X, Trophy, FileText, BarChart2, AlertTriangle, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { actualizarPartido, subirActaPartido, getBoxScore } from '../api/partidos.api';
-import { postEstadisticasBulk } from '../../estadisticas/api/estadisticas.api';
+import { actualizarPartido, subirActaPartido, getBoxScore, postEstadisticasBulk } from '../api/partidos.api';
 import { AsyncButton } from '@/shared/ui/AsyncButton';
 import type { Partido } from '@/shared/api/tipos';
+import { clavesPartidos } from '../api/claves';
 
 // Esquema Zod
 const statRowSchema = z.object({
@@ -46,7 +46,7 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
 
   // Obtener box score
   const { data: boxScoreRes, isLoading: loadingBoxScore } = useQuery({
-    queryKey: ['partido-stats', partido.id_partido],
+    queryKey: clavesPartidos.estadisticas(partido.id_partido),
     queryFn: () => getBoxScore(partido.id_partido!),
     enabled: !!partido.id_partido
   });
@@ -160,9 +160,9 @@ export function ModalFinalizarPartido({ partido, onClose }: ModalFinalizarPartid
       }
 
       toast.success('Partido finalizado y estadísticas guardadas');
-      queryClient.invalidateQueries({ queryKey: ['partidos'] });
-      queryClient.invalidateQueries({ queryKey: ['partido-stats', partido.id_partido] });
-      queryClient.invalidateQueries({ queryKey: ['partido', partido.id_partido, 'box-score'] }); // Para el modal público
+      queryClient.invalidateQueries({ queryKey: clavesPartidos.todos });
+      queryClient.invalidateQueries({ queryKey: clavesPartidos.estadisticas(partido.id_partido) });
+      queryClient.invalidateQueries({ queryKey: clavesPartidos.boxScore(partido.id_partido) }); // Para el modal público
       queryClient.invalidateQueries({ queryKey: ['torneos'] }); // Invalidate torneos to update public standings and calendar
       onClose();
     } catch (error: any) {

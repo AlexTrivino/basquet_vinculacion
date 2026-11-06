@@ -15,13 +15,6 @@ export async function getPosicionesByTorneo(id: string | number, idCategoria?: n
   return response.data;
 }
 
-export async function getPartidosByTorneo(idTorneo: string | number, page = 1, perPage = 20, idCategoria?: number): Promise<ApiResponse<Partido[]>> {
-  const params: any = { id_torneo: idTorneo, page, per_page: perPage };
-  if (idCategoria) params.id_categoria = idCategoria;
-  const response = await axiosInstance.get('/partidos', { params });
-  return response.data;
-}
-
 export async function getLideresEstadisticos(idTorneo: string | number, idCategoria?: number): Promise<ApiResponse<any>> {
   const params: any = {};
   if (idCategoria) params.id_categoria = idCategoria;

@@ -78,3 +78,17 @@ export const eliminarPartido = async (idPartido: number): Promise<ApiResponse<nu
   // Ajuste según sea necesario. En este rediseño, el botón eliminar llama a anularPartido.
   return anularPartido(idPartido);
 };
+
+// El calendario de un torneo (con las fechas para los flyers).
+export async function getPartidosByTorneo(idTorneo: string | number, page = 1, perPage = 20, idCategoria?: number): Promise<ApiResponse<Partido[]>> {
+  const params: any = { id_torneo: idTorneo, page, per_page: perPage };
+  if (idCategoria) params.id_categoria = idCategoria;
+  const response = await axiosInstance.get('/partidos', { params });
+  return response.data;
+}
+
+// Carga las estadísticas de un partido al finalizarlo.
+export async function postEstadisticasBulk(data: any): Promise<ApiResponse<any>> {
+  const response = await axiosInstance.post('/estadisticas/bulk', data);
+  return response.data;
+}

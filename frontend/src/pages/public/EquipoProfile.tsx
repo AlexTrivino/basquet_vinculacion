@@ -13,7 +13,7 @@ import {
   deleteBannerEquipo,
   getInscripcionesPublicas,
 } from '../../features/equipos/api/equipos.api';
-import { getPartidosByEquipo } from '../../features/partidos/api/partidos.api';
+import { getPartidosByEquipo, clavesPartidos } from '@/modules/partidos';
 import { getPlantillas } from '../../features/plantillas/api/plantillas.api';
 import { Escudo } from '@/shared/ui/Escudo';
 import { FotoJugador } from '@/shared/ui/FotoJugador';
@@ -267,7 +267,7 @@ export default function EquipoProfile({ teamId, dashboardStatus }: { teamId?: nu
   const plantillas = plantillasRes?.data || [];
 
   const { data: partidosRes, isLoading: loadingPartidos } = useQuery({
-    queryKey: ['partidos', idEquipo],
+    queryKey: clavesPartidos.delEquipo(idEquipo),
     queryFn: () => getPartidosByEquipo(idEquipo),
     enabled: !!idEquipo,
   });

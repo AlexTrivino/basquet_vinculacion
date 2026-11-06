@@ -8,6 +8,7 @@ import { generarLlaves, getFaseFinal, setFormatoCategoria, setGrupos } from '../
 import { getTorneosAdmin } from '@/shared/api/catalogo';
 import { getInscripcionesPublicas } from '../../features/equipos/api/equipos.api';
 import type { Categoria, FormatoFaseFinal, Llave } from '@/shared/api/tipos';
+import { clavesPartidos } from '@/modules/partidos';
 
 const TARJETA = 'bg-marino-claro p-6 rounded-2xl border border-white/10 shadow-sm';
 const SELECT = 'w-full rounded-md border border-white/15 bg-marino-claro px-3 py-2 text-sm focus:border-celeste focus:outline-none';
@@ -93,7 +94,7 @@ export default function FaseFinal() {
   const listas = (fase?.llaves || []).filter((l) => l.estado === 'listo' && programacion[l.codigo]?.fecha && programacion[l.codigo]?.hora);
   const crearPartidos = useMutation({
     mutationFn: () => generarLlaves(idTorneo, idCategoria, listas.map((l) => ({ llave: l.codigo, ...programacion[l.codigo], ubicacion }))),
-    onSuccess: (res) => { toast.success(`${res.data?.length ?? 0} partido(s) creado(s)`); refrescar(); queryClient.invalidateQueries({ queryKey: ['partidos'] }); },
+    onSuccess: (res) => { toast.success(`${res.data?.length ?? 0} partido(s) creado(s)`); refrescar(); queryClient.invalidateQueries({ queryKey: clavesPartidos.todos }); },
     onError: (e: any) => toast.error(e?.response?.data?.message || 'No se pudieron crear los partidos'),
   });
 
