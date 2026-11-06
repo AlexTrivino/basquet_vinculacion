@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Menu, User, ChevronDown, LogOut } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth, getPerfil } from '@/modules/auth';
 import { useBusinessRules } from '@/hooks/useBusinessRules';
 import { Sidebar } from './Sidebar';
 import { useQuery } from '@tanstack/react-query';
 import { getInscripciones } from '@/features/equipos/api/equipos.api';
-import { getPerfil } from '@/features/auth/api/usuarios.api';
 
 const NAV_LINKS = {
   public: [

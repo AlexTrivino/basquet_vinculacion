@@ -3,10 +3,10 @@ import { useForm } from 'react-hook-form';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { User, Mail, Shield, Lock } from 'lucide-react';
-import { getPerfil, actualizarPerfil } from '../../features/auth/api/usuarios.api';
-import { updatePasswordWithSupabase } from '../../features/auth/api/auth.api';
+import { getPerfil, actualizarPerfil } from '../api/usuarios.api';
+import { updatePasswordWithSupabase } from '../api/auth.api';
 import { AsyncButton } from '@/shared/ui/AsyncButton';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../AuthContext';
 import { getAuthToken } from '@/shared/lib/authStorage';
 
 interface PerfilFormValues {

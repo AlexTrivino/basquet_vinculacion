@@ -26,7 +26,7 @@ import { z } from 'zod';
 
 import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
 import { AsyncButton } from '@/shared/ui/AsyncButton';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '@/modules/auth';
 import { 
   getPlantillas, 
   createJugador, 

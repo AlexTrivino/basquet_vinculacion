@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { toast } from 'sonner';
-import { resetPasswordWithSupabase } from '../../features/auth/api/auth.api';
+import { resetPasswordWithSupabase } from '../api/auth.api';
 import { AsyncButton } from '@/shared/ui/AsyncButton';
 
 export default function RecuperarPassword() {

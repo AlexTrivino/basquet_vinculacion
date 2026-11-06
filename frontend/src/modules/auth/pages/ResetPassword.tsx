@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock } from 'lucide-react';
 import { toast } from 'sonner';
-import { updatePasswordWithSupabase } from '../../features/auth/api/auth.api';
+import { updatePasswordWithSupabase } from '../api/auth.api';
 import { AsyncButton } from '@/shared/ui/AsyncButton';
 
 export default function ResetPassword() {

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '@/modules/auth';
 import { useBusinessRules } from '../../hooks/useBusinessRules';
 import { getInscripciones } from '../../features/equipos/api/equipos.api';
 import { ShieldAlert, Trophy } from 'lucide-react';

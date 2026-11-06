@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import { useAuth, type UserRole } from '../../../context/AuthContext';
+import { useAuth, type UserRole } from '../AuthContext';
 import { loginWithSupabase } from '../api/auth.api';
 import { AsyncButton } from '@/shared/ui/AsyncButton';
 import api from '@/shared/api/axios.config';

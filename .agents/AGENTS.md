@@ -93,6 +93,11 @@ src/
 Imports: relativos dentro de la misma zona (un módulo, `app/` o `shared/`) y con el alias `@/` entre zonas
 (`@/shared/ui/Skeleton`, `@/modules/<nombre>`).
 
+Cada módulo tiene `api/`, `components/`, `pages/`, `types.ts` si tiene tipos propios, `routes.tsx` con sus
+`rutas` (`publicas` dentro del layout, `delegado` y `admin` bajo su guarda, `sueltas` fuera del layout), que junta
+`app/router.tsx`, e `index.ts` con lo único que usan los demás. Migrados (fase 10):
+- `auth`: la sesión (`AuthContext`), `ProtectedRoute`, login, registro, recuperación de la clave y perfil.
+
 **Prohibido:** estructura plana, `useState` múltiples en formularios complejos,
 componentes controlados puros donde aplique React Hook Form.
 
@@ -246,7 +251,7 @@ Desktop (≥1024px)              Mobile (<1024px)
 
 ---
 
-## UI Kit — Componentes Base (`src/shared/ui/`; Navbar, Sidebar y ErrorBoundary están en `src/app/`)
+## UI Kit — Componentes Base (`src/shared/ui/`; Navbar, Sidebar y ErrorBoundary están en `src/app/` y ProtectedRoute en el módulo auth)
 
 | Componente | Responsabilidad |
 |-----------|-----------------|

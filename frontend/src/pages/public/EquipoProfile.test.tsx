@@ -11,7 +11,7 @@ import * as plantillasApi from '../../features/plantillas/api/plantillas.api';
 vi.mock('../../features/equipos/api/equipos.api');
 vi.mock('../../features/partidos/api/partidos.api');
 vi.mock('../../features/plantillas/api/plantillas.api');
-vi.mock('../../context/AuthContext', () => ({
+vi.mock('@/modules/auth/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: false,
     userRole: null,

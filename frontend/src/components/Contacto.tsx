@@ -1,4 +1,4 @@
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@/modules/auth';
 
 // Íconos de marca oficiales (Simple Icons, CC0). lucide-react no trae logos de marcas.
 const ICONOS = {

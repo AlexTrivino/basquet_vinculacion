@@ -15,7 +15,7 @@ vi.mock('../../features/equipos/api/equipos.api');
 vi.mock('../../features/patrocinadores/api/patrocinadores.api');
 vi.mock('../../features/estadisticas/api/estadisticas.api');
 vi.mock('@google/model-viewer', () => ({}));
-vi.mock('../../context/AuthContext', () => ({ useAuth: () => ({ userRole: null }) }));
+vi.mock('@/modules/auth/AuthContext', () => ({ useAuth: () => ({ userRole: null }) }));
 
 const torneos = [
   { id_torneo: 1, nombre: 'Copa Verano Manta 2026', fecha_inicio: '2026-06-01', fecha_fin: '2026-08-30', estado: 'en_curso', categorias: [{ id_categoria: 10, nombre_categoria: 'Senior Libre' }] },

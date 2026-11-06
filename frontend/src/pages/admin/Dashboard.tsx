@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { AlertCircle, ArrowRight, FileText, Trophy } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '@/modules/auth';
 import { getDashboardStats, getActividadReciente } from '../../features/estadisticas/api/estadisticas.api';
 import { getPartidos } from '../../features/partidos/api/partidos.api';
 import { EstudioFlyers } from '../../features/flyers/components/EstudioFlyers';

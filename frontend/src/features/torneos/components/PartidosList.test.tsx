@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PartidosList } from './PartidosList';
 
 const auth = vi.hoisted(() => ({ rol: null as string | null }));
-vi.mock('../../../context/AuthContext', () => ({ useAuth: () => ({ userRole: auth.rol }) }));
+vi.mock('@/modules/auth/AuthContext', () => ({ useAuth: () => ({ userRole: auth.rol }) }));
 vi.mock('../../flyers/components/FlyerFecha', () => ({ default: () => <p>flyer de la fecha</p> }));
 vi.mock('../api/torneos.api', () => ({
   getPartidosByTorneo: async () => ({

@@ -4,7 +4,7 @@ import { RouterProvider } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-import { AuthProvider } from '@/context/AuthContext';
+import { AuthProvider } from '@/modules/auth';
 import { ErrorBoundary } from './ErrorBoundary';
 import { router } from './router';
 import '@/index.css';

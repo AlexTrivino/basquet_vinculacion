@@ -3,7 +3,7 @@ import { ShieldAlert } from 'lucide-react';
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '@/modules/auth';
 import { desactivarEquipo } from '../api/equipos.api';
 
 interface Props {

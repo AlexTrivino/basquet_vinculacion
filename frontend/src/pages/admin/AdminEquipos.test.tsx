@@ -7,7 +7,7 @@ import { getTorneos } from '@/shared/api/catalogo';
 import { BrowserRouter } from 'react-router-dom';
 
 // Mocks
-vi.mock('../../context/AuthContext', () => ({
+vi.mock('@/modules/auth/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: true,
     userRole: 'super_admin'

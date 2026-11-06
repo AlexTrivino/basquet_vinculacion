@@ -4,7 +4,7 @@ import { getPartidosByTorneo } from '../api/torneos.api';
 import { Calendar as CalendarIcon, FileText, Activity, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { Escudo } from '@/shared/ui/Escudo';
 import { BoxScoreModal } from '../../partidos/components/BoxScoreModal';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '@/modules/auth';
 import { lazy, Suspense, useState, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, isToday, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';

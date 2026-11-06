@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { LoginForm } from '../../features/auth/components/LoginForm';
+import { LoginForm } from '../components/LoginForm';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';

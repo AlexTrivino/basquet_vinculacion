@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
-import { ProtectedRoute } from '@/routes/ProtectedRoute';
+import { ProtectedRoute, rutas as auth } from '@/modules/auth';
 import { MainLayout } from './MainLayout';
 import NotFound from './NotFound';
 import Unauthorized from './Unauthorized';
@@ -15,12 +15,7 @@ const EquipoProfile = lazy(() => import('@/pages/public/EquipoProfile'));
 const DirectorioEquipos = lazy(() => import('@/pages/public/DirectorioEquipos'));
 const JugadorProfile = lazy(() => import('@/pages/public/JugadorProfile'));
 
-// Auth
-const Login = lazy(() => import('@/pages/auth/Login'));
-const Registro = lazy(() => import('@/pages/auth/Registro'));
-const RecuperarPassword = lazy(() => import('@/pages/auth/RecuperarPassword'));
-const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'));
-const MiPerfil = lazy(() => import('@/pages/auth/MiPerfil'));
+// Visor
 const BuscadorJugadores = lazy(() => import('@/pages/visor/BuscadorJugadores'));
 
 // Delegado
@@ -70,13 +65,7 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute allowedRoles={['visor', 'super_admin']} />,
         children: [{ index: true, element: withSuspense(BuscadorJugadores) }],
       },
-      {
-        path: '/perfil',
-        element: <ProtectedRoute allowedRoles={['super_admin', 'delegado', 'visor']} />,
-        children: [
-          { index: true, element: withSuspense(MiPerfil) },
-        ],
-      },
+      ...auth.publicas,
       {
         path: '/delegado',
         element: <ProtectedRoute allowedRoles={['delegado']} />,
@@ -106,22 +95,7 @@ export const router = createBrowserRouter([
     ],
   },
   // Auth Layout (se excluye MainLayout para no mostrar el Navbar en Login)
-  {
-    path: '/auth/login',
-    element: withSuspense(Login),
-  },
-  {
-    path: '/auth/registro',
-    element: withSuspense(Registro),
-  },
-  {
-    path: '/auth/recuperar',
-    element: withSuspense(RecuperarPassword),
-  },
-  {
-    path: '/auth/reset-password',
-    element: withSuspense(ResetPassword),
-  },
+  ...auth.sueltas,
   {
     path: '/unauthorized',
     element: <Unauthorized />,

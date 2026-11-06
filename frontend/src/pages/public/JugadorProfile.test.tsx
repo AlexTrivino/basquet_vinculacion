@@ -78,7 +78,7 @@ const mockJugadorData = {
 };
 
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from '../../context/AuthContext';
+import { AuthProvider } from '@/modules/auth';
 
 function renderWithProviders() {
   const queryClient = new QueryClient({

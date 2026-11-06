@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ArrowRight, Camera, ChevronLeft, ChevronRight, MapPin, ShieldAlert, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '@/modules/auth';
 import {
   getEquipoById,
   uploadLogoEquipo,
