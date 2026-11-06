@@ -5,8 +5,8 @@ import { useEffect } from 'react';
 import { useAuth } from '@/modules/auth';
 import { useBusinessRules, getInscripciones } from '@/modules/inscripciones';
 import { ShieldAlert, Trophy } from 'lucide-react';
-import EquipoProfile from '../public/EquipoProfile';
-import { BannerNuevosTorneos } from './components/BannerNuevosTorneos';
+import EquipoProfile from './EquipoProfile';
+import { BannerNuevosTorneos } from '../components/BannerNuevosTorneos';
 
 // El panel vive bajo la barra oscura y muestra el perfil del equipo: sus estados usan la misma paleta
 const PANEL = 'rounded-2xl border border-oro/25 bg-marino-claro/80 shadow-xl shadow-black/30';

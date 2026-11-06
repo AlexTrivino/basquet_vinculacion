@@ -1,8 +1,8 @@
 ---
 version: 1
 slug: "frontend-src-pages-public-equipoprofile-tsx"
-primary_target: "frontend/src/pages/public/EquipoProfile.tsx"
-related_targets: ["frontend/src/components/Navbar.tsx","frontend/src/index.css"]
+primary_target: "frontend/src/modules/equipos/pages/EquipoProfile.tsx"
+related_targets: ["frontend/src/app/Navbar.tsx","frontend/src/index.css"]
 ---
 
 ## Alcance

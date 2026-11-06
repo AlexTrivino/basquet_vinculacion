@@ -7,12 +7,12 @@ import { toast } from 'sonner';
 import { Shield, X, Edit, Trash2, Search, Filter, RefreshCw, Users } from 'lucide-react';
 import { Escudo } from '@/shared/ui/Escudo';
 
-import { getEquiposAdmin, updateEquipo, uploadLogoEquipo, uploadBannerEquipo, deleteLogoEquipo, deleteBannerEquipo, reactivarEquipo } from '../../features/equipos/api/equipos.api';
+import { getEquiposAdmin, updateEquipo, uploadLogoEquipo, uploadBannerEquipo, deleteLogoEquipo, deleteBannerEquipo, reactivarEquipo } from '../api/equipos.api';
 import { getTorneos, getCategorias } from '@/shared/api/catalogo';
 import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
 import { AsyncButton } from '@/shared/ui/AsyncButton';
 import { FileUploadButton } from '@/shared/ui/FileUploadButton';
-import { DesactivarEquipoModal } from '../../features/equipos/components/DesactivarEquipoModal';
+import { DesactivarEquipoModal } from '../components/DesactivarEquipoModal';
 import { ModalGestionarPlantillasAdmin } from '@/modules/inscripciones';
 import type { Equipo } from '@/shared/api/tipos';
 

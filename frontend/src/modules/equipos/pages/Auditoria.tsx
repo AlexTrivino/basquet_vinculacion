@@ -1,4 +1,4 @@
-import { AuditoriaEquipos } from '../../features/equipos/components/AuditoriaEquipos';
+import { AuditoriaEquipos } from '../components/AuditoriaEquipos';
 
 export default function Auditoria() {
   return (

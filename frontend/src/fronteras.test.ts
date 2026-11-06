@@ -9,7 +9,7 @@
  */
 import { describe, expect, it } from 'vitest';
 
-const IMPORTS_ENTRE_FEATURES = 3; // trinquete: cuando baje, bájalo aquí en el mismo commit
+const IMPORTS_ENTRE_FEATURES = 2; // trinquete: cuando baje, bájalo aquí en el mismo commit
 
 const FUENTES = import.meta.glob('/src/**/*.{ts,tsx}', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 const IMPORT = /\b(?:from|import)\s*\(?\s*['"]([^'"]+)['"]/g;

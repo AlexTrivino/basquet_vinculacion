@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AdminEquipos from './AdminEquipos';
-import { getEquiposAdmin } from '../../features/equipos/api/equipos.api';
+import { getEquiposAdmin } from '../api/equipos.api';
 import { getTorneos } from '@/shared/api/catalogo';
 import { BrowserRouter } from 'react-router-dom';
 
@@ -14,7 +14,7 @@ vi.mock('@/modules/auth/AuthContext', () => ({
   })
 }));
 
-vi.mock('../../features/equipos/api/equipos.api', () => ({
+vi.mock('../api/equipos.api', () => ({
   getEquiposAdmin: vi.fn(),
   reactivarEquipo: vi.fn(),
   desactivarEquipo: vi.fn()

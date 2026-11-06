@@ -27,7 +27,7 @@ import {
   deleteJugador,
 } from '../../features/jugadores/api/jugadores.api';
 import { getTorneos } from '@/shared/api/catalogo';
-import { getEquipos } from '../../features/equipos/api/equipos.api';
+import { getEquipos } from '@/modules/equipos';
 import { getInscripciones } from '@/modules/inscripciones';
 import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
 import { StatusBadge } from '@/shared/ui/StatusBadge';

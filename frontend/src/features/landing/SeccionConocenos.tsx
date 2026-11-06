@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getTorneos } from '@/shared/api/catalogo';
-import { getEquipos } from '../equipos/api/equipos.api';
+import { getEquipos } from '@/modules/equipos';
 import { getPartidos } from '@/modules/partidos';
 import { getEstadisticasPublicas } from '../estadisticas/api/estadisticas.api';
 

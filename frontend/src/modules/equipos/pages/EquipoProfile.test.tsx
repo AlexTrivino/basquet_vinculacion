@@ -3,12 +3,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import EquipoProfile from './EquipoProfile';
-import * as equiposApi from '../../features/equipos/api/equipos.api';
+import * as equiposApi from '../api/equipos.api';
 import * as partidosApi from '@/modules/partidos';
 import * as inscripcionesApi from '@/modules/inscripciones';
 
 // Mocks de APIs
-vi.mock('../../features/equipos/api/equipos.api');
+vi.mock('../api/equipos.api');
 vi.mock('@/modules/partidos/api/partidos.api');
 vi.mock('@/modules/inscripciones/api/plantillas.api');
 vi.mock('@/modules/inscripciones/api/inscripciones.api');

@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight, Camera, ChevronLeft, ChevronRight, MapPin, Shiel
 import { toast } from 'sonner';
 
 import { useAuth } from '@/modules/auth';
-import { getEquipoById, uploadLogoEquipo, uploadBannerEquipo, deleteLogoEquipo, deleteBannerEquipo } from '../../features/equipos/api/equipos.api';
+import { getEquipoById, uploadLogoEquipo, uploadBannerEquipo, deleteLogoEquipo, deleteBannerEquipo } from '../api/equipos.api';
 import { getInscripcionesPublicas, getPlantillas } from '@/modules/inscripciones';
 import { getPartidosByEquipo, clavesPartidos } from '@/modules/partidos';
 import { Escudo } from '@/shared/ui/Escudo';
@@ -13,7 +13,7 @@ import { FotoJugador } from '@/shared/ui/FotoJugador';
 import { partirNombre } from '@/shared/lib/nombres';
 import { Esquinas } from '@/shared/ui/Esquinas';
 import axiosInstance from '@/shared/api/axios.config';
-import { DesactivarEquipoModal } from '../../features/equipos/components/DesactivarEquipoModal';
+import { DesactivarEquipoModal } from '../components/DesactivarEquipoModal';
 import type { Partido, Plantilla } from '@/shared/api/tipos';
 
 // 🚩 FEATURE FLAG: Subida de imágenes de equipo por delegados.
