@@ -1,5 +1,5 @@
-import axiosInstance from '../../../api/axios.config';
-import type { ApiResponse, Jugador, Plantilla } from '../../../types/api.types';
+import axiosInstance from '@/shared/api/axios.config';
+import type { ApiResponse, Jugador, Plantilla } from '@/shared/api/tipos';
 
 // Jugadores
 export async function getJugadores(page = 1, perPage = 20): Promise<ApiResponse<Jugador[]>> {

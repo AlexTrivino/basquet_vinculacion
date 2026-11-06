@@ -1,4 +1,4 @@
-import api from "../../../api/axios.config";
+import api from "@/shared/api/axios.config";
 
 export interface Patrocinador {
   id?: number; // Para compatibilidad con DataGridTable

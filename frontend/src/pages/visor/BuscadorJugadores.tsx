@@ -2,11 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { ArrowRight, ChevronDown, Search, Users } from 'lucide-react';
-import { getTorneos } from '../../features/torneos/api/torneos.api';
+import { getTorneos } from '@/shared/api/catalogo';
 import { getInscripcionesPublicas } from '../../features/equipos/api/equipos.api';
 import { buscarJugadores, type FiltrosVisor, type JugadorVisor } from '../../features/visor/api/visor.api';
-import { Escudo } from '../../features/torneos/components/PartidosList';
-import { FotoJugador } from '../../components/FotoJugador';
+import { Escudo } from '@/shared/ui/Escudo';
+import { FotoJugador } from '@/shared/ui/FotoJugador';
 
 const EDADES = [
   { valor: '', texto: 'Todas las edades' },

@@ -1,7 +1,7 @@
 import { forwardRef, type ReactNode } from 'react';
 import { ChevronsRight, Shield } from 'lucide-react';
-import { Escudo } from '../../torneos/components/PartidosList';
-import { FotoJugador } from '../../../components/FotoJugador';
+import { Escudo } from '@/shared/ui/Escudo';
+import { FotoJugador } from '@/shared/ui/FotoJugador';
 import { horaCartel, lineaCorta, numerosDe } from '../textos';
 import type { FiguraFlyer, ResultadoFlyer } from '../api/flyers.api';
 

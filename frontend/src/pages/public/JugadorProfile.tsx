@@ -4,8 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { getJugadorPerfil } from '../../features/jugadores/api/jugadores.api';
 import { useAuth } from '../../context/AuthContext';
 import { PartidosJugador } from '../../features/visor/components/PartidosJugador';
-import { Escudo } from '../../features/torneos/components/PartidosList';
-import { FotoJugador } from '../../components/FotoJugador';
+import { Escudo } from '@/shared/ui/Escudo';
+import { FotoJugador } from '@/shared/ui/FotoJugador';
 import {
   Shield,
   Activity,

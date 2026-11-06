@@ -1,5 +1,5 @@
-import axiosInstance from '../../../api/axios.config';
-import type { ApiResponse } from '../../../types/api.types';
+import axiosInstance from '@/shared/api/axios.config';
+import type { ApiResponse } from '@/shared/api/tipos';
 
 export interface EquipoFlyer {
   id_equipo: number;

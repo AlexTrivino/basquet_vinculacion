@@ -6,11 +6,12 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { Trophy, Plus, X, Edit, Trash2, Search, Filter, RefreshCw, FileSpreadsheet } from 'lucide-react';
 
-import { DataGridTable, type Column } from '../../components/DataGridTable';
-import { AsyncButton } from '../../components/AsyncButton';
-import { FileUploadButton } from '../../components/FileUploadButton';
-import { getTorneosAdmin, createTorneo, updateTorneo, anularTorneo, addCategoria, deleteCategoria, uploadCalendario } from '../../features/torneos/api/torneos.api';
-import type { Torneo } from '../../types/api.types';
+import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
+import { AsyncButton } from '@/shared/ui/AsyncButton';
+import { FileUploadButton } from '@/shared/ui/FileUploadButton';
+import { getTorneosAdmin } from '@/shared/api/catalogo';
+import { createTorneo, updateTorneo, anularTorneo, addCategoria, deleteCategoria, uploadCalendario } from '../../features/torneos/api/torneos.api';
+import type { Torneo } from '@/shared/api/tipos';
 
 const torneoSchema = z.object({
   nombre: z.string().min(1, 'El nombre es obligatorio').max(100, 'Máximo 100 caracteres'),

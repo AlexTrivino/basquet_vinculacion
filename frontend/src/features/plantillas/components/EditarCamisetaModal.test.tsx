@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { EditarCamisetaModal } from './EditarCamisetaModal';
-import type { Plantilla } from '../../../types/api.types';
+import type { Plantilla } from '@/shared/api/tipos';
 
 describe('EditarCamisetaModal', () => {
   const mockPlantilla: Plantilla = {

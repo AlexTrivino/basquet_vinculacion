@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { getPartidosByTorneo } from '../api/torneos.api';
-import { Calendar as CalendarIcon, FileText, Activity, ChevronLeft, ChevronRight, MapPin, Shield } from 'lucide-react';
+import { Calendar as CalendarIcon, FileText, Activity, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import { Escudo } from '@/shared/ui/Escudo';
 import { BoxScoreModal } from '../../partidos/components/BoxScoreModal';
 import { useAuth } from '../../../context/AuthContext';
 import { lazy, Suspense, useState, useMemo } from 'react';
@@ -25,19 +26,6 @@ export const colorCategoria = (indice: number) => ({ punto: COLORES[indice % COL
 // Paralelogramo del cartel: boletos de partido
 const DIAGONAL = '[clip-path:polygon(2.5%_0,100%_0,97.5%_100%,0_100%)]';
 const nombre = (e: any, defecto: string) => e?.nombre || e?.nombre_equipo || defecto;
-
-// Medallón claro para los escudos (los logos en silueta negra se leen sobre marino)
-export function Escudo({ url, className = 'h-12 w-12' }: { url?: string | null; className?: string }) {
-  return (
-    <span className={`flex shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-white to-slate-200 shadow-md shadow-black/40 ring-2 ring-oro/40 ${className}`}>
-      {url ? (
-        <img src={url} alt="" loading="lazy" className="h-[76%] w-[76%] object-contain" />
-      ) : (
-        <Shield className="h-1/2 w-1/2 text-slate-400" aria-hidden="true" />
-      )}
-    </span>
-  );
-}
 
 function Equipo({ equipo, defecto, lado, atenuado }: { equipo: any; defecto: string; lado: 'local' | 'visitante'; atenuado: boolean }) {
   const posicion =

@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ModalExpedienteInscripcion } from './ModalExpedienteInscripcion';
 import * as plantillasApi from '../../plantillas/api/plantillas.api';
-import type { Inscripcion } from '../../../types/api.types';
+import type { Inscripcion } from '@/shared/api/tipos';
 
 vi.mock('../../plantillas/api/plantillas.api');
 

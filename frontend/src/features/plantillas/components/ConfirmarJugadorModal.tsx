@@ -1,5 +1,5 @@
 import { UserCheck, AlertTriangle } from 'lucide-react';
-import type { Jugador } from '../../../types/api.types';
+import type { Jugador } from '@/shared/api/tipos';
 
 interface Props {
   isOpen: boolean;

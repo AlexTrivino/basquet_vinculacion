@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { X, Users, Eye, Pencil, Shield, Clock, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import { getInscripciones } from '../api/equipos.api';
-import { getTorneos } from '../../torneos/api/torneos.api';
+import { getTorneos } from '@/shared/api/catalogo';
 import { GestorPlantilla } from '../../plantillas/components/GestorPlantilla';
-import type { Equipo, Inscripcion } from '../../../types/api.types';
+import type { Equipo, Inscripcion } from '@/shared/api/tipos';
 interface ModalGestionarPlantillasAdminProps {
   isOpen: boolean;
   onClose: () => void;

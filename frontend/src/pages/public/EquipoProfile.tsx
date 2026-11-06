@@ -15,13 +15,13 @@ import {
 } from '../../features/equipos/api/equipos.api';
 import { getPartidosByEquipo } from '../../features/partidos/api/partidos.api';
 import { getPlantillas } from '../../features/plantillas/api/plantillas.api';
-import { Escudo } from '../../features/torneos/components/PartidosList';
-import { FotoJugador } from '../../components/FotoJugador';
-import { partirNombre } from '../../utils/nombres';
-import { Esquinas } from '../../features/landing/SeccionPartidos';
-import axiosInstance from '../../api/axios.config';
+import { Escudo } from '@/shared/ui/Escudo';
+import { FotoJugador } from '@/shared/ui/FotoJugador';
+import { partirNombre } from '@/shared/lib/nombres';
+import { Esquinas } from '@/shared/ui/Esquinas';
+import axiosInstance from '@/shared/api/axios.config';
 import { DesactivarEquipoModal } from '../../features/equipos/components/DesactivarEquipoModal';
-import type { Partido, Plantilla } from '../../types/api.types';
+import type { Partido, Plantilla } from '@/shared/api/tipos';
 
 // 🚩 FEATURE FLAG: Subida de imágenes de equipo por delegados.
 const TEAM_UPLOADS_ENABLED = true;

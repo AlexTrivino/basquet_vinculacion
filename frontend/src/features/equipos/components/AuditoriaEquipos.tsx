@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { DataGridTable, type Column } from '../../../components/DataGridTable';
-import { StatusBadge } from '../../../components/StatusBadge';
-import { AsyncButton } from '../../../components/AsyncButton';
+import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
+import { StatusBadge } from '@/shared/ui/StatusBadge';
+import { AsyncButton } from '@/shared/ui/AsyncButton';
 import { getInscripciones, updateInscripcionEstado, purgarInscripcionesExpiradas, retirarEquipo } from '../api/equipos.api';
-import { getTorneos } from '../../torneos/api/torneos.api';
-import type { Inscripcion, Torneo } from '../../../types/api.types';
-import { EmptyState } from '../../../components/EmptyState';
+import { getTorneos } from '@/shared/api/catalogo';
+import type { Inscripcion, Torneo } from '@/shared/api/tipos';
+import { EmptyState } from '@/shared/ui/EmptyState';
 import {
   FileWarning,
   Eye,
@@ -24,7 +24,7 @@ import {
 import { ModalExpedienteInscripcion } from './ModalExpedienteInscripcion';
 import { ModalRechazarInscripcion } from './ModalRechazarInscripcion';
 import { ModalRetirarEquipo } from './ModalRetirarEquipo';
-import { Escudo } from '../../torneos/components/PartidosList';
+import { Escudo } from '@/shared/ui/Escudo';
 
 export function AuditoriaEquipos() {
   const queryClient = useQueryClient();

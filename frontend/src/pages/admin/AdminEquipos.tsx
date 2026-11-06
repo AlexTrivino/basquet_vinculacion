@@ -5,17 +5,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { Shield, X, Edit, Trash2, Search, Filter, RefreshCw, Users } from 'lucide-react';
-import { Escudo } from '../../features/torneos/components/PartidosList';
+import { Escudo } from '@/shared/ui/Escudo';
 
 import { getEquiposAdmin, updateEquipo, uploadLogoEquipo, uploadBannerEquipo, deleteLogoEquipo, deleteBannerEquipo, reactivarEquipo } from '../../features/equipos/api/equipos.api';
-import { getTorneos } from '../../features/torneos/api/torneos.api';
-import { getCategorias } from '../../features/categorias/api/categorias.api';
-import { DataGridTable, type Column } from '../../components/DataGridTable';
-import { AsyncButton } from '../../components/AsyncButton';
-import { FileUploadButton } from '../../components/FileUploadButton';
+import { getTorneos, getCategorias } from '@/shared/api/catalogo';
+import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
+import { AsyncButton } from '@/shared/ui/AsyncButton';
+import { FileUploadButton } from '@/shared/ui/FileUploadButton';
 import { DesactivarEquipoModal } from '../../features/equipos/components/DesactivarEquipoModal';
 import { ModalGestionarPlantillasAdmin } from '../../features/equipos/components/ModalGestionarPlantillasAdmin';
-import type { Equipo } from '../../types/api.types';
+import type { Equipo } from '@/shared/api/tipos';
 
 const equipoSchema = z.object({
   nombre_equipo: z.string().min(2, 'Mínimo 2 caracteres').max(100, 'Máximo 100 caracteres'),

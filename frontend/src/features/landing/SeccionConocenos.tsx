@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getTorneos } from '../torneos/api/torneos.api';
+import { getTorneos } from '@/shared/api/catalogo';
 import { getEquipos } from '../equipos/api/equipos.api';
 import { getPartidos } from '../partidos/api/partidos.api';
 import { getEstadisticasPublicas } from '../estadisticas/api/estadisticas.api';

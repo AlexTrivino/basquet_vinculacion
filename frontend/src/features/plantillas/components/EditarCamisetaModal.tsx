@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Shirt, Loader2, X } from 'lucide-react';
-import type { Plantilla } from '../../../types/api.types';
+import type { Plantilla } from '@/shared/api/tipos';
 
 interface Props {
   isOpen: boolean;

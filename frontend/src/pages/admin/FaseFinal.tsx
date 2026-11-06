@@ -3,10 +3,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { GitBranch, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { AsyncButton } from '../../components/AsyncButton';
-import { generarLlaves, getFaseFinal, getTorneosAdmin, setFormatoCategoria, setGrupos } from '../../features/torneos/api/torneos.api';
+import { AsyncButton } from '@/shared/ui/AsyncButton';
+import { generarLlaves, getFaseFinal, setFormatoCategoria, setGrupos } from '../../features/torneos/api/torneos.api';
+import { getTorneosAdmin } from '@/shared/api/catalogo';
 import { getInscripcionesPublicas } from '../../features/equipos/api/equipos.api';
-import type { Categoria, FormatoFaseFinal, Llave } from '../../types/api.types';
+import type { Categoria, FormatoFaseFinal, Llave } from '@/shared/api/tipos';
 
 const TARJETA = 'bg-marino-claro p-6 rounded-2xl border border-white/10 shadow-sm';
 const SELECT = 'w-full rounded-md border border-white/15 bg-marino-claro px-3 py-2 text-sm focus:border-celeste focus:outline-none';

@@ -1,12 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, Save, AlertTriangle } from 'lucide-react';
-import { getTorneos } from '../../torneos/api/torneos.api';
-import { getCategorias } from '../../categorias/api/categorias.api';
+import { getTorneos, getCategorias } from '@/shared/api/catalogo';
 import { editarInscripcion, getInscripciones } from '../api/equipos.api';
-import { ConfirmationModal } from '../../../components/ConfirmationModal';
+import { ConfirmationModal } from '@/shared/ui/ConfirmationModal';
 import { toast } from 'sonner';
-import type { Inscripcion } from '../../../types/api.types';
+import type { Inscripcion } from '@/shared/api/tipos';
 
 interface ModalEditarInscripcionProps {
   isOpen: boolean;

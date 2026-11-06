@@ -20,4 +20,5 @@ Los cambios de arquitectura se hacen con Spec-Driven Development: primero la esp
 | 6 · Backend: inscripciones | [06-inscripciones](06-inscripciones/spec.md) | terminada |
 | 7 · Backend: estadísticas | [07-estadisticas](07-estadisticas/spec.md) | terminada |
 | 8 · Backend: identidad y cierre | [08-identidad-y-cierre](08-identidad-y-cierre/spec.md) | terminada |
-| 9 y 10 · Frontend por módulos | se crean al empezar cada fase | pendiente |
+| 9 · Frontend: app y shared | [09-app-y-shared](09-app-y-shared/spec.md) | terminada |
+| 10 · Frontend: módulos y cierre | se crea al empezar la fase | pendiente |

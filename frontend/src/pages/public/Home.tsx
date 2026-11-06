@@ -5,7 +5,8 @@ import { SponsorsCarousel } from '../../components/SponsorsCarousel';
 import { Footer } from '../../components/Footer';
 import { HeroTorneos } from '../../features/landing/HeroTorneos';
 import { SeccionConocenos } from '../../features/landing/SeccionConocenos';
-import { Esquinas, SeccionPartidos } from '../../features/landing/SeccionPartidos';
+import { Esquinas } from '@/shared/ui/Esquinas';
+import { SeccionPartidos } from '../../features/landing/SeccionPartidos';
 
 export default function Home() {
   const navigate = useNavigate();

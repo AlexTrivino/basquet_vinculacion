@@ -6,14 +6,13 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { CheckCircle2, Users, ChevronRight, Trophy, X, Trash2, Shield } from 'lucide-react';
-import { AsyncButton } from '../../../components/AsyncButton';
+import { AsyncButton } from '@/shared/ui/AsyncButton';
 import { inscribirEquipoCompleto, finalizarBorradorInscripcion, deleteBorradorInscripcion } from '../api/equipos.api';
-import { getTorneos } from '../../torneos/api/torneos.api';
-import { getCategorias } from '../../categorias/api/categorias.api';
+import { getTorneos, getCategorias } from '@/shared/api/catalogo';
 import { GestorPlantilla } from '../../plantillas/components/GestorPlantilla';
 import { getPlantillas } from '../../plantillas/api/plantillas.api';
 import { useBusinessRules } from '../../../hooks/useBusinessRules';
-import type { Inscripcion, Categoria } from '../../../types/api.types';
+import type { Inscripcion, Categoria } from '@/shared/api/tipos';
 
 const MAX_COMPROBANTE_SIZE = 5 * 1024 * 1024; // 5 MB
 const MAX_LOGO_SIZE = 2 * 1024 * 1024;        // 2 MB

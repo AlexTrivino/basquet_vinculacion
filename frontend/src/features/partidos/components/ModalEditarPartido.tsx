@@ -8,9 +8,9 @@ import { toast } from 'sonner';
 
 import { getInscripciones } from '../../equipos/api/equipos.api';
 import { actualizarPartido } from '../api/partidos.api';
-import { SearchableSelect, type Option } from '../../../components/SearchableSelect';
-import { AsyncButton } from '../../../components/AsyncButton';
-import type { Partido } from '../../../types/api.types';
+import { SearchableSelect, type Option } from '@/shared/ui/SearchableSelect';
+import { AsyncButton } from '@/shared/ui/AsyncButton';
+import type { Partido } from '@/shared/api/tipos';
 
 const partidoUpdateSchema = z.object({
   fecha: z.string().min(1, 'Fecha requerida'),

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { X, FileText, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { subirActaPartido, eliminarActaPartido } from '../api/partidos.api';
-import type { Partido } from '../../../types/api.types';
+import type { Partido } from '@/shared/api/tipos';
 
 interface GestionActaModalProps {
   partido: Partido;

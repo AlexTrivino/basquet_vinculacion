@@ -1,7 +1,7 @@
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { FiguraFlyer, ResultadoFlyer } from './api/flyers.api';
-import type { Partido } from '../../types/api.types';
+import type { Partido } from '@/shared/api/tipos';
 
 // Lema del organizador, tomado de su flyer de programación
 export const LEMA = '¡Es momento de revivir el pasado!';

@@ -3,13 +3,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Home from './Home';
-import { getTorneos } from '../../features/torneos/api/torneos.api';
+import { getTorneos } from '@/shared/api/catalogo';
 import { getPartidos } from '../../features/partidos/api/partidos.api';
 import { getEquipos } from '../../features/equipos/api/equipos.api';
 import { getPatrocinadores } from '../../features/patrocinadores/api/patrocinadores.api';
 import { getEstadisticasPublicas } from '../../features/estadisticas/api/estadisticas.api';
 
-vi.mock('../../features/torneos/api/torneos.api');
+vi.mock('@/shared/api/catalogo');
 vi.mock('../../features/partidos/api/partidos.api');
 vi.mock('../../features/equipos/api/equipos.api');
 vi.mock('../../features/patrocinadores/api/patrocinadores.api');

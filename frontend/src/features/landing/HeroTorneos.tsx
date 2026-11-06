@@ -4,9 +4,9 @@ import { useQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ArrowRight, CalendarDays, Goal, Pause, Play } from 'lucide-react';
-import { getTorneos } from '../torneos/api/torneos.api';
+import { getTorneos } from '@/shared/api/catalogo';
 import { getEstadisticasPublicas } from '../estadisticas/api/estadisticas.api';
-import type { Torneo } from '../../types/api.types';
+import type { Torneo } from '@/shared/api/tipos';
 
 const MAX_TORNEOS = 8;
 const cifra = new Intl.NumberFormat('es-EC');

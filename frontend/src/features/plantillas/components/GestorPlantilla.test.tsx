@@ -31,7 +31,7 @@ vi.mock('../../equipos/api/equipos.api', () => ({
   })
 }));
 
-vi.mock('../../torneos/api/torneos.api', () => ({
+vi.mock('@/shared/api/catalogo', () => ({
   getTorneos: vi.fn().mockResolvedValue({ data: [] })
 }));
 

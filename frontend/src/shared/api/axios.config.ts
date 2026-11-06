@@ -5,11 +5,11 @@
  * - Response: Captura 401/403, purga localStorage y redirige a login.
  *
  * Uso en toda la app:
- *   import api from '@/api/axios.config';
+ *   import api from '@/shared/api/axios.config';
  *   const { data } = await api.get('/torneos');
  */
 import axios from 'axios';
-import { getAuthItem, clearAllAuthStorage, AUTH_KEYS } from '../utils/authStorage';
+import { getAuthItem, clearAllAuthStorage, AUTH_KEYS } from '../lib/authStorage';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',

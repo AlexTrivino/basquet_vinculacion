@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AdminEquipos from './AdminEquipos';
 import { getEquiposAdmin } from '../../features/equipos/api/equipos.api';
-import { getTorneos } from '../../features/torneos/api/torneos.api';
+import { getTorneos } from '@/shared/api/catalogo';
 import { BrowserRouter } from 'react-router-dom';
 
 // Mocks
@@ -20,7 +20,8 @@ vi.mock('../../features/equipos/api/equipos.api', () => ({
   desactivarEquipo: vi.fn()
 }));
 
-vi.mock('../../features/torneos/api/torneos.api', () => ({
+vi.mock('@/shared/api/catalogo', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/shared/api/catalogo')>()),
   getTorneos: vi.fn()
 }));
 

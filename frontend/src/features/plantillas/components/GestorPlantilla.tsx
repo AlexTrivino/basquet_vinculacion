@@ -24,8 +24,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-import { DataGridTable, type Column } from '../../../components/DataGridTable';
-import { AsyncButton } from '../../../components/AsyncButton';
+import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
+import { AsyncButton } from '@/shared/ui/AsyncButton';
 import { useAuth } from '../../../context/AuthContext';
 import { 
   getPlantillas, 
@@ -40,14 +40,14 @@ import {
 } from '../api/plantillas.api';
 import { getInscripciones } from '../../equipos/api/equipos.api';
 import { getSanciones } from '../../sanciones/api/sanciones.api';
-import type { Plantilla, Jugador, Categoria } from '../../../types/api.types';
-import { Skeleton } from '../../../components/Skeleton';
-import { EmptyState } from '../../../components/EmptyState';
+import type { Plantilla, Jugador, Categoria } from '@/shared/api/tipos';
+import { Skeleton } from '@/shared/ui/Skeleton';
+import { EmptyState } from '@/shared/ui/EmptyState';
 import { ConfirmarJugadorModal } from './ConfirmarJugadorModal';
 import { EditarCamisetaModal } from './EditarCamisetaModal';
 import { ConfirmarEliminarJugadorModal } from './ConfirmarEliminarJugadorModal';
 import { useBusinessRules } from '../../../hooks/useBusinessRules';
-import { FotoJugador } from '../../../components/FotoJugador';
+import { FotoJugador } from '@/shared/ui/FotoJugador';
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB
 

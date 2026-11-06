@@ -8,8 +8,8 @@ import { toast } from 'sonner';
 
 import { actualizarPartido, subirActaPartido, getBoxScore } from '../api/partidos.api';
 import { postEstadisticasBulk } from '../../estadisticas/api/estadisticas.api';
-import { AsyncButton } from '../../../components/AsyncButton';
-import type { Partido } from '../../../types/api.types';
+import { AsyncButton } from '@/shared/ui/AsyncButton';
+import type { Partido } from '@/shared/api/tipos';
 
 // Esquema Zod
 const statRowSchema = z.object({

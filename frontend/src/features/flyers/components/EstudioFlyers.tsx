@@ -4,7 +4,8 @@ import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ChevronDown, Copy } from 'lucide-react';
 import { toast } from 'sonner';
-import { getPartidosByTorneo, getTorneosAdmin } from '../../torneos/api/torneos.api';
+import { getPartidosByTorneo } from '../../torneos/api/torneos.api';
+import { getTorneosAdmin } from '@/shared/api/catalogo';
 import { getDatosFlyers, type DatosFlyers, type FiguraFlyer } from '../api/flyers.api';
 import {
   DESEMPATE, diaSemana, ESTADISTICAS, fechaCartel, filaDePartido, textoFigura, textoFiguras, textoLideres, textoPartidos, topJugadores,
@@ -12,7 +13,7 @@ import {
 } from '../textos';
 import { FichaFigura, FichaLider, FORMATOS, HeroeFigura, ListaFiguras, type Formato } from './Flyer';
 import { archivo, Laminas, paginasDeLaFecha, trocear, type Pagina } from './Laminas';
-import type { Partido } from '../../../types/api.types';
+import type { Partido } from '@/shared/api/tipos';
 
 type Tipo = 'partidos' | 'lideres' | 'figura-fecha' | 'categoria' | 'equipo';
 const TIPOS: { valor: Tipo; texto: string }[] = [

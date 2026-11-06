@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useId, useState, type ReactNode } from 'react';
 import { ChevronDown, MapPin } from 'lucide-react';
-import { getTorneos } from '../features/torneos/api/torneos.api';
+import { getTorneos } from '@/shared/api/catalogo';
 import { IconoMarca, REDES } from './Contacto';
 
 // Sin teléfono ni correo en pantalla: el único contacto es el botón flotante de WhatsApp (MainLayout)

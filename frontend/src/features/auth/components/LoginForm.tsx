@@ -6,8 +6,8 @@ import { toast } from 'sonner';
 
 import { useAuth, type UserRole } from '../../../context/AuthContext';
 import { loginWithSupabase } from '../api/auth.api';
-import { AsyncButton } from '../../../components/AsyncButton';
-import api from '../../../api/axios.config';
+import { AsyncButton } from '@/shared/ui/AsyncButton';
+import api from '@/shared/api/axios.config';
 
 // 1. Esquema de Validación con Zod
 const loginSchema = z.object({

@@ -4,10 +4,10 @@ import { RouterProvider } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-import { AuthProvider } from './context/AuthContext';
-import { ErrorBoundary } from './components/ErrorBoundary';
-import { router } from './routes/router';
-import './index.css';
+import { AuthProvider } from '@/context/AuthContext';
+import { ErrorBoundary } from './ErrorBoundary';
+import { router } from './router';
+import '@/index.css';
 
 // Tras un deploy, una pestaña abierta desde antes pide chunks que el build nuevo ya borró
 // ("Failed to fetch dynamically imported module"): se recarga una vez para traer el index.html nuevo.

@@ -5,9 +5,9 @@ import { toast } from 'sonner';
 import { User, Mail, Shield, Lock } from 'lucide-react';
 import { getPerfil, actualizarPerfil } from '../../features/auth/api/usuarios.api';
 import { updatePasswordWithSupabase } from '../../features/auth/api/auth.api';
-import { AsyncButton } from '../../components/AsyncButton';
+import { AsyncButton } from '@/shared/ui/AsyncButton';
 import { useAuth } from '../../context/AuthContext';
-import { getAuthToken } from '../../utils/authStorage';
+import { getAuthToken } from '@/shared/lib/authStorage';
 
 interface PerfilFormValues {
   nombre: string;

@@ -3,15 +3,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ModalGestionarPlantillasAdmin } from './ModalGestionarPlantillasAdmin';
 import { getInscripciones } from '../api/equipos.api';
-import { getTorneos } from '../../torneos/api/torneos.api';
-import type { Equipo } from '../../../types/api.types';
+import { getTorneos } from '@/shared/api/catalogo';
+import type { Equipo } from '@/shared/api/tipos';
 
 // Mock dependencias
 vi.mock('../api/equipos.api', () => ({
   getInscripciones: vi.fn(),
 }));
 
-vi.mock('../../torneos/api/torneos.api', () => ({
+vi.mock('@/shared/api/catalogo', () => ({
   getTorneos: vi.fn(),
 }));
 

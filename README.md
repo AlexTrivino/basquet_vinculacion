@@ -75,10 +75,9 @@ basquet_vinculacion/
 │
 ├── frontend/                         # SPA (React 18 + TypeScript + Vite)
 │   ├── src/
-│   │   ├── api/                      # Instancia configurada de Axios + Interceptores
-│   │   ├── components/               # UI Kit: Navbar, Sidebar, DataGridTable, AsyncButton, etc.
-│   │   ├── context/                  # AuthContext.tsx (sesión global y switch de equipo activo)
-│   │   ├── features/                 # Módulos por dominio de negocio (Feature-Driven)
+│   │   ├── app/                      # main.tsx (providers), router, MainLayout, Navbar, Sidebar y páginas de error
+│   │   ├── shared/                   # Lo común: ui/ (UI kit, Escudo), api/ (Axios, tipos, catálogo de torneos) y lib/
+│   │   ├── features/                 # Dominios de negocio que pasan a modules/ en la fase 10 (ver specs/)
 │   │   │   ├── auth/                 # Login y recuperación de clave
 │   │   │   ├── torneos/              # Explorador de torneos, posiciones y estadísticas
 │   │   │   ├── equipos/              # InscripcionWizard (Paso 1: Club, Paso 2: Roster)
@@ -87,8 +86,8 @@ basquet_vinculacion/
 │   │   │   ├── estadisticas/         # Carga y visualización de líderes
 │   │   │   └── sanciones/            # Registro y visualización de faltas
 │   │   ├── pages/                    # Vistas de alto nivel (Público, Delegado, Admin)
-│   │   ├── routes/                   # React Router v6 + ProtectedRoute (RBAC)
-│   │   └── types/                    # Tipados TypeScript estrictos alineados a Marshmallow
+│   │   ├── components/, context/, hooks/, routes/, types/  # Contacto, Footer, SponsorsCarousel, AuthContext, useBusinessRules, ProtectedRoute
+│   │   └── fronteras.test.ts         # Reglas de app/, shared/ y modules/, verificadas en npm test
 │   └── package.json                  # Dependencias y scripts de Vitest
 │
 └── documentacion/                    # Documentación técnica y directivas de desarrollo

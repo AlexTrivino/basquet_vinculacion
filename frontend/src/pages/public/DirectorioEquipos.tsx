@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { getTorneos } from '../../features/torneos/api/torneos.api';
+import { getTorneos } from '@/shared/api/catalogo';
 import { getInscripcionesPublicas } from '../../features/equipos/api/equipos.api';
 import { ChevronDown, Users } from 'lucide-react';
 

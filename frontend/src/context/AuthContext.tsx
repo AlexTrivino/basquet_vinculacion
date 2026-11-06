@@ -26,7 +26,7 @@ import {
   removeAuthItem,
   clearAllAuthStorage,
   isTokenExpired,
-} from '../utils/authStorage';
+} from '@/shared/lib/authStorage';
 
 // ── Tipos estrictos ──────────────────────────────────────────────
 

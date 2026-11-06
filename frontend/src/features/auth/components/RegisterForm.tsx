@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { Mail } from 'lucide-react';
 
 import { registerWithSupabase } from '../api/auth.api';
-import { AsyncButton } from '../../../components/AsyncButton';
+import { AsyncButton } from '@/shared/ui/AsyncButton';
 
 const registerSchema = z.object({
   nombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),

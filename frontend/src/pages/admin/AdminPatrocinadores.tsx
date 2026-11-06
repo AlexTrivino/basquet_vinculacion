@@ -5,8 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { getPatrocinadores, createPatrocinador, updatePatrocinador, deletePatrocinador, type Patrocinador } from '../../features/patrocinadores/api/patrocinadores.api';
-import { DataGridTable, type Column } from '../../components/DataGridTable';
-import { ConfirmationModal } from '../../components/ConfirmationModal';
+import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
+import { ConfirmationModal } from '@/shared/ui/ConfirmationModal';
 import { Loader2, Award, Plus, Trash2, X, Image as ImageIcon } from 'lucide-react';
 
 const schema = z.object({

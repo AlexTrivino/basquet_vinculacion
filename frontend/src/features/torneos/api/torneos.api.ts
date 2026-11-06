@@ -1,29 +1,10 @@
-import axiosInstance from '../../../api/axios.config';
-import type { FaseFinal, FormatoFaseFinal, Recorrido, ApiResponse, Torneo, Partido, PosicionFIBA } from '../../../types/api.types';
+import axiosInstance from '@/shared/api/axios.config';
+import type { FaseFinal, FormatoFaseFinal, Recorrido, ApiResponse, Torneo, Partido, PosicionFIBA } from '@/shared/api/tipos';
 
 // Ojo: axiosInstance (importado arriba) ya inyecta el baseUrl y el token.
 
-export async function getTorneos(page = 1, perPage = 20, anio?: number): Promise<ApiResponse<Torneo[]>> {
-  const params: any = { page, per_page: perPage };
-  if (anio) params.anio = anio;
-  
-  const response = await axiosInstance.get('/torneos', { params });
-  return response.data;
-}
-
-export async function getTorneosAdmin(page = 1, perPage = 20): Promise<ApiResponse<Torneo[]>> {
-  const params: any = { page, per_page: perPage };
-  const response = await axiosInstance.get('/torneos/admin', { params });
-  return response.data;
-}
-
 export async function getTorneoById(id: string | number): Promise<ApiResponse<Torneo>> {
   const response = await axiosInstance.get(`/torneos/${id}`);
-  return response.data;
-}
-
-export async function getTorneosDisponiblesReinscripcion(): Promise<ApiResponse<Torneo[]>> {
-  const response = await axiosInstance.get('/torneos/disponibles-reinscripcion');
   return response.data;
 }
 

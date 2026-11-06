@@ -7,8 +7,8 @@ import { useAuth } from '../../context/AuthContext';
 import { getDashboardStats, getActividadReciente } from '../../features/estadisticas/api/estadisticas.api';
 import { getPartidos } from '../../features/partidos/api/partidos.api';
 import { EstudioFlyers } from '../../features/flyers/components/EstudioFlyers';
-import { Skeleton } from '../../components/Skeleton';
-import type { Partido } from '../../types/api.types';
+import { Skeleton } from '@/shared/ui/Skeleton';
+import type { Partido } from '@/shared/api/tipos';
 
 const PANEL = 'rounded-xl border border-oro/25 bg-marino-claro/80 shadow-[0_20px_25px_-5px_rgb(0_0_0/0.3)]';
 const fechaPartido = (f?: string) => (f ? format(new Date(`${f}T12:00:00`), "d 'de' MMMM", { locale: es }) : '');

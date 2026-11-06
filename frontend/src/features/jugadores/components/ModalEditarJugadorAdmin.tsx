@@ -18,7 +18,7 @@ import {
   Trophy,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import type { Jugador } from '../../../types/api.types';
+import type { Jugador } from '@/shared/api/tipos';
 import {
   updateJugador,
   uploadFotoJugador,

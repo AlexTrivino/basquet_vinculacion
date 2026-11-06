@@ -1,57 +1,44 @@
-import { lazy, Suspense } from 'react';
+import { lazy } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
-import { ProtectedRoute } from './ProtectedRoute';
-import { MainLayout } from '../components/MainLayout';
-import NotFound from '../pages/errors/NotFound';
-import Unauthorized from '../pages/errors/Unauthorized';
+import { ProtectedRoute } from '@/routes/ProtectedRoute';
+import { MainLayout } from './MainLayout';
+import NotFound from './NotFound';
+import Unauthorized from './Unauthorized';
+import { withSuspense } from '@/shared/ui/withSuspense';
 
 // --- Lazy loaded pages (Code Splitting) ---
 // Público
-const Home = lazy(() => import('../pages/public/Home'));
-const TorneoDetail = lazy(() => import('../pages/public/TorneoDetail'));
-const EquipoProfile = lazy(() => import('../pages/public/EquipoProfile'));
-const DirectorioEquipos = lazy(() => import('../pages/public/DirectorioEquipos'));
-const JugadorProfile = lazy(() => import('../pages/public/JugadorProfile'));
+const Home = lazy(() => import('@/pages/public/Home'));
+const TorneoDetail = lazy(() => import('@/pages/public/TorneoDetail'));
+const EquipoProfile = lazy(() => import('@/pages/public/EquipoProfile'));
+const DirectorioEquipos = lazy(() => import('@/pages/public/DirectorioEquipos'));
+const JugadorProfile = lazy(() => import('@/pages/public/JugadorProfile'));
 
 // Auth
-const Login = lazy(() => import('../pages/auth/Login'));
-const Registro = lazy(() => import('../pages/auth/Registro'));
-const RecuperarPassword = lazy(() => import('../pages/auth/RecuperarPassword'));
-const ResetPassword = lazy(() => import('../pages/auth/ResetPassword'));
-const MiPerfil = lazy(() => import('../pages/auth/MiPerfil'));
-const BuscadorJugadores = lazy(() => import('../pages/visor/BuscadorJugadores'));
+const Login = lazy(() => import('@/pages/auth/Login'));
+const Registro = lazy(() => import('@/pages/auth/Registro'));
+const RecuperarPassword = lazy(() => import('@/pages/auth/RecuperarPassword'));
+const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'));
+const MiPerfil = lazy(() => import('@/pages/auth/MiPerfil'));
+const BuscadorJugadores = lazy(() => import('@/pages/visor/BuscadorJugadores'));
 
 // Delegado
-const DelegadoDashboard = lazy(() => import('../pages/delegado/Dashboard'));
-const DelegadoInscripcion = lazy(() => import('../pages/delegado/Inscripcion'));
-const DelegadoReinscripcion = lazy(() => import('../pages/delegado/Reinscripcion'));
-const DelegadoPlantilla = lazy(() => import('../pages/delegado/Plantilla'));
+const DelegadoDashboard = lazy(() => import('@/pages/delegado/Dashboard'));
+const DelegadoInscripcion = lazy(() => import('@/pages/delegado/Inscripcion'));
+const DelegadoReinscripcion = lazy(() => import('@/pages/delegado/Reinscripcion'));
+const DelegadoPlantilla = lazy(() => import('@/pages/delegado/Plantilla'));
 
 // Admin
-const AdminTorneos = lazy(() => import('../pages/admin/TorneosAdmin'));
-const AdminDashboard = lazy(() => import('../pages/admin/Dashboard'));
-const AdminAuditoria = lazy(() => import('../pages/admin/Auditoria'));
-const AdminEquipos = lazy(() => import('../pages/admin/AdminEquipos'));
-const AdminPartidos = lazy(() => import('../pages/admin/AdminPartidos'));
-const AdminSanciones = lazy(() => import('../pages/admin/AdminSanciones'));
-const AdminJugadores = lazy(() => import('../pages/admin/AdminJugadores'));
-const AdminPatrocinadores = lazy(() => import('../pages/admin/AdminPatrocinadores'));
-const AdminFaseFinal = lazy(() => import('../pages/admin/FaseFinal'));
-
-// --- Suspense Wrapper ---
-// Placeholder temporal de carga mientras se bajan los chunks.
-const withSuspense = (Component: React.LazyExoticComponent<any>) => (
-  <Suspense
-    fallback={
-      <div className="flex min-h-[50vh] items-center justify-center p-8">
-        <div className="text-slate-400">Cargando contenido...</div>
-      </div>
-    }
-  >
-    <Component />
-  </Suspense>
-);
+const AdminTorneos = lazy(() => import('@/pages/admin/TorneosAdmin'));
+const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
+const AdminAuditoria = lazy(() => import('@/pages/admin/Auditoria'));
+const AdminEquipos = lazy(() => import('@/pages/admin/AdminEquipos'));
+const AdminPartidos = lazy(() => import('@/pages/admin/AdminPartidos'));
+const AdminSanciones = lazy(() => import('@/pages/admin/AdminSanciones'));
+const AdminJugadores = lazy(() => import('@/pages/admin/AdminJugadores'));
+const AdminPatrocinadores = lazy(() => import('@/pages/admin/AdminPatrocinadores'));
+const AdminFaseFinal = lazy(() => import('@/pages/admin/FaseFinal'));
 
 export const router = createBrowserRouter([
   {

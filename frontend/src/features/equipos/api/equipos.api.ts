@@ -1,5 +1,5 @@
-import axiosInstance from '../../../api/axios.config';
-import type { ApiResponse, Equipo, Inscripcion } from '../../../types/api.types';
+import axiosInstance from '@/shared/api/axios.config';
+import type { ApiResponse, Equipo, Inscripcion } from '@/shared/api/tipos';
 
 export async function getEquipos(page = 1, perPage = 20): Promise<ApiResponse<Equipo[]>> {
   const response = await axiosInstance.get('/equipos', {

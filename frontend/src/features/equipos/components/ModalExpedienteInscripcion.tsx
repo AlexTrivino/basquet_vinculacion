@@ -16,14 +16,14 @@ import {
   Maximize2,
   Edit2,
 } from 'lucide-react';
-import type { Inscripcion, Plantilla } from '../../../types/api.types';
+import type { Inscripcion, Plantilla } from '@/shared/api/tipos';
 import { getPlantillas } from '../../plantillas/api/plantillas.api';
 import { useBusinessRules } from '../../../hooks/useBusinessRules';
-import { StatusBadge } from '../../../components/StatusBadge';
-import { AsyncButton } from '../../../components/AsyncButton';
+import { StatusBadge } from '@/shared/ui/StatusBadge';
+import { AsyncButton } from '@/shared/ui/AsyncButton';
 import { ModalRechazarInscripcion } from './ModalRechazarInscripcion';
 import { ModalEditarInscripcion } from './ModalEditarInscripcion';
-import { FotoJugador } from '../../../components/FotoJugador';
+import { FotoJugador } from '@/shared/ui/FotoJugador';
 
 interface ModalExpedienteInscripcionProps {
   isOpen: boolean;

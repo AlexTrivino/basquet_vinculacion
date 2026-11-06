@@ -4,17 +4,17 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Calendar, Plus, Filter, Search, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { getTorneos } from '../../features/torneos/api/torneos.api';
+import { getTorneos } from '@/shared/api/catalogo';
 import { getPartidos, anularPartido, restaurarPartido } from '../../features/partidos/api/partidos.api';
-import { SearchableSelect, type Option } from '../../components/SearchableSelect';
-import { DataGridTable, type Column } from '../../components/DataGridTable';
-import { StatusBadge } from '../../components/StatusBadge';
-import { Skeleton } from '../../components/Skeleton';
-import { EmptyState } from '../../components/EmptyState';
+import { SearchableSelect, type Option } from '@/shared/ui/SearchableSelect';
+import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
+import { StatusBadge } from '@/shared/ui/StatusBadge';
+import { Skeleton } from '@/shared/ui/Skeleton';
+import { EmptyState } from '@/shared/ui/EmptyState';
 import { ModalCrearPartido } from '../../features/partidos/components/ModalCrearPartido';
 import { ModalEditarPartido } from '../../features/partidos/components/ModalEditarPartido';
 import { ModalFinalizarPartido } from '../../features/partidos/components/ModalFinalizarPartido';
-import type { Partido } from '../../types/api.types';
+import type { Partido } from '@/shared/api/tipos';
 
 export default function AdminPartidos() {
   const [searchParams, setSearchParams] = useSearchParams();

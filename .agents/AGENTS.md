@@ -70,26 +70,28 @@ y nunca escribir código de relleno ni sobre-diseñar.
 
 ## Arquitectura del Frontend
 
-### Estructura de Carpetas (Feature-Driven — obligatoria)
+### Estructura de Carpetas (Screaming Architecture — migración por fases, ver `specs/`)
 
 ```
 src/
- ├── api/            # Instancia Axios + interceptores (axios.config.ts)
- ├── components/     # UI Kit genérico y reutilizable
- ├── context/        # AuthContext.tsx (sesión global)
- ├── features/       # Lógica por dominio de negocio
- │   ├── auth/
- │   ├── torneos/
- │   ├── equipos/
- │   ├── plantillas/
- │   ├── partidos/
- │   └── estadisticas/
- ├── hooks/          # Custom hooks transversales (useAuth, useFetch)
- ├── pages/          # Vistas de alto nivel que ensamblan features
- ├── routes/         # React Router config + ProtectedRoute HOC
- ├── tests/          # Tests unitarios e integración (Vitest + RTL)
- └── utils/          # Funciones puras (formateo de fechas, parseo JWT)
+ ├── app/            # Arma la aplicación: main.tsx (providers), router.tsx, MainLayout, Navbar, Sidebar,
+ │                   # ErrorBoundary, NotFound y Unauthorized
+ ├── shared/         # Lo que no es de ningún negocio; no importa app/ ni modules/
+ │   ├── ui/         # UI kit: AsyncButton, ConfirmationModal, DataGridTable, EmptyState, Skeleton, StatusBadge,
+ │   │               # FotoJugador, SearchableSelect, FileUploadButton, Escudo, Esquinas y withSuspense
+ │   ├── api/        # axios.config.ts (cliente), tipos.ts (ApiResponse y tipos de la API) y catalogo.ts
+ │   │               # (las lecturas de torneos y categorías que usan todos los módulos)
+ │   └── lib/        # nombres.ts y authStorage.ts
+ ├── modules/        # Un módulo por negocio (fase 10); de afuera se entra solo por su index.ts
+ ├── features/, pages/, components/, context/, hooks/, routes/
+ │                   # Código que todavía no pasó a su módulo
+ ├── tests/setup.ts  # Configuración de Vitest + RTL
+ └── fronteras.test.ts  # Verifica en npm test que shared no importe app ni módulos, que a un módulo
+                        # se entre por su index y que no haya ciclos entre módulos
 ```
+
+Imports: relativos dentro de la misma zona (un módulo, `app/` o `shared/`) y con el alias `@/` entre zonas
+(`@/shared/ui/Skeleton`, `@/modules/<nombre>`).
 
 **Prohibido:** estructura plana, `useState` múltiples en formularios complejos,
 componentes controlados puros donde aplique React Hook Form.
@@ -128,7 +130,7 @@ Posiciones, Calendario, Stats        la línea gráfica de cada torneo
 
 ## Capa de Red (Networking)
 
-- **Cliente Axios** exportado desde `src/api/axios.config.ts`.
+- **Cliente Axios** exportado desde `src/shared/api/axios.config.ts`.
 - **Interceptor de Request:** inyecta `Authorization: Bearer <token>` desde
   `localStorage` antes de cada petición.
 - **Interceptor de Response:** captura `401` y `403` globalmente — purga
@@ -244,7 +246,7 @@ Desktop (≥1024px)              Mobile (<1024px)
 
 ---
 
-## UI Kit — Componentes Base (`src/components/`)
+## UI Kit — Componentes Base (`src/shared/ui/`; Navbar, Sidebar y ErrorBoundary están en `src/app/`)
 
 | Componente | Responsabilidad |
 |-----------|-----------------|

@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Trophy, ArrowRight, PlayCircle, Trash2 } from 'lucide-react';
-import { getTorneosDisponiblesReinscripcion } from '../../../features/torneos/api/torneos.api';
+import { getTorneosDisponiblesReinscripcion } from '@/shared/api/catalogo';
 import { deleteBorradorInscripcion } from '../../../features/equipos/api/equipos.api';
-import type { Inscripcion } from '../../../types/api.types';
+import type { Inscripcion } from '@/shared/api/tipos';
 import { toast } from 'sonner';
-import { AsyncButton } from '../../../components/AsyncButton';
+import { AsyncButton } from '@/shared/ui/AsyncButton';
 
 // Mismas piezas que el perfil del equipo (marino, oro y celeste): el aviso vive sobre su portada
 const MOVIL = 'relative z-20 block border-b border-oro/40 bg-marino-claro p-4 text-crema lg:hidden';

@@ -6,11 +6,11 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { X, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { getTorneos } from '../../torneos/api/torneos.api';
+import { getTorneos } from '@/shared/api/catalogo';
 import { getInscripciones } from '../../equipos/api/equipos.api';
 import { crearPartido } from '../api/partidos.api';
-import { SearchableSelect, type Option } from '../../../components/SearchableSelect';
-import { AsyncButton } from '../../../components/AsyncButton';
+import { SearchableSelect, type Option } from '@/shared/ui/SearchableSelect';
+import { AsyncButton } from '@/shared/ui/AsyncButton';
 
 const partidoSchema = z.object({
   fecha: z.string().min(1, 'Fecha requerida'),

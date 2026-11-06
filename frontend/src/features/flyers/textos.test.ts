@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fechaCartel, filaDePartido, horaCartel, lineaCorta, numerosDe, textoFigura, textoPartidos, textoResultados, topJugadores } from './textos';
 import type { FiguraFlyer, ResultadoFlyer } from './api/flyers.api';
-import type { Partido } from '../../types/api.types';
+import type { Partido } from '@/shared/api/tipos';
 
 const partido = (local: number, visitante: number, estado = 'finalizado'): ResultadoFlyer => ({
   id_partido: local, hora: '17:00', categoria: 'Juvenil', fase: 'Grupo A', estado, figura: null,

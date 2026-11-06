@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../api/axios.config';
+import api from '@/shared/api/axios.config';
 
 interface BusinessRules {
   MAX_EQUIPOS_POR_DELEGADO: number;

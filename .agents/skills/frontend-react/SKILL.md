@@ -20,7 +20,7 @@ de implementación para el frontend.
 ## Axios — Convención de Llamadas
 
 ```typescript
-// src/api/axios.config.ts — instancia base
+// src/shared/api/axios.config.ts — instancia base
 import axios from 'axios';
 
 const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });

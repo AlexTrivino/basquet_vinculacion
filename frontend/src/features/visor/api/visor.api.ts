@@ -1,5 +1,5 @@
-import api from '../../../api/axios.config';
-import type { ApiResponse } from '../../../types/api.types';
+import api from '@/shared/api/axios.config';
+import type { ApiResponse } from '@/shared/api/tipos';
 
 interface EquipoCorto {
   id_equipo: number;

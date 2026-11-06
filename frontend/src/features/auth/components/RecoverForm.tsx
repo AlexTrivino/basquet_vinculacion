@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 
 import { resetPasswordWithSupabase } from '../api/auth.api';
-import { AsyncButton } from '../../../components/AsyncButton';
+import { AsyncButton } from '@/shared/ui/AsyncButton';
 
 const recoverSchema = z.object({
   email: z.string().email('Ingresa un correo electrónico válido'),

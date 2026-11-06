@@ -1,5 +1,5 @@
-import api from '../../../api/axios.config';
-import type { ApiResponse, Jugador } from '../../../types/api.types';
+import api from '@/shared/api/axios.config';
+import type { ApiResponse, Jugador } from '@/shared/api/tipos';
 
 export interface JugadorAdminFilterParams {
   search?: string;

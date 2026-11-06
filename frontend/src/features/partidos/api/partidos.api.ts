@@ -1,5 +1,5 @@
-import axiosInstance from '../../../api/axios.config';
-import type { ApiResponse, Partido } from '../../../types/api.types';
+import axiosInstance from '@/shared/api/axios.config';
+import type { ApiResponse, Partido } from '@/shared/api/tipos';
 
 export async function actualizarPartido(
   idPartido: number,

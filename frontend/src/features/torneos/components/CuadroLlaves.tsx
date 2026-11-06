@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, Trophy } from 'lucide-react';
 import { getFaseFinal } from '../api/torneos.api';
-import { Escudo } from './PartidosList';
+import { Escudo } from '@/shared/ui/Escudo';
 import { fechaCorta } from './faseFinal';
-import type { Llave } from '../../../types/api.types';
+import type { Llave } from '@/shared/api/tipos';
 
 const PLACA = 'font-display text-xs font-semibold uppercase tracking-[0.25em] text-oro/80';
 

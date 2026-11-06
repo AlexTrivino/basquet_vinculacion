@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { FORMATOS, type Formato } from './Flyer';
 import { Laminas, paginasDeLaFecha } from './Laminas';
 import { filaDePartido } from '../textos';
-import type { Partido } from '../../../types/api.types';
+import type { Partido } from '@/shared/api/tipos';
 
 // Flyer de los partidos de la fecha elegida en el calendario del torneo, para redes (4:5) o estados (9:16).
 // Se carga aparte (lazy) para que html-to-image no pese en la vista del torneo.

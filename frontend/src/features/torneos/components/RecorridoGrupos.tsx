@@ -2,9 +2,9 @@ import { useSyncExternalStore } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getRecorrido } from '../api/torneos.api';
-import { Escudo } from './PartidosList';
+import { Escudo } from '@/shared/ui/Escudo';
 import { COLORES_LINEA, SITUACION, fechaCorta } from './faseFinal';
-import type { Recorrido } from '../../../types/api.types';
+import type { Recorrido } from '@/shared/api/tipos';
 
 // Sigla para rotular cada línea: iniciales de hasta dos palabras ("5 DE JUNIO" → "5J")
 const sigla = (nombre: string) =>

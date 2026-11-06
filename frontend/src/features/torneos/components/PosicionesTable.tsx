@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, Trophy } from 'lucide-react';
 import { getPosicionesByTorneo } from '../api/torneos.api';
-import { Escudo } from './PartidosList';
+import { Escudo } from '@/shared/ui/Escudo';
 import { RecorridoGrupos } from './RecorridoGrupos';
 import { CUPOS, LEYENDA_CRUCES } from './faseFinal';
-import type { FormatoFaseFinal, PosicionFIBA } from '../../../types/api.types';
+import type { FormatoFaseFinal, PosicionFIBA } from '@/shared/api/tipos';
 
 interface PosicionesTableProps {
   torneoId: string;

@@ -20,17 +20,17 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import type { Jugador, Torneo, Equipo, Inscripcion } from '../../types/api.types';
+import type { Jugador, Torneo, Equipo, Inscripcion } from '@/shared/api/tipos';
 import {
   getJugadoresAdmin,
   updateJugador,
   deleteJugador,
 } from '../../features/jugadores/api/jugadores.api';
-import { getTorneos } from '../../features/torneos/api/torneos.api';
+import { getTorneos } from '@/shared/api/catalogo';
 import { getEquipos, getInscripciones } from '../../features/equipos/api/equipos.api';
-import { DataGridTable, type Column } from '../../components/DataGridTable';
-import { StatusBadge } from '../../components/StatusBadge';
-import { ConfirmationModal } from '../../components/ConfirmationModal';
+import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
+import { StatusBadge } from '@/shared/ui/StatusBadge';
+import { ConfirmationModal } from '@/shared/ui/ConfirmationModal';
 import { ModalEditarJugadorAdmin } from '../../features/jugadores/components/ModalEditarJugadorAdmin';
 import { ModalCrearJugador } from '../../features/jugadores/components/ModalCrearJugador';
 

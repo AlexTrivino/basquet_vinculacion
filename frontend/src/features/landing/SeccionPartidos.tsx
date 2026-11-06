@@ -5,7 +5,8 @@ import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, Shield, Trophy } from 'lucide-react';
 import { getPartidos } from '../partidos/api/partidos.api';
-import type { Equipo, Partido } from '../../types/api.types';
+import { Esquinas } from '@/shared/ui/Esquinas';
+import type { Equipo, Partido } from '@/shared/api/tipos';
 
 const INICIALES = 4; // tarjetas visibles antes de "Ver más"
 const PASO = 4; // cuántas agrega cada "Ver más"
@@ -15,19 +16,6 @@ const COLUMNAS = 'grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-x-3';
 
 function nombreEquipo(equipo?: Equipo): string {
   return equipo?.nombre_equipo || equipo?.nombre || 'Por definir';
-}
-
-// Esquinas en L del cartel (tarjetas de partido y CTA)
-export function Esquinas() {
-  const base = 'absolute h-4 w-4 border-oro/40';
-  return (
-    <>
-      <span aria-hidden="true" className={`${base} left-3 top-3 border-l border-t`} />
-      <span aria-hidden="true" className={`${base} right-3 top-3 border-r border-t`} />
-      <span aria-hidden="true" className={`${base} bottom-3 left-3 border-b border-l`} />
-      <span aria-hidden="true" className={`${base} bottom-3 right-3 border-b border-r`} />
-    </>
-  );
 }
 
 // Medallón claro: los logos en silueta negra se leen sobre el fondo oscuro. Se encoge con su columna.
