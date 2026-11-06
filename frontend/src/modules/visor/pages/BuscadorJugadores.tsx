@@ -4,7 +4,7 @@ import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { ArrowRight, ChevronDown, Search, Users } from 'lucide-react';
 import { getTorneos } from '@/shared/api/catalogo';
 import { getInscripcionesPublicas } from '@/modules/inscripciones';
-import { buscarJugadores, type FiltrosVisor, type JugadorVisor } from '../../features/visor/api/visor.api';
+import { buscarJugadores, type FiltrosVisor, type JugadorVisor } from '../api/visor.api';
 import { Escudo } from '@/shared/ui/Escudo';
 import { FotoJugador } from '@/shared/ui/FotoJugador';
 

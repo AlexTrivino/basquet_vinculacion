@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getJugadorPerfil } from '../api/jugadores.api';
 import { useAuth } from '@/modules/auth';
-import { PartidosJugador } from '@/features/visor/components/PartidosJugador';
+import { PartidosJugador } from '@/modules/visor';
 import { Escudo } from '@/shared/ui/Escudo';
 import { FotoJugador } from '@/shared/ui/FotoJugador';
 import {

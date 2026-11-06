@@ -104,6 +104,7 @@ Cada módulo tiene `api/`, `components/`, `pages/`, `types.ts` si tiene tipos pr
 - `inscripciones`: las inscripciones (asistentes de inscripción y reinscripción, revisión, edición, retiro y purga de borradores; sus llamadas a `/inscripciones` salieron de `equipos.api.ts`), las plantillas con `GestorPlantilla` y `useBusinessRules`.
 - `equipos`: el directorio y el perfil público de los equipos, su administración (con la auditoría de inscripciones y la baja) y el panel del delegado (`Dashboard`, con `BannerNuevosTorneos`).
 - `jugadores`: el perfil público del jugador y la administración de los jugadores, con `types.ts` (el perfil con sus participaciones y métricas).
+- `visor`: el buscador de jugadores del rol visor (`/visor`, con su guarda) y `PartidosJugador`, que también usa el perfil del jugador.
 
 **Prohibido:** estructura plana, `useState` múltiples en formularios complejos,
 componentes controlados puros donde aplique React Hook Form.

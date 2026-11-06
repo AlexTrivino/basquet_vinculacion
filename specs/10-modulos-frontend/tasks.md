@@ -11,7 +11,7 @@ Cada módulo es un commit. Comprobación de cada uno: `npm test` (con la prueba 
 - [x] inscripciones, con sus doce llamadas fuera de `equipos.api.ts` (`inscripciones.api.ts`). El chunk inicial baja 938 bytes: el Navbar ya no arrastra las llamadas de equipos. Trinquete 10 → 3.
 - [x] equipos, con el panel del delegado y `BannerNuevosTorneos`. Trinquete 3 → 2.
 - [x] jugadores, con `types.ts` (el perfil del jugador).
-- [ ] visor.
+- [x] visor.
 - [ ] flyers.
 - [ ] estadísticas, con `LideresEstadisticos` y el panel del admin.
 - [ ] portada, con el Footer y Contacto.

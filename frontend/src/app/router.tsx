@@ -9,6 +9,7 @@ import { rutas as torneos } from '@/modules/torneos';
 import { rutas as inscripciones } from '@/modules/inscripciones';
 import { rutas as equipos } from '@/modules/equipos';
 import { rutas as jugadores } from '@/modules/jugadores';
+import { rutas as visor } from '@/modules/visor';
 import { MainLayout } from './MainLayout';
 import NotFound from './NotFound';
 import Unauthorized from './Unauthorized';
@@ -17,9 +18,6 @@ import { withSuspense } from '@/shared/ui/withSuspense';
 // --- Lazy loaded pages (Code Splitting) ---
 // Público
 const Home = lazy(() => import('@/pages/public/Home'));
-
-// Visor
-const BuscadorJugadores = lazy(() => import('@/pages/visor/BuscadorJugadores'));
 
 // Delegado
 
@@ -38,11 +36,7 @@ export const router = createBrowserRouter([
       ...torneos.publicas,
       ...equipos.publicas,
       ...jugadores.publicas,
-      {
-        path: '/visor',
-        element: <ProtectedRoute allowedRoles={['visor', 'super_admin']} />,
-        children: [{ index: true, element: withSuspense(BuscadorJugadores) }],
-      },
+      ...visor.publicas,
       ...auth.publicas,
       {
         path: '/delegado',
