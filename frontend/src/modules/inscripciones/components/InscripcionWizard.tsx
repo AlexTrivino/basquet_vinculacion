@@ -7,11 +7,11 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { CheckCircle2, Users, ChevronRight, Trophy, X, Trash2, Shield } from 'lucide-react';
 import { AsyncButton } from '@/shared/ui/AsyncButton';
-import { inscribirEquipoCompleto, finalizarBorradorInscripcion, deleteBorradorInscripcion } from '../api/equipos.api';
+import { inscribirEquipoCompleto, finalizarBorradorInscripcion, deleteBorradorInscripcion } from '../api/inscripciones.api';
 import { getTorneos, getCategorias } from '@/shared/api/catalogo';
-import { GestorPlantilla } from '../../plantillas/components/GestorPlantilla';
-import { getPlantillas } from '../../plantillas/api/plantillas.api';
-import { useBusinessRules } from '../../../hooks/useBusinessRules';
+import { GestorPlantilla } from './GestorPlantilla';
+import { getPlantillas } from '../api/plantillas.api';
+import { useBusinessRules } from '../useBusinessRules';
 import type { Inscripcion, Categoria } from '@/shared/api/tipos';
 
 const MAX_COMPROBANTE_SIZE = 5 * 1024 * 1024; // 5 MB

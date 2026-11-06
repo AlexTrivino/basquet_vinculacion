@@ -1,5 +1,5 @@
 import { useParams, Navigate } from 'react-router-dom';
-import { ReinscripcionWizard } from '../../features/equipos/components/ReinscripcionWizard';
+import { ReinscripcionWizard } from '../components/ReinscripcionWizard';
 
 export default function Reinscripcion() {
   const { idEquipo } = useParams<{ idEquipo: string }>();

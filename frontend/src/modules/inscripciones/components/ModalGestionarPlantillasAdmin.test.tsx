@@ -2,12 +2,12 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ModalGestionarPlantillasAdmin } from './ModalGestionarPlantillasAdmin';
-import { getInscripciones } from '../api/equipos.api';
+import { getInscripciones } from '../api/inscripciones.api';
 import { getTorneos } from '@/shared/api/catalogo';
 import type { Equipo } from '@/shared/api/tipos';
 
 // Mock dependencias
-vi.mock('../api/equipos.api', () => ({
+vi.mock('../api/inscripciones.api', () => ({
   getInscripciones: vi.fn(),
 }));
 
@@ -16,7 +16,7 @@ vi.mock('@/shared/api/catalogo', () => ({
 }));
 
 // Mock GestorPlantilla para no testear su complejidad interna aquí
-vi.mock('../../plantillas/components/GestorPlantilla', () => ({
+vi.mock('./GestorPlantilla', () => ({
   GestorPlantilla: ({ readOnly, isAdmin }: any) => (
     <div data-testid="mock-gestor-plantilla">
       GestorPlantilla Mock - Admin: {isAdmin ? 'Yes' : 'No'} - ReadOnly: {readOnly ? 'Yes' : 'No'}

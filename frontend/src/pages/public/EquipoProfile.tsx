@@ -5,16 +5,9 @@ import { ArrowLeft, ArrowRight, Camera, ChevronLeft, ChevronRight, MapPin, Shiel
 import { toast } from 'sonner';
 
 import { useAuth } from '@/modules/auth';
-import {
-  getEquipoById,
-  uploadLogoEquipo,
-  uploadBannerEquipo,
-  deleteLogoEquipo,
-  deleteBannerEquipo,
-  getInscripcionesPublicas,
-} from '../../features/equipos/api/equipos.api';
+import { getEquipoById, uploadLogoEquipo, uploadBannerEquipo, deleteLogoEquipo, deleteBannerEquipo } from '../../features/equipos/api/equipos.api';
+import { getInscripcionesPublicas, getPlantillas } from '@/modules/inscripciones';
 import { getPartidosByEquipo, clavesPartidos } from '@/modules/partidos';
-import { getPlantillas } from '../../features/plantillas/api/plantillas.api';
 import { Escudo } from '@/shared/ui/Escudo';
 import { FotoJugador } from '@/shared/ui/FotoJugador';
 import { partirNombre } from '@/shared/lib/nombres';

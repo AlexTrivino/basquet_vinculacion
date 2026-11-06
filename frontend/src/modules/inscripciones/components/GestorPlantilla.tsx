@@ -38,7 +38,7 @@ import {
   deletePlantilla,
   updateNumeroCamiseta
 } from '../api/plantillas.api';
-import { getInscripciones } from '../../equipos/api/equipos.api';
+import { getInscripciones } from '../api/inscripciones.api';
 import { getSanciones } from '@/modules/sanciones';
 import type { Plantilla, Jugador, Categoria } from '@/shared/api/tipos';
 import { Skeleton } from '@/shared/ui/Skeleton';
@@ -46,7 +46,7 @@ import { EmptyState } from '@/shared/ui/EmptyState';
 import { ConfirmarJugadorModal } from './ConfirmarJugadorModal';
 import { EditarCamisetaModal } from './EditarCamisetaModal';
 import { ConfirmarEliminarJugadorModal } from './ConfirmarEliminarJugadorModal';
-import { useBusinessRules } from '../../../hooks/useBusinessRules';
+import { useBusinessRules } from '../useBusinessRules';
 import { FotoJugador } from '@/shared/ui/FotoJugador';
 
 const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB

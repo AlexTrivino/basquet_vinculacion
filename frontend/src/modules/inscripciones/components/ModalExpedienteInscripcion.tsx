@@ -17,8 +17,8 @@ import {
   Edit2,
 } from 'lucide-react';
 import type { Inscripcion, Plantilla } from '@/shared/api/tipos';
-import { getPlantillas } from '../../plantillas/api/plantillas.api';
-import { useBusinessRules } from '../../../hooks/useBusinessRules';
+import { getPlantillas } from '../api/plantillas.api';
+import { useBusinessRules } from '../useBusinessRules';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { AsyncButton } from '@/shared/ui/AsyncButton';
 import { ModalRechazarInscripcion } from './ModalRechazarInscripcion';

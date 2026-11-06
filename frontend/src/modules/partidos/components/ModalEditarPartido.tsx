@@ -6,7 +6,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { X, Edit } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { getInscripciones } from '@/features/equipos/api/equipos.api';
+import { getInscripciones } from '@/modules/inscripciones';
 import { actualizarPartido } from '../api/partidos.api';
 import { SearchableSelect, type Option } from '@/shared/ui/SearchableSelect';
 import { AsyncButton } from '@/shared/ui/AsyncButton';

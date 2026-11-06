@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Users, ArrowRight } from 'lucide-react';
-import { getInscripciones } from '../../features/equipos/api/equipos.api';
-import { InscripcionWizard } from '../../features/equipos/components/InscripcionWizard';
+import { getInscripciones } from '../api/inscripciones.api';
+import { InscripcionWizard } from '../components/InscripcionWizard';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import { EmptyState } from '@/shared/ui/EmptyState';
 
-import { useBusinessRules } from '../../hooks/useBusinessRules';
+import { useBusinessRules } from '../useBusinessRules';
 
 
 export default function Inscripcion() {

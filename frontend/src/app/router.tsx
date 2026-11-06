@@ -6,6 +6,7 @@ import { rutas as auspicios } from '@/modules/auspicios';
 import { rutas as sanciones } from '@/modules/sanciones';
 import { rutas as partidos } from '@/modules/partidos';
 import { rutas as torneos } from '@/modules/torneos';
+import { rutas as inscripciones } from '@/modules/inscripciones';
 import { MainLayout } from './MainLayout';
 import NotFound from './NotFound';
 import Unauthorized from './Unauthorized';
@@ -23,9 +24,6 @@ const BuscadorJugadores = lazy(() => import('@/pages/visor/BuscadorJugadores'));
 
 // Delegado
 const DelegadoDashboard = lazy(() => import('@/pages/delegado/Dashboard'));
-const DelegadoInscripcion = lazy(() => import('@/pages/delegado/Inscripcion'));
-const DelegadoReinscripcion = lazy(() => import('@/pages/delegado/Reinscripcion'));
-const DelegadoPlantilla = lazy(() => import('@/pages/delegado/Plantilla'));
 
 // Admin
 const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
@@ -66,9 +64,7 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute allowedRoles={['delegado']} />,
         children: [
           { path: 'dashboard', element: withSuspense(DelegadoDashboard) },
-          { path: 'inscripcion', element: withSuspense(DelegadoInscripcion) },
-          { path: 'reinscripcion/:idEquipo', element: withSuspense(DelegadoReinscripcion) },
-          { path: 'plantilla', element: withSuspense(DelegadoPlantilla) },
+          ...inscripciones.delegado,
         ],
       },
       {

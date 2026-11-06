@@ -2,10 +2,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ModalExpedienteInscripcion } from './ModalExpedienteInscripcion';
-import * as plantillasApi from '../../plantillas/api/plantillas.api';
+import * as plantillasApi from '../api/plantillas.api';
 import type { Inscripcion } from '@/shared/api/tipos';
 
-vi.mock('../../plantillas/api/plantillas.api');
+vi.mock('../api/plantillas.api');
 
 const mockInscripcion: Inscripcion = {
   id_inscripcion: 1,

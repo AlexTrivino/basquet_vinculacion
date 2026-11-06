@@ -26,7 +26,7 @@ vi.mock('@/shared/api/catalogo', async (importOriginal) => ({
 }));
 
 // Mock del modal para probar que se abre correctamente
-vi.mock('../../features/equipos/components/ModalGestionarPlantillasAdmin', () => ({
+vi.mock('@/modules/inscripciones/components/ModalGestionarPlantillasAdmin', () => ({
   ModalGestionarPlantillasAdmin: ({ isOpen, equipo }: any) => {
     if (!isOpen) return null;
     return <div data-testid="mock-modal-plantillas">Modal abierto para {equipo?.nombre_equipo}</div>;

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Trophy, ArrowRight, PlayCircle, Trash2 } from 'lucide-react';
 import { getTorneosDisponiblesReinscripcion } from '@/shared/api/catalogo';
-import { deleteBorradorInscripcion } from '../../../features/equipos/api/equipos.api';
+import { deleteBorradorInscripcion } from '@/modules/inscripciones';
 import type { Inscripcion } from '@/shared/api/tipos';
 import { toast } from 'sonner';
 import { AsyncButton } from '@/shared/ui/AsyncButton';

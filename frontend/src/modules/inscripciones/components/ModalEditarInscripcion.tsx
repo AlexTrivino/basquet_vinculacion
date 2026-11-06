@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, Save, AlertTriangle } from 'lucide-react';
 import { getTorneos, getCategorias } from '@/shared/api/catalogo';
-import { editarInscripcion, getInscripciones } from '../api/equipos.api';
+import { editarInscripcion, getInscripciones } from '../api/inscripciones.api';
 import { ConfirmationModal } from '@/shared/ui/ConfirmationModal';
 import { toast } from 'sonner';
 import type { Inscripcion } from '@/shared/api/tipos';

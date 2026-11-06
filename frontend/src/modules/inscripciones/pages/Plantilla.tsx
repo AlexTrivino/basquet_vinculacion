@@ -1,4 +1,4 @@
-import { GestorPlantilla } from '../../features/plantillas/components/GestorPlantilla';
+import { GestorPlantilla } from '../components/GestorPlantilla';
 
 export default function Plantilla() {
   return (

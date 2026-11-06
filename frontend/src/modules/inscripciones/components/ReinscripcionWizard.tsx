@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronRight, Trash2, ArrowLeft } from 'lucide-react';
 import { AsyncButton } from '@/shared/ui/AsyncButton';
-import { reinscribirEquipo, subirComprobante } from '../api/equipos.api';
+import { reinscribirEquipo, subirComprobante } from '../api/inscripciones.api';
 import { getCategorias, getTorneosDisponiblesReinscripcion } from '@/shared/api/catalogo';
 
 const MAX_COMPROBANTE_SIZE = 5 * 1024 * 1024; // 5 MB

@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { AsyncButton } from '@/shared/ui/AsyncButton';
 import { generarLlaves, getFaseFinal, setFormatoCategoria, setGrupos } from '../api/torneos.api';
 import { getTorneosAdmin } from '@/shared/api/catalogo';
-import { getInscripcionesPublicas } from '@/features/equipos/api/equipos.api';
+import { getInscripcionesPublicas } from '@/modules/inscripciones';
 import type { Categoria, FormatoFaseFinal } from '@/shared/api/tipos';
 import type { Llave } from '../types';
 import { clavesPartidos } from '@/modules/partidos';

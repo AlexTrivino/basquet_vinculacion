@@ -24,7 +24,7 @@ vi.mock('../api/plantillas.api', () => ({
   updateNumeroCamiseta: vi.fn()
 }));
 
-vi.mock('../../equipos/api/equipos.api', () => ({
+vi.mock('../api/inscripciones.api', () => ({
   getEquipos: vi.fn().mockResolvedValue({ data: [] }),
   getInscripciones: vi.fn().mockResolvedValue({
     data: [{ id_torneo: 99, estado_inscripcion: 'aprobado', torneo: { estado: 'programado' }, categoria: { id_categoria: 1 } }]
@@ -35,7 +35,7 @@ vi.mock('@/shared/api/catalogo', () => ({
   getTorneos: vi.fn().mockResolvedValue({ data: [] })
 }));
 
-vi.mock('../../jugadores/api/jugadores.api', () => ({
+vi.mock('@/features/jugadores/api/jugadores.api', () => ({
   getJugadores: vi.fn().mockResolvedValue({ data: [], total: 0, pages: 1 })
 }));
 

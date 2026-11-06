@@ -3,8 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 import { useAuth } from '@/modules/auth';
-import { useBusinessRules } from '../../hooks/useBusinessRules';
-import { getInscripciones } from '../../features/equipos/api/equipos.api';
+import { useBusinessRules, getInscripciones } from '@/modules/inscripciones';
 import { ShieldAlert, Trophy } from 'lucide-react';
 import EquipoProfile from '../public/EquipoProfile';
 import { BannerNuevosTorneos } from './components/BannerNuevosTorneos';

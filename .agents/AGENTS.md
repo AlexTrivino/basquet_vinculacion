@@ -101,6 +101,7 @@ Cada módulo tiene `api/`, `components/`, `pages/`, `types.ts` si tiene tipos pr
 - `sanciones`: las sanciones de los jugadores (`getSanciones`, que también consulta la plantilla) y su administración.
 - `partidos`: la programación y el cierre de los partidos (estadísticas y acta), el box score público y las listas de partidos que leen el calendario, la portada, los flyers y el perfil del equipo, con sus claves de React Query en `api/claves.ts` (`clavesPartidos`).
 - `torneos`: el detalle público del torneo (`CalendarioTorneo`, posiciones, llaves, recorrido y líderes), su administración y la fase final, con sus claves de React Query en `api/claves.ts` (`clavesTorneos`) y `types.ts` con las posiciones, las llaves y el recorrido. Nadie lo importa: solo expone `rutas`.
+- `inscripciones`: las inscripciones (asistentes de inscripción y reinscripción, revisión, edición, retiro y purga de borradores; sus llamadas a `/inscripciones` salieron de `equipos.api.ts`), las plantillas con `GestorPlantilla` y `useBusinessRules`.
 
 **Prohibido:** estructura plana, `useState` múltiples en formularios complejos,
 componentes controlados puros donde aplique React Hook Form.

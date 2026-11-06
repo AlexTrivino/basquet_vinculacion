@@ -13,7 +13,7 @@ import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
 import { AsyncButton } from '@/shared/ui/AsyncButton';
 import { FileUploadButton } from '@/shared/ui/FileUploadButton';
 import { DesactivarEquipoModal } from '../../features/equipos/components/DesactivarEquipoModal';
-import { ModalGestionarPlantillasAdmin } from '../../features/equipos/components/ModalGestionarPlantillasAdmin';
+import { ModalGestionarPlantillasAdmin } from '@/modules/inscripciones';
 import type { Equipo } from '@/shared/api/tipos';
 
 const equipoSchema = z.object({

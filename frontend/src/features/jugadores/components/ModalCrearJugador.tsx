@@ -11,7 +11,7 @@ import {
   uploadCedulaJugador,
   uploadActaJugador
 } from '../api/jugadores.api';
-import { buscarJugadorPorCedula } from '../../plantillas/api/plantillas.api';
+import { buscarJugadorPorCedula } from '@/modules/inscripciones';
 
 // Esquema de validación coincidente con backend
 const crearJugadorSchema = z.object({

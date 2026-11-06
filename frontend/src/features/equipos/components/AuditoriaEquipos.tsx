@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { AsyncButton } from '@/shared/ui/AsyncButton';
-import { getInscripciones, updateInscripcionEstado, purgarInscripcionesExpiradas, retirarEquipo } from '../api/equipos.api';
+import { getInscripciones, updateInscripcionEstado, purgarInscripcionesExpiradas, retirarEquipo, ModalExpedienteInscripcion, ModalRechazarInscripcion } from '@/modules/inscripciones';
 import { getTorneos } from '@/shared/api/catalogo';
 import type { Inscripcion, Torneo } from '@/shared/api/tipos';
 import { EmptyState } from '@/shared/ui/EmptyState';
@@ -21,8 +21,6 @@ import {
   Check,
   Ban,
 } from 'lucide-react';
-import { ModalExpedienteInscripcion } from './ModalExpedienteInscripcion';
-import { ModalRechazarInscripcion } from './ModalRechazarInscripcion';
 import { ModalRetirarEquipo } from './ModalRetirarEquipo';
 import { Escudo } from '@/shared/ui/Escudo';
 

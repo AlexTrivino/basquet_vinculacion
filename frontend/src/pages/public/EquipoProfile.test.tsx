@@ -5,12 +5,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import EquipoProfile from './EquipoProfile';
 import * as equiposApi from '../../features/equipos/api/equipos.api';
 import * as partidosApi from '@/modules/partidos';
-import * as plantillasApi from '../../features/plantillas/api/plantillas.api';
+import * as inscripcionesApi from '@/modules/inscripciones';
 
 // Mocks de APIs
 vi.mock('../../features/equipos/api/equipos.api');
 vi.mock('@/modules/partidos/api/partidos.api');
-vi.mock('../../features/plantillas/api/plantillas.api');
+vi.mock('@/modules/inscripciones/api/plantillas.api');
+vi.mock('@/modules/inscripciones/api/inscripciones.api');
 vi.mock('@/modules/auth/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: false,
@@ -195,7 +196,7 @@ describe('EquipoProfile Component', () => {
       message: 'Equipo encontrado',
     });
 
-    vi.spyOn(plantillasApi, 'getPlantillas').mockResolvedValue({
+    vi.spyOn(inscripcionesApi, 'getPlantillas').mockResolvedValue({
       success: true,
       data: mockPlantillas,
       message: 'Plantilla obtenida',
@@ -207,7 +208,7 @@ describe('EquipoProfile Component', () => {
       message: 'Partidos obtenidos',
     });
 
-    vi.spyOn(equiposApi, 'getInscripcionesPublicas').mockResolvedValue({
+    vi.spyOn(inscripcionesApi, 'getInscripcionesPublicas').mockResolvedValue({
       success: true,
       data: mockInscripciones,
       message: 'Inscripciones obtenidas',
@@ -247,7 +248,7 @@ describe('EquipoProfile Component', () => {
   });
 
   it('parte el nombre del cromo en apellidos y nombres, salvo con partículas', async () => {
-    vi.spyOn(plantillasApi, 'getPlantillas').mockResolvedValue({
+    vi.spyOn(inscripcionesApi, 'getPlantillas').mockResolvedValue({
       success: true,
       data: [
         { ...mockPlantillas[0], jugador: { id_jugador: 50, nombre: 'JORGE EDUARDO SALTOS BACUSOY', url_foto: null } },
@@ -333,7 +334,7 @@ describe('EquipoProfile Component', () => {
       message: 'Sin partidos',
     });
 
-    vi.spyOn(equiposApi, 'getInscripcionesPublicas').mockResolvedValue({
+    vi.spyOn(inscripcionesApi, 'getInscripcionesPublicas').mockResolvedValue({
       success: true,
       data: [],
       message: 'Sin inscripciones',
