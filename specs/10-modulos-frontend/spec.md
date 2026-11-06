@@ -27,7 +27,7 @@ Después de la fase 9, el negocio sigue repartido entre `features/`, `pages/`, `
 
 ## Criterios de aceptación
 
-- [ ] No quedan `pages/`, `features/`, `components/`, `context/`, `hooks/`, `routes/` ni `types/`.
-- [ ] La prueba de fronteras es estricta y pasa, y falla con un import a una carpeta interna de otro módulo, con un ciclo entre módulos o con un archivo fuera de `app`, `shared` y `modules`.
-- [ ] Cada módulo va en su commit con `npm test` y `npm run build` en verde, sin código de más en el chunk inicial y con la prueba de humo igual a la del build de antes de la fase 9.
-- [ ] `.agents/AGENTS.md`, el README y `DESIGN.md` describen los módulos.
+- [x] No quedan `pages/`, `features/`, `components/`, `context/`, `hooks/`, `routes/` ni `types/`.
+- [x] La prueba de fronteras es estricta y pasa, y falla con un import a una carpeta interna de otro módulo, con un ciclo entre módulos o con un archivo fuera de `app`, `shared` y `modules`.
+- [x] Cada módulo va en su commit con `npm test` y `npm run build` en verde, sin código de más en el chunk inicial y con la prueba de humo igual a la del build de antes de la fase 9.
+- [x] `.agents/AGENTS.md`, el README y `DESIGN.md` describen los módulos.

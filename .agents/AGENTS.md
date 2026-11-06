@@ -70,24 +70,25 @@ y nunca escribir código de relleno ni sobre-diseñar.
 
 ## Arquitectura del Frontend
 
-### Estructura de Carpetas (Screaming Architecture — migración por fases, ver `specs/`)
+### Estructura de Carpetas (Screaming Architecture — fases 9 y 10, ver `specs/`)
 
 ```
 src/
- ├── app/            # Arma la aplicación: main.tsx (providers), router.tsx, MainLayout, Navbar, Sidebar,
- │                   # ErrorBoundary, NotFound y Unauthorized
+ ├── app/            # Arma la aplicación: main.tsx (providers), router.tsx (junta las rutas de los módulos bajo el
+ │                   # layout y las guardas), MainLayout, Navbar, Sidebar, ErrorBoundary, NotFound y Unauthorized
  ├── shared/         # Lo que no es de ningún negocio; no importa app/ ni modules/
  │   ├── ui/         # UI kit: AsyncButton, ConfirmationModal, DataGridTable, EmptyState, Skeleton, StatusBadge,
  │   │               # FotoJugador, SearchableSelect, FileUploadButton, Escudo, Esquinas y withSuspense
- │   ├── api/        # axios.config.ts (cliente), tipos.ts (ApiResponse y tipos de la API) y catalogo.ts
- │   │               # (las lecturas de torneos y categorías que usan todos los módulos)
+ │   ├── api/        # axios.config.ts (cliente), tipos.ts (ApiResponse y los tipos que usan varios módulos) y
+ │   │               # catalogo.ts (las lecturas de torneos y categorías que usan todos los módulos)
  │   └── lib/        # nombres.ts y authStorage.ts
- ├── modules/        # Un módulo por negocio (fase 10); de afuera se entra solo por su index.ts
- ├── features/, pages/, components/, context/, hooks/, routes/
- │                   # Código que todavía no pasó a su módulo
+ ├── modules/        # Un módulo por negocio: auth, auspicios, sanciones, inscripciones, visor, partidos, equipos,
+ │   │               # jugadores, flyers, estadisticas, torneos y portada
+ │   └── <módulo>/   # api/ (llamadas y claves de React Query), components/, pages/, types.ts, routes.tsx e index.ts
  ├── tests/setup.ts  # Configuración de Vitest + RTL
- └── fronteras.test.ts  # Verifica en npm test que shared no importe app ni módulos, que a un módulo
-                        # se entre por su index y que no haya ciclos entre módulos
+ └── fronteras.test.ts  # Verifica en npm test que el código esté en app/, shared/ o modules/, que shared no importe
+                        # app ni módulos, que a un módulo se entre por su index (que solo reexporta) y que no haya
+                        # ciclos entre módulos
 ```
 
 Imports: relativos dentro de la misma zona (un módulo, `app/` o `shared/`) y con el alias `@/` entre zonas
@@ -96,7 +97,9 @@ Imports: relativos dentro de la misma zona (un módulo, `app/` o `shared/`) y co
 Cada módulo tiene `api/`, `components/`, `pages/`, `types.ts` si tiene tipos propios, `routes.tsx` con sus
 `rutas` (`publicas` dentro del layout, `delegado` y `admin` bajo su guarda, `sueltas` fuera del layout), que junta
 `app/router.tsx`, e `index.ts` con lo único que usan los demás. El `index.ts` solo reexporta: con código propio
-(un `lazy`, una constante) Vite mete en el chunk de quien lo importa todo lo que el index reexporta. Migrados (fase 10):
+(un `lazy`, una constante) Vite mete en el chunk de quien lo importa todo lo que el index reexporta (por eso
+`package.json` declara `"sideEffects": ["*.css"]`). Grafo, de abajo hacia arriba: auth, auspicios y sanciones;
+inscripciones; visor y partidos; equipos; jugadores y flyers; estadisticas; torneos y portada. Módulos:
 - `auth`: la sesión (`AuthContext`), `ProtectedRoute`, login, registro, recuperación de la clave y perfil.
 - `auspicios`: los patrocinadores: el carrusel de la portada (`SponsorsCarousel`) y su administración.
 - `sanciones`: las sanciones de los jugadores (`getSanciones`, que también consulta la plantilla) y su administración.
@@ -106,7 +109,7 @@ Cada módulo tiene `api/`, `components/`, `pages/`, `types.ts` si tiene tipos pr
 - `equipos`: el directorio y el perfil público de los equipos, su administración (con la auditoría de inscripciones y la baja) y el panel del delegado (`Dashboard`, con `BannerNuevosTorneos`).
 - `jugadores`: el perfil público del jugador y la administración de los jugadores, con `types.ts` (el perfil con sus participaciones y métricas).
 - `visor`: el buscador de jugadores del rol visor (`/visor`, con su guarda) y `PartidosJugador`, que también usa el perfil del jugador.
-- `flyers`: el estudio de flyers del panel del admin (`EstudioFlyers`) y el flyer de la fecha del calendario (`FlyerFecha`, que el `index.ts` exporta con `lazy` para que html-to-image no pese en la vista del torneo).
+- `flyers`: el estudio de flyers del panel del admin (`EstudioFlyers`) y el flyer de la fecha del calendario (`FlyerFecha`, que se exporta con `lazy` desde `components/FlyerFechaDiferido.ts` para que html-to-image no pese en la vista del torneo).
 - `estadisticas`: el panel del admin (tablero, actividad reciente, partidos pendientes y el estudio de flyers), `LideresEstadisticos` (la pestaña Estadísticas del torneo) y los totales públicos de la portada.
 - `portada`: la página de inicio (`HeroTorneos`, `SeccionConocenos`, `SeccionPartidos`, el carrusel de auspicios y el `Footer`) y `Contacto`, con el botón de WhatsApp que el layout muestra en todas las páginas.
 

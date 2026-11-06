@@ -40,36 +40,33 @@ backend/
 
 ## 🎨 Estructura del Frontend (`/frontend`)
 
-El frontend utiliza una arquitectura orientada a características (*Feature-Driven Development*), evitando estructuras planas.
+El frontend usa Screaming Architecture: cada pantalla vive en el módulo de negocio al que pertenece, `app/` arma la aplicación y `shared/` tiene lo que no es de ningún negocio (fases 9 y 10 de `specs/`).
 
 ```text
 frontend/
-├── public/               # Archivos estáticos directos (favicon)
+├── public/               # Archivos estáticos directos (favicon, siluetas)
 ├── src/
-│   ├── api/              # Cliente global Axios e interceptores (`axios.config.ts`)
-│   ├── assets/           # Imágenes locales y CSS global (`index.css`)
-│   ├── components/       # UI Genérica Reutilizable (Tablas, Modales, Botones, Badges)
-│   ├── context/          # Manejo de Estado Global
-│   │   └── AuthContext.tsx # Mantiene la sesión del usuario viva en toda la app
-│   ├── features/         # Agrupación por Dominio de Negocio (El Core de la app)
-│   │   ├── auth/         # Login, Recuperación de clave
-│   │   ├── categorias/   # Gestión de categorías
-│   │   ├── equipos/      # Perfiles, creación de equipos y reinscripción
-│   │   ├── estadisticas/ # Dashboard admin, Bulk de Box Scores
-│   │   ├── jugadores/    # Perfiles, creación de jugadores, documentos
-│   │   ├── partidos/     # Calendarios, actas de partidos
-│   │   ├── patrocinadores/
-│   │   ├── plantillas/   # Asignación de roster a equipos
+│   ├── app/              # main.tsx (providers), router.tsx, MainLayout, Navbar, Sidebar, ErrorBoundary y páginas de error
+│   ├── shared/
+│   │   ├── ui/           # UI kit genérico (tablas, modales, botones, badges, Escudo, Esquinas, withSuspense)
+│   │   ├── api/          # Cliente Axios (`axios.config.ts`), tipos de la API y catálogo de torneos y categorías
+│   │   └── lib/          # Helpers puros (nombres, almacenamiento de la sesión)
+│   ├── modules/          # Un módulo por negocio; de afuera se entra solo por su index.ts
+│   │   ├── auth/         # Sesión (AuthContext), ProtectedRoute, login, registro y perfil
+│   │   ├── auspicios/    # Patrocinadores
 │   │   ├── sanciones/
-│   │   └── torneos/      # Fixtures, Posiciones, Líderes
-│   ├── hooks/            # Custom hooks transversales
-│   ├── pages/            # Layouts y Vistas base que ensamblan los features
-│   ├── routes/           # Configuración centralizada de React Router y HOCs (ProtectedRoute)
-│   ├── utils/            # Helpers puros (formateo de fechas, string utilities)
-│   ├── App.tsx           # Enrutador principal
-│   └── main.tsx          # Punto de montaje de React
-├── tests/                # Pruebas automatizadas del Frontend (Vitest + RTL)
+│   │   ├── inscripciones/ # Inscripciones, plantillas y reglas de negocio
+│   │   ├── visor/        # Buscador de jugadores del rol visor
+│   │   ├── partidos/     # Programación, cierre, actas y box score
+│   │   ├── equipos/      # Directorio, perfil, administración y panel del delegado
+│   │   ├── jugadores/    # Perfil y administración de jugadores
+│   │   ├── flyers/       # Estudio de flyers y flyer de la fecha
+│   │   ├── estadisticas/ # Panel del admin y líderes
+│   │   ├── torneos/      # Detalle del torneo, calendario, posiciones, llaves y fase final
+│   │   └── portada/      # Página de inicio, pie y contacto
+│   ├── index.css         # CSS global y tokens de Tailwind (@theme)
+│   ├── tests/setup.ts    # Configuración de Vitest + RTL
+│   └── fronteras.test.ts # Reglas de app/, shared/ y modules/
 ├── package.json          # Dependencias y scripts de Node
-├── vite.config.ts        # Configuración del Bundler
-└── tailwind.config.ts    # Tokens de diseño y sistema visual
+└── vite.config.ts        # Configuración del bundler (alias @/ → src)
 ```

@@ -1,15 +1,13 @@
 /**
- * Fronteras del frontend (constitución, regla 4), leídas del código con import.meta.glob.
- *
- * Estricto para lo nuevo:
- *  - a un módulo se entra solo por su index (`@/modules/<nombre>`);
+ * Fronteras del frontend (constitución, regla 4), leídas del código con import.meta.glob:
+ *  - todo el código está en `app`, `shared` o `modules` (más esta prueba, `vite-env.d.ts` y `tests/`);
+ *  - a un módulo se entra solo por su index (`@/modules/<nombre>`), y el index solo reexporta;
  *  - `shared` no importa `modules` ni `app`; los módulos no importan `app`;
  *  - sin ciclos entre módulos.
- * Trinquete para lo viejo: los imports de una feature a archivos de otra solo pueden bajar.
  */
 import { describe, expect, it } from 'vitest';
 
-const IMPORTS_ENTRE_FEATURES = 0; // trinquete: cuando baje, bájalo aquí en el mismo commit
+const SUELTOS = ['/src/fronteras.test.ts', '/src/vite-env.d.ts', '/src/tests/setup.ts'];
 
 const FUENTES = import.meta.glob('/src/**/*.{ts,tsx}', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 const IMPORT = /\b(?:from|import)\s*\(?\s*['"]([^'"]+)['"]/g;
@@ -93,8 +91,22 @@ describe('fronteras del frontend', () => {
     expect(cicloEntreModulos()).toBeNull();
   });
 
-  it('no suma imports entre features viejas', () => {
-    const entreFeatures = IMPORTS.filter(({ de, a }) => de.zona === 'features' && a.zona === 'features' && de.nombre && a.nombre && de.nombre !== a.nombre);
-    expect(entreFeatures.length, 'Si bajó, actualiza IMPORTS_ENTRE_FEATURES; si subió, importa desde el index de un módulo').toBe(IMPORTS_ENTRE_FEATURES);
+  it('no deja código fuera de app, shared y modules', () => {
+    const fuera = Object.keys(FUENTES).filter((ruta) => !/^\/src\/(app|shared|modules)\//.test(ruta) && !SUELTOS.includes(ruta));
+    expect(fuera).toEqual([]);
+  });
+
+  it('el index de cada módulo solo reexporta', () => {
+    // Con código propio (un lazy, una constante), Vite mete en el chunk de quien importa el index todo lo que reexporta
+    const conCodigo = Object.entries(FUENTES)
+      .filter(([ruta]) => /^\/src\/modules\/[^/]+\/index\.tsx?$/.test(ruta))
+      .filter(([, codigo]) =>
+        codigo
+          .replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '')
+          .replace(/export\s+(type\s+)?(\*|\{[^}]*\})\s+from\s+['"][^'"]+['"];?/g, '')
+          .trim(),
+      )
+      .map(([ruta]) => ruta);
+    expect(conCodigo).toEqual([]);
   });
 });

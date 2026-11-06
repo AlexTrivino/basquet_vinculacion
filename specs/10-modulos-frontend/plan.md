@@ -59,3 +59,12 @@ Cada `routes.tsx` exporta `rutas`, con las páginas cargadas con `lazy` y `withS
 5. `npm test`, `npm run build`, el tamaño del chunk inicial y la prueba de humo (`scratchpad/front/humo.cjs`) contra el build de `6294037`; trinquete en lo que quede; `.agents/AGENTS.md`; commit.
 
 Al final se borran las carpetas viejas y sus `.gitkeep`, la prueba de fronteras pierde el trinquete y gana la regla de que no haya archivos fuera de `app`, `shared` y `modules`, y se actualizan `.agents/AGENTS.md`, el README, `DESIGN.md` y `Docs/04_estructura_carpetas.md`.
+
+## Resultado
+
+- 12 commits de módulo y uno de cierre: 98 archivos con `git mv`, 30 nuevos (12 `index.ts`, 11 `routes.tsx`, 3 `types.ts`, las dos `claves.ts`, `inscripciones.api.ts` y `FlyerFechaDiferido.ts`) y los `.gitkeep` de las carpetas viejas borrados. `modules/` tiene 128 archivos y fuera de `app`, `shared` y `modules` quedan `index.css`, `vite-env.d.ts`, `tests/setup.ts` y la prueba de fronteras.
+- El trinquete de imports entre features bajó de 19 a 0 y se quitó; la prueba de fronteras ganó dos reglas (nada fuera de `app`, `shared` y `modules`; el `index.ts` solo reexporta) y mata las seis mutaciones probadas: import a una carpeta interna, ciclo entre módulos, archivo suelto, index con código, `shared` que importa un módulo y módulo que importa `app`.
+- 27 claves de React Query pasaron a `clavesPartidos` (18) y `clavesTorneos` (9) con los mismos arreglos.
+- `package.json` declara `"sideEffects": ["*.css"]`: sin eso, lo que un `index.ts` reexporta para otros módulos entraba al chunk inicial al importar sus `rutas`. Un index con código propio hacía que la vista pública del torneo descargara el estudio de flyers (45 KB); por eso `FlyerFecha` se exporta desde `FlyerFechaDiferido.ts` y la prueba de fronteras exige índices de solo reexportaciones.
+- El chunk inicial quedó en 402.459 bytes (403.019 antes de la fase 9). Por página, comparado con el build de `6294037`: el perfil del equipo, el del jugador, el buscador del visor, la auditoría, el panel del delegado y la administración de equipos descargan entre 46 y 57 KB menos (ya no arrastran el calendario para usar `Escudo`), el panel del admin 19 KB menos y el flyer de la fecha 21 KB menos; ninguna página sube más de 1 KB.
+- Las pruebas pasan en cada commit (80; 81 con la regla nueva de fronteras; solo cambiaron rutas de imports y mocks) y la prueba de humo de 42 rutas en cuatro sesiones dio el mismo texto que el build de `6294037` después de cada módulo.

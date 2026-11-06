@@ -312,6 +312,8 @@ El lenguaje de formas mezcla dos familias. Contenedores y controles tienen esqui
 
 ## Components
 
+Dónde vive cada pieza (`frontend/src`): lo que usan varias pantallas está en `shared/ui` (`Escudo`, `Esquinas`, `FotoJugador` con la silueta, `Skeleton`, `EmptyState`, `StatusBadge`, `AsyncButton`, `DataGridTable`…); la barra y el menú lateral, en `app/`; lo demás, en el módulo de su pantalla: el cartel de partido (`TarjetaPartido`, `Medallon`), la tarjeta diagonal de torneo (`HeroTorneos`), el panel CTA, el pie, las redes y el botón de WhatsApp en `modules/portada`; la banda de auspiciantes en `modules/auspicios`; el calendario (`CalendarioTorneo`), las posiciones y las llaves en `modules/torneos`; el flyer y sus láminas en `modules/flyers`; el cromo y el boleto en `modules/equipos`.
+
 ### Botones
 Sobrios y claros: la acción la dice el color, no la forma.
 - **Forma:** esquinas suaves (0.5rem).

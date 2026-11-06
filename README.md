@@ -75,19 +75,11 @@ basquet_vinculacion/
 │
 ├── frontend/                         # SPA (React 18 + TypeScript + Vite)
 │   ├── src/
-│   │   ├── app/                      # main.tsx (providers), router, MainLayout, Navbar, Sidebar y páginas de error
+│   │   ├── app/                      # main.tsx (providers), router (junta las rutas de los módulos), layout, Navbar y páginas de error
 │   │   ├── shared/                   # Lo común: ui/ (UI kit, Escudo), api/ (Axios, tipos, catálogo de torneos) y lib/
-│   │   ├── modules/                  # Un módulo por negocio, se entra por su index.ts: auth, auspicios, sanciones, partidos, torneos, inscripciones, equipos, jugadores, visor, flyers, estadisticas, portada
-│   │   ├── features/                 # Dominios de negocio que pasan a modules/ en la fase 10 (ver specs/)
-│   │   │   ├── auth/                 # Login y recuperación de clave
-│   │   │   ├── torneos/              # Explorador de torneos, posiciones y estadísticas
-│   │   │   ├── equipos/              # InscripcionWizard (Paso 1: Club, Paso 2: Roster)
-│   │   │   ├── plantillas/           # GestorPlantilla, modales de confirmación y dorsales
-│   │   │   ├── partidos/             # Calendario y programación de partidos
-│   │   │   ├── estadisticas/         # Carga y visualización de líderes
-│   │   │   └── sanciones/            # Registro y visualización de faltas
-│   │   ├── pages/                    # Vistas de alto nivel (Público, Delegado, Admin)
-│   │   ├── components/, hooks/, types/  # Contacto, Footer, SponsorsCarousel y useBusinessRules
+│   │   ├── modules/                  # Un módulo por negocio, cada uno con api/, components/, pages/, routes.tsx e index.ts:
+│   │   │                             # auth, auspicios, sanciones, inscripciones, visor, partidos, equipos, jugadores,
+│   │   │                             # flyers, estadisticas, torneos y portada
 │   │   └── fronteras.test.ts         # Reglas de app/, shared/ y modules/, verificadas en npm test
 │   └── package.json                  # Dependencias y scripts de Vitest
 │
