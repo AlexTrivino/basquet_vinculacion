@@ -107,6 +107,7 @@ Cada módulo tiene `api/`, `components/`, `pages/`, `types.ts` si tiene tipos pr
 - `jugadores`: el perfil público del jugador y la administración de los jugadores, con `types.ts` (el perfil con sus participaciones y métricas).
 - `visor`: el buscador de jugadores del rol visor (`/visor`, con su guarda) y `PartidosJugador`, que también usa el perfil del jugador.
 - `flyers`: el estudio de flyers del panel del admin (`EstudioFlyers`) y el flyer de la fecha del calendario (`FlyerFecha`, que el `index.ts` exporta con `lazy` para que html-to-image no pese en la vista del torneo).
+- `estadisticas`: el panel del admin (tablero, actividad reciente, partidos pendientes y el estudio de flyers), `LideresEstadisticos` (la pestaña Estadísticas del torneo) y los totales públicos de la portada.
 
 **Prohibido:** estructura plana, `useState` múltiples en formularios complejos,
 componentes controlados puros donde aplique React Hook Form.

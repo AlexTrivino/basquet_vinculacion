@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getTorneos } from '@/shared/api/catalogo';
 import { getEquipos } from '@/modules/equipos';
 import { getPartidos } from '@/modules/partidos';
-import { getEstadisticasPublicas } from '../estadisticas/api/estadisticas.api';
+import { getEstadisticasPublicas } from '@/modules/estadisticas';
 
 // "1 torneo" / "3 torneos": la cifra en negrita y el resto en texto corrido
 function Cifra({ valor, singular, plural }: { valor: number; singular: string; plural: string }) {

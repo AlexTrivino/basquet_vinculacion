@@ -10,6 +10,7 @@ import { rutas as inscripciones } from '@/modules/inscripciones';
 import { rutas as equipos } from '@/modules/equipos';
 import { rutas as jugadores } from '@/modules/jugadores';
 import { rutas as visor } from '@/modules/visor';
+import { rutas as estadisticas } from '@/modules/estadisticas';
 import { MainLayout } from './MainLayout';
 import NotFound from './NotFound';
 import Unauthorized from './Unauthorized';
@@ -22,7 +23,6 @@ const Home = lazy(() => import('@/pages/public/Home'));
 // Delegado
 
 // Admin
-const AdminDashboard = lazy(() => import('@/pages/admin/Dashboard'));
 
 export const router = createBrowserRouter([
   {
@@ -52,7 +52,7 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <Navigate to="torneos" replace /> },
           ...torneos.admin,
-          { path: 'dashboard', element: withSuspense(AdminDashboard) },
+          ...estadisticas.admin,
           ...equipos.admin,
           ...jugadores.admin,
           ...partidos.admin,

@@ -7,13 +7,13 @@ import { getTorneos } from '@/shared/api/catalogo';
 import { getPartidos } from '@/modules/partidos';
 import { getEquipos } from '@/modules/equipos';
 import { getPatrocinadores } from '@/modules/auspicios';
-import { getEstadisticasPublicas } from '../../features/estadisticas/api/estadisticas.api';
+import { getEstadisticasPublicas } from '@/modules/estadisticas';
 
 vi.mock('@/shared/api/catalogo');
 vi.mock('@/modules/partidos/api/partidos.api');
 vi.mock('@/modules/equipos/api/equipos.api');
 vi.mock('@/modules/auspicios/api/patrocinadores.api');
-vi.mock('../../features/estadisticas/api/estadisticas.api');
+vi.mock('@/modules/estadisticas/api/estadisticas.api');
 vi.mock('@google/model-viewer', () => ({}));
 vi.mock('@/modules/auth/AuthContext', () => ({ useAuth: () => ({ userRole: null }) }));
 

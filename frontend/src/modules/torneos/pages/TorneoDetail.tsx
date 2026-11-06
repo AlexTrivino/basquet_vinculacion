@@ -8,7 +8,7 @@ import { getTorneoById } from '../api/torneos.api';
 import { getPartidosByTorneo, clavesPartidos } from '@/modules/partidos';
 import { PosicionesTable } from '../components/PosicionesTable';
 import { CalendarioTorneo, colorCategoria } from '../components/CalendarioTorneo';
-import { LideresEstadisticos } from '@/features/estadisticas/components/LideresEstadisticos';
+import { LideresEstadisticos } from '@/modules/estadisticas';
 import { CuadroLlaves } from '../components/CuadroLlaves';
 import { clavesTorneos } from '../api/claves';
 

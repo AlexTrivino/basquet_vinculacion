@@ -5,7 +5,7 @@ import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ArrowRight, CalendarDays, Goal, Pause, Play } from 'lucide-react';
 import { getTorneos } from '@/shared/api/catalogo';
-import { getEstadisticasPublicas } from '../estadisticas/api/estadisticas.api';
+import { getEstadisticasPublicas } from '@/modules/estadisticas';
 import type { Torneo } from '@/shared/api/tipos';
 
 const MAX_TORNEOS = 8;

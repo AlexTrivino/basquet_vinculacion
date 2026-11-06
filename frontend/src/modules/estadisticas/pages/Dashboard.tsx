@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { AlertCircle, ArrowRight, FileText, Trophy } from 'lucide-react';
 import { useAuth } from '@/modules/auth';
-import { getDashboardStats, getActividadReciente } from '../../features/estadisticas/api/estadisticas.api';
+import { getDashboardStats, getActividadReciente } from '../api/estadisticas.api';
 import { getPartidos, clavesPartidos } from '@/modules/partidos';
 import { EstudioFlyers } from '@/modules/flyers';
 import { Skeleton } from '@/shared/ui/Skeleton';
