@@ -27,9 +27,10 @@ def estadisticas_publicas():
 
 
 @stats_bp.route('/figuras', methods=['GET'])
-def figuras_en_curso():
-    """La figura de cada categoría de los torneos en curso hasta hoy, sin autenticación (la sección de la portada)."""
-    return api_response(_figuras_schema.dump(casos.figuras_en_curso(RepositorioEstadisticas())))
+def figuras_de_portada():
+    """La figura de cada categoría hasta hoy, sin autenticación (la sección de la portada): de los torneos vigentes
+    o, si ninguno tiene partidos jugados, del último finalizado."""
+    return api_response(_figuras_schema.dump(casos.figuras_de_portada(RepositorioEstadisticas())))
 
 
 @stats_bp.route('/flyers', methods=['GET'])

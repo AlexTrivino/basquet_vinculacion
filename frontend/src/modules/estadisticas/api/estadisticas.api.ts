@@ -42,7 +42,7 @@ export async function getEstadisticasPublicas(): Promise<
   return response.data;
 }
 
-// La figura acumulada de cada categoría de los torneos en curso (la sección de figuras de la portada)
+// La figura acumulada de cada categoría de los torneos vigentes, o del último finalizado (la sección de figuras de la portada)
 export interface FiguraDelTorneo {
   torneo: { id_torneo: number; nombre: string };
   categoria: string | null;
@@ -54,7 +54,7 @@ export interface FiguraDelTorneo {
   valoracion: number;
 }
 
-export async function getFigurasEnCurso(): Promise<ApiResponse<FiguraDelTorneo[]>> {
+export async function getFigurasPortada(): Promise<ApiResponse<FiguraDelTorneo[]>> {
   const response = await axiosInstance.get('/estadisticas/figuras');
   return response.data;
 }

@@ -2,7 +2,7 @@ import { Fragment, useRef, useState, type KeyboardEvent, type PointerEvent } fro
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
-import { getFigurasEnCurso, type FiguraDelTorneo } from '@/modules/estadisticas';
+import { getFigurasPortada, type FiguraDelTorneo } from '@/modules/estadisticas';
 import { Escudo } from '@/shared/ui/Escudo';
 import { FotoJugador } from '@/shared/ui/FotoJugador';
 
@@ -265,10 +265,8 @@ function Carrusel({ figuras }: { figuras: FiguraDelTorneo[] }) {
 }
 
 export function SeccionFiguras() {
-  const { data, isLoading, isError, refetch } = useQuery({ queryKey: ['landing', 'figuras'], queryFn: getFigurasEnCurso });
+  const { data, isLoading, isError, refetch } = useQuery({ queryKey: ['landing', 'figuras'], queryFn: getFigurasPortada });
   const figuras = data?.data ?? [];
-  // Sin torneos en curso o sin estadísticas cargadas todavía, la sección no aparece
-  if (!isLoading && !isError && figuras.length === 0) return null;
 
   return (
     <section id="figuras" className="relative z-10 scroll-mt-16 px-4 py-24 sm:px-6 lg:px-8">
@@ -295,6 +293,11 @@ export function SeccionFiguras() {
               Reintentar
             </button>
           </div>
+        ) : figuras.length === 0 ? (
+          // Solo pasa si ningún torneo tiene partidos jugados con estadísticas: la API cae al último finalizado
+          <p className="mt-12 rounded-xl border border-white/10 bg-white/5 p-10 text-center text-slate-300">
+            Las figuras aparecen cuando se juegan los primeros partidos de un torneo.
+          </p>
         ) : (
           <>
             <Carrusel figuras={figuras} />

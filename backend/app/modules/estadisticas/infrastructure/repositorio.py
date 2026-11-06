@@ -121,9 +121,17 @@ class RepositorioEstadisticas:
             'tiros_libres': int(row.tiros_libres_totales or 0),
         } for row in query.all()]
 
-    def torneos_en_curso(self):
-        """Los ids de los torneos en curso, del que empezó antes al último."""
-        filas = db.session.query(Torneo.id_torneo).filter(Torneo.estado == 'en_curso').order_by(Torneo.fecha_inicio, Torneo.id_torneo)
+    def torneos_vigentes(self):
+        """Los ids de los torneos en curso o programados (uno programado puede tener partidos jugados si nadie le
+        cambió el estado), del que empezó antes al último."""
+        filas = (db.session.query(Torneo.id_torneo).filter(Torneo.estado.in_(('en_curso', 'programado')))
+                 .order_by(Torneo.fecha_inicio, Torneo.id_torneo))
+        return [id_torneo for (id_torneo,) in filas]
+
+    def torneos_finalizados(self):
+        """Los ids de los torneos finalizados, del que terminó último al primero."""
+        filas = (db.session.query(Torneo.id_torneo).filter(Torneo.estado == 'finalizado')
+                 .order_by(Torneo.fecha_fin.desc(), Torneo.id_torneo.desc()))
         return [id_torneo for (id_torneo,) in filas]
 
     # ── Flyers ────────────────────────────────────────────────────

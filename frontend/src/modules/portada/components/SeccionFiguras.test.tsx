@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SeccionFiguras } from './SeccionFiguras';
-import { getFigurasEnCurso, type FiguraDelTorneo } from '@/modules/estadisticas';
+import { getFigurasPortada, type FiguraDelTorneo } from '@/modules/estadisticas';
 
 vi.mock('@/modules/estadisticas/api/estadisticas.api');
 
@@ -44,7 +44,7 @@ const terminarBarra = () => fireEvent(barra(), new Event('webkitAnimationEnd', {
 
 describe('SeccionFiguras (portada)', () => {
   beforeEach(() => {
-    vi.mocked(getFigurasEnCurso).mockResolvedValue({ success: true, message: '', data: FIGURAS } as never);
+    vi.mocked(getFigurasPortada).mockResolvedValue({ success: true, message: '', data: FIGURAS } as never);
   });
   afterEach(() => vi.unstubAllGlobals());
 
@@ -117,16 +117,16 @@ describe('SeccionFiguras (portada)', () => {
     expect(barra()).toHaveStyle({ animationPlayState: 'paused' });
   });
 
-  it('sin figuras la sección no aparece', async () => {
-    vi.mocked(getFigurasEnCurso).mockResolvedValue({ success: true, message: '', data: [] } as never);
-    const { container } = renderSeccion();
-    await vi.waitFor(() => expect(vi.mocked(getFigurasEnCurso)).toHaveBeenCalled());
-    await vi.waitFor(() => expect(container.querySelector('#figuras')).toBeNull());
-    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+  it('sin figuras avisa que aparecen con los primeros partidos', async () => {
+    vi.mocked(getFigurasPortada).mockResolvedValue({ success: true, message: '', data: [] } as never);
+    renderSeccion();
+    expect(await screen.findByText('Las figuras aparecen cuando se juegan los primeros partidos de un torneo.')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Figuras del torneo/i })).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Figuras del torneo' })).not.toBeInTheDocument();
   });
 
   it('si la API falla avisa y deja reintentar', async () => {
-    vi.mocked(getFigurasEnCurso).mockRejectedValueOnce(new Error('sin red'));
+    vi.mocked(getFigurasPortada).mockRejectedValueOnce(new Error('sin red'));
     renderSeccion();
     fireEvent.click(await screen.findByRole('button', { name: 'Reintentar' }));
     expect(await screen.findByRole('link', { name: /^Ver a ANA MERO/ })).toBeInTheDocument();

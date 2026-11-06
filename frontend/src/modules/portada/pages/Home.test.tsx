@@ -7,7 +7,7 @@ import { getTorneos } from '@/shared/api/catalogo';
 import { getPartidos } from '@/modules/partidos';
 import { getEquipos } from '@/modules/equipos';
 import { getPatrocinadores } from '@/modules/auspicios';
-import { getEstadisticasPublicas, getFigurasEnCurso } from '@/modules/estadisticas';
+import { getEstadisticasPublicas, getFigurasPortada } from '@/modules/estadisticas';
 
 vi.mock('@/shared/api/catalogo');
 vi.mock('@/modules/partidos/api/partidos.api');
@@ -56,7 +56,7 @@ describe('Home (página de inicio)', () => {
     vi.clearAllMocks();
     Element.prototype.scrollIntoView = vi.fn(); // jsdom no lo implementa
     vi.mocked(getEstadisticasPublicas).mockResolvedValue({ success: true, message: '', data: { puntos_totales: 15230 } } as never);
-    vi.mocked(getFigurasEnCurso).mockResolvedValue({ success: true, message: '', data: [figura] } as never);
+    vi.mocked(getFigurasPortada).mockResolvedValue({ success: true, message: '', data: [figura] } as never);
     vi.mocked(getTorneos).mockResolvedValue({ success: true, message: '', data: torneos, pagination: { page: 1, per_page: 50, total: 2, pages: 1 } } as never);
     vi.mocked(getEquipos).mockResolvedValue({ success: true, message: '', data: [], pagination: { page: 1, per_page: 1, total: 7, pages: 7 } } as never);
     vi.mocked(getPatrocinadores).mockResolvedValue([{ id_patrocinador: 1, nombre_patrocinador: 'Nike Ecuador', url_logo_patrocinador: '/n.png' }] as never);

@@ -35,14 +35,19 @@ def flyers(id_torneo, fecha, repositorio):
     return datos
 
 
-def figuras_en_curso(repositorio):
-    """La figura acumulada de cada categoría de los torneos en curso (la de los flyers: la mayor valoración hasta
-    hoy), con su torneo."""
-    figuras = []
-    for id_torneo in repositorio.torneos_en_curso():
-        # ponytail: arma el flyer completo de cada torneo en curso; una consulta propia si la portada llega a pesar
+def figuras_de_portada(repositorio):
+    """La figura acumulada de cada categoría (la de los flyers: la mayor valoración hasta hoy), con su torneo, de
+    los torneos vigentes; si ninguno tiene partidos jugados, las del último torneo finalizado que las tenga."""
+    def figuras_de(id_torneo):
+        # ponytail: arma el flyer completo de cada torneo; una consulta propia si la portada llega a pesar
         datos = repositorio.flyers(id_torneo)
-        figuras += [{**figura, 'torneo': datos['torneo']} for figura in datos['figuras_categoria']]
+        return [{**figura, 'torneo': datos['torneo']} for figura in datos['figuras_categoria']]
+
+    figuras = [f for id_torneo in repositorio.torneos_vigentes() for f in figuras_de(id_torneo)]
+    for id_torneo in [] if figuras else repositorio.torneos_finalizados():
+        figuras = figuras_de(id_torneo)
+        if figuras:
+            break
     return figuras
 
 

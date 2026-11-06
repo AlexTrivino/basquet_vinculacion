@@ -56,8 +56,10 @@ def test_validar_la_carga_de_un_equipo():
 
 
 class Repositorio:
-    def __init__(self, partido=FAE_MANTA, plantilla=frozenset({5, 6}), nombre='INTERCOLEGIAL', planilla=None, en_curso=(1,)):
-        self.partido, self.plantilla, self.nombre, self.planilla_, self.en_curso = partido, plantilla, nombre, planilla, en_curso
+    def __init__(self, partido=FAE_MANTA, plantilla=frozenset({5, 6}), nombre='INTERCOLEGIAL', planilla=None, vigentes=(1,),
+                 finalizados=(), sin_partidos=()):
+        self.partido, self.plantilla, self.nombre, self.planilla_ = partido, plantilla, nombre, planilla
+        self.vigentes, self.finalizados, self.sin_partidos = vigentes, finalizados, sin_partidos
         self.lineas, self.sanciones, self.procesadas = None, None, None
 
     def puntos_por_torneo(self):
@@ -72,11 +74,14 @@ class Repositorio:
     def flyers(self, id_torneo, fecha=None):
         if id_torneo == 99:
             return None
-        figuras = [{'categoria': f'Categoría {id_torneo}', 'valoracion': 40 + id_torneo}]
+        figuras = [] if id_torneo in self.sin_partidos else [{'categoria': f'Categoría {id_torneo}', 'valoracion': 40 + id_torneo}]
         return {'fecha': fecha, 'torneo': {'id_torneo': id_torneo, 'nombre': f'Torneo {id_torneo}'}, 'figuras_categoria': figuras}
 
-    def torneos_en_curso(self):
-        return self.en_curso
+    def torneos_vigentes(self):
+        return self.vigentes
+
+    def torneos_finalizados(self):
+        return self.finalizados
 
     def planilla(self, id_partido):
         return self.planilla_
@@ -147,10 +152,10 @@ def test_cargar_las_estadisticas_de_un_equipo():
     assert (repositorio.sanciones, repositorio.procesadas) == (None, (6, False))  # el visitante, sin sanciones
 
 
-def test_figuras_de_los_torneos_en_curso():
-    """Las figuras de cada categoría, de todos los torneos en curso y con su torneo; sin torneos en curso, ninguna."""
-    assert casos.figuras_en_curso(Repositorio(en_curso=(1, 3))) == [
-        {'categoria': 'Categoría 1', 'valoracion': 41, 'torneo': {'id_torneo': 1, 'nombre': 'Torneo 1'}},
-        {'categoria': 'Categoría 3', 'valoracion': 43, 'torneo': {'id_torneo': 3, 'nombre': 'Torneo 3'}},
-    ]
-    assert casos.figuras_en_curso(Repositorio(en_curso=())) == []
+def test_figuras_de_la_portada():
+    """Las figuras de cada categoría de todos los torneos vigentes, con su torneo; si ninguno tiene partidos jugados,
+    las del último finalizado que las tenga; si no hay ninguna, ninguna."""
+    figura = lambda t: {'categoria': f'Categoría {t}', 'valoracion': 40 + t, 'torneo': {'id_torneo': t, 'nombre': f'Torneo {t}'}}
+    assert casos.figuras_de_portada(Repositorio(vigentes=(1, 3), finalizados=(2,))) == [figura(1), figura(3)]
+    assert casos.figuras_de_portada(Repositorio(vigentes=(5,), finalizados=(4, 2), sin_partidos=(5, 4))) == [figura(2)]
+    assert casos.figuras_de_portada(Repositorio(vigentes=(), finalizados=(4,), sin_partidos=(4,))) == []
