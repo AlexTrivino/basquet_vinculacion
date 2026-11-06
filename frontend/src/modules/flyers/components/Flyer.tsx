@@ -40,15 +40,19 @@ function Pie({ torneo, pagina }: { torneo: string; pagina?: readonly [number, nu
   return (
     <footer className="mt-[24px] flex items-end justify-between gap-[40px] border-t border-crema/15 pt-[20px]">
       <p className="line-clamp-2 max-w-[540px] font-display text-[22px] font-semibold leading-snug text-crema/85">{torneo}</p>
-      <div className="shrink-0 text-right">
-        {sigue ? (
-          <p className="flex items-center justify-end gap-[4px] text-[24px] font-bold uppercase tracking-[0.2em] text-oro">
-            Desliza <ChevronsRight className="h-[32px] w-[32px]" aria-hidden="true" />
-          </p>
-        ) : (
-          <p className="text-[24px] font-semibold text-crema">baloncestomanta.com</p>
-        )}
-        <p className="mt-[4px] text-[20px] text-slate-400">{pagina ? `${pagina[0]} de ${pagina[1]}` : 'Coliseo Pablo Delgado Álava'}</p>
+      <div className="flex shrink-0 items-end gap-[16px] text-right">
+        {/* La organización firma junto a su dominio; el logo principal es el del campeonato */}
+        <img src="/img/logo-recortado.webp" alt="" className="h-[64px] w-auto object-contain" />
+        <div>
+          {sigue ? (
+            <p className="flex items-center justify-end gap-[4px] text-[24px] font-bold uppercase tracking-[0.2em] text-oro">
+              Desliza <ChevronsRight className="h-[32px] w-[32px]" aria-hidden="true" />
+            </p>
+          ) : (
+            <p className="text-[24px] font-semibold text-crema">baloncestomanta.com</p>
+          )}
+          <p className="mt-[4px] text-[20px] text-slate-400">{pagina ? `${pagina[0]} de ${pagina[1]}` : 'Coliseo Pablo Delgado Álava'}</p>
+        </div>
       </div>
     </footer>
   );
@@ -87,7 +91,8 @@ export const MarcoFlyer = forwardRef<HTMLDivElement, MarcoProps>(function MarcoF
 
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-[24px] border-b border-crema/15 pb-[18px]">
         <Par etiqueta={dato[0]} valor={dato[1]} />
-        <img src="/img/logo-recortado.webp" alt="" className="h-[104px] w-[104px] object-contain" />
+        {/* El logo del campeonato manda: 164 px de alto que pisan el filete sin mover el resto (ocupa 104 en la grilla) */}
+        <img src="/img/logo-copa-intercolegial.webp" alt="" className="-my-[30px] h-[164px] w-auto max-w-none object-contain" />
         <Par etiqueta={cifra[0]} valor={cifra[1]} derecha />
       </div>
 
