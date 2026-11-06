@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getPatrocinadores } from '../features/patrocinadores/api/patrocinadores.api';
+import { getPatrocinadores } from '../api/patrocinadores.api';
 
 // className viste el contenedor (p. ej. el panel blanco); sin auspiciantes queda un aviso breve
 export function SponsorsCarousel({ className = '' }: { className?: string }) {

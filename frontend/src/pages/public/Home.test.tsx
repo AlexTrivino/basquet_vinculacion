@@ -6,13 +6,13 @@ import Home from './Home';
 import { getTorneos } from '@/shared/api/catalogo';
 import { getPartidos } from '../../features/partidos/api/partidos.api';
 import { getEquipos } from '../../features/equipos/api/equipos.api';
-import { getPatrocinadores } from '../../features/patrocinadores/api/patrocinadores.api';
+import { getPatrocinadores } from '@/modules/auspicios';
 import { getEstadisticasPublicas } from '../../features/estadisticas/api/estadisticas.api';
 
 vi.mock('@/shared/api/catalogo');
 vi.mock('../../features/partidos/api/partidos.api');
 vi.mock('../../features/equipos/api/equipos.api');
-vi.mock('../../features/patrocinadores/api/patrocinadores.api');
+vi.mock('@/modules/auspicios/api/patrocinadores.api');
 vi.mock('../../features/estadisticas/api/estadisticas.api');
 vi.mock('@google/model-viewer', () => ({}));
 vi.mock('@/modules/auth/AuthContext', () => ({ useAuth: () => ({ userRole: null }) }));

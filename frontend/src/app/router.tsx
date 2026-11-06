@@ -2,6 +2,7 @@ import { lazy } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import { ProtectedRoute, rutas as auth } from '@/modules/auth';
+import { rutas as auspicios } from '@/modules/auspicios';
 import { MainLayout } from './MainLayout';
 import NotFound from './NotFound';
 import Unauthorized from './Unauthorized';
@@ -32,7 +33,6 @@ const AdminEquipos = lazy(() => import('@/pages/admin/AdminEquipos'));
 const AdminPartidos = lazy(() => import('@/pages/admin/AdminPartidos'));
 const AdminSanciones = lazy(() => import('@/pages/admin/AdminSanciones'));
 const AdminJugadores = lazy(() => import('@/pages/admin/AdminJugadores'));
-const AdminPatrocinadores = lazy(() => import('@/pages/admin/AdminPatrocinadores'));
 const AdminFaseFinal = lazy(() => import('@/pages/admin/FaseFinal'));
 
 export const router = createBrowserRouter([
@@ -88,7 +88,7 @@ export const router = createBrowserRouter([
           { path: 'jugadores', element: withSuspense(AdminJugadores) },
           { path: 'partidos', element: withSuspense(AdminPartidos) },
           { path: 'sanciones', element: withSuspense(AdminSanciones) },
-          { path: 'patrocinadores', element: withSuspense(AdminPatrocinadores) },
+          ...auspicios.admin,
           { path: 'fase-final', element: withSuspense(AdminFaseFinal) },
         ],
       },
