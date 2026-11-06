@@ -35,7 +35,7 @@ vi.mock('@/shared/api/catalogo', () => ({
   getTorneos: vi.fn().mockResolvedValue({ data: [] })
 }));
 
-vi.mock('@/features/jugadores/api/jugadores.api', () => ({
+vi.mock('@/modules/jugadores/api/jugadores.api', () => ({
   getJugadores: vi.fn().mockResolvedValue({ data: [], total: 0, pages: 1 })
 }));
 

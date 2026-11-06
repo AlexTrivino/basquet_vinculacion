@@ -77,7 +77,7 @@ basquet_vinculacion/
 │   ├── src/
 │   │   ├── app/                      # main.tsx (providers), router, MainLayout, Navbar, Sidebar y páginas de error
 │   │   ├── shared/                   # Lo común: ui/ (UI kit, Escudo), api/ (Axios, tipos, catálogo de torneos) y lib/
-│   │   ├── modules/                  # Un módulo por negocio, se entra por su index.ts: auth, auspicios, sanciones, partidos, torneos, inscripciones, equipos
+│   │   ├── modules/                  # Un módulo por negocio, se entra por su index.ts: auth, auspicios, sanciones, partidos, torneos, inscripciones, equipos, jugadores
 │   │   ├── features/                 # Dominios de negocio que pasan a modules/ en la fase 10 (ver specs/)
 │   │   │   ├── auth/                 # Login y recuperación de clave
 │   │   │   ├── torneos/              # Explorador de torneos, posiciones y estadísticas

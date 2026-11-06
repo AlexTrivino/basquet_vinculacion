@@ -25,15 +25,15 @@ import {
   getJugadoresAdmin,
   updateJugador,
   deleteJugador,
-} from '../../features/jugadores/api/jugadores.api';
+} from '../api/jugadores.api';
 import { getTorneos } from '@/shared/api/catalogo';
 import { getEquipos } from '@/modules/equipos';
 import { getInscripciones } from '@/modules/inscripciones';
 import { DataGridTable, type Column } from '@/shared/ui/DataGridTable';
 import { StatusBadge } from '@/shared/ui/StatusBadge';
 import { ConfirmationModal } from '@/shared/ui/ConfirmationModal';
-import { ModalEditarJugadorAdmin } from '../../features/jugadores/components/ModalEditarJugadorAdmin';
-import { ModalCrearJugador } from '../../features/jugadores/components/ModalCrearJugador';
+import { ModalEditarJugadorAdmin } from '../components/ModalEditarJugadorAdmin';
+import { ModalCrearJugador } from '../components/ModalCrearJugador';
 
 export default function AdminJugadores() {
   const queryClient = useQueryClient();

@@ -10,7 +10,7 @@ Cada módulo es un commit. Comprobación de cada uno: `npm test` (con la prueba 
 - [x] torneos, con `clavesTorneos` (9 claves en 6 archivos), `CalendarioTorneo` y `types.ts` (posiciones, llaves y recorrido); `LideresEstadisticos` y `getLideresEstadisticos` esperan en `features/estadisticas`. Trinquete 11 → 10.
 - [x] inscripciones, con sus doce llamadas fuera de `equipos.api.ts` (`inscripciones.api.ts`). El chunk inicial baja 938 bytes: el Navbar ya no arrastra las llamadas de equipos. Trinquete 10 → 3.
 - [x] equipos, con el panel del delegado y `BannerNuevosTorneos`. Trinquete 3 → 2.
-- [ ] jugadores.
+- [x] jugadores, con `types.ts` (el perfil del jugador).
 - [ ] visor.
 - [ ] flyers.
 - [ ] estadísticas, con `LideresEstadisticos` y el panel del admin.
