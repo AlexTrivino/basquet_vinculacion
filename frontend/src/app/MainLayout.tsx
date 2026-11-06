@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { Navbar } from './Navbar';
-import { BotonWhatsApp } from '@/components/Contacto';
+import { BotonWhatsApp } from '@/modules/portada';
 
 export function MainLayout() {
   return (

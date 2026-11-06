@@ -1,4 +1,3 @@
-import { lazy } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import { ProtectedRoute, rutas as auth } from '@/modules/auth';
@@ -11,28 +10,18 @@ import { rutas as equipos } from '@/modules/equipos';
 import { rutas as jugadores } from '@/modules/jugadores';
 import { rutas as visor } from '@/modules/visor';
 import { rutas as estadisticas } from '@/modules/estadisticas';
+import { rutas as portada } from '@/modules/portada';
 import { MainLayout } from './MainLayout';
 import NotFound from './NotFound';
 import Unauthorized from './Unauthorized';
-import { withSuspense } from '@/shared/ui/withSuspense';
 
-// --- Lazy loaded pages (Code Splitting) ---
-// Público
-const Home = lazy(() => import('@/pages/public/Home'));
-
-// Delegado
-
-// Admin
-
+// Junta las rutas de cada módulo (su `rutas`, con las páginas en carga diferida) bajo el layout y las guardas.
 export const router = createBrowserRouter([
   {
     // MainLayout envuelve a todas las rutas de negocio para proveer el Navbar
     element: <MainLayout />,
     children: [
-      {
-        path: '/',
-        element: withSuspense(Home),
-      },
+      ...portada.publicas,
       ...torneos.publicas,
       ...equipos.publicas,
       ...jugadores.publicas,

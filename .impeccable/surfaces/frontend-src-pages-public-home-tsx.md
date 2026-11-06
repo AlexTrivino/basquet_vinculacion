@@ -1,8 +1,8 @@
 ---
 version: 1
 slug: "frontend-src-pages-public-home-tsx"
-primary_target: "frontend/src/pages/public/Home.tsx"
-related_targets: ["frontend/src/features/landing/HeroTorneos.tsx","frontend/src/features/landing/SeccionConocenos.tsx","frontend/src/features/landing/SeccionPartidos.tsx","frontend/src/components/Footer.tsx","frontend/src/components/SponsorsCarousel.tsx"]
+primary_target: "frontend/src/modules/portada/pages/Home.tsx"
+related_targets: ["frontend/src/modules/portada/components/HeroTorneos.tsx","frontend/src/modules/portada/components/SeccionConocenos.tsx","frontend/src/modules/portada/components/SeccionPartidos.tsx","frontend/src/modules/portada/components/Footer.tsx","frontend/src/modules/auspicios/components/SponsorsCarousel.tsx"]
 ---
 
 ## Alcance

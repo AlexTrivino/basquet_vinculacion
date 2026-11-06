@@ -14,6 +14,6 @@ Cada módulo es un commit. Comprobación de cada uno: `npm test` (con la prueba 
 - [x] visor.
 - [x] flyers: `FlyerFecha` se exporta con `lazy` desde `components/FlyerFechaDiferido.ts`. Medido: si el `lazy` está en el `index.ts`, el index deja de ser solo reexportaciones y la vista pública del torneo descarga los 45 KB del estudio de flyers.
 - [x] estadísticas, con `LideresEstadisticos` y el panel del admin. Trinquete 2 → 0.
-- [ ] portada, con el Footer y Contacto.
+- [x] portada, con el Footer, Contacto y `model-viewer.d.ts`; `app/router.tsx` queda solo con las guardas y las `rutas` de los módulos.
 - [ ] Cierre: carpetas viejas borradas, fronteras estrictas sin trinquete (comprobación: falla con un import interno, con un ciclo y con un archivo suelto), `.agents/AGENTS.md`, README, `DESIGN.md` y `Docs/04_estructura_carpetas.md`.
 - [ ] Entrega en Windows y fase 10 marcada en el plan.
