@@ -118,19 +118,30 @@ def calcular_tabla(partidos, equipos=()):
     return lista
 
 
-def tablas_por_grupo(partidos, grupos):
+def relegar(tabla, inactivos):
+    """Un equipo inactivo quedó fuera del torneo: va último con todo en cero, y los demás conservan lo que jugaron
+    contra él. Las posiciones se renumeran."""
+    lista = [f for f in tabla if f['id_equipo'] not in inactivos]
+    lista += [dict(f, PJ=0, PG=0, PP=0, PF=0, PC=0, DIF=0, puntos=0) for f in tabla if f['id_equipo'] in inactivos]
+    for i, fila in enumerate(lista, start=1):
+        fila['posicion'] = i
+    return lista
+
+
+def tablas_por_grupo(partidos, grupos, inactivos=frozenset()):
     """Una tabla por grupo. Sin grupos asignados devuelve {None: tabla única}.
 
-    Solo cuentan los partidos entre equipos del mismo grupo; los equipos sin partidos aparecen en cero.
+    Solo cuentan los partidos entre equipos del mismo grupo; los equipos sin partidos aparecen en cero y los
+    ``inactivos``, últimos (``relegar``).
     """
     letras = sorted({g for g in grupos.values() if g})
     if not letras:
-        return {None: calcular_tabla(partidos, grupos.keys())}
+        return {None: relegar(calcular_tabla(partidos, grupos.keys()), inactivos)}
     tablas = {}
     for letra in letras:
         miembros = {e for e, g in grupos.items() if g == letra}
         propios = [p for p in partidos if p[0] in miembros and p[1] in miembros]
-        tablas[letra] = calcular_tabla(propios, miembros)
+        tablas[letra] = relegar(calcular_tabla(propios, miembros), inactivos)
     return tablas
 
 

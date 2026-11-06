@@ -1,6 +1,6 @@
 """Casos de uso de partidos. Cada uno recibe sus piezas por parámetro:
 
-- repositorio: RepositorioPartidos (listar, obtener, agregar, actualizar, grupos_de_categoria, plantilla,
+- repositorio: RepositorioPartidos (listar, obtener, agregar, actualizar, grupos_de_categoria, inactivos, plantilla,
   estadisticas y sancionados). Al agregar, lanza Conflicto si la base rechaza el partido.
 - almacen: subir_archivo(stream, nombre, carpeta, mime) -> url y borrar_archivo(url).
 - unidad: confirmar() y revertir().
@@ -28,7 +28,8 @@ def obtener(id_partido, repositorio):
 def crear(datos, *, repositorio, unidad):
     """Programa un partido si el cruce es válido. ``datos``: los campos del partido, ya validados."""
     validar_cruce(datos['id_equipo_local'], datos['id_equipo_visitante'],
-                  repositorio.grupos_de_categoria(datos['id_torneo'], datos['id_categoria']), datos.get('llave'))
+                  repositorio.grupos_de_categoria(datos['id_torneo'], datos['id_categoria']), datos.get('llave'),
+                  repositorio.inactivos())
     try:
         id_partido = repositorio.agregar(datos)
         unidad.confirmar()
@@ -45,7 +46,8 @@ def actualizar(id_partido, cambios, *, repositorio, unidad):
     local = cambios.get('id_equipo_local', partido.id_equipo_local)
     visitante = cambios.get('id_equipo_visitante', partido.id_equipo_visitante)
     if (local, visitante) != (partido.id_equipo_local, partido.id_equipo_visitante):
-        validar_cruce(local, visitante, repositorio.grupos_de_categoria(partido.id_torneo, partido.id_categoria), partido.llave)
+        validar_cruce(local, visitante, repositorio.grupos_de_categoria(partido.id_torneo, partido.id_categoria), partido.llave,
+                      repositorio.inactivos())
     validar_sin_empate(partido, cambios)
     repositorio.actualizar(id_partido, cambios)
     unidad.confirmar()

@@ -39,7 +39,7 @@ def tabla_de_posiciones(id_torneo, id_categoria, repositorio):
     grupos = repositorio.grupos_de_categoria(id_torneo, id_categoria) if id_categoria is not None else {}
     if not partidos_grupos and not grupos:
         return []
-    tablas = posiciones.tablas_por_grupo(partidos_grupos, grupos)
+    tablas = posiciones.tablas_por_grupo(partidos_grupos, grupos, repositorio.inactivos())
     equipos = repositorio.equipos([f['id_equipo'] for tabla in tablas.values() for f in tabla])
     return posiciones.filas_con_equipo(tablas, equipos)
 
@@ -54,6 +54,7 @@ def estado(categoria, repositorio):
         repositorio.pendientes_fase_grupos(categoria.id_torneo, categoria.id_categoria),
         repositorio.partidos_de_llaves(categoria.id_torneo, categoria.id_categoria) if con_formato else {},
         repositorio.equipos(list(grupos)) if con_formato and grupos else {},
+        repositorio.inactivos(),
     )
 
 
@@ -64,6 +65,7 @@ def recorrido(categoria, repositorio):
         categoria, grupos,
         repositorio.partidos_fase_grupos_por_fecha(categoria.id_torneo, categoria.id_categoria),
         repositorio.equipos(list(grupos)) if grupos else {},
+        repositorio.inactivos(),
     )
 
 

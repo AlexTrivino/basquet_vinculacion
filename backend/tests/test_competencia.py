@@ -5,7 +5,7 @@ from datetime import date
 import pytest
 
 from app.modules.competencia.application import fase_final, partidos
-from app.modules.competencia.domain import llaves
+from app.modules.competencia.domain import llaves, posiciones
 from app.modules.competencia.domain.llaves import Categoria
 from app.modules.competencia.domain.partido import (
     ESTADISTICAS, Partido, box_score, validar_cambio_de_equipos, validar_cruce, validar_sin_empate,
@@ -37,6 +37,13 @@ def test_cruces_invalidos(local, visitante, mensaje):
 def test_cruces_validos():
     validar_cruce(1, 2, GRUPOS)
     validar_cruce(1, 3, GRUPOS, llave='CF1')  # la fase final mezcla grupos
+
+
+def test_un_inactivo_no_juega_mas_la_fase_de_grupos_pero_su_llave_se_puede_crear():
+    for local, visitante, lado in ((1, 2, 'local'), (2, 1, 'visitante')):
+        with pytest.raises(ReglaDeNegocio, match=f'El equipo {lado} está inactivo'):
+            validar_cruce(local, visitante, GRUPOS, inactivos={1})
+    validar_cruce(1, 3, GRUPOS, llave='CF1', inactivos={1})  # se cierra a mano, por W.O.
 
 
 def test_los_equipos_solo_cambian_mientras_esta_programado():
@@ -111,6 +118,35 @@ def test_el_cuadro_se_arma_con_la_tabla_y_los_resultados():
     assert cuadro['3P']['local']['id_equipo'] == 1
 
 
+def test_el_inactivo_queda_ultimo_en_cero_y_los_demas_conservan_lo_jugado():
+    finalizados = [(a, b, 70, 60, 'finalizado') for a, b in TODOS_CONTRA_TODOS]
+    tabla = posiciones.tablas_por_grupo(finalizados, CUATRO, {1})[None]
+    assert [(f['id_equipo'], f['posicion'], f['PJ'], f['puntos']) for f in tabla] == [(2, 1, 3, 5), (3, 2, 3, 4), (4, 3, 3, 3), (1, 4, 0, 0)]
+    assert {k: tabla[-1][k] for k in ('PG', 'PP', 'PF', 'PC', 'DIF')} == dict.fromkeys(('PG', 'PP', 'PF', 'PC', 'DIF'), 0)
+    dos = posiciones.tablas_por_grupo(finalizados, GRUPOS, {1})  # solo baja en su grupo
+    assert ([f['id_equipo'] for f in dos['A']], [f['id_equipo'] for f in dos['B']]) == ([2, 1], [3])
+
+
+def test_la_fase_de_grupos_termina_sin_los_partidos_que_le_faltaban_al_inactivo():
+    cinco = {i: None for i in range(1, 6)}
+    finalizados = [(a, b, 70, 60, 'finalizado') for a, b in TODOS_CONTRA_TODOS] + [(5, e, 80, 60, 'finalizado') for e in (1, 2, 3)]
+    assert llaves.estado_fase_final(SEMIS, cinco, finalizados, 0, {}, {})['fase_grupos']['terminada'] is False
+    estado = llaves.estado_fase_final(SEMIS, cinco, finalizados, 0, {}, {}, inactivos={5})
+    assert estado['fase_grupos'] == {'jugados': 6, 'esperados': 6, 'pendientes': 0, 'terminada': True}
+    cruces = {ll['codigo']: (ll['local']['id_equipo'], ll['visitante']['id_equipo']) for ll in estado['llaves'] if ll['local']}
+    assert cruces == {'SF1': (1, 4), 'SF2': (2, 3)}  # el 5 sumaba 6 puntos, pero va último; los demás conservan sus derrotas
+
+
+def test_recorrido_con_un_inactivo():
+    cinco = {i: None for i in range(1, 6)}
+    jugados = [(1, 2, 70, 60, 'finalizado', date(2026, 9, 1)), (5, 1, 70, 60, 'finalizado', date(2026, 9, 8))]
+    equipos = {e['id_equipo']: e for e in llaves.recorrido(SEMIS, cinco, jugados, {}, inactivos={5})['grupos'][0]['equipos']}
+    assert (equipos[5]['posicion'], equipos[5]['situacion'], equipos[5]['restantes'], equipos[5]['posiciones']) == (5, 'eliminado', 0, [5, 5])
+    assert (equipos[1]['PJ'], equipos[1]['restantes'], equipos[2]['restantes']) == (2, 2, 2)  # al 2 ya no le toca el 5
+    todos = [(a, b, 70, 60, 'finalizado', date(2026, 9, 15)) for a, b in TODOS_CONTRA_TODOS]
+    assert llaves.recorrido(SEMIS, cinco, jugados + todos[1:], {}, inactivos={5})['grupos'][0]['terminado'] is True
+
+
 def test_recorrido_despues_de_la_primera_fecha():
     cinco = {i: None for i in range(1, 6)}
     salida = llaves.recorrido(SEMIS, cinco, [(1, 2, 70, 60, 'finalizado', date(2026, 9, 1))], {})
@@ -126,9 +162,9 @@ def test_recorrido_despues_de_la_primera_fecha():
 class Repositorio:
     """Lo que usan los casos de uso de partidos y de la fase final, en memoria."""
 
-    def __init__(self, *guardados, grupos=CUATRO, rechaza=False):
+    def __init__(self, *guardados, grupos=CUATRO, rechaza=False, inactivos=()):
         self.partidos = {p.id_partido: p for p in guardados}
-        self.grupos, self.rechaza = dict(grupos), rechaza
+        self.grupos, self.rechaza, self.inactivos_ = dict(grupos), rechaza, set(inactivos)
 
     def obtener(self, id_partido):
         partido = self.partidos.get(id_partido)
@@ -146,6 +182,9 @@ class Repositorio:
 
     def grupos_de_categoria(self, id_torneo, id_categoria):
         return self.grupos
+
+    def inactivos(self):
+        return self.inactivos_
 
     def partidos_fase_grupos(self, id_torneo, id_categoria):
         return [(p.id_equipo_local, p.id_equipo_visitante, p.marcador_local, p.marcador_visitante, p.estado)
@@ -182,6 +221,15 @@ class Unidad:
 
     def revertir(self):
         self.estado = 'revertida'
+
+
+def test_no_se_programa_la_fase_de_grupos_de_un_inactivo():
+    datos = {'id_torneo': 1, 'id_categoria': 2, 'id_equipo_local': 1, 'id_equipo_visitante': 2, 'fase': 'PRIMERA FASE'}
+    with pytest.raises(ReglaDeNegocio, match='El equipo visitante está inactivo'):
+        partidos.crear(datos, repositorio=Repositorio(inactivos={2}), unidad=Unidad())
+    programado = Partido(1, 1, 2, 1, 3, estado='programado')
+    with pytest.raises(ReglaDeNegocio, match='El equipo visitante está inactivo'):
+        partidos.actualizar(1, {'id_equipo_visitante': 2}, repositorio=Repositorio(programado, inactivos={2}), unidad=Unidad())
 
 
 def test_crear_revierte_si_la_base_rechaza_el_partido():

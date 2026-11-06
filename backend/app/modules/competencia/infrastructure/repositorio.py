@@ -133,6 +133,10 @@ class RepositorioPartidos:
         categoria = db.session.get(FilaCategoria, id_categoria)
         return grupos_del_formato(categoria.formato if categoria else None, {f.id_equipo: f.grupo for f in filas})
 
+    def inactivos(self):
+        """Ids de los equipos inactivos: quedaron fuera de los torneos (``posiciones.relegar``)."""
+        return set(db.session.execute(db.select(Equipo.id_equipo).where(Equipo.estado == 'inactivo')).scalars())
+
     def guardar_grupos(self, id_torneo, id_categoria, asignados):
         """Escribe en cada inscripción aprobada su grupo de ``asignados`` ({id_equipo: letra o None})."""
         for inscripcion in Inscripcion.query.filter_by(

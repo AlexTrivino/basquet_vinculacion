@@ -51,22 +51,27 @@ def crear(datos, id_usuario, *, repositorio, unidad):
 
 
 def actualizar(id_equipo, cambios, id_usuario, rol, *, repositorio, unidad):
-    """Cambia el nombre o el estado de un equipo activo; un delegado, solo de los suyos."""
+    """Cambia el nombre o el estado de un equipo activo; un delegado, solo de los suyos. Pasarlo a 'inactivo' lo saca
+    de los torneos, como la baja."""
     equipo = obtener(id_equipo, repositorio)
     cambios = normalizar_mayusculas(dict(cambios), ['nombre_equipo'])
     if not puede_gestionar(equipo, id_usuario, rol):
         raise SinPermiso('No tienes permiso para modificar este equipo.')
     repositorio.actualizar(id_equipo, cambios)
+    if cambios.get('estado') == 'inactivo':
+        repositorio.borrar_partidos_pendientes(id_equipo)
     unidad.confirmar()
     return repositorio.obtener(id_equipo, detalle=True)
 
 
 def dar_de_baja(id_equipo, id_usuario, rol, *, repositorio, unidad):
-    """Baja lógica: el equipo pasa a 'inactivo'; un delegado, solo los suyos."""
+    """Baja lógica: el equipo pasa a 'inactivo' y queda fuera de los torneos: se borran sus partidos pendientes y en
+    las tablas va último con todo en cero (competencia). Un delegado, solo los suyos."""
     equipo = obtener(id_equipo, repositorio)
     if not puede_gestionar(equipo, id_usuario, rol):
         raise SinPermiso('No tienes permiso para eliminar este equipo.')
     repositorio.actualizar(id_equipo, {'estado': 'inactivo'})
+    repositorio.borrar_partidos_pendientes(id_equipo)
     unidad.confirmar()
 
 

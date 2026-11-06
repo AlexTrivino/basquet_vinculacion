@@ -262,6 +262,49 @@ class TestFaseFinal(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual([p['id_partido'] for p in r.get_json()['data']], [pid])
 
+    def test_un_equipo_inactivo_queda_fuera_del_torneo(self):
+        """Ticket del 03-11: el equipo que se pone inactivo queda último con todo en cero (los demás conservan lo que
+        jugaron contra él), sus partidos pendientes se borran y la fase de grupos termina sin ellos."""
+        from app.shared.infrastructure.modelos import Estadistica, Jugador
+        db.session.get(Equipo, 1).id_usuario = 'u-admin'  # su dueño no tiene otro equipo: se puede reactivar al final
+        db.session.add(Torneo(id_torneo=2, nombre='Anulado', fecha_inicio=self.dia, fecha_fin=self.dia, estado='anulado'))
+        db.session.add(Categoria(id_categoria=4, nombre_categoria='Juvenil', genero_categoria='masculino', id_torneo=2))
+        db.session.add(Jugador(id_jugador=1, nombre='ANA', documento_identificacion='1300000001', fecha_nacimiento=date(2000, 1, 1)))
+        self._jugar(1, 2, 70, 60)  # el 2 le perdió al 1: esa derrota se queda
+        self._jugar(2, 3, 70, 60)
+        borrados = [self._jugar(1, 3, 0, 0), self._jugar(4, 1, 0, 0), self._jugar(1, 6, 0, 0, llave='CF1', fase='Cuartos de final')]
+        quedan = [self._jugar(1, 5, 10, 8), self._jugar(1, 2, 0, 0, cat=4), self._jugar(5, 1, 0, 0)]
+        for p, estado in zip(borrados + quedan, ('programado', 'suspendido', 'programado', 'en_curso', 'programado', 'programado')):
+            p.estado = estado
+        quedan[1].id_torneo = 2  # torneo anulado: no se toca
+        db.session.add(Estadistica(id_partido=quedan[2].id_partido, id_jugador=1, puntos_anotados=4))  # con datos cargados
+        db.session.commit()
+        ids_borrados = {p.id_partido for p in borrados}
+
+        status, _ = self._admin('delete', '/api/equipos/1')
+        self.assertEqual(status, 200)
+        restantes = {p.id_partido for p in Partido.query.all()}
+        self.assertFalse(restantes & ids_borrados)
+        self.assertEqual(len(restantes), 5)  # los dos jugados y los tres que se quedan
+
+        grupo_a = [f for f in self.client.get('/api/torneos/1/posiciones?id_categoria=3').get_json()['data'] if f['grupo'] == 'A']
+        self.assertEqual([f['id_equipo'] for f in grupo_a], [2, 3, 4, 5, 1])
+        self.assertEqual({k: grupo_a[-1][k] for k in ('PJ', 'PG', 'PP', 'PF', 'PC', 'DIF', 'puntos')}, dict.fromkeys(('PJ', 'PG', 'PP', 'PF', 'PC', 'DIF', 'puntos'), 0))
+        self.assertEqual((grupo_a[0]['PJ'], grupo_a[0]['PP'], grupo_a[0]['puntos']), (2, 1, 3))  # el 2 conserva la derrota
+        fase = self.client.get('/api/torneos/1/fase-final?id_categoria=3').get_json()['data']['fase_grupos']
+        self.assertEqual((fase['jugados'], fase['esperados']), (1, 16))  # sin el 1: 6 en el A y 10 en el B
+
+        base = {'id_torneo': 1, 'id_categoria': 3, 'fecha': '2026-09-30', 'hora': '19:00', 'fase': 'PRIMERA FASE', 'ubicacion': 'Coliseo'}
+        status, cuerpo = self._admin('post', '/api/partidos', {**base, 'id_equipo_local': 1, 'id_equipo_visitante': 2})
+        self.assertEqual((status, cuerpo['message'][:31]), (422, 'El equipo local está inactivo: '))
+        status, _ = self._admin('post', '/api/partidos', {**base, 'id_equipo_local': 1, 'id_equipo_visitante': 6, 'llave': 'CF1', 'fase': 'Cuartos'})
+        self.assertEqual(status, 201)  # la llave se cierra a mano
+
+        status, _ = self._admin('put', '/api/equipos/1/reactivar')
+        self.assertEqual(status, 200)
+        grupo_a = [f for f in self.client.get('/api/torneos/1/posiciones?id_categoria=3').get_json()['data'] if f['grupo'] == 'A']
+        self.assertEqual([(f['id_equipo'], f['puntos']) for f in grupo_a][:2], [(2, 3), (1, 2)])  # vuelve con lo que jugó
+
     def test_el_calendario_del_torneo_trae_todos_sus_partidos(self):
         """La vista del torneo pide per_page=1000; con el tope de 50 el calendario se cortaba en la fecha del partido 50."""
         for k in range(60):

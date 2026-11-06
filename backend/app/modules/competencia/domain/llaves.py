@@ -89,30 +89,38 @@ class Categoria:
     formato: str | None = None
 
 
-def estado_fase_final(categoria, grupos, partidos_grupos, pendientes, jugados, equipos):
+def _entre_activos(partidos, grupos, inactivos):
+    """Los partidos y los grupos sin los equipos inactivos: lo que todavía se juega en la fase de grupos."""
+    return ([p for p in partidos if p[0] not in inactivos and p[1] not in inactivos],
+            {e: g for e, g in grupos.items() if e not in inactivos})
+
+
+def estado_fase_final(categoria, grupos, partidos_grupos, pendientes, jugados, equipos, inactivos=frozenset()):
     """Estado completo de la fase final de una categoría (ver docstring del módulo).
 
     ``grupos``: {id_equipo: grupo} de las inscripciones aprobadas. ``partidos_grupos``: los finalizados de la fase
     de grupos, como tuplas para ``calcular_tabla``. ``pendientes``: cuántos de la fase de grupos están programados o
     en curso. ``jugados``: {llave: partido como dict} de las llaves no anuladas. ``equipos``: {id_equipo: con
-    ``nombre_equipo`` y ``url_logo``}.
+    ``nombre_equipo`` y ``url_logo``}. ``inactivos``: los equipos fuera del torneo; van últimos en su tabla y la fase
+    de grupos termina sin sus partidos (los que les faltaban se borraron al desactivarlos).
     """
     formato = FORMATOS.get(categoria.formato)
-    esperados = _partidos_esperados(grupos, _vueltas(formato))
-    terminada = esperados > 0 and len(partidos_grupos) >= esperados and pendientes == 0
+    partidos_activos, grupos_activos = _entre_activos(partidos_grupos, grupos, inactivos)
+    esperados = _partidos_esperados(grupos_activos, _vueltas(formato))
+    terminada = esperados > 0 and len(partidos_activos) >= esperados and pendientes == 0
     estado = {
         'id_torneo': categoria.id_torneo,
         'id_categoria': categoria.id_categoria,
         'formato': categoria.formato,
         'formatos': {k: {'nombre': v['nombre'], 'descripcion': v['descripcion'], 'grupos': v['grupos'], 'cupos': v['cupos']} for k, v in FORMATOS.items()},
         'grupos': {e: g for e, g in grupos.items()},
-        'fase_grupos': {'jugados': len(partidos_grupos), 'esperados': esperados, 'pendientes': pendientes, 'terminada': terminada},
+        'fase_grupos': {'jugados': len(partidos_activos), 'esperados': esperados, 'pendientes': pendientes, 'terminada': terminada},
         'llaves': [],
     }
     if not formato:
         return estado
 
-    tablas = tablas_por_grupo(partidos_grupos, grupos) if terminada else {}
+    tablas = tablas_por_grupo(partidos_grupos, grupos, inactivos) if terminada else {}
     ganadores, perdedores = {}, {}
     for codigo, p in jugados.items():
         if p['estado'] in ESTADOS_FINALES:
@@ -172,7 +180,7 @@ def asignar_grupos(categoria, aprobados, grupos):
     return asignados
 
 
-def recorrido(categoria, grupos, partidos, equipos):
+def recorrido(categoria, grupos, partidos, equipos, inactivos=frozenset()):
     """Posición de cada equipo después de cada fecha de la fase de grupos y su situación.
 
     ``partidos``: los finalizados de la fase de grupos, ordenados por fecha, como
@@ -180,30 +188,39 @@ def recorrido(categoria, grupos, partidos, equipos):
     Situación (con los puntos que todavía puede sumar cada uno, 2 por victoria):
     ``clasificado`` si ya nadie puede quitarle el cupo, ``eliminado`` si ya no alcanza,
     ``zona`` si hoy está dentro de los cupos y ``depende`` si hoy está fuera.
+    Un equipo de ``inactivos`` está ``eliminado``, último en todas las fechas, y a los demás ya no les quedan
+    partidos contra él.
     ponytail: no mira desempates; en empate exacto deja al equipo en zona/depende.
     """
     formato = FORMATOS.get(categoria.formato)
     cupos = formato['cupos'] if formato else None
     fechas = sorted({p[5] for p in partidos})
     tuplas = lambda hasta: [p[:5] for p in partidos if p[5] <= hasta]
-    por_fecha = [tablas_por_grupo(tuplas(f), grupos) for f in fechas]
-    final = por_fecha[-1] if por_fecha else tablas_por_grupo([], grupos)
+    por_fecha = [tablas_por_grupo(tuplas(f), grupos, inactivos) for f in fechas]
+    final = por_fecha[-1] if por_fecha else tablas_por_grupo([], grupos, inactivos)
+    # Partidos jugados de cada equipo contra los que siguen en el torneo: de ahí sale lo que le falta
+    entre_activos = tablas_por_grupo(*_entre_activos([p[:5] for p in partidos], grupos, inactivos))
+    jugados = {f['id_equipo']: f['PJ'] for t in entre_activos.values() for f in t}
 
     salida = {'fechas': [f.isoformat() for f in fechas], 'cupos': cupos, 'grupos': []}
     for letra, tabla in final.items():
-        n = len(tabla)
+        activos = [f for f in tabla if f['id_equipo'] not in inactivos]
+        n = len(activos)
         por_jugar = (n - 1) * _vueltas(formato)  # partidos de cada equipo en la fase de grupos
+        faltan = lambda f: max(0, por_jugar - jugados.get(f['id_equipo'], 0))
+        terminado = all(faltan(o) == 0 for o in activos)
         filas = []
         for f in tabla:
-            restantes = max(0, por_jugar - f['PJ'])
+            restantes = 0 if f['id_equipo'] in inactivos else faltan(f)
             maximo = f['puntos'] + 2 * restantes
-            if cupos is None or n <= cupos:
+            if f['id_equipo'] in inactivos:
+                situacion = 'eliminado'
+            elif cupos is None or n <= cupos:
                 situacion = 'zona'
             else:
-                otros = [o for o in tabla if o['id_equipo'] != f['id_equipo']]
-                fuera_de_alcance = sum(1 for o in otros if o['puntos'] + 2 * max(0, por_jugar - o['PJ']) < f['puntos'])
+                otros = [o for o in activos if o['id_equipo'] != f['id_equipo']]
+                fuera_de_alcance = sum(1 for o in otros if o['puntos'] + 2 * faltan(o) < f['puntos'])
                 imposibles = sum(1 for o in otros if o['puntos'] > maximo)
-                terminado = all(o['PJ'] >= por_jugar for o in tabla)
                 if terminado:
                     situacion = 'clasificado' if f['posicion'] <= cupos else 'eliminado'
                 elif fuera_de_alcance >= n - cupos:
@@ -227,5 +244,5 @@ def recorrido(categoria, grupos, partidos, equipos):
                     for t in por_fecha
                 ],
             })
-        salida['grupos'].append({'grupo': letra, 'equipos': filas, 'terminado': n > 0 and all(x['PJ'] >= por_jugar for x in tabla)})
+        salida['grupos'].append({'grupo': letra, 'equipos': filas, 'terminado': n > 0 and terminado})
     return salida

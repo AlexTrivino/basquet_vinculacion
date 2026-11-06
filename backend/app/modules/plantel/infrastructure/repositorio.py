@@ -11,6 +11,7 @@ from sqlalchemy.orm import joinedload
 
 from app.modules.plantel.domain.equipo import CategoriaResumen, Equipo, InscripcionResumen, TorneoResumen, UsuarioResumen
 from app.modules.plantel.domain.jugador import Jugador, PlantillaDeJugador, edad, hace_anios
+from app.modules.torneos.application import casos_de_uso as torneos
 from app.shared.infrastructure.db import db, enviar_cambios
 from app.shared.infrastructure.modelos.categoria import Categoria
 from app.shared.infrastructure.modelos.equipo import Equipo as FilaEquipo
@@ -86,6 +87,18 @@ class RepositorioEquipos:
         fila = db.session.get(FilaEquipo, id_equipo)
         for campo, valor in cambios.items():
             setattr(fila, campo, valor)
+
+    def borrar_partidos_pendientes(self, id_equipo):
+        """Borra los partidos que el equipo todavía no jugó (programados o suspendidos) en los torneos vigentes, también
+        los de las llaves. ponytail: deja los que ya tienen estadísticas o sanciones cargadas, para no perderlas."""
+        pendientes = Partido.query.filter(
+            Partido.estado.in_(('programado', 'suspendido')),
+            db.or_(Partido.id_equipo_local == id_equipo, Partido.id_equipo_visitante == id_equipo),
+            ~Partido.estadisticas.any(), ~Partido.sanciones.any(),
+        ).all()
+        for partido in pendientes:
+            if torneos.vigente(partido.torneo.estado):
+                db.session.delete(partido)
 
 
 # ── Jugadores ─────────────────────────────────────────────────────

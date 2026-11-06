@@ -21,7 +21,7 @@ class Repositorio:
         self.entidad, self.choca = entidad, choca
         self.filas = {f.id_equipo if entidad is Equipo else f.id_jugador: f for f in filas}
         self.delegados = delegados or {}  # id_jugador → delegado de cada equipo donde juega
-        self.pedido = None
+        self.pedido, self.sin_pendientes = None, []
 
     def obtener(self, id_fila, detalle=False):
         fila = self.filas.get(id_fila)
@@ -36,6 +36,9 @@ class Repositorio:
 
     def actualizar(self, id_fila, cambios):
         self.filas[id_fila] = replace(self.filas[id_fila], **cambios)
+
+    def borrar_partidos_pendientes(self, id_equipo):
+        self.sin_pendientes.append(id_equipo)
 
     def activos_de(self, id_usuario):
         return sum(e.id_usuario == id_usuario and e.estado == 'activo' for e in self.filas.values())
@@ -147,6 +150,15 @@ def test_un_delegado_solo_gestiona_sus_equipos():
     with pytest.raises(NoEncontrado):
         equipos.para_gestionar(1, DELEGADO, 'delegado', p['repositorio'])
     assert equipos.obtener(1, p['repositorio'], incluir_inactivos=True).estado == 'inactivo'
+
+
+def test_un_equipo_que_pasa_a_inactivo_deja_sus_partidos_pendientes():
+    p = piezas(Equipo, TIGRES, Equipo(2, 'PUMAS', OTRO))
+    equipos.actualizar(1, {'nombre_equipo': 'tigres b'}, DELEGADO, 'delegado', **p)
+    assert p['repositorio'].sin_pendientes == []
+    equipos.actualizar(1, {'estado': 'inactivo'}, DELEGADO, 'super_admin', **p)
+    equipos.dar_de_baja(2, OTRO, 'delegado', **p)
+    assert (p['repositorio'].sin_pendientes, p['unidad'].estado) == ([1, 2], 'confirmada')
 
 
 def test_reactivar_si_el_delegado_no_tiene_otro_equipo_activo():

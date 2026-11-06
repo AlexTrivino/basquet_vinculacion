@@ -54,11 +54,13 @@ class Partido:
     equipo_visitante: EquipoEnPartido | None = None
 
 
-def validar_cruce(id_local, id_visitante, grupos, llave=None):
-    """Equipos distintos, ambos aprobados en la categoría y, en la fase de grupos, del mismo grupo.
+def validar_cruce(id_local, id_visitante, grupos, llave=None, inactivos=frozenset()):
+    """Equipos distintos, ambos aprobados en la categoría y, en la fase de grupos, activos y del mismo grupo.
 
     ``grupos``: {id_equipo: grupo} de las inscripciones aprobadas de la categoría. Un partido de fase de grupos
     entre grupos distintos no contaría en ninguna tabla; los cruces de la fase final llevan llave y sí mezclan grupos.
+    Un equipo de ``inactivos`` quedó fuera del torneo: no juega más la fase de grupos, pero una llave donde quedó
+    se puede crear para cerrarla a mano (por W.O.).
     """
     if id_local == id_visitante:
         raise ReglaDeNegocio('El equipo local y visitante no pueden ser el mismo.')
@@ -66,6 +68,9 @@ def validar_cruce(id_local, id_visitante, grupos, llave=None):
         raise ReglaDeNegocio('El equipo local no tiene una inscripción aprobada para este torneo en esta categoría.')
     if id_visitante not in grupos:
         raise ReglaDeNegocio('El equipo visitante no tiene una inscripción aprobada para este torneo en esta categoría.')
+    for lado, id_equipo in (('local', id_local), ('visitante', id_visitante)):
+        if not llave and id_equipo in inactivos:
+            raise ReglaDeNegocio(f'El equipo {lado} está inactivo: quedó fuera del torneo y ya no juega la fase de grupos.')
     if not llave and grupos[id_local] != grupos[id_visitante]:
         raise ReglaDeNegocio(
             'En la fase de grupos solo se enfrentan equipos del mismo grupo '
