@@ -7,7 +7,7 @@ import { getTorneos } from '@/shared/api/catalogo';
 import { getPartidos } from '@/modules/partidos';
 import { getEquipos } from '@/modules/equipos';
 import { getPatrocinadores } from '@/modules/auspicios';
-import { getEstadisticasPublicas } from '@/modules/estadisticas';
+import { getEstadisticasPublicas, getFigurasEnCurso } from '@/modules/estadisticas';
 
 vi.mock('@/shared/api/catalogo');
 vi.mock('@/modules/partidos/api/partidos.api');
@@ -34,6 +34,12 @@ const partidoProgramado = {
   torneo: { id_torneo: 1 }, equipo_local: { id_equipo: 3, nombre_equipo: 'Manta Bulls' }, equipo_visitante: { id_equipo: 4, nombre_equipo: 'Tiburones de Manta' },
 };
 
+const figura = {
+  torneo: { id_torneo: 1, nombre: 'Copa Verano Manta 2026' }, categoria: 'Senior Libre (masculino)',
+  jugador: { id_jugador: 5, nombre: 'LUIS PONCE', url_foto: null, numero_camiseta: 9 }, equipo: { id_equipo: 1, nombre_equipo: 'Delfines BC', url_logo: null },
+  partidos: 3, linea: { puntos: 54, rebotes: 11, asistencias: 9, tapones: 1, triples: 4, tiros_libres: 6 }, promedio_puntos: 18, valoracion: 76,
+};
+
 function renderHome() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
@@ -50,6 +56,7 @@ describe('Home (página de inicio)', () => {
     vi.clearAllMocks();
     Element.prototype.scrollIntoView = vi.fn(); // jsdom no lo implementa
     vi.mocked(getEstadisticasPublicas).mockResolvedValue({ success: true, message: '', data: { puntos_totales: 15230 } } as never);
+    vi.mocked(getFigurasEnCurso).mockResolvedValue({ success: true, message: '', data: [figura] } as never);
     vi.mocked(getTorneos).mockResolvedValue({ success: true, message: '', data: torneos, pagination: { page: 1, per_page: 50, total: 2, pages: 1 } } as never);
     vi.mocked(getEquipos).mockResolvedValue({ success: true, message: '', data: [], pagination: { page: 1, per_page: 1, total: 7, pages: 7 } } as never);
     vi.mocked(getPatrocinadores).mockResolvedValue([{ id_patrocinador: 1, nombre_patrocinador: 'Nike Ecuador', url_logo_patrocinador: '/n.png' }] as never);
@@ -68,8 +75,9 @@ describe('Home (página de inicio)', () => {
     expect(screen.getByRole('heading', { level: 1, name: /Torneos Baloncesto Manta/i })).toBeInTheDocument();
     expect(await screen.findByRole('heading', { name: 'Nuestros auspiciantes' })).toBeInTheDocument();
 
+    expect(await screen.findByRole('heading', { name: /Figuras del torneo/i })).toBeInTheDocument();
     const orden = [...container.querySelectorAll('main > section[id], main > footer[id]')].map((el) => el.id);
-    expect(orden).toEqual(['inicio', 'auspiciantes', 'conocenos', 'partidos', 'unete', 'contacto']);
+    expect(orden).toEqual(['inicio', 'auspiciantes', 'conocenos', 'partidos', 'figuras', 'unete', 'contacto']);
     // Sin teléfonos en pantalla: solo redes sociales en el footer
     expect(screen.queryByText(/\+593/)).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Instagram/ })).toHaveAttribute('href', 'https://www.instagram.com/baloncestomanta');

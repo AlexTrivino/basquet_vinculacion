@@ -110,8 +110,8 @@ inscripciones; visor y partidos; equipos; jugadores y flyers; estadisticas; torn
 - `jugadores`: el perfil público del jugador y la administración de los jugadores, con `types.ts` (el perfil con sus participaciones y métricas).
 - `visor`: el buscador de jugadores del rol visor (`/visor`, con su guarda) y `PartidosJugador`, que también usa el perfil del jugador.
 - `flyers`: el estudio de flyers del panel del admin (`EstudioFlyers`) y el flyer de la fecha del calendario (`FlyerFecha`, que se exporta con `lazy` desde `components/FlyerFechaDiferido.ts` para que html-to-image no pese en la vista del torneo).
-- `estadisticas`: el panel del admin (tablero, actividad reciente, partidos pendientes y el estudio de flyers), `LideresEstadisticos` (la pestaña Estadísticas del torneo) y los totales públicos de la portada.
-- `portada`: la página de inicio (`HeroTorneos`, `SeccionConocenos`, `SeccionPartidos`, el carrusel de auspicios y el `Footer`) y `Contacto`, con el botón de WhatsApp que el layout muestra en todas las páginas.
+- `estadisticas`: el panel del admin (tablero, actividad reciente, partidos pendientes y el estudio de flyers), `LideresEstadisticos` (la pestaña Estadísticas del torneo) y, para la portada, los totales públicos y las figuras de los torneos en curso (`getFigurasEnCurso`).
+- `portada`: la página de inicio (`HeroTorneos`, `SeccionConocenos`, `SeccionPartidos`, `SeccionFiguras` con las figuras de los torneos en curso, el carrusel de auspicios y el `Footer`) y `Contacto`, con el botón de WhatsApp que el layout muestra en todas las páginas.
 
 **Prohibido:** estructura plana, `useState` múltiples en formularios complejos,
 componentes controlados puros donde aplique React Hook Form.

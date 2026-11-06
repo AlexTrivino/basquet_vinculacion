@@ -56,8 +56,8 @@ def test_validar_la_carga_de_un_equipo():
 
 
 class Repositorio:
-    def __init__(self, partido=FAE_MANTA, plantilla=frozenset({5, 6}), nombre='INTERCOLEGIAL', planilla=None):
-        self.partido, self.plantilla, self.nombre, self.planilla_ = partido, plantilla, nombre, planilla
+    def __init__(self, partido=FAE_MANTA, plantilla=frozenset({5, 6}), nombre='INTERCOLEGIAL', planilla=None, en_curso=(1,)):
+        self.partido, self.plantilla, self.nombre, self.planilla_, self.en_curso = partido, plantilla, nombre, planilla, en_curso
         self.lineas, self.sanciones, self.procesadas = None, None, None
 
     def puntos_por_torneo(self):
@@ -69,8 +69,14 @@ class Repositorio:
     def totales_por_jugador(self, id_torneo, id_categoria):
         return [{'id_jugador': 5, **linea(puntos=30)}]
 
-    def flyers(self, id_torneo, fecha):
-        return None if id_torneo == 99 else {'fecha': fecha}
+    def flyers(self, id_torneo, fecha=None):
+        if id_torneo == 99:
+            return None
+        figuras = [{'categoria': f'Categoría {id_torneo}', 'valoracion': 40 + id_torneo}]
+        return {'fecha': fecha, 'torneo': {'id_torneo': id_torneo, 'nombre': f'Torneo {id_torneo}'}, 'figuras_categoria': figuras}
+
+    def torneos_en_curso(self):
+        return self.en_curso
 
     def planilla(self, id_partido):
         return self.planilla_
@@ -104,7 +110,7 @@ def test_portada_lideres_flyers_y_planilla():
     assert casos.lideres(1, None, Repositorio())[0] == 'INTERCOLEGIAL'
     with pytest.raises(NoEncontrado, match='Torneo no encontrado'):
         casos.lideres(4, None, Repositorio(nombre=None))
-    assert casos.flyers(1, date(2026, 8, 8), Repositorio()) == {'fecha': date(2026, 8, 8)}
+    assert casos.flyers(1, date(2026, 8, 8), Repositorio())['fecha'] == date(2026, 8, 8)
     with pytest.raises(NoEncontrado, match='El torneo no existe'):
         casos.flyers(99, None, Repositorio())
     with pytest.raises(NoEncontrado, match='no existe'):
@@ -139,3 +145,12 @@ def test_cargar_las_estadisticas_de_un_equipo():
     casos.cargar({'id_partido': 6, 'id_equipo': 3, 'estadisticas_jugadores': [{'id_jugador': 7, 'puntos': 49}]}, 'super_admin', hoy,
                  repositorio=repositorio, unidad=Unidad())
     assert (repositorio.sanciones, repositorio.procesadas) == (None, (6, False))  # el visitante, sin sanciones
+
+
+def test_figuras_de_los_torneos_en_curso():
+    """Las figuras de cada categoría, de todos los torneos en curso y con su torneo; sin torneos en curso, ninguna."""
+    assert casos.figuras_en_curso(Repositorio(en_curso=(1, 3))) == [
+        {'categoria': 'Categoría 1', 'valoracion': 41, 'torneo': {'id_torneo': 1, 'nombre': 'Torneo 1'}},
+        {'categoria': 'Categoría 3', 'valoracion': 43, 'torneo': {'id_torneo': 3, 'nombre': 'Torneo 3'}},
+    ]
+    assert casos.figuras_en_curso(Repositorio(en_curso=())) == []

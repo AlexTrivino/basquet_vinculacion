@@ -35,6 +35,17 @@ def flyers(id_torneo, fecha, repositorio):
     return datos
 
 
+def figuras_en_curso(repositorio):
+    """La figura acumulada de cada categoría de los torneos en curso (la de los flyers: la mayor valoración hasta
+    hoy), con su torneo."""
+    figuras = []
+    for id_torneo in repositorio.torneos_en_curso():
+        # ponytail: arma el flyer completo de cada torneo en curso; una consulta propia si la portada llega a pesar
+        datos = repositorio.flyers(id_torneo)
+        figuras += [{**figura, 'torneo': datos['torneo']} for figura in datos['figuras_categoria']]
+    return figuras
+
+
 def planilla(id_partido, repositorio):
     """La planilla oficial de un partido terminado."""
     partido = repositorio.planilla(id_partido)

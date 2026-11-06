@@ -121,6 +121,11 @@ class RepositorioEstadisticas:
             'tiros_libres': int(row.tiros_libres_totales or 0),
         } for row in query.all()]
 
+    def torneos_en_curso(self):
+        """Los ids de los torneos en curso, del que empezó antes al último."""
+        filas = db.session.query(Torneo.id_torneo).filter(Torneo.estado == 'en_curso').order_by(Torneo.fecha_inicio, Torneo.id_torneo)
+        return [id_torneo for (id_torneo,) in filas]
+
     # ── Flyers ────────────────────────────────────────────────────
     def flyers(self, id_torneo, fecha=None):
         """Resultados de ``fecha`` (por defecto la última con partidos jugados) con la figura de cada partido y de la

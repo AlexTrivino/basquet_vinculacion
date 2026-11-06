@@ -93,3 +93,23 @@ class EstadisticasBulkSchema(Schema):
             error='El array de estadísticas no puede estar vacío.',
         ),
     )
+
+
+# La figura de una categoría en la portada: solo datos públicos (ni cédula ni contacto), aunque el flyer sume más
+_LINEA = ('puntos', 'rebotes', 'asistencias', 'tapones', 'triples', 'tiros_libres')
+
+
+class FiguraPublicaSchema(Schema):
+    torneo = fields.Nested(Schema.from_dict({'id_torneo': fields.Integer(), 'nombre': fields.String()}))
+    categoria = fields.String(allow_none=True)
+    jugador = fields.Nested(Schema.from_dict({
+        'id_jugador': fields.Integer(), 'nombre': fields.String(), 'url_foto': fields.String(allow_none=True),
+        'numero_camiseta': fields.Integer(allow_none=True),
+    }))
+    equipo = fields.Nested(Schema.from_dict({
+        'id_equipo': fields.Integer(), 'nombre_equipo': fields.String(), 'url_logo': fields.String(allow_none=True),
+    }), allow_none=True)
+    partidos = fields.Integer()
+    linea = fields.Nested(Schema.from_dict({campo: fields.Integer() for campo in _LINEA}))
+    promedio_puntos = fields.Float()
+    valoracion = fields.Integer()

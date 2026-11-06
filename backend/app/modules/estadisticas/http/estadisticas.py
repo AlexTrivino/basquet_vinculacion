@@ -6,7 +6,7 @@ from flask import Blueprint, g, request
 from marshmallow import ValidationError
 
 from app.modules.estadisticas.application import estadisticas as casos
-from app.modules.estadisticas.http.esquemas import EstadisticasBulkSchema
+from app.modules.estadisticas.http.esquemas import EstadisticasBulkSchema, FiguraPublicaSchema
 from app.modules.estadisticas.infrastructure.repositorio import RepositorioEstadisticas
 from app.shared.domain.errores import NoEncontrado
 from app.shared.http.autenticacion import token_required
@@ -16,6 +16,7 @@ from app.shared.infrastructure.unidad_de_trabajo import UnidadDeTrabajo
 stats_bp = Blueprint('estadisticas', __name__, url_prefix='/api/estadisticas')
 
 _bulk_schema = EstadisticasBulkSchema()
+_figuras_schema = FiguraPublicaSchema(many=True)
 
 
 @stats_bp.route('/publicas', methods=['GET'])
@@ -23,6 +24,12 @@ def estadisticas_publicas():
     """Totales de la portada, sin autenticación: los puntos de los partidos finalizados, en total y por torneo
     ({id_torneo: puntos}). Los ganados por W.O. no cuentan: su marcador es administrativo."""
     return api_response(casos.publicas(RepositorioEstadisticas()))
+
+
+@stats_bp.route('/figuras', methods=['GET'])
+def figuras_en_curso():
+    """La figura de cada categoría de los torneos en curso hasta hoy, sin autenticación (la sección de la portada)."""
+    return api_response(_figuras_schema.dump(casos.figuras_en_curso(RepositorioEstadisticas())))
 
 
 @stats_bp.route('/flyers', methods=['GET'])

@@ -269,7 +269,7 @@ El administrador (`/admin/*`), el resto del área de delegado, el perfil (`/perf
 
 ## Layout
 
-La página es una sola columna de secciones apiladas sobre una noche fija. Cada sección centra un contenedor: 80rem para el hero y los auspiciantes; 72rem para Conócenos, Partidos, el CTA y el pie. Los márgenes laterales son de 16 px en móvil, 24 px desde 640 px y 32 px desde 1024 px. El ritmo vertical es de 96 px por sección, 80 px en el hero y en la banda de auspiciantes, y 64 px en el pie. Las anclas de sección compensan los 64 px de la barra fija.
+La página es una sola columna de secciones apiladas sobre una noche fija. Cada sección centra un contenedor: 80rem para el hero y los auspiciantes; 72rem para Conócenos, Partidos, Figuras, el CTA y el pie. Los márgenes laterales son de 16 px en móvil, 24 px desde 640 px y 32 px desde 1024 px. El ritmo vertical es de 96 px por sección, 80 px en el hero y en la banda de auspiciantes, y 64 px en el pie. Las anclas de sección compensan los 64 px de la barra fija.
 
 Desde 1024 px, los pares de texto y objeto se abren en columnas asimétricas. El hero reparte 1 : 1.3, con el titular a la izquierda y la tarjeta de torneo a la derecha. Los auspiciantes reparten 3 : 7, con columnas de mínimo cero para que la marquesina no estire la suya, y el CTA reparte 1.5 : 1. Conócenos reparte 1 : 1. Los carteles de partido forman una rejilla de dos columnas desde 768 px, con 24 px de separación. El pie pasa de una columna a dos (desde 640 px) y a cuatro (desde 1024 px), con 48 px entre ellas. Por debajo de esos cortes todo se apila en una columna, y la tarjeta de torneo queda bajo el titular.
 
@@ -312,7 +312,7 @@ El lenguaje de formas mezcla dos familias. Contenedores y controles tienen esqui
 
 ## Components
 
-Dónde vive cada pieza (`frontend/src`): lo que usan varias pantallas está en `shared/ui` (`Escudo`, `Esquinas`, `FotoJugador` con la silueta, `Skeleton`, `EmptyState`, `StatusBadge`, `AsyncButton`, `DataGridTable`…); la barra y el menú lateral, en `app/`; lo demás, en el módulo de su pantalla: el cartel de partido (`TarjetaPartido`, `Medallon`), la tarjeta diagonal de torneo (`HeroTorneos`), el panel CTA, el pie, las redes y el botón de WhatsApp en `modules/portada`; la banda de auspiciantes en `modules/auspicios`; el calendario (`CalendarioTorneo`), las posiciones y las llaves en `modules/torneos`; el flyer y sus láminas en `modules/flyers`; el cromo y el boleto en `modules/equipos`.
+Dónde vive cada pieza (`frontend/src`): lo que usan varias pantallas está en `shared/ui` (`Escudo`, `Esquinas`, `FotoJugador` con la silueta, `Skeleton`, `EmptyState`, `StatusBadge`, `AsyncButton`, `DataGridTable`…); la barra y el menú lateral, en `app/`; lo demás, en el módulo de su pantalla: el cartel de partido (`TarjetaPartido`, `Medallon`), la tarjeta diagonal de torneo (`HeroTorneos`), el carrusel de figuras (`SeccionFiguras`), el panel CTA, el pie, las redes y el botón de WhatsApp en `modules/portada`; la banda de auspiciantes en `modules/auspicios`; el calendario (`CalendarioTorneo`), las posiciones y las llaves en `modules/torneos`; el flyer y sus láminas en `modules/flyers`; el cromo y el boleto en `modules/equipos`.
 
 ### Botones
 Sobrios y claros: la acción la dice el color, no la forma.
@@ -400,6 +400,14 @@ Es el mismo cartel que el del partido, en sólido: marino claro, borde oro al 30
 - **Nombre:** bajo el retrato, los apellidos en Cinzel 700 a 0.95rem crema (blancos al pasar el cursor) y, debajo, los nombres en Inter a 0.75rem `slate-400`, con mayúscula inicial. El nombre solo se parte cuando el orden de nombres y apellidos es claro; si no, va completo.
 - **Al pasar el cursor:** sube 6 px en 500 ms, su sombra se hunde, el filete pasa al 70 %, el retrato crece a 1.04 en 700 ms y un brillo de lámina (una banda crema al 30 %, inclinada −16°) lo cruza en 1 s, todo con la curva del álbum, `cubic-bezier(0.32, 0.72, 0, 1)`. Con movimiento reducido solo cambian el filete y el nombre.
 
+### Figuras del torneo (componente firma)
+`SeccionFiguras` va en la portada después de Partidos: la figura acumulada de cada categoría de los torneos en curso (la mayor valoración hasta hoy, la misma de los flyers), en un carrusel 3D. Sin torneos en curso o sin estadísticas, la sección no aparece.
+- **Encabezado:** «FIGURAS DEL TORNEO» en la voz del título de Partidos, con «DEL TORNEO» en oro (el honor), y el subtítulo «LOS MEJORES DE CADA CATEGORÍA HASTA HOY». Debajo del carrusel, la fórmula de la valoración en Inter a 0.75rem `slate-400`.
+- **Escenario:** las tarjetas comparten una celda de grilla con perspectiva de 1400 px. La del centro va al frente; las vecinas se corren al 62 % de su ancho, bajan a 0.86, se alejan 150 px y giran 24° hacia el centro; las segundas, al 112 %, 0.74, 300 px y 32°. Las demás esperan ocultas. Las vecinas llevan un velo marino al 55 %. El ancho es de 15rem (17rem desde 640 px y 18rem desde 1024 px). Todo se mueve en 700 ms con la curva del álbum.
+- **Tarjeta:** el cromo del perfil de equipo (doble bisel, retrato 3:4 recortado al rostro, degradado marino y dorsal contorneado) con la categoría en una cinta dorada centrada arriba. Debajo, el nombre en Cinzel 700 crema (dos líneas como máximo), el escudo de 24 px con el equipo en `slate-300` y los totales en una frase con las cifras en Inter 600 crema («53 puntos, 4 rebotes y 2 asistencias en 2 partidos», sin los que están en 0). La franja inferior del cartel dice «VALORACIÓN» en la voz de placa con la cifra en crema y, debajo, el torneo en la voz de etiqueta. La del centro enlaza al perfil del jugador y su filete sube al 70 % al pasar el cursor; tocar una vecina la trae al centro.
+- **Controles:** flechas circulares de 44 px (contorno oro al 40 %, fondo marino al 80 %, chevrón oro) montadas en los bordes de la tarjeta del centro desde 640 px; en el celular van chicas (32 px) junto a los puntos. Pausa, puntos y barra son los del carrusel de torneos, con la barra de 5 s y centrada; con más de 10 figuras, los puntos se cambian por «3 de 12». Se arrastra en el celular y responde a las flechas del teclado desde sus controles.
+- **Pausa:** el botón, el cursor encima o el foco adentro detienen la barra; solo en pausa se anuncia el cambio a los lectores de pantalla.
+
 ### Boleto del próximo partido (componente firma)
 `Boleto` da el próximo partido como una entrada. Es un cartel sólido: marino claro, borde oro al 25 %, radio de 0.75rem, sombra de panel y esquinas en L desde 768 px. Monta 2rem sobre el filete de la portada. Desde 768 px se reparte en tres columnas (talón, campo y hora); por debajo se apila.
 - **Talón:** el día en la voz de marcador, en crema, entre el día de la semana y el mes en la voz de placa. La perforación lo separa del campo.
@@ -443,7 +451,7 @@ Columna "Síguenos": Instagram y Facebook como círculos de 44 px con borde oro 
 En todo el sitio (reglas sobre `html`), el lienzo es marino y `color-scheme: dark` oscurece selectores, barras y controles nativos. La barra de desplazamiento lleva el pulgar celeste, mezclado al 45 % con marino, sobre un carril marino. La selección de texto es oro con texto marino. El cursor de texto y `accent-color` son celestes. El foco es un anillo celeste de 2 px con 3 px de separación. Los enlaces subrayados separan el subrayado 4 px.
 
 ### Movimiento reducido
-Con `prefers-reduced-motion: reduce` se apagan el parallax, el zoom del hero y de la portada del perfil, las entradas (`.aparecer` y las del perfil de equipo, que dejan todo visible), el rebote del balón y de su sombra, la marquesina, el pulso de los esqueletos y, en el cromo, la elevación, el zoom del retrato y el brillo de lámina. El carrusel de torneos arranca en pausa (el botón permite reanudarlo) y el balón no gira.
+Con `prefers-reduced-motion: reduce` se apagan el parallax, el zoom del hero y de la portada del perfil, las entradas (`.aparecer` y las del perfil de equipo, que dejan todo visible), el rebote del balón y de su sombra, la marquesina, el pulso de los esqueletos y, en el cromo, la elevación, el zoom del retrato y el brillo de lámina. El carrusel de torneos y el de figuras arrancan en pausa (el botón permite reanudarlos), las figuras cambian sin girar y el balón no gira.
 
 ## Do's and Don'ts
 

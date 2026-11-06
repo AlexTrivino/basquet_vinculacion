@@ -1696,6 +1696,72 @@
    "success": false
   }
  },
+ "GET /api/estadisticas/figuras · anónimo": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": [
+    {
+     "categoria": "Cadetes +30 (femenino)",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "jugador": {
+      "id_jugador": 9,
+      "nombre": "ANA MERO VÉLEZ",
+      "numero_camiseta": 3,
+      "url_foto": null
+     },
+     "linea": {
+      "asistencias": 3,
+      "puntos": 18,
+      "rebotes": 6,
+      "tapones": 0,
+      "tiros_libres": 4,
+      "triples": 2
+     },
+     "partidos": 1,
+     "promedio_puntos": 18.0,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "valoracion": 27
+    },
+    {
+     "categoria": "Juvenil (masculino)",
+     "equipo": {
+      "id_equipo": 1,
+      "nombre_equipo": "SAN JOSÉ",
+      "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+     },
+     "jugador": {
+      "id_jugador": 1,
+      "nombre": "BRYAN CHÁVEZ VÉLEZ",
+      "numero_camiseta": 4,
+      "url_foto": "https://supabase.test/storage/v1/object/public/archivos/jugadores/1/foto.jpg"
+     },
+     "linea": {
+      "asistencias": 7,
+      "puntos": 37,
+      "rebotes": 11,
+      "tapones": 1,
+      "tiros_libres": 6,
+      "triples": 3
+     },
+     "partidos": 2,
+     "promedio_puntos": 18.5,
+     "torneo": {
+      "id_torneo": 1,
+      "nombre": "INTERCOLEGIAL 2026"
+     },
+     "valoracion": 56
+    }
+   ],
+   "success": true
+  }
+ },
  "GET /api/estadisticas/flyers · admin · sin torneo": {
   "codigo": 400,
   "cuerpo": {

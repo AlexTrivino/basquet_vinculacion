@@ -7,6 +7,7 @@ import { HeroTorneos } from '../components/HeroTorneos';
 import { SeccionConocenos } from '../components/SeccionConocenos';
 import { Esquinas } from '@/shared/ui/Esquinas';
 import { SeccionPartidos } from '../components/SeccionPartidos';
+import { SeccionFiguras } from '../components/SeccionFiguras';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -61,6 +62,8 @@ export default function Home() {
       <SeccionConocenos />
 
       <SeccionPartidos />
+
+      <SeccionFiguras />
 
       {/* ─── CTA ─── */}
       <section ref={cta} id="unete" data-visible={ctaVisible || undefined} className="relative z-10 scroll-mt-16 px-4 py-24 sm:px-6 lg:px-8">

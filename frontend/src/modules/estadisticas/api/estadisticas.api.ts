@@ -41,3 +41,20 @@ export async function getEstadisticasPublicas(): Promise<
   const response = await axiosInstance.get('/estadisticas/publicas');
   return response.data;
 }
+
+// La figura acumulada de cada categoría de los torneos en curso (la sección de figuras de la portada)
+export interface FiguraDelTorneo {
+  torneo: { id_torneo: number; nombre: string };
+  categoria: string | null;
+  jugador: { id_jugador: number; nombre: string; url_foto: string | null; numero_camiseta: number | null };
+  equipo: { id_equipo: number; nombre_equipo: string; url_logo: string | null } | null;
+  partidos: number;
+  linea: { puntos: number; rebotes: number; asistencias: number; tapones: number; triples: number; tiros_libres: number };
+  promedio_puntos: number;
+  valoracion: number;
+}
+
+export async function getFigurasEnCurso(): Promise<ApiResponse<FiguraDelTorneo[]>> {
+  const response = await axiosInstance.get('/estadisticas/figuras');
+  return response.data;
+}

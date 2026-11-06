@@ -423,6 +423,7 @@ BASE = [
 
     # ── Estadísticas ──
     G('/api/estadisticas/publicas'),
+    G('/api/estadisticas/figuras'),  # desde la fase 12: la portada
     G('/api/estadisticas/dashboard', 'admin'),
     G('/api/estadisticas/dashboard/actividad-reciente', 'admin'),
     G('/api/estadisticas/flyers?id_torneo=1', 'admin'),
