@@ -27,6 +27,14 @@ Se revisó y está bien: las consultas van con parámetros (SQLAlchemy), React e
 
 ## Pendiente fuera del repositorio
 
+El servidor usa Supabase self-hosted en Docker (según las notas del proyecto: `supabase-db`, `supabase-pooler` con 5432 y 6543 publicados en `0.0.0.0`, `supabase-kong` con 8000 y 8443, y Studio en `supabase.baloncestomanta.com`). Eso suma tres revisiones a las de cualquier Supabase.
+
+### 0. Llaves y puertos del Supabase self-hosted (crítico si quedaron como en el ejemplo)
+
+- **Secretos del `.env` de Supabase.** `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, `POSTGRES_PASSWORD` y `DASHBOARD_PASSWORD` no pueden ser los de `docker/.env.example` del repositorio de Supabase: esos son públicos. Con el `JWT_SECRET` de ejemplo cualquiera firma un token `service_role` (toda la base y el Storage) y, como el backend acepta HS256 con `SUPABASE_JWT_SECRET`, también un token del super_admin para esta API. Si alguno quedó igual: generar secretos nuevos (la guía de self-hosting de Supabase explica cómo derivar `ANON_KEY` y `SERVICE_ROLE_KEY` del `JWT_SECRET` nuevo), reiniciar los contenedores y actualizar `backend/.env` y `VITE_SUPABASE_ANON_KEY` antes del build.
+- **Puertos.** El pooler (5432 y 6543) no tiene que verse desde internet: publicarlo solo en `127.0.0.1` en el `docker-compose` (`"127.0.0.1:5432:5432"`) o cerrarlo con el firewall. Lo mismo Kong (8000 y 8443) si nginx ya lo publica por su dominio.
+- **Studio.** Es la llave de toda la base: restringirlo por IP en nginx (o VPN) además de su usuario y contraseña.
+
 ### 1. RLS en Supabase (crítico si está apagado)
 
 Las tablas del sistema están en el esquema `public` del Postgres de Supabase y la anon key viaja en el JavaScript del sitio. Si las tablas no tienen RLS, cualquiera puede leerlas y modificarlas por `https://<proyecto>.supabase.co/rest/v1/<tabla>` sin pasar por el backend: todas las cédulas, teléfonos y correos, y también borrar datos. Supabase lo marca en *Advisors → Security*.
