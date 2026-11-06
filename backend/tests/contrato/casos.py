@@ -478,6 +478,10 @@ BASE = [
     G('/api/usuarios/me', 'firma_mala'),
     C('PUT', '/api/usuarios/me', 'del1', json={'nombre': 'Delegado de San José'}),
     C('PUT', '/api/usuarios/me', 'del1', 'sin nombre', json={}),
+    G('/api/usuarios/me', 'admin'),  # desde la fase 8
+    C('PUT', '/api/usuarios/me', 'del1', 'sin cuerpo'),
+    C('PUT', '/api/usuarios/me', 'del1', 'nombre vacío', json={'nombre': ''}),
+    C('PUT', '/api/usuarios/me', 'del1', 'con rol', json={'nombre': 'Delegado de San José', 'rol': 'super_admin'}),
 
     # ── Visor ──
     G('/api/visor/jugadores', 'visor'),

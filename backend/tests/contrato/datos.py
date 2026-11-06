@@ -19,12 +19,12 @@ from datetime import date, datetime, time
 
 from sqlalchemy import text
 
-from app import db
-from app.models import (
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos import (
     Categoria, Documentacion, Equipo, Estadistica, Inscripcion, Jugador, Partido, Patrocinador,
     PatrocinadorTorneo, Plantilla, Sancion, Torneo, Usuario,
 )
-from app.models.documento_jugador import DocumentoJugador
+from app.shared.infrastructure.modelos.documento_jugador import DocumentoJugador
 
 URL = 'https://supabase.test/storage/v1/object/public/archivos'
 

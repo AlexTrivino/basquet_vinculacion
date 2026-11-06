@@ -12,7 +12,7 @@ se extiende o corrige el backend existente.
 
 1. **Rutas delgadas:** Las funciones de blueprint no contienen lógica de negocio.
    Solo reciben → validan con Marshmallow → delegan al servicio → responden.
-2. **Respuestas estandarizadas:** Siempre usar `api_response()` / `api_error()` de `utils/response.py`.
+2. **Respuestas estandarizadas:** Siempre usar `api_response()` / `api_error()` de `app/shared/http/respuestas.py`.
 3. **Paginación obligatoria:** Todo GET de listado usa `paginate_query()`.
 4. **Schemas DTO:** Usar schemas diferenciados (Public, Admin, Create, Update). No filtrar IDs
    sensibles en Public. Usar `Nested` para relaciones en vez de queries adicionales.

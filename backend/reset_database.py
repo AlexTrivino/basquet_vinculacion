@@ -8,7 +8,8 @@ from sqlalchemy import text
 from sqlalchemy.exc import ProgrammingError
 
 # Importamos la app de Flask para usar el contexto y la conexión a BD
-from app import create_app, db
+from app import create_app
+from app.shared.infrastructure.db import db
 
 def reset_database():
     app = create_app()

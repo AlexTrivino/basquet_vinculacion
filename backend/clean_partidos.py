@@ -3,7 +3,9 @@ import os
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
-from app import create_app, db
+from app import create_app
+
+from app.shared.infrastructure.db import db
 from sqlalchemy import text
 
 app = create_app()

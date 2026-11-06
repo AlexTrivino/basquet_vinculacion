@@ -10,7 +10,7 @@ os.environ.setdefault('SUPABASE_JWT_SECRET', 'secreto-de-prueba')
 os.environ.setdefault('SUPABASE_URL', 'http://127.0.0.1:9')
 
 import app as paquete  # noqa: E402
-from app import db  # noqa: E402
+from app.shared.infrastructure.db import db  # noqa: E402
 
 _create_app = paquete.create_app
 

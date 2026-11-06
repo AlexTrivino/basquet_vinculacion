@@ -38,7 +38,7 @@ npm run test
 Flask está configurado con Flask-Migrate (Alembic). **Nunca modifiques las tablas directamente en Supabase con SQL si no es estrictamente necesario.** Usa siempre migraciones.
 
 ### Crear una nueva migración
-Si añades una columna o modificas un modelo en `backend/app/models/`:
+Si añades una columna o modificas un modelo en `backend/app/shared/infrastructure/modelos/`:
 ```bash
 cd backend
 flask db migrate -m "Añadida columna X a tabla Y"

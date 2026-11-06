@@ -1,12 +1,11 @@
 """Regla de dependencia del backend (constitución, regla 4), leída de los imports con ast.
 
-Estricto para lo nuevo (app/modules/<módulo>/<capa> y app/shared/<capa>):
+Estricto para todo app/: fuera de la fábrica (app/__init__.py) solo hay app/modules/<módulo>/<capa> y
+app/shared/<capa>, y en ellos:
   - domain: solo su propio domain y app.shared.domain; nada de Flask, SQLAlchemy, marshmallow, boto3 ni jwt.
   - application: además su application y la application de otros módulos; tampoco frameworks.
   - infrastructure y http: entran a otro módulo solo por su application.
   - shared nunca importa app.modules.
-Trinquete para lo viejo: las líneas de app/routes que usan el ORM solo pueden bajar.
-Dentro de app/ nadie importa las rutas viejas que hoy reexportan app/shared.
 """
 import ast
 import re
@@ -14,10 +13,7 @@ from pathlib import Path
 
 APP = Path(__file__).resolve().parents[1] / 'app'
 FRAMEWORKS = {'flask', 'flask_sqlalchemy', 'flask_cors', 'flask_migrate', 'sqlalchemy', 'marshmallow', 'werkzeug', 'boto3', 'jwt'}
-ORM_EN_RUTAS = 4  # trinquete: cuando baje, bájalo aquí en el mismo commit
-RUTAS_VIEJAS = ('app.models', 'app.utils.storage', 'app.utils.response', 'app.utils.pagination', 'app.utils.auth_middleware',
-                'app.utils.error_handlers',  # reexportan app/shared desde la fase 1
-                'app.utils.business_rules', 'app.utils.text_utils')  # desde la fase 5
+CAPAS = {'domain', 'application', 'infrastructure', 'http'}
 
 
 def _dentro(destino, *prefijos):
@@ -51,7 +47,7 @@ def _permitido(modulo, capa, destino):
     return not _dentro(destino, 'app.modules') or _dentro(destino, propio) or bool(application_ajena)
 
 
-def test_capas_de_lo_nuevo():
+def test_regla_de_dependencia():
     violaciones = []
     for ruta in sorted([*APP.glob('modules/*/*/**/*.py'), *APP.glob('shared/*/**/*.py')]):
         partes = ruta.relative_to(APP).parts
@@ -60,22 +56,16 @@ def test_capas_de_lo_nuevo():
     assert not violaciones, 'Imports que rompen la regla de dependencia:\n' + '\n'.join(violaciones)
 
 
-def test_app_importa_desde_shared():
-    """Las rutas viejas solo quedan como reexportaciones para pruebas, scripts y migraciones."""
-    def es_reexportacion(ruta):
-        return _dentro('.'.join(ruta.relative_to(APP.parent).with_suffix('').parts).removesuffix('.__init__'), *RUTAS_VIEJAS)
-
-    viejos = [f'{ruta.relative_to(APP.parent)} importa {d}' for ruta in sorted(APP.rglob('*.py')) if not es_reexportacion(ruta)
-              for d in _imports(ruta) if _dentro(d, *RUTAS_VIEJAS, 'app.db', 'app.migrate')]
-    assert not viejos, 'Importa desde app/shared:\n' + '\n'.join(viejos)
-
-
-def test_orm_en_rutas_viejas_no_sube():
-    lineas = 0
-    for ruta in APP.glob('routes/**/*.py'):
-        nodos = ast.walk(ast.parse(ruta.read_text(encoding='utf-8')))
-        lineas += len({n.lineno for n in nodos if isinstance(n, ast.Attribute) and (
-            n.attr == 'query' or (n.attr == 'session' and isinstance(n.value, ast.Name) and n.value.id == 'db'))})
-    assert lineas == ORM_EN_RUTAS, (
-        f'app/routes usa el ORM en {lineas} líneas y el trinquete dice {ORM_EN_RUTAS}. '
-        'Si bajó, actualiza ORM_EN_RUTAS; si subió, esa consulta va en la infraestructura de un módulo.')
+def test_todo_app_esta_en_un_modulo_o_en_shared():
+    """app/ es la fábrica, app/modules/<módulo>/<capa> y app/shared/<capa>: nada de rutas, servicios ni utilidades
+    sueltas, ni reexportaciones de rutas viejas."""
+    sueltos = []
+    for ruta in sorted(APP.rglob('*.py')):
+        partes = ruta.relative_to(APP).parts
+        en_capa = (partes[0] == 'shared' and len(partes) > 2 and partes[1] in CAPAS) or (
+            partes[0] == 'modules' and len(partes) > 3 and partes[2] in CAPAS)
+        paquete = partes in (('__init__.py',), ('modules', '__init__.py'), ('shared', '__init__.py')) or (
+            partes[0] == 'modules' and len(partes) == 3 and partes[2] == '__init__.py')
+        if not (en_capa or paquete):
+            sueltos.append(str(ruta.relative_to(APP.parent)))
+    assert not sueltos, 'Fuera de un módulo o de shared:\n' + '\n'.join(sueltos)

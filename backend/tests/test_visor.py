@@ -5,15 +5,17 @@ from datetime import date, time as hora
 
 import jwt
 
-from app import create_app, db
-from app.models import Partido
-from app.models.categoria import Categoria
-from app.models.equipo import Equipo
-from app.models.estadistica import Estadistica
-from app.models.jugador import Jugador
-from app.models.plantilla import Plantilla
-from app.models.torneo import Torneo
-from app.models.usuario import Usuario
+from app import create_app
+
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos import Partido
+from app.shared.infrastructure.modelos.categoria import Categoria
+from app.shared.infrastructure.modelos.equipo import Equipo
+from app.shared.infrastructure.modelos.estadistica import Estadistica
+from app.shared.infrastructure.modelos.jugador import Jugador
+from app.shared.infrastructure.modelos.plantilla import Plantilla
+from app.shared.infrastructure.modelos.torneo import Torneo
+from app.shared.infrastructure.modelos.usuario import Usuario
 
 SECRETO = 'secreto-de-prueba'
 SENSIBLES = {'documento_identificacion', 'fecha_nacimiento', 'correo', 'telefono', 'url_cedula', 'url_acta_bachiller'}

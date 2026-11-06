@@ -1,7 +1,7 @@
 import io
 import unittest
 
-from app.utils.storage import (
+from app.shared.infrastructure.almacenamiento import (
     MAX_LOGO_EQUIPO,
     MAX_BANNER_EQUIPO,
     TIPOS_IMAGEN,

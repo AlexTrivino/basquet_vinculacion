@@ -10,13 +10,13 @@ from dotenv import load_dotenv
 from flask import Flask
 from flask_cors import CORS
 
-from app.shared.infrastructure.db import db, migrate  # noqa: F401  (`from app import db` sigue funcionando)
-
 load_dotenv()
 
 
 def create_app() -> Flask:
     """Crea y configura la instancia de la aplicación Flask."""
+    from app.shared.infrastructure.db import db, migrate
+
     app = Flask(__name__)
 
     # ── Configuración ──────────────────────────────────────────────
@@ -46,7 +46,7 @@ def create_app() -> Flask:
         from app.shared.infrastructure import modelos  # noqa: F401  (registra las tablas para Alembic)
 
     # ── Blueprints ─────────────────────────────────────────────────
-    from app.routes.health_bp import health_bp
+    from app.shared.http.salud import health_bp
     from app.modules.torneos.http.torneos import torneo_bp
     from app.modules.torneos.http.categorias import categoria_bp
     from app.modules.estadisticas.http.lideres import lideres_bp
@@ -57,10 +57,10 @@ def create_app() -> Flask:
     from app.modules.competencia.http.partidos import partido_bp
     from app.modules.estadisticas.http.estadisticas import stats_bp
     from app.modules.estadisticas.http.reportes import reportes_bp
-    from app.routes.usuario_bp import usuario_bp
+    from app.modules.identidad.http.usuarios import usuario_bp
     from app.modules.competencia.http.sanciones import sancion_bp
     from app.modules.competencia.http.fase_final import competencia_bp
-    from app.routes.config_bp import config_bp
+    from app.shared.http.reglas import config_bp
     from app.modules.auspicios.http.rutas import patrocinador_bp
     from app.modules.plantel.http.visor import visor_bp
     

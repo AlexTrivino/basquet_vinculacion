@@ -4,9 +4,10 @@ from datetime import date
 import os
 from unittest.mock import patch
 from marshmallow import ValidationError
-from app import create_app, db
-from app.models.torneo import Torneo
-from app.models.categoria import Categoria
+from app import create_app
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.torneo import Torneo
+from app.shared.infrastructure.modelos.categoria import Categoria
 from app.modules.torneos.application import casos_de_uso as torneos
 from app.modules.torneos.http.esquemas import TorneoUpdateSchema
 from app.modules.torneos.infrastructure.repositorio import RepositorioTorneos
@@ -96,7 +97,7 @@ class TestFase4TorneosBusiness(unittest.TestCase):
         self.assertIsNone(cat_deleted)
 
     def test_validar_archivo_magic_bytes(self):
-        from app.utils.storage import validar_archivo, TIPOS_DOCUMENTO, MAX_CALENDARIO_TORNEO
+        from app.shared.infrastructure.almacenamiento import validar_archivo, TIPOS_DOCUMENTO, MAX_CALENDARIO_TORNEO
         import io
 
         fake_xlsx = b'PK\x03\x04\x00\x00\x00\x00\x00\x00FakeExcelContent'

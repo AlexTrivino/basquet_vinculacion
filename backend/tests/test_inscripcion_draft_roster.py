@@ -2,17 +2,18 @@ import unittest
 import uuid
 from datetime import date
 from marshmallow import ValidationError
-from app import create_app, db
+from app import create_app
+from app.shared.infrastructure.db import db
 from app.modules.inscripciones.application import plantillas
 from app.modules.inscripciones.http.esquemas import InscripcionEstadoSchema
 from app.modules.inscripciones.infrastructure.repositorio import RepositorioInscripciones, RepositorioPlantillas
-from app.models.usuario import Usuario
-from app.models.inscripcion import Inscripcion
-from app.models.equipo import Equipo
-from app.models.torneo import Torneo
-from app.models.categoria import Categoria
-from app.models.jugador import Jugador
-from app.models.plantilla import Plantilla
+from app.shared.infrastructure.modelos.usuario import Usuario
+from app.shared.infrastructure.modelos.inscripcion import Inscripcion
+from app.shared.infrastructure.modelos.equipo import Equipo
+from app.shared.infrastructure.modelos.torneo import Torneo
+from app.shared.infrastructure.modelos.categoria import Categoria
+from app.shared.infrastructure.modelos.jugador import Jugador
+from app.shared.infrastructure.modelos.plantilla import Plantilla
 from app.shared.infrastructure.unidad_de_trabajo import UnidadDeTrabajo
 
 class TestInscripcionDraftAndRoster(unittest.TestCase):

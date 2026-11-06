@@ -12537,6 +12537,21 @@
    "success": true
   }
  },
+ "GET /api/usuarios/me · admin": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "correo": "admin@manta.test",
+    "created_at": "2026-10-01T12:01:00",
+    "estado": "activo",
+    "id_usuario": "u-admin",
+    "nombre": "Admin Manta",
+    "rol": "super_admin",
+    "updated_at": "2026-10-01T12:01:00"
+   },
+   "success": true
+  }
+ },
  "GET /api/usuarios/me · anónimo · sin token": {
   "codigo": 401,
   "cuerpo": {
@@ -18878,6 +18893,46 @@
    },
    "message": "Perfil actualizado exitosamente.",
    "success": true
+  }
+ },
+ "PUT /api/usuarios/me · del1 · con rol": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "correo": "del1@manta.test",
+    "created_at": "2026-10-01T12:02:00",
+    "estado": "activo",
+    "id_usuario": "u-del-1",
+    "nombre": "Delegado de San José",
+    "rol": "delegado",
+    "updated_at": "<hoy>"
+   },
+   "message": "Perfil actualizado exitosamente.",
+   "success": true
+  }
+ },
+ "PUT /api/usuarios/me · del1 · nombre vacío": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "correo": "del1@manta.test",
+    "created_at": "2026-10-01T12:02:00",
+    "estado": "activo",
+    "id_usuario": "u-del-1",
+    "nombre": "",
+    "rol": "delegado",
+    "updated_at": "<hoy>"
+   },
+   "message": "Perfil actualizado exitosamente.",
+   "success": true
+  }
+ },
+ "PUT /api/usuarios/me · del1 · sin cuerpo": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "El campo nombre es requerido.",
+   "success": false
   }
  },
  "PUT /api/usuarios/me · del1 · sin nombre": {

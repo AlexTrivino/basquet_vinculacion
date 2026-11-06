@@ -2,8 +2,10 @@ import os
 import unittest
 from datetime import date, time
 
-from app import create_app, db
-from app.models import Partido
+from app import create_app
+
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos import Partido
 
 
 class TestEstadisticasPublicas(unittest.TestCase):

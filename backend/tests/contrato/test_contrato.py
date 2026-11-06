@@ -21,7 +21,9 @@ import jwt
 import pytest
 from sqlalchemy import text
 
-from app import create_app, db
+from app import create_app
+
+from app.shared.infrastructure.db import db
 from tests.contrato.casos import CASOS, ROLES
 from tests.contrato.datos import sembrar
 

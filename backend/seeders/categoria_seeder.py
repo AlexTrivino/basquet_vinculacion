@@ -15,8 +15,10 @@ import sys
 # Agregar el directorio raíz al path para importar la app
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app import create_app, db
-from app.models.categoria import Categoria
+from app import create_app
+
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.categoria import Categoria
 
 # ── Definición de categorías del torneo ──────────────────────────
 #

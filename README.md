@@ -59,17 +59,15 @@ basquet_vinculacion/
 │   │   │   │       ├── partido.py    # Encuentros con marcadores y fases
 │   │   │   │       ├── estadistica.py # Stats individuales por partido (puntos, faltas, etc.)
 │   │   │   │       └── sancion.py    # Tarjetas y suspensiones disciplinarias
-│   │   │   └── http/                 # Respuestas API, paginador, autenticación JWT y errores a HTTP
+│   │   │   └── http/                 # Respuestas API, paginador, autenticación JWT, errores a HTTP, /api/health y /api/config
 │   │   ├── modules/                  # Módulos migrados, cada uno con domain/, application/, infrastructure/ y http/
 │   │   │   ├── auspicios/            # Patrocinadores (/api/patrocinadores): el molde de los demás
 │   │   │   ├── competencia/          # Partidos, sanciones, tabla de posiciones FIBA y fase final (llaves y recorrido)
 │   │   │   ├── estadisticas/         # Carga por partido, líderes, flyers, tablero y planilla oficial en PDF
+│   │   │   ├── identidad/            # Perfil del usuario autenticado (/api/usuarios/me)
 │   │   │   ├── inscripciones/        # Inscripciones (borrador, revisión, retiro) y plantillas de 5 a 18 jugadores
 │   │   │   ├── plantel/              # Equipos, jugadores y buscador del visor: quién ve los datos personales y quién gestiona
 │   │   │   └── torneos/              # Torneos y categorías: estados, fechas y calendario
-│   │   ├── models/                   # Ruta vieja: reexporta shared/infrastructure/modelos
-│   │   ├── routes/                   # Blueprints que faltan migrar (salud, configuración y usuarios)
-│   │   └── utils/                    # Ruta vieja: reexporta shared/ (reglas, texto, storage, response, pagination, auth y errores)
 │   ├── tests/                        # Suite de pruebas unitarias y de integración (pytest)
 │   ├── seed_database.py              # Script interactivo para poblar base de datos mock
 │   ├── requirements.txt              # Dependencias fijadas
@@ -240,8 +238,9 @@ Ejemplo de script para inyectar información (como crear nuevas categorías sin 
 
 ```python
 # add_categorias.py (Ejecutado directamente en el servidor)
-from app import create_app, db
-from app.models.categoria import Categoria
+from app import create_app
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.categoria import Categoria
 
 app = create_app()
 

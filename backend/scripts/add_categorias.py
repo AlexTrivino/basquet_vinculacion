@@ -1,5 +1,6 @@
-from app import create_app, db
-from app.models.categoria import Categoria
+from app import create_app
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos.categoria import Categoria
 
 # Inicializa la app de Flask para tener contexto de la base de datos
 app = create_app()

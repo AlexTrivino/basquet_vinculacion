@@ -6,8 +6,10 @@ from datetime import date, time as hora
 
 import jwt
 
-from app import create_app, db
-from app.models import Categoria, Equipo, Estadistica, Jugador, Partido, Plantilla, Torneo, Usuario
+from app import create_app
+
+from app.shared.infrastructure.db import db
+from app.shared.infrastructure.modelos import Categoria, Equipo, Estadistica, Jugador, Partido, Plantilla, Torneo, Usuario
 
 SECRETO = 'secreto-de-prueba'
 

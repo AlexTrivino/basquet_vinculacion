@@ -1,7 +1,8 @@
 from datetime import date
 import unittest
 from marshmallow import ValidationError
-from app import create_app, db
+from app import create_app
+from app.shared.infrastructure.db import db
 from app.modules.plantel.domain.jugador import Jugador, PlantillaDeJugador
 from app.modules.plantel.http.esquemas import JugadorUpdateSchema, JugadorAdminSchema
 from app.modules.plantel.infrastructure.repositorio import RepositorioJugadores

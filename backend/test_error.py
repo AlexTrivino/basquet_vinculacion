@@ -1,5 +1,6 @@
 import os
-from app import create_app, db
+from app import create_app
+from app.shared.infrastructure.db import db
 from datetime import date
 
 from app.modules.inscripciones.application.plantillas import agregar_jugador

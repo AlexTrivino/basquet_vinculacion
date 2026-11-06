@@ -99,8 +99,8 @@ Respuesta esperada:
 ```json
 {
   "success": true,
-  "message": "El servidor está funcionando correctamente.",
-  "data": { "database": "connected" }
+  "message": "API operativa.",
+  "database": "conectada"
 }
 ```
 
@@ -120,10 +120,7 @@ backend/
 └── app/
     ├── __init__.py            # Fábrica Flask (create_app)
     ├── shared/                # Lo común: errores de dominio, los 14 modelos, db, storage y utilidades HTTP
-    ├── modules/               # Módulos con domain/, application/, infrastructure/ y http/
-    ├── models/                # Ruta vieja: reexporta shared/infrastructure/modelos
-    ├── routes/                # Blueprints que faltan migrar (salud, configuración y usuarios)
-    └── utils/                 # Middleware, helpers, storage
+    └── modules/               # Módulos con domain/, application/, infrastructure/ y http/
 ```
 
 Para detalles de la arquitectura, consultar [`docs/arquitectura.md`](docs/arquitectura.md).
@@ -153,11 +150,13 @@ Para la referencia completa de endpoints, consultar [`docs/api_referencia.md`](d
 
 | Módulo | Archivo | Responsabilidad |
 |--------|---------|-----------------|
-| Auth Middleware | `utils/auth_middleware.py` | JWKS + HS256 fallback + RBAC |
-| Respuestas | `utils/response.py` | `api_response()` / `api_error()` |
-| Paginación | `utils/pagination.py` | `paginate_query()` obligatorio |
-| Storage | `utils/storage.py` | Magic bytes + boto3 → Supabase S3 |
-| Error Handlers | `utils/error_handlers.py` | 400, 401, 404, 405, 500 globales |
+| Auth Middleware | `shared/http/autenticacion.py` | JWKS + HS256 fallback + RBAC |
+| Respuestas | `shared/http/respuestas.py` | `api_response()` / `api_error()` |
+| Paginación | `shared/http/paginacion.py` | `paginate_query()` obligatorio |
+| Storage | `shared/infrastructure/almacenamiento.py` | Magic bytes + boto3 → Supabase S3 |
+| Error Handlers | `shared/http/errores.py` | 400, 401, 404, 405, 500 globales |
+| Salud y reglas | `shared/http/salud.py`, `shared/http/reglas.py` | `/api/health` y `/api/config/reglas-negocio` |
+| Perfil propio | `modules/identidad/http/usuarios.py` | `/api/usuarios/me` |
 | Motor FIBA | `modules/competencia/domain/posiciones.py` | Tabla de posiciones y desempate FIBA, en Python puro |
 
 ---
