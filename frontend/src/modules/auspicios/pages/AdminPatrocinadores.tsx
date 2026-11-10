@@ -97,8 +97,9 @@ export default function AdminPatrocinadores() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
-      if (selectedFile.size > 10 * 1024 * 1024) {
-        toast.error('El archivo excede los 10MB');
+      // El servidor rechaza cualquier pedido de más de 5 MB (MAX_CONTENT_LENGTH)
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        toast.error('El archivo excede los 5 MB');
         if (fileInputRef.current) fileInputRef.current.value = '';
         return;
       }
@@ -242,7 +243,10 @@ export default function AdminPatrocinadores() {
                       onChange={handleFileChange}
                       className="block w-full text-sm text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-celeste/10 file:text-celeste hover:file:bg-celeste/15 cursor-pointer transition-colors"
                     />
-                    <p className="mt-2 text-xs text-slate-400">Formato JPG, PNG o WebP. Tamaño máximo 10MB.</p>
+                    <p className="mt-2 text-xs text-slate-400">
+                      Formato JPG, PNG o WebP. Tamaño máximo 5 MB. En la portada el logo se muestra en blanco: súbelo con
+                      fondo blanco o transparente.
+                    </p>
                   </div>
                 </div>
               </div>

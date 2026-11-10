@@ -55,7 +55,7 @@ export default function Home() {
               Empresas y marcas que respaldan el baloncesto de Manta y hacen posible cada temporada.
             </p>
           </div>
-          <SponsorsCarousel className="rounded-2xl bg-white py-6 shadow-2xl shadow-black/30" />
+          <SponsorsCarousel />
         </div>
       </section>
 

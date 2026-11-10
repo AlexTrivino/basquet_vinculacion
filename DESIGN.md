@@ -214,9 +214,9 @@ Una noche marino con dos metales: el oro distingue y el celeste actúa.
 
 ### Neutros
 - **Marino Noche** (#081226, `marino`): el fondo de toda la página, incluido el `html`, para que el rebote del scroll no muestre otro color. También la barra de navegación en las rutas de este mundo, el fondo de los selectores de los perfiles, el relleno del rombo VS y el texto sobre celeste y sobre oro.
-- **Marino Cartel** (#0E1D3D, `marino-claro`): la superficie elevada. Sólida en el panel CTA, en el boleto y en el núcleo del cromo; al 70 % en el cartel de partido, al 80 % en los paneles de lista del perfil de equipo y al 90 % en la tarjeta de torneo sobre la foto.
+- **Marino Cartel** (#0E1D3D, `marino-claro`): la superficie elevada. Sólida en el panel CTA, en el boleto, en el núcleo del cromo y en las fichas de auspiciantes; al 70 % en el cartel de partido, al 80 % en los paneles de lista del perfil de equipo y al 90 % en la tarjeta de torneo sobre la foto.
 - **Carbón** (#16181D, `carbon`): solo el pie de página. Es un valor literal en `Footer.tsx`, sin token en `@theme`: un gris frío que cierra la noche y separa el pie del contenido.
-- **Blanco** (#FFFFFF, `white`): el soporte de marcas ajenas (medallones de escudos, banda de auspiciantes) y el hover de las acciones celestes. Como tinta, el texto de los botones secundarios y los títulos de columna del pie. Sus veladuras hacen el resto: 4 % para la bandeja del cromo, 5 % para chips y paneles de estado, 10 % para bordes finos, divisores, pistas, hovers y esqueletos, 15 % para el contorno de selectores y botones de página, 20 a 30 % para el contorno del botón de pausa y los puntos inactivos, y 25 % para el contorno de los botones secundarios.
+- **Blanco** (#FFFFFF, `white`): el soporte de los escudos de equipo (medallones) y el hover de las acciones celestes. Como tinta, el texto de los botones secundarios, los títulos de columna del pie y los logos de auspiciantes. Sus veladuras hacen el resto: 4 % para la bandeja del cromo, 5 % para chips y paneles de estado, 10 % para bordes finos, divisores, pistas, hovers y esqueletos, 15 % para el contorno de selectores y botones de página, 20 a 30 % para el contorno del botón de pausa y los puntos inactivos, y 25 % para el contorno de los botones secundarios.
 - **Pizarra Clara** (oklch(92.9% 0.013 255.508), `slate-200`): texto de chips e ícono de pausa; final del degradado de los medallones.
 - **Pizarra Texto** (oklch(86.9% 0.022 252.894), `slate-300`): párrafos sobre marino, enlaces de navegación en reposo y texto base del pie.
 - **Pizarra Tenue** (oklch(70.4% 0.04 256.788), `slate-400`): texto secundario. El segundo párrafo, la línea de metadatos del cartel, el subtítulo de sección, los avisos y la línea legal del pie.
@@ -240,7 +240,7 @@ El administrador (`/admin/*`), el resto del área de delegado, el perfil (`/perf
 - **Acción:** la acción principal de cada pantalla («Nuevo torneo», «Agregar jugador», «Guardar») es el botón primario celeste con texto marino, y pasa a blanco al pasar el cursor. La selección actual (pestaña o fila elegida) también puede ir en celeste.
 - **Estados:** cada tono va en veladura: fondo del tono al 15 o 20 % y tinta del mismo tono en 100 a 300, nunca un relleno sólido. Verde para lo aprobado, ámbar y amarillo para lo pendiente, rojo o rosa para lo rechazado y lo destructivo, azul para lo programado.
 - **Íconos de cabecera:** en oro, sobre una caja con oro al 10 % y borde oro al 30 %, como los íconos de apoyo del home.
-- **Marcas ajenas:** los escudos de equipo van en el medallón blanco (`Escudo`) y los logos de auspiciantes sobre blanco.
+- **Marcas ajenas:** los escudos de equipo van en el medallón blanco (`Escudo`); los logos de auspiciantes, en blanco sobre sus fichas marino claro (ver Banda de auspiciantes).
 
 ## Typography
 
@@ -286,8 +286,7 @@ El sistema es híbrido: capas tonales, sombras negras suaves y atmósfera. La su
 
 ### Vocabulario de sombras
 - **Panel** (`box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3)`): el cartel de partido, el panel CTA, el boleto y los paneles de lista del perfil de equipo.
-- **Banda** (`box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.3)`): la banda blanca de auspiciantes.
-- **Medallón** (`box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4)`): los medallones de escudo, con un anillo oro al 40 % de 2 px, y el botón flotante.
+- **Medallón** (`box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4)`): los medallones de escudo, con un anillo oro al 40 % de 2 px, las fichas de auspiciantes y el botón flotante.
 - **Escudo** (`box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4)`): el medallón compacto de las listas de partidos, del boleto y del perfil de equipo, con el mismo anillo oro.
 - **Cromo** (`box-shadow: 0 24px 48px -24px rgb(0 0 0 / 0.7)`; al pasar el cursor, `0 32px 56px -24px rgb(0 0 0 / 0.85)`): la sombra recogida bajo cada cromo. El spread negativo de 24 px la concentra bajo la base; por eso admite más opacidad.
 - **Sombra del balón**: una elipse negra al 70 %, desenfocada 12 px, bajo el balón 3D. Se estrecha a la mitad y se aclara (de 0.55 a 0.15) cuando el balón sube.
@@ -299,7 +298,7 @@ El sistema es híbrido: capas tonales, sombras negras suaves y atmósfera. La su
 
 ## Shapes
 
-El lenguaje de formas mezcla dos familias. Contenedores y controles tienen esquinas suaves y escalonadas: 0.25rem en las cintas, 0.375rem en los chips, 0.5rem en botones y selectores, 0.75rem en carteles, boletos y paneles (incluidos los de estado) y 1rem en la banda de auspiciantes y en la bandeja del cromo, cuyo núcleo baja a 0.625rem para que las dos curvas sean concéntricas. Medallones, píldoras, puntos del carrusel, botón de pausa, botones del escudo, anillos de íconos del pie y botón flotante son círculos. Las piezas de cartel son geométricas y afiladas:
+El lenguaje de formas mezcla dos familias. Contenedores y controles tienen esquinas suaves y escalonadas: 0.25rem en las cintas, 0.375rem en los chips, 0.5rem en botones y selectores, 0.75rem en carteles, boletos, paneles (incluidos los de estado) y fichas de auspiciantes, y 1rem en la bandeja del cromo, cuyo núcleo baja a 0.625rem para que las dos curvas sean concéntricas. Medallones, píldoras, puntos del carrusel, botón de pausa, botones del escudo, anillos de íconos del pie y botón flotante son círculos. Las piezas de cartel son geométricas y afiladas:
 
 - **Paralelogramo:** la tarjeta de torneo se recorta con `clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%)`. Su filete oro (al 55 %) es un contenedor con el mismo recorte y 1 px de relleno, porque un borde no sigue al `clip-path`.
 - **Rombo VS:** un cuadrado de 56 px (64 px desde 640 px) girado 45°, con borde oro al 70 %, relleno marino y el texto contragirado. En el boleto va compacto: 44 px (48 px desde 640 px).
@@ -387,7 +386,7 @@ Un jugador sin foto, o cuya foto no carga, muestra `jugador-silueta.svg`: un bus
 Figura es la mejor valoración: puntos + rebotes + asistencias + tapones.
 
 ### Banda de auspiciantes
-Desde 1024 px, el texto ocupa el 30 % y la banda el 70 %. La banda es un panel blanco con radio de 1rem, sombra de banda y 24 px de relleno vertical. Lleva una marquesina infinita de logos de 144 × 80 px, ajustados sin recorte y con 32 px a cada lado. Una máscara la desvanece en los bordes: transparente, negro del 8 % al 92 % y otra vez transparente. Recorre la lista en 45 s y se detiene al pasar el cursor. Solo la primera vuelta se anuncia a los lectores de pantalla. Sin auspiciantes, muestra un aviso breve en `slate-400`.
+Desde 1024 px, el texto ocupa el 30 % y la banda el 70 %. La banda no lleva panel: es una marquesina infinita de fichas sobre la noche, con 16 px arriba y abajo para que no se corte su sombra. Cada ficha mide 176 × 96 px, en marino claro, con filete oro al 30 %, radio de 0.75rem, sombra de medallón y 40 px entre una y otra. El logo va dentro, ajustado sin recorte en 134 × 70 px y pasado a blanco: en escala de grises, invertido y fundido con `mix-blend-mode: screen`, así su fondo blanco o transparente toma el marino de la ficha y solo resalta el logo. Un logo con fondo oscuro se vería como un recuadro claro; por eso el formulario del admin pide fondo blanco o transparente. Una máscara desvanece la banda en los bordes: transparente, negro del 8 % al 92 % y otra vez transparente. Recorre la lista en 45 s y se detiene al pasar el cursor. Solo la primera vuelta se anuncia a los lectores de pantalla. Sin auspiciantes, muestra un aviso breve en `slate-400`.
 
 ### Panel CTA
 Es el mismo cartel que el del partido, en sólido: marino claro, borde oro al 30 %, radio de 0.75rem, esquinas en L, sombra de panel y relleno de 40 px (56 px desde 640 px). El titular y el cuerpo van a la izquierda. A la derecha, el botón primario y el secundario van apilados a ancho completo, con la invitación a registrarse debajo en `slate-400` y el enlace en celeste.
@@ -460,7 +459,7 @@ Con `prefers-reduced-motion: reduce` se apagan el parallax, el zoom del hero y d
 - **Haz** del celeste (#29A9E1) la única tinta de acción, progreso y foco, con texto marino encima.
 - **Haz** los titulares en Cinzel 700 crema (#F1E7D0) y en caja normal; párrafos, botones y navegación, en Inter.
 - **Haz** que cada cinta dorada lleve un dato real (fecha o estado) y que marcadores, horas y fechas usen cifras tabulares.
-- **Haz** que los escudos y logos ajenos se apoyen en blanco: medallón circular con anillo oro para los escudos, banda blanca para los auspiciantes.
+- **Haz** que los escudos de equipo se apoyen en blanco, en el medallón circular con anillo oro, y que los logos de auspiciantes vayan en blanco sobre sus fichas marino claro.
 - **Haz** los estados completos sobre la noche: esqueletos y paneles de estado en veladura blanca del 5 al 10 % (o, en el perfil de equipo, el panel de lista), el error con «Reintentar» en botón secundario y el vacío con un aviso en `slate-300` o, dentro de un panel, un título crema con su línea en `slate-400`.
 - **Haz** que toda superficie nueva de este mundo tematice la selección, el cursor de texto, la barra de desplazamiento y el foco con la paleta.
 - **Haz** que cada animación nueva se apague con `prefers-reduced-motion` y que ninguna entrada esconda contenido si no llega a correr.
