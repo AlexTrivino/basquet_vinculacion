@@ -16,6 +16,7 @@ from app.shared.infrastructure.db import db
 from app.shared.infrastructure.modelos.categoria import Categoria as FilaCategoria
 from app.shared.infrastructure.modelos.equipo import Equipo
 from app.shared.infrastructure.modelos.estadistica import Estadistica
+from app.shared.infrastructure.modelos.foto_podio import FotoPodio
 from app.shared.infrastructure.modelos.inscripcion import Inscripcion
 from app.shared.infrastructure.modelos.partido import Partido as FilaPartido
 from app.shared.infrastructure.modelos.plantilla import Plantilla
@@ -63,6 +64,11 @@ def _fase_de_grupos(id_torneo, id_categoria):
     if id_categoria is not None:
         query = query.filter(FilaPartido.id_categoria == id_categoria)
     return query
+
+
+def _torneo(fila):
+    return {'id_torneo': fila.id_torneo, 'nombre': fila.nombre, 'estado': fila.estado,
+            'fecha_inicio': fila.fecha_inicio.isoformat(), 'fecha_fin': fila.fecha_fin.isoformat()}
 
 
 class RepositorioPartidos:
@@ -201,9 +207,12 @@ class RepositorioPartidos:
     def torneos_recientes(self):
         """Los torneos vigentes (la regla es del módulo de torneos), del que termina último al primero."""
         filas = Torneo.query.order_by(desc(Torneo.fecha_fin), desc(Torneo.id_torneo)).all()
-        return [{'id_torneo': t.id_torneo, 'nombre': t.nombre, 'estado': t.estado,
-                 'fecha_inicio': t.fecha_inicio.isoformat(), 'fecha_fin': t.fecha_fin.isoformat()}
-                for t in filas if torneos.vigente(t.estado)]
+        return [_torneo(t) for t in filas if torneos.vigente(t.estado)]
+
+    def torneo(self, id_torneo):
+        """El torneo como en ``torneos_recientes``, o None si no existe o no está vigente."""
+        fila = db.session.get(Torneo, id_torneo)
+        return _torneo(fila) if fila and torneos.vigente(fila.estado) else None
 
     def categorias_del_torneo(self, id_torneo):
         """(Categoria, nombre, género) de cada categoría del torneo, en el orden en que se crearon."""
@@ -221,6 +230,48 @@ class RepositorioPartidos:
 
     def guardar_formato(self, id_categoria, formato):
         db.session.get(FilaCategoria, id_categoria).formato = formato
+
+    # ── Fotos del podio (fase 14) ─────────────────────────────────────
+
+    def fotos_podio(self, id_categoria):
+        """{id_equipo: foto como dict} de las fotos de la categoría."""
+        return {f.id_equipo: f.to_dict() for f in FotoPodio.query.filter_by(id_categoria=id_categoria).all()}
+
+    def foto_podio(self, id_categoria, id_equipo):
+        fila = FotoPodio.query.filter_by(id_categoria=id_categoria, id_equipo=id_equipo).first()
+        return fila.to_dict() if fila else None
+
+    def fotos_de_equipos(self, ids):
+        """{id_equipo: url_foto_equipo} de los equipos que tienen la foto que subió su delegado."""
+        filas = db.session.execute(
+            db.select(Equipo.id_equipo, Equipo.url_foto_equipo).where(Equipo.id_equipo.in_(ids), Equipo.url_foto_equipo.isnot(None))
+        ).all()
+        return {f.id_equipo: f.url_foto_equipo for f in filas}
+
+    def guardar_foto_podio(self, id_categoria, id_equipo, url, ancho, alto):
+        """Crea la foto del equipo en la categoría o reemplaza la que tenía (con el encuadre vuelto a 50 / 50 / 1).
+        Devuelve la URL de la foto anterior, o None si no había."""
+        fila = FotoPodio.query.filter_by(id_categoria=id_categoria, id_equipo=id_equipo).first()
+        anterior = fila.url_foto if fila else None
+        if fila is None:
+            fila = FotoPodio(id_categoria=id_categoria, id_equipo=id_equipo)
+            db.session.add(fila)
+        fila.url_foto, fila.ancho, fila.alto = url, ancho, alto
+        fila.foco_x, fila.foco_y, fila.zoom = 50, 50, 1
+        return anterior
+
+    def ajustar_foto_podio(self, id_categoria, id_equipo, foco_x, foco_y, zoom):
+        fila = FotoPodio.query.filter_by(id_categoria=id_categoria, id_equipo=id_equipo).one()
+        fila.foco_x, fila.foco_y, fila.zoom = foco_x, foco_y, zoom
+
+    def borrar_foto_podio(self, id_categoria, id_equipo):
+        """Borra la fila y devuelve la URL de su archivo, o None si no había foto."""
+        fila = FotoPodio.query.filter_by(id_categoria=id_categoria, id_equipo=id_equipo).first()
+        if fila is None:
+            return None
+        url = fila.url_foto
+        db.session.delete(fila)
+        return url
 
 
 def _sancion(fila):

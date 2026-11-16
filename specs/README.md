@@ -24,3 +24,5 @@ Los cambios de arquitectura se hacen con Spec-Driven Development: primero la esp
 | 10 · Frontend: módulos y cierre | [10-modulos-frontend](10-modulos-frontend/spec.md) | terminada |
 | 11 · Seguridad: OWASP Top 10:2025 | [11-seguridad-owasp](11-seguridad-owasp/spec.md) | terminada |
 | 12 · Portada: figuras del torneo | [12-figuras-portada](12-figuras-portada/spec.md) | terminada |
+| 13 · Portada: el podio del torneo | [13-podio-portada](13-podio-portada/spec.md) | terminada |
+| 14 · La foto del ganador en el flyer del podio | [14-foto-podio-flyer](14-foto-podio-flyer/spec.md) | terminada |

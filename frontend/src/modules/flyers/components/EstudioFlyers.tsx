@@ -4,24 +4,28 @@ import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ChevronDown, Copy } from 'lucide-react';
 import { toast } from 'sonner';
-import { getPartidosByTorneo, clavesPartidos } from '@/modules/partidos';
+import { getPartidosByTorneo, getPodiosDelTorneo, clavesPartidos, type PodioDeCategoria, type PodiosDelTorneo } from '@/modules/partidos';
 import { getTorneosAdmin } from '@/shared/api/catalogo';
-import { getDatosFlyers, type DatosFlyers, type FiguraFlyer } from '../api/flyers.api';
+import { clavePodios, getDatosFlyers, type DatosFlyers, type FiguraFlyer } from '../api/flyers.api';
 import {
-  DESEMPATE, diaSemana, ESTADISTICAS, fechaCartel, filaDePartido, textoFigura, textoFiguras, textoLideres, textoPartidos, topJugadores,
-  VALORACION,
+  DESEMPATE, diaSemana, ESTADISTICAS, etiquetaCategoria, fechaCartel, filaDePartido, textoFigura, textoFiguras, textoLideres, textoPartidos,
+  topJugadores, VALORACION,
 } from '../textos';
+import { LUGARES, textoPodio } from '../textosPodio';
+import { AccionesFotoPodio, type Borrador } from './AccionesFotoPodio';
 import { FichaFigura, FichaLider, FORMATOS, HeroeFigura, ListaFiguras, type Formato } from './Flyer';
-import { archivo, Laminas, paginasDeLaFecha, trocear, type Pagina } from './Laminas';
+import { FlyerPodio } from './FlyerPodio';
+import { archivo, Laminas, paginasDeLaFecha, trocear, type Pagina, type PaginaMarco } from './Laminas';
 import type { Partido } from '@/shared/api/tipos';
 
-type Tipo = 'partidos' | 'lideres' | 'figura-fecha' | 'categoria' | 'equipo';
+type Tipo = 'partidos' | 'lideres' | 'figura-fecha' | 'categoria' | 'equipo' | 'podio';
 const TIPOS: { valor: Tipo; texto: string }[] = [
   { valor: 'partidos', texto: 'Partidos de la fecha' },
   { valor: 'lideres', texto: 'Líderes' },
   { valor: 'figura-fecha', texto: 'Figura de la fecha' },
   { valor: 'categoria', texto: 'Figuras por categoría' },
   { valor: 'equipo', texto: 'Figura por equipo' },
+  { valor: 'podio', texto: 'Podio del torneo' },
 ];
 type Alcance = 'fecha' | 'torneo';
 const ALCANCES: { valor: Alcance; texto: string }[] = [
@@ -86,7 +90,7 @@ function armarFiguras(datos: DatosFlyers, tipo: Tipo, formato: Formato, categori
   const fecha = datos.fecha;
   if (!fecha) return NADA;
   const acumulado = ['Acumulado', fechaCartel(fecha)] as const;
-  const unaFigura = (f: FiguraFlyer, titulo: Pagina['titulo'], dato: Pagina['dato'], encabezado: string, nombre?: string | null): Armado => ({
+  const unaFigura = (f: FiguraFlyer, titulo: PaginaMarco['titulo'], dato: PaginaMarco['dato'], encabezado: string, nombre?: string | null): Armado => ({
     paginas: [{
       titulo, dato, cifra: ['Valoración', f.valoracion], formula: VALORACION,
       heroe: <HeroeFigura figura={f} formato={formato} />,
@@ -121,6 +125,34 @@ function armarFiguras(datos: DatosFlyers, tipo: Tipo, formato: Formato, categori
   }
   const f = datos.figuras_equipo.find((x) => `${x.equipo?.id_equipo}-${x.id_categoria}` === equipo);
   return f ? unaFigura(f, ['Figura', 'del', 'Equipo'], acumulado, `Figura de ${f.equipo?.nombre_equipo} en ${f.categoria}`, f.equipo?.nombre_equipo) : NADA;
+}
+
+// Podio de una categoría: un flyer por puesto (campeón, vicecampeón y tercer lugar), cada uno con los controles de su foto
+function armarPodio(
+  datos: PodiosDelTorneo | undefined, podio: PodioDeCategoria | undefined, formato: Formato, idTorneo: number,
+  borrador: Borrador | null, alBorrador: (b: Borrador | null) => void
+): Armado {
+  if (!datos || !podio) return NADA;
+  const { id_categoria: idCategoria, nombre_categoria: categoria } = podio.categoria;
+  const paginas: Pagina[] = [...podio.puestos]
+    .sort((a, b) => a.lugar - b.lugar)
+    .map((puesto) => ({
+      suelta: true,
+      archivo: archivo('podio', LUGARES[puesto.lugar], categoria),
+      etiqueta: `Descargar ${LUGARES[puesto.lugar].toLowerCase()}`,
+      lienzo: (ref) => (
+        <FlyerPodio
+          ref={ref}
+          formato={formato}
+          torneo={datos.torneo}
+          categoria={podio.categoria}
+          puesto={puesto}
+          encuadre={borrador?.id_categoria === idCategoria && borrador.id_equipo === puesto.equipo.id_equipo ? borrador.encuadre : undefined}
+        />
+      ),
+      acciones: <AccionesFotoPodio idTorneo={idTorneo} idCategoria={idCategoria} puesto={puesto} formato={formato} borrador={borrador} alBorrador={alBorrador} />,
+    }));
+  return { paginas, texto: textoPodio(datos.torneo.nombre, podio) };
 }
 
 const etiqueta = 'mb-1.5 block text-xs font-semibold uppercase tracking-[0.12em] text-slate-400';
@@ -174,15 +206,19 @@ export function EstudioFlyers() {
   const { data: torneosRes } = useQuery({ queryKey: ['torneos_admin'], queryFn: () => getTorneosAdmin(1, 100) });
   const torneos = torneosRes?.data ?? [];
   const [elegido, setElegido] = useState(0);
-  const actual = torneos.find((t) => t.estado === 'en_curso') ?? torneos.find((t) => t.estado === 'programado');
-  const idTorneo = elegido || (actual?.id_torneo ?? actual?.id ?? 0);
-
   const [tipo, setTipo] = useState<Tipo>('partidos');
+  // Sin elegir: el torneo en curso o por jugarse, o el último que hay; el podio es de un torneo que ya se jugó
+  const actual = torneos.find((t) => t.estado === 'en_curso') ?? torneos.find((t) => t.estado === 'programado');
+  const sugerido = (tipo === 'podio' ? torneos.find((t) => t.estado === 'finalizado') : undefined) ?? actual ?? torneos[0];
+  const idTorneo = elegido || (sugerido?.id_torneo ?? sugerido?.id ?? 0);
+
   const [formato, setFormato] = useState<Formato>('feed');
   const [fecha, setFecha] = useState('');
   const [alcance, setAlcance] = useState<Alcance>('fecha');
   const [categoria, setCategoria] = useState('todas');
   const [equipo, setEquipo] = useState('');
+  const [categoriaPodio, setCategoriaPodio] = useState('');
+  const [borrador, setBorrador] = useState<Borrador | null>(null);
 
   const flyers = useQuery({
     queryKey: ['flyers', idTorneo, fecha],
@@ -195,7 +231,14 @@ export function EstudioFlyers() {
     queryFn: () => getPartidosByTorneo(idTorneo, 1, 1000),
     enabled: idTorneo > 0 && tipo === 'partidos',
   });
+  const podios = useQuery({
+    queryKey: clavePodios(idTorneo),
+    queryFn: () => getPodiosDelTorneo(idTorneo),
+    enabled: idTorneo > 0 && tipo === 'podio',
+  });
   const datos = flyers.data?.data;
+  const datosPodio = podios.data?.data;
+  const podioActual = datosPodio?.podios.find((p) => String(p.categoria.id_categoria) === categoriaPodio) ?? datosPodio?.podios[0];
   const partidos = (calendario.data?.data ?? []).filter((p) => p.estado !== 'anulado' && p.fecha);
 
   // Partidos de la fecha: por defecto hoy, si no la próxima fecha con partidos, si no la última
@@ -206,15 +249,18 @@ export function EstudioFlyers() {
   const equipoActual = equipo || (datos?.figuras_equipo[0] ? `${datos.figuras_equipo[0].equipo?.id_equipo}-${datos.figuras_equipo[0].id_categoria}` : '');
   const { paginas, texto } =
     tipo === 'partidos' ? (fechaPartidos ? armarPartidos(fechaPartidos, partidos, datos, formato) : NADA)
+    : tipo === 'podio' ? armarPodio(datosPodio, podioActual, formato, idTorneo, borrador, setBorrador)
     : !datos ? NADA
     : tipo === 'lideres' ? armarLideres(datos, alcance, categoria, formato)
     : armarFiguras(datos, tipo, formato, categoria, equipoActual);
 
-  const cargando = tipo === 'partidos' ? calendario.isLoading : flyers.isLoading;
-  const error = tipo === 'partidos' ? calendario.isError : flyers.isError;
-  const reintentar = () => (tipo === 'partidos' ? calendario.refetch() : flyers.refetch());
+  const consulta = tipo === 'partidos' ? calendario : tipo === 'podio' ? podios : flyers;
+  const cargando = consulta.isLoading;
+  const error = consulta.isError;
+  const reintentar = () => consulta.refetch();
   const vacio =
     tipo === 'partidos' ? (fechasPartidos.length ? 'No hay partidos en esta fecha.' : 'Este torneo todavía no tiene partidos programados.')
+    : tipo === 'podio' ? 'El podio aparece cuando se juega la final de una categoría. Elige un torneo que ya se jugó.'
     : !datos?.fecha ? 'Este torneo todavía no tiene partidos jugados.'
     : tipo === 'figura-fecha' ? 'Los partidos de esta fecha no tienen estadísticas cargadas, así que no hay figura.'
     : tipo === 'lideres' && alcance === 'fecha' ? 'Los partidos de esta fecha no tienen estadísticas cargadas.'
@@ -240,7 +286,7 @@ export function EstudioFlyers() {
 
       <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)]">
         <div className="space-y-5">
-          <Selector id="flyer-torneo" texto="Torneo" valor={String(idTorneo)} alCambiar={(v) => { setElegido(Number(v)); setFecha(''); }}>
+          <Selector id="flyer-torneo" texto="Torneo" valor={String(idTorneo)} alCambiar={(v) => { setElegido(Number(v)); setFecha(''); setCategoriaPodio(''); }}>
             {torneos.map((t) => (
               <option key={t.id_torneo ?? t.id} value={t.id_torneo ?? t.id}>
                 {t.nombre ?? t.nombre_torneo} ({t.estado.replace('_', ' ')})
@@ -272,6 +318,13 @@ export function EstudioFlyers() {
               ))}
             </Selector>
           )}
+          {tipo === 'podio' && (
+            <Selector id="flyer-podio-categoria" texto="Categoría" valor={String(podioActual?.categoria.id_categoria ?? '')} alCambiar={setCategoriaPodio} deshabilitado={!datosPodio?.podios.length}>
+              {(datosPodio?.podios ?? []).map((p) => (
+                <option key={p.categoria.id_categoria} value={p.categoria.id_categoria}>{etiquetaCategoria(p.categoria)}</option>
+              ))}
+            </Selector>
+          )}
           {tipo === 'equipo' && (
             <Selector id="flyer-equipo" texto="Equipo" valor={equipoActual} alCambiar={setEquipo} deshabilitado={!datos?.figuras_equipo.length}>
               {(datos?.figuras_equipo ?? []).map((f) => {
@@ -291,7 +344,9 @@ export function EstudioFlyers() {
               ? 'Si los partidos de la fecha ya se jugaron, el flyer sale con los marcadores; si no, con las horas.'
               : tipo === 'lideres'
                 ? 'Una lámina por estadística: puntos, triples, rebotes, asistencias, tapones y tiros libres. Cada una se publica sola.'
-                : 'Figura es la mejor valoración: puntos + rebotes + asistencias + tapones. Por categoría y por equipo se suma todo el torneo; en la fecha, cada partido.'}
+                : tipo === 'podio'
+                  ? 'Un flyer por puesto. Sube la foto de cada ganador y acomódala con «Ajustar recorte»: lo que ves es lo que se descarga. Sin foto sale el escudo.'
+                  : 'Figura es la mejor valoración: puntos + rebotes + asistencias + tapones. Por categoría y por equipo se suma todo el torneo; en la fecha, cada partido.'}
           </p>
           {texto && (
             <button

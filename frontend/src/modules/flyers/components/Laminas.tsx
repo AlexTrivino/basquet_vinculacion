@@ -7,18 +7,27 @@ import { FORMATOS, ListaPartidos, MarcoFlyer, type Formato } from './Flyer';
 import { cifra, diaSemana, fechaCartel, horaCartel, LEMA, puntosDelDia } from '../textos';
 import type { ResultadoFlyer } from '../api/flyers.api';
 
-// Una lámina del flyer: lo que lleva el marco (ver MarcoFlyer) y el nombre del PNG
-export interface Pagina {
+// Una lámina del flyer: el nombre del PNG y, o lo que lleva el marco (ver MarcoFlyer), o un lienzo propio
+// (como el del podio, que no usa ese marco). `etiqueta` cambia el texto del botón de descarga y `acciones` va debajo.
+interface PaginaBase {
+  archivo: string;
+  etiqueta?: string;
+  suelta?: boolean; // láminas que se publican solas: sin "Desliza" ni "1 de N"
+  acciones?: ReactNode;
+}
+export interface PaginaMarco extends PaginaBase {
   titulo: readonly [string, string, string];
   dato: readonly [string, string];
   cifra: readonly [string, string | number];
   gancho?: ReactNode;
   heroe?: ReactNode;
   formula?: string;
-  suelta?: boolean; // láminas que se publican solas: sin "Desliza" ni "1 de N"
   cuerpo: ReactNode;
-  archivo: string;
 }
+export interface PaginaLibre extends PaginaBase {
+  lienzo: (ref: (nodo: HTMLDivElement | null) => void) => ReactNode;
+}
+export type Pagina = PaginaMarco | PaginaLibre;
 
 // Si un escudo o una foto no se pueden leer, la imagen sale igual (con ese hueco vacío)
 const PIXEL_VACIO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
@@ -123,25 +132,29 @@ export function Laminas({ paginas, formato, torneo, anchoMaximo }: { paginas: Pa
       )}
       <ol className="flex flex-wrap gap-6">
         {paginas.map((p, i) => (
-          <li key={p.archivo} className="flex flex-col gap-3">
+          <li key={p.archivo} className="flex flex-col gap-3" style={{ width: ancho * escala + 16 }}>
             {/* Bandeja y núcleo: el flyer va encajado como una lámina */}
             <div className="rounded-[1.25rem] bg-white/[0.04] p-2 ring-1 ring-oro/30">
               <div className="overflow-hidden rounded-[0.75rem]" style={{ width: ancho * escala, height: alto * escala }}>
                 <div style={{ width: ancho, transform: `scale(${escala})`, transformOrigin: 'top left' }}>
-                  <MarcoFlyer
-                    ref={(n) => { nodos.current[i] = n; }}
-                    formato={formato}
-                    torneo={torneo}
-                    titulo={p.titulo}
-                    dato={p.dato}
-                    cifra={p.cifra}
-                    gancho={p.gancho}
-                    heroe={p.heroe}
-                    formula={p.formula}
-                    pagina={serie ? [i + 1, paginas.length] : undefined}
-                  >
-                    {p.cuerpo}
-                  </MarcoFlyer>
+                  {'lienzo' in p ? (
+                    p.lienzo((n) => { nodos.current[i] = n; })
+                  ) : (
+                    <MarcoFlyer
+                      ref={(n) => { nodos.current[i] = n; }}
+                      formato={formato}
+                      torneo={torneo}
+                      titulo={p.titulo}
+                      dato={p.dato}
+                      cifra={p.cifra}
+                      gancho={p.gancho}
+                      heroe={p.heroe}
+                      formula={p.formula}
+                      pagina={serie ? [i + 1, paginas.length] : undefined}
+                    >
+                      {p.cuerpo}
+                    </MarcoFlyer>
+                  )}
                 </div>
               </div>
             </div>
@@ -152,8 +165,9 @@ export function Laminas({ paginas, formato, torneo, anchoMaximo }: { paginas: Pa
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-celeste px-5 py-2.5 text-sm font-semibold text-marino transition-colors duration-150 hover:bg-white active:scale-[0.98] disabled:opacity-60"
             >
               <Download className="h-4 w-4" aria-hidden="true" />
-              {descargando === i ? 'Generando…' : paginas.length > 1 ? `Descargar ${i + 1} de ${paginas.length}` : 'Descargar PNG'}
+              {descargando === i ? 'Generando…' : p.etiqueta ?? (paginas.length > 1 ? `Descargar ${i + 1} de ${paginas.length}` : 'Descargar PNG')}
             </button>
+            {p.acciones}
           </li>
         ))}
       </ol>

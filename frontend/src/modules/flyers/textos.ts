@@ -28,9 +28,9 @@ export function puntosDelDia(resultados: ResultadoFlyer[]) {
 }
 
 // Caption de Steban: emoji + gancho + detalle + enlace + etiquetas de la ciudad
-const ETIQUETAS = '#BaloncestoManta #Manta #Manabí #Básquet';
-const ENLACE = 'Estadísticas completas en baloncestomanta.com';
-const cuenta = (n: number, uno: string, varios: string) => `${cifra.format(n)} ${n === 1 ? uno : varios}`;
+export const ETIQUETAS = '#BaloncestoManta #Manta #Manabí #Básquet';
+export const ENLACE = 'Estadísticas completas en baloncestomanta.com';
+export const cuenta = (n: number, uno: string, varios: string) => `${cifra.format(n)} ${n === 1 ? uno : varios}`;
 const mayuscula = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export function textoResultados(fecha: string, resultados: ResultadoFlyer[]) {

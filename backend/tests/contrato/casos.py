@@ -4,7 +4,10 @@
 ruta, una variante sin token (401 en las protegidas) y, si la ruta solo tiene casos de admin, otra
 con un delegado (403). Los ids son los de datos.py.
 """
+import io
 import re
+
+from PIL import Image
 
 from tests.contrato.datos import USUARIOS
 
@@ -17,6 +20,18 @@ JPG = b'\xff\xd8\xff\xe0' + bytes(24)
 PDF = b'%PDF-1.4\n%%EOF\n'
 XLSX = b'PK\x03\x04' + bytes(24)
 TXT = b'#!/bin/sh\necho hola\n'
+
+
+def _imagen(ancho, alto):
+    """Una imagen de verdad: la foto del podio se abre con Pillow, y un color liso pesa muy poco."""
+    salida = io.BytesIO()
+    Image.new('RGB', (ancho, alto), (30, 60, 90)).save(salida, 'JPEG')
+    return salida.getvalue()
+
+
+FOTO_PODIO = _imagen(1200, 700)
+FOTO_CHICA = _imagen(800, 500)
+FOTO_GRANDE = JPG + bytes(4 * 1024 * 1024)  # pasa de los 4 MB
 
 
 def C(metodo, ruta, rol=None, nota='', json=None, form=None, archivos=None):
@@ -111,10 +126,30 @@ BASE = [
     G('/api/torneos/1/fase-final?id_categoria=2'),
     G('/api/torneos/2/fase-final?id_categoria=3'),
     G('/api/torneos/1/fase-final', nota='sin categoría'),
-    G('/api/torneos/podios'),  # desde la fase 13: la portada
+    G('/api/torneos/podios'),  # desde la fase 13: la portada; desde la fase 14 con la foto de cada puesto
+    G('/api/torneos/3/podios'),  # desde la fase 14: el Estudio de flyers
+    G('/api/torneos/1/podios', nota='sin finales jugadas'),
+    G('/api/torneos/99/podios'),
+    G('/api/torneos/4/podios', nota='anulado'),
     G('/api/torneos/1/recorrido?id_categoria=1'),
     G('/api/torneos/1/recorrido?id_categoria=2'),
     G('/api/torneos/1/recorrido?id_categoria=3', nota='categoría de otro torneo'),
+    # ── Foto del podio (fase 14) ──
+    C('POST', '/api/torneos/categorias/4/podio/1/foto', 'admin', archivos={'foto': (FOTO_PODIO, 'foto.jpg')}),
+    C('POST', '/api/torneos/categorias/4/podio/2/foto', 'admin', 'reemplaza la que tenía', archivos={'foto': (FOTO_PODIO, 'foto.jpg')}),
+    C('POST', '/api/torneos/categorias/4/podio/1/foto', 'admin', 'texto renombrado', archivos={'foto': (TXT, 'foto.jpg')}),
+    C('POST', '/api/torneos/categorias/4/podio/1/foto', 'admin', 'más de 4 MB', archivos={'foto': (FOTO_GRANDE, 'foto.jpg')}),
+    C('POST', '/api/torneos/categorias/4/podio/1/foto', 'admin', 'menos de 1080 × 608', archivos={'foto': (FOTO_CHICA, 'foto.jpg')}),
+    C('POST', '/api/torneos/categorias/4/podio/1/foto', 'admin', 'imagen dañada', archivos={'foto': (JPG, 'foto.jpg')}),
+    C('POST', '/api/torneos/categorias/4/podio/1/foto', 'admin', 'sin archivo'),
+    C('POST', '/api/torneos/categorias/4/podio/3/foto', 'admin', 'equipo fuera del podio', archivos={'foto': (FOTO_PODIO, 'foto.jpg')}),
+    C('POST', '/api/torneos/categorias/99/podio/1/foto', 'admin', 'categoría inexistente', archivos={'foto': (FOTO_PODIO, 'foto.jpg')}),
+    C('PATCH', '/api/torneos/categorias/4/podio/2/foto', 'admin', json={'foco_x': 35, 'foco_y': 20, 'zoom': 1.5}),
+    C('PATCH', '/api/torneos/categorias/4/podio/2/foto', 'admin', 'fuera de rango', json={'foco_x': 120, 'foco_y': 20, 'zoom': 1.5}),
+    C('PATCH', '/api/torneos/categorias/4/podio/2/foto', 'admin', 'sin cuerpo'),
+    C('PATCH', '/api/torneos/categorias/4/podio/1/foto', 'admin', 'equipo sin foto', json={'foco_x': 35, 'foco_y': 20, 'zoom': 1.5}),
+    C('DELETE', '/api/torneos/categorias/4/podio/2/foto', 'admin'),
+    C('DELETE', '/api/torneos/categorias/4/podio/1/foto', 'admin', 'equipo sin foto'),
     C('POST', '/api/torneos/1/fase-final/partidos', 'admin', json=SEMIFINAL_2),
     C('POST', '/api/torneos/1/fase-final/partidos', 'admin', 'con ubicación',
       json={'id_categoria': 1, 'partidos': [{**SEMIFINAL_2['partidos'][0], 'ubicacion': 'Coliseo de Manta'}]}),

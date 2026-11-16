@@ -100,6 +100,17 @@ export interface EquipoDelPodio {
   url_logo: string | null;
 }
 
+// La foto de un equipo en el podio de una categoría y su encuadre en el flyer: el punto de la foto que queda al
+// centro del héroe (foco_x y foco_y, de 0 a 100 %) y cuánto se acerca (zoom, de 1 a 3)
+export interface FotoDelPodio {
+  url: string;
+  ancho: number;
+  alto: number;
+  foco_x: number;
+  foco_y: number;
+  zoom: number;
+}
+
 export interface PuestoDelPodio {
   lugar: 1 | 2 | 3;
   equipo: EquipoDelPodio;
@@ -111,6 +122,9 @@ export interface PuestoDelPodio {
   sellos: ('invicto' | 'mas_puntos')[];
   // El partido que definió el puesto (final, tercer puesto o repechaje); null si salió de la tabla
   partido: { ronda: string; fecha: string | null; propio: number; rival: number; wo: boolean; equipo_rival: EquipoDelPodio } | null;
+  // La que subió el admin para el flyer; si no hay, la del equipo (la del delegado) y, si tampoco, el escudo
+  foto: FotoDelPodio | null;
+  url_foto_equipo: string | null;
 }
 
 export interface PodioDeCategoria {
@@ -125,5 +139,16 @@ export interface PodiosDePortada {
 
 export async function getPodios(): Promise<ApiResponse<PodiosDePortada>> {
   const response = await axiosInstance.get('/torneos/podios');
+  return response.data;
+}
+
+// Los podios de un torneo en concreto (el estudio de flyers elige el torneo)
+export interface PodiosDelTorneo {
+  torneo: NonNullable<PodiosDePortada['torneo']>;
+  podios: PodioDeCategoria[];
+}
+
+export async function getPodiosDelTorneo(idTorneo: number): Promise<ApiResponse<PodiosDelTorneo>> {
+  const response = await axiosInstance.get(`/torneos/${idTorneo}/podios`);
   return response.data;
 }

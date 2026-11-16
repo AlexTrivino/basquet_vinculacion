@@ -14,7 +14,7 @@ const ANDINO = equipo(3, 'ANDINO 2.0');
 const PIERREGROSSE = equipo(4, 'JULIO PIERREGROSSE');
 
 const puesto = (lugar: 1 | 2 | 3, e: typeof JAVIER, extra: Partial<PuestoDelPodio> = {}): PuestoDelPodio => ({
-  lugar, equipo: e, PJ: 6, PG: 4, PP: 2, PF: 300, PC: 250, sellos: [], partido: null, ...extra,
+  lugar, equipo: e, PJ: 6, PG: 4, PP: 2, PF: 300, PC: 250, sellos: [], partido: null, foto: null, url_foto_equipo: null, ...extra,
 });
 const final = (propio: number, rival: number, contra: typeof JAVIER) => ({ ronda: 'Final', fecha: '2026-11-02', propio, rival, wo: false, equipo_rival: contra });
 

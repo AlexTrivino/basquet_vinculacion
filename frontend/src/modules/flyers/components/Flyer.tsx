@@ -71,6 +71,19 @@ interface MarcoProps {
   children: ReactNode;
 }
 
+// El fondo de todos los flyers: el coliseo desenfocado, el velo marino, la marca de agua del logo y el grano
+// (capas con z negativo: el flyer que lo usa es `isolate`)
+export function FondoFlyer() {
+  return (
+    <>
+      <img src="/img/hero-coliseo.jpg" alt="" className="absolute inset-x-0 top-0 -z-10 h-[60%] w-full object-cover opacity-70 [filter:blur(2px)]" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-marino/40 via-marino/85 via-50% to-marino" />
+      <img src="/img/logo-recortado.webp" alt="" className="absolute -right-[200px] bottom-[90px] -z-10 h-[820px] max-w-none opacity-[0.07]" />
+      <div className="absolute inset-0 -z-10 opacity-[0.09] mix-blend-overlay" style={{ backgroundImage: GRANO }} />
+    </>
+  );
+}
+
 // Cartelera de coliseo (Noche Cinemática): franja con fecha, logo y cifra; título apilado que pisa al héroe
 // o a la foto del coliseo; gancho con la cifra en oro; el contenido entre filetes y el pie.
 export const MarcoFlyer = forwardRef<HTMLDivElement, MarcoProps>(function MarcoFlyer(
@@ -84,10 +97,7 @@ export const MarcoFlyer = forwardRef<HTMLDivElement, MarcoProps>(function MarcoF
       style={{ width: ancho, height: alto, paddingTop: margen, paddingBottom: margen }}
       className="relative isolate flex flex-col overflow-hidden bg-marino px-[72px] font-sans text-slate-100"
     >
-      <img src="/img/hero-coliseo.jpg" alt="" className="absolute inset-x-0 top-0 -z-10 h-[60%] w-full object-cover opacity-70 [filter:blur(2px)]" />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-marino/40 via-marino/85 via-50% to-marino" />
-      <img src="/img/logo-recortado.webp" alt="" className="absolute -right-[200px] bottom-[90px] -z-10 h-[820px] max-w-none opacity-[0.07]" />
-      <div className="absolute inset-0 -z-10 opacity-[0.09] mix-blend-overlay" style={{ backgroundImage: GRANO }} />
+      <FondoFlyer />
 
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-[24px] border-b border-crema/15 pb-[18px]">
         <Par etiqueta={dato[0]} valor={dato[1]} />
@@ -122,7 +132,7 @@ export const MarcoFlyer = forwardRef<HTMLDivElement, MarcoProps>(function MarcoF
 });
 
 // Sin logo, medallón oscuro: un disco blanco vacío sería lo más brillante del cartel
-function EscudoFlyer({ url, className }: { url: string | null; className: string }) {
+export function EscudoFlyer({ url, className }: { url: string | null; className: string }) {
   if (url) return <Escudo url={url} className={className} />;
   return (
     <span className={`flex shrink-0 items-center justify-center rounded-full bg-marino-claro ring-2 ring-crema/15 ${className}`}>

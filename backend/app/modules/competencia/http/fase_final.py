@@ -34,6 +34,12 @@ def podios_route():
     return api_response(data=casos.podios_de_portada(RepositorioPartidos()))
 
 
+@competencia_bp.route('/<int:id_torneo>/podios', methods=['GET'])
+def podios_del_torneo_route(id_torneo):
+    """Los podios de un torneo con la foto de cada puesto y su encuadre, para el Estudio de flyers (pública)."""
+    return api_response(data=casos.podios_del_torneo(id_torneo, RepositorioPartidos()))
+
+
 @competencia_bp.route('/<int:id_torneo>/fase-final', methods=['GET'])
 def fase_final_route(id_torneo):
     """Estado del cuadro de llaves de una categoría: formato, grupos y cada llave con su partido."""

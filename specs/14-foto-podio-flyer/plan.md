@@ -43,15 +43,18 @@ COMMIT;
   - `POST /categorias/<id_categoria>/podio/<id_equipo>/foto` (multipart, campo `foto`) → 201 con la foto.
   - `PATCH /categorias/<id_categoria>/podio/<id_equipo>/foto` con `{"foco_x": 50, "foco_y": 35, "zoom": 1.2}` → 200.
   - `DELETE /categorias/<id_categoria>/podio/<id_equipo>/foto` → 200.
-  - `GET /<id_torneo>/podios`: los podios de ese torneo, cada puesto con su foto y su encuadre (o la foto del equipo), para el estudio. `GET /podios` (la portada) suma el mismo campo.
+  - `GET /<id_torneo>/podios` (público, como el de la portada): los podios de ese torneo, cada puesto con su foto y su encuadre (`foto`) o la foto del equipo (`url_foto_equipo`), para el estudio. `GET /podios` (la portada) suma los mismos dos campos.
+  - Respuestas: 422 `VALIDATION_ERROR` por tipo, peso, medidas, una imagen que no se puede leer, un encuadre fuera de rango o un equipo que no está en el podio; 404 si la categoría no existe o el equipo no tiene foto; 502 `STORAGE_ERROR` si el bucket no responde. Reemplazar la foto devuelve el encuadre a 50 / 50 / 1 y borra el archivo anterior; quitarla no exige que el equipo siga en el podio, para poder limpiar tras corregir una final.
 - Pruebas: `tests/test_fotos_podio.py` con un almacén falso (los rechazos, el reemplazo que borra el anterior, la foto sin EXIF y a 2560 px) y los casos de contrato de las cuatro rutas.
 
 ## Frontend
 
-- `modules/flyers`: el tipo `podio` en `EstudioFlyers` (torneo y categoría); `FlyerPodio` con el diseño de la ruta 1 en estados (márgenes de 250 px) y redes; `EditorEncuadre` (arrastre con pointer events, zoom con un `input range`, flechas del teclado, «Centrar») y la subida con la validación del navegador (`createImageBitmap` para medirla y `canvas.toBlob` para reducirla).
+- `modules/partidos`: `getPodiosDelTorneo` y los tipos `FotoDelPodio` y `PodiosDelTorneo`; `podio.ts` con `partidoClave` y `fechaCorta`, que salieron de `SeccionPodio` para que los lea también el flyer.
+- `modules/flyers`: el tipo `podio` en `EstudioFlyers` (torneo y categoría; sin elegir, sugiere el último torneo finalizado); `FlyerPodio` con el diseño de la ruta 1 en estados (márgenes de 250 px) y redes; `EditorEncuadre` (arrastre con pointer events, zoom con un `input range`, flechas del teclado, «Centrar»), `AccionesFotoPodio` (subir, cambiar, ajustar y quitar, con el borrador del encuadre que el flyer muestra en vivo) y `foto.ts`, la validación del navegador (`createImageBitmap` para medirla y `canvas.toBlob` para reducirla).
+- La imagen del editor no es arrastrable como archivo (`draggable=false`): si lo fuera, el navegador cancelaría el puntero a mitad del gesto y solo se aplicaría el primer movimiento.
 - El flyer pinta la foto con `object-fit: cover`, `object-position: X% Y%` y `transform: scale(zoom)` con el origen en el foco: el mismo encuadre sirve en 9:16 y en 4:5.
 - La descarga sigue con html-to-image: las fotos salen del bucket público con CORS, como los escudos que ya van en los PNG.
-- Pruebas del editor (arrastre, zoom, teclado, centrar) y de la validación (tipo, peso, dimensiones, aviso de foto vertical).
+- Pruebas del editor (la cuenta del arrastre, los gestos del puntero, zoom, teclado, centrar), de la validación (tipo, peso, dimensiones, reducción, aviso de foto vertical), de las acciones de la foto, del flyer (foto del podio, del equipo o escudo) y del estudio con la API simulada.
 
 ## Bucket
 
@@ -62,5 +65,5 @@ COMMIT;
 
 ## Comprobación
 
-- `pytest` en Python 3.12 y 3.13 (contrato con los casos nuevos), `npm test`, build y prueba de humo.
-- Capturas del estudio con el editor abierto y de los tres flyers con y sin foto, en estados y redes.
+- `pytest` en Python 3.12 y 3.13 (758 pruebas, con el contrato de los casos nuevos y la migración probada en PostgreSQL), `npm test` (29 archivos, 181 pruebas, con tipos y fronteras), build y prueba de humo.
+- Capturas del estudio, en un navegador real con los datos del torneo 5, del editor abierto, de la subida (foto que cabe, de 5,5 MB reducida en el navegador, vertical y de menos de 1080 × 608 px), de quitar la foto y de los tres flyers con y sin foto, en estados y redes.

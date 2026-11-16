@@ -6,10 +6,42 @@ formato de llaves, los tres primeros de la tabla única, y solo con el torneo fi
 
 Cada puesto lleva lo que el equipo hizo en todo el torneo (fase de grupos y llaves) y sus sellos: ``invicto`` (sin
 derrotas) y ``mas_puntos`` (nadie de la categoría anotó más).
+
+También las reglas de la foto del ganador para el flyer: las medidas que se aceptan y el encuadre que se guarda.
 """
 from app.modules.competencia.domain.posiciones import calcular_tabla, marcador_efectivo
+from app.shared.domain.errores import ReglaDeNegocio
 
 TOTALES = ('PJ', 'PG', 'PP', 'PF', 'PC')
+
+# La foto del flyer: el héroe mide 1080 px de ancho en proporción 9:5, y menos que eso se vería borroso
+MIN_ANCHO, MIN_ALTO = 1080, 608
+MAX_LADO = 8000
+MAX_PIXELES = 40_000_000  # freno a las bombas de descompresión: un archivo chico que al abrirse ocupa gigas
+ZOOM_MIN, ZOOM_MAX = 1, 3
+
+
+def validar_dimensiones(ancho, alto):
+    """Las medidas (en px) de la foto original: ni menores que el héroe del flyer ni enormes."""
+    if ancho < MIN_ANCHO or alto < MIN_ALTO:
+        raise ReglaDeNegocio(f'La foto mide {ancho} × {alto} px y el mínimo es {MIN_ANCHO} × {MIN_ALTO} px: en el flyer se vería borrosa.')
+    if ancho > MAX_LADO or alto > MAX_LADO or ancho * alto > MAX_PIXELES:
+        raise ReglaDeNegocio(
+            f'La foto mide {ancho} × {alto} px y el máximo es {MAX_LADO} × {MAX_LADO} px y {MAX_PIXELES // 1_000_000} megapíxeles.')
+
+
+def _entre(valor, nombre, minimo, maximo):
+    # nan e inf no entran: ninguna comparación con nan es verdadera
+    if isinstance(valor, bool) or not isinstance(valor, (int, float)) or not minimo <= valor <= maximo:
+        raise ReglaDeNegocio(f'{nombre} tiene que ser un número entre {minimo} y {maximo}.')
+    return round(float(valor), 2)
+
+
+def validar_encuadre(foco_x, foco_y, zoom):
+    """El encuadre de la foto en el héroe del flyer, con dos decimales: el foco (el punto de la foto que queda al centro,
+    de 0 a 100 % en cada eje) y el zoom (de 1 a 3 veces)."""
+    return (_entre(foco_x, 'El foco horizontal', 0, 100), _entre(foco_y, 'El foco vertical', 0, 100),
+            _entre(zoom, 'El zoom', ZOOM_MIN, ZOOM_MAX))
 
 
 def _ficha(equipo):

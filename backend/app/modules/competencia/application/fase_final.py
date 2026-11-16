@@ -58,28 +58,54 @@ def estado(categoria, repositorio):
     )
 
 
+def podio_de_categoria(torneo, categoria, repositorio):
+    """Los puestos del podio de la categoría, del 1 al 3 y cada uno con su foto (lista vacía si todavía no hay podio).
+    ``torneo`` es el de ``repositorio.torneo``: sin llaves la tabla solo cuenta con el torneo finalizado."""
+    id_torneo, id_categoria = categoria.id_torneo, categoria.id_categoria
+    sin_llaves = not categoria.formato
+    puestos = podio.podio(
+        {'formato': None, 'llaves': []} if sin_llaves else estado(categoria, repositorio),
+        repositorio.partidos_finalizados(id_torneo, id_categoria),
+        tabla_de_posiciones(id_torneo, id_categoria, repositorio) if sin_llaves and torneo['estado'] == 'finalizado' else None,
+    )
+    if not puestos:
+        return puestos
+    ids = [p['equipo']['id_equipo'] for p in puestos]
+    fotos, de_equipo = repositorio.fotos_podio(id_categoria), repositorio.fotos_de_equipos(ids)
+    # foto: la que subió el admin para el flyer (con su encuadre); url_foto_equipo: la del delegado, si no hay otra
+    return [{**p, 'foto': fotos.get(i), 'url_foto_equipo': de_equipo.get(i)} for p, i in zip(puestos, ids)]
+
+
+def _podios(torneo, repositorio):
+    """Cada categoría del torneo que ya tiene podio, con sus puestos."""
+    podios = []
+    for categoria, nombre, genero in repositorio.categorias_del_torneo(torneo['id_torneo']):
+        puestos = podio_de_categoria(torneo, categoria, repositorio)
+        if puestos:
+            podios.append({
+                'categoria': {'id_categoria': categoria.id_categoria, 'nombre_categoria': nombre, 'genero_categoria': genero},
+                'puestos': puestos,
+            })
+    return podios
+
+
 def podios_de_portada(repositorio):
     """Los podios del torneo más reciente que ya tenga alguno (del que termina último al primero, sea en curso,
     programado o finalizado): cada categoría con su podio definido. Sin torneo y sin podios si ninguno tiene uno."""
     # ponytail: recorre los torneos hasta el primero con podio; con muchos torneos sin finales, una consulta propia
     for torneo in repositorio.torneos_recientes():
-        podios = []
-        for categoria, nombre, genero in repositorio.categorias_del_torneo(torneo['id_torneo']):
-            id_torneo, id_categoria = torneo['id_torneo'], categoria.id_categoria
-            sin_llaves = not categoria.formato
-            puestos = podio.podio(
-                {'formato': None, 'llaves': []} if sin_llaves else estado(categoria, repositorio),
-                repositorio.partidos_finalizados(id_torneo, id_categoria),
-                tabla_de_posiciones(id_torneo, id_categoria, repositorio) if sin_llaves and torneo['estado'] == 'finalizado' else None,
-            )
-            if puestos:
-                podios.append({
-                    'categoria': {'id_categoria': id_categoria, 'nombre_categoria': nombre, 'genero_categoria': genero},
-                    'puestos': puestos,
-                })
+        podios = _podios(torneo, repositorio)
         if podios:
             return {'torneo': torneo, 'podios': podios}
     return {'torneo': None, 'podios': []}
+
+
+def podios_del_torneo(id_torneo, repositorio):
+    """Los podios de un torneo vigente, para el Estudio de flyers: el torneo y sus categorías con podio (puede no haber)."""
+    torneo = repositorio.torneo(id_torneo)
+    if torneo is None:
+        raise NoEncontrado('Torneo no encontrado.')
+    return {'torneo': torneo, 'podios': _podios(torneo, repositorio)}
 
 
 def recorrido(categoria, repositorio):

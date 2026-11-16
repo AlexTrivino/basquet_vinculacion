@@ -21,7 +21,7 @@ from sqlalchemy import text
 
 from app.shared.infrastructure.db import db
 from app.shared.infrastructure.modelos import (
-    Categoria, Documentacion, Equipo, Estadistica, Inscripcion, Jugador, Partido, Patrocinador,
+    Categoria, Documentacion, Equipo, Estadistica, FotoPodio, Inscripcion, Jugador, Partido, Patrocinador,
     PatrocinadorTorneo, Plantilla, Sancion, Torneo, Usuario,
 )
 from app.shared.infrastructure.modelos.documento_jugador import DocumentoJugador
@@ -159,6 +159,9 @@ def sembrar():
     # Torneo 2025
     partido(14, 3, 4, 1, 2, date(2025, 10, 10), time(17, 0), 'finalizado', 45, 40)
     db.session.flush()
+    # La foto del 2.º del podio del torneo 2025, con el encuadre que le dio el admin (fase 14)
+    db.session.add(FotoPodio(id_categoria=4, id_equipo=2, url_foto=f'{URL}/podios/3/4/fae.webp', ancho=2560, alto=1440,
+                             foco_x=40, foco_y=30, zoom=1.2))
 
     lineas = [
         # (partido, jugador, puntos, triples, rebotes, asistencias, tapones, tiros libres, faltas)

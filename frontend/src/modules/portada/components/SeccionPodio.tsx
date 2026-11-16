@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { ArrowRight, Trophy } from 'lucide-react';
-import { getPodios, type PodioDeCategoria, type PuestoDelPodio } from '@/modules/partidos';
+import { fechaCorta, getPodios, partidoClave, type PodioDeCategoria, type PuestoDelPodio } from '@/modules/partidos';
 import { Escudo } from '@/shared/ui/Escudo';
 import { Esquinas } from '@/shared/ui/Esquinas';
 
@@ -33,20 +33,8 @@ const PUESTOS = {
 
 const SELLOS = { invicto: 'Invicto', mas_puntos: 'Mejor ataque' } as const;
 
-const fechaCorta = (f: string) => format(parseISO(f), 'd MMM', { locale: es });
-
 function fechas(inicio: string, fin: string) {
   return `${fechaCorta(inicio)} – ${format(parseISO(fin), "d MMM yyyy", { locale: es })}`;
-}
-
-// El partido que definió el puesto: «Final · 2 nov» y «58 – 55 ante Spellman»; sin llaves, su campaña en la tabla
-function partidoClave(puesto: PuestoDelPodio): [string, string] {
-  const p = puesto.partido;
-  if (!p) return [`${puesto.lugar}.º de la tabla`, `${puesto.PG} ${puesto.PG === 1 ? 'ganado' : 'ganados'} de ${puesto.PJ}`];
-  const etiqueta = [p.ronda, p.fecha && fechaCorta(p.fecha)].filter(Boolean).join(' · ');
-  const rival = p.equipo_rival.nombre_equipo;
-  if (p.wo) return [etiqueta, `${p.propio >= p.rival ? 'Ganó' : 'Perdió'} por W.O. ante ${rival}`];
-  return [etiqueta, `${p.propio} – ${p.rival} ante ${rival}`];
 }
 
 // Una columna del podio: el medallón con su anillo de metal, el nombre y el escalón con el número grabado.
