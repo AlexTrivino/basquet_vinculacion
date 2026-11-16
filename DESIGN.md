@@ -7,6 +7,7 @@ colors:
   celeste: "#29A9E1"
   oro: "#D6B36A"
   crema: "#F1E7D0"
+  bronce: "#C98552"
   carbon: "#16181D"
   white: "#FFFFFF"
   slate-200: "oklch(92.9% 0.013 255.508)"
@@ -209,6 +210,9 @@ Una noche marino con dos metales: el oro distingue y el celeste actúa.
 ### Secundario
 - **Oro Trofeo** (#D6B36A, `oro`): el filete y el honor. Lo usan los bordes de 1 px (entre el 20 % y el 70 %), las esquinas en L (al 40 %), el rombo VS (al 70 %), las cintas de fecha y de estado y la píldora GANADOR (oro sólido con texto marino, 9.35:1). También el marcador del ganador, los dorsales contorneados del cromo, el año de cada edición en el historial, los íconos de apoyo (calendario, contacto, lugar), las barras bajo los títulos del pie y la selección de texto. Los únicos controles en oro son el botón de acceso de la barra, «Ingresar», y el botón que cambia el escudo en el perfil de equipo: contorno oro que se llena de oro al pasar el cursor.
 
+### Metales del podio
+- **Plata** (`slate-300`, la Pizarra Texto) y **Bronce** (#C98552, `bronce`, valor literal sin token en `@theme`) solo existen en el podio, junto al oro del campeón: la cinta del puesto, el anillo del medallón bajo el foco y el número de su escalón (relleno bajo el foco, contorneado al 55 % en reposo). Fuera del podio no aparecen.
+
 ### Terciario
 - **Crema Placa** (#F1E7D0, `crema`): la tinta de todo lo que va en Cinzel. Titulares, nombre del torneo, nombres de equipo, apellidos del cromo, el dato de la franja del cartel (hora o ganador), la fecha y la hora del boleto y las cifras destacadas en prosa (15.19:1 sobre marino). En la barra, el nombre del sitio y el enlace activo; en los filtros, el texto de los selectores. El marcador del perdedor baja a crema al 55 %, y el guion del marcador, al 40 %.
 
@@ -227,7 +231,7 @@ El botón flotante de WhatsApp usa el verde de la marca del servicio (#25D366) c
 - **Rosa Aviso** (`rose-500`, con `rose-100` y `rose-300`): lo destructivo y lo negativo, allí donde el dueño de un equipo edita su perfil. Tiñe los controles que quitan la portada o el escudo, el que desactiva el equipo y el chip de una inscripción rechazada o de un equipo retirado. Siempre es veladura: fondo `rose-500` al 10 % en reposo y del 20 al 30 % al pasar el cursor, tinta `rose-100` y contorno `rose-300` al 40 %. Nunca es un relleno sólido.
 
 ### Reglas
-**La regla del celeste útil.** El celeste, como tinta o como relleno, solo marca acción, progreso o foco. Su única otra aparición es la luz del cartel de partido y del boleto, un radial al 18 % a la izquierda (el lado local en el cartel y el propio en el boleto), que se lee como foco de estadio y no como color. Si algo celeste no se pulsa, no avanza y no señala el foco, sobra.
+**La regla del celeste útil.** El celeste, como tinta o como relleno, solo marca acción, progreso o foco. Su única otra aparición es la luz del cartel de partido y del boleto, un radial al 18 % a la izquierda (el lado local en el cartel y el propio en el boleto), y la del escenario del podio, un radial al 14 % arriba al centro: se leen como foco de estadio y no como color. Si algo celeste no se pulsa, no avanza y no señala el foco, sobra.
 
 **La regla del filete dorado.** El oro dibuja y distingue; no llena. Trazos finos, esquinas, cintas, píldoras y el marcador del ganador. Ningún panel ni sección es oro.
 
@@ -269,7 +273,7 @@ El administrador (`/admin/*`), el resto del área de delegado, el perfil (`/perf
 
 ## Layout
 
-La página es una sola columna de secciones apiladas sobre una noche fija. Cada sección centra un contenedor: 80rem para el hero y los auspiciantes; 72rem para Conócenos, Partidos, Figuras, el CTA y el pie. Los márgenes laterales son de 16 px en móvil, 24 px desde 640 px y 32 px desde 1024 px. El ritmo vertical es de 96 px por sección, 80 px en el hero y en la banda de auspiciantes, y 64 px en el pie. Las anclas de sección compensan los 64 px de la barra fija.
+La página es una sola columna de secciones apiladas sobre una noche fija. Cada sección centra un contenedor: 80rem para el hero y los auspiciantes; 72rem para Conócenos, Partidos, Podio, Figuras, el CTA y el pie. Los márgenes laterales son de 16 px en móvil, 24 px desde 640 px y 32 px desde 1024 px. El ritmo vertical es de 96 px por sección, 80 px en el hero y en la banda de auspiciantes, y 64 px en el pie. Las anclas de sección compensan los 64 px de la barra fija.
 
 Desde 1024 px, los pares de texto y objeto se abren en columnas asimétricas. El hero reparte 1 : 1.3, con el titular a la izquierda y la tarjeta de torneo a la derecha. Los auspiciantes reparten 3 : 7, con columnas de mínimo cero para que la marquesina no estire la suya, y el CTA reparte 1.5 : 1. Conócenos reparte 1 : 1. Los carteles de partido forman una rejilla de dos columnas desde 768 px, con 24 px de separación. El pie pasa de una columna a dos (desde 640 px) y a cuatro (desde 1024 px), con 48 px entre ellas. Por debajo de esos cortes todo se apila en una columna, y la tarjeta de torneo queda bajo el titular.
 
@@ -311,7 +315,7 @@ El lenguaje de formas mezcla dos familias. Contenedores y controles tienen esqui
 
 ## Components
 
-Dónde vive cada pieza (`frontend/src`): lo que usan varias pantallas está en `shared/ui` (`Escudo`, `Esquinas`, `FotoJugador` con la silueta, `Skeleton`, `EmptyState`, `StatusBadge`, `AsyncButton`, `DataGridTable`…); la barra y el menú lateral, en `app/`; lo demás, en el módulo de su pantalla: el cartel de partido (`TarjetaPartido`, `Medallon`), la tarjeta diagonal de torneo (`HeroTorneos`), el carrusel de figuras (`SeccionFiguras`), el panel CTA, el pie, las redes y el botón de WhatsApp en `modules/portada`; la banda de auspiciantes en `modules/auspicios`; el calendario (`CalendarioTorneo`), las posiciones y las llaves en `modules/torneos`; el flyer y sus láminas en `modules/flyers`; el cromo y el boleto en `modules/equipos`.
+Dónde vive cada pieza (`frontend/src`): lo que usan varias pantallas está en `shared/ui` (`Escudo`, `Esquinas`, `FotoJugador` con la silueta, `Skeleton`, `EmptyState`, `StatusBadge`, `AsyncButton`, `DataGridTable`…); la barra y el menú lateral, en `app/`; lo demás, en el módulo de su pantalla: el cartel de partido (`TarjetaPartido`, `Medallon`), la tarjeta diagonal de torneo (`HeroTorneos`), el podio (`SeccionPodio`), el carrusel de figuras (`SeccionFiguras`), el panel CTA, el pie, las redes y el botón de WhatsApp en `modules/portada`; la banda de auspiciantes en `modules/auspicios`; el calendario (`CalendarioTorneo`), las posiciones y las llaves en `modules/torneos`; el flyer y sus láminas en `modules/flyers`; el cromo y el boleto en `modules/equipos`.
 
 ### Botones
 Sobrios y claros: la acción la dice el color, no la forma.
@@ -407,6 +411,14 @@ Es el mismo cartel que el del partido, en sólido: marino claro, borde oro al 30
 - **Controles:** flechas circulares de 44 px (contorno oro al 40 %, fondo marino al 80 %, chevrón oro) montadas en los bordes de la tarjeta del centro desde 640 px; en el celular van chicas (32 px) junto a los puntos. Pausa, puntos y barra son los del carrusel de torneos, con la barra de 5 s y centrada; con más de 10 figuras, los puntos se cambian por «3 de 12». Se arrastra en el celular y responde a las flechas del teclado desde sus controles.
 - **Pausa:** el botón, el cursor encima o el foco adentro detienen la barra; solo en pausa se anuncia el cambio a los lectores de pantalla.
 
+### Podio del torneo (componente firma)
+`SeccionPodio` va en la portada entre Partidos y Figuras: el podio de cada categoría del torneo más reciente que ya tenga uno (el que termina último, esté en curso o finalizado). Campeón y vicecampeón salen de la final y el tercero, del partido por el tercer puesto (o de quien perdió el repechaje con tres equipos); sin llaves, de los tres primeros de la tabla, solo con el torneo finalizado. Sin ningún podio, un aviso en veladura blanca al 5 % dice que aparece cuando se juega la primera final.
+- **Encabezado:** «PODIO DEL TORNEO» como el de Figuras, con «DEL TORNEO» en oro. Debajo, el nombre del torneo en la voz del subtítulo y, en oro, la categoría (si hay una sola) y las fechas, que no se cortan. Con varias categorías, píldoras redondas para elegir: la elegida en oro sólido con texto marino; las demás con contorno blanco al 20 %.
+- **Escenario:** un cartel (marino claro al 70 %, borde oro al 25 %, esquinas en L y sombra de panel) con la luz celeste arriba. Adentro, el podio 2 · 1 · 3 de 48rem como máximo: tres escalones pegados en degradado de marino claro a marino, con filo superior de 2 px (oro al 25 % en reposo y oro pleno bajo el foco) y el número del puesto en Cinzel (4.5rem desde 640 px). Los altos son 13, 9 y 7rem (9, 6 y 4rem en el celular). Sobre cada escalón, el medallón del escudo (8rem el campeón y 6rem los otros desde 640 px; 5 y 4rem en el celular) con un anillo de 3 px del metal del puesto y el nombre en Cinzel crema, en dos líneas como máximo.
+- **El foco:** un cono de luz crema (del 7 al 20 %) con su lámpara arriba y un reflejo oro al 14 % en el piso siguen al escalón elegido en 700 ms con la curva del álbum. Al pasar el cursor, enfocar o tocar un escalón, queda bajo el foco: su medallón sube 8 px y crece al 105 %, y los otros dos bajan al 70 % con el gris al 60 %. Al pasar el cursor, el brillo de lámina del cromo cruza el escalón. Arranca en el campeón y vuelve a él al cambiar de categoría.
+- **Franja:** la del cartel (filete oro al 20 % y negro al 35 %) cuenta al de bajo el foco en tres partes: la cinta del puesto en su metal con el nombre en Cinzel 700 y los sellos («Invicto», con el trofeo, y «Mejor ataque»: nadie de la categoría anotó más) como píldoras de contorno oro; los ganados, perdidos y puntos a favor y en contra; y el partido que definió el puesto («FINAL · 2 NOV» en la voz de placa y «58 – 55 ante Spellman»; sin llaves, «1.º de la tabla» y su campaña) con «Ver el torneo» en celeste. En el celular se apila y se centra.
+- **Entrada:** al llegar a la sección (un 35 % visible), los escalones salen del piso del 3.º al 1.º (900 ms, 150 ms entre uno y otro) y los medallones caen sobre ellos 450 ms después. El estado oculto solo existe mientras se espera esa llegada.
+
 ### Boleto del próximo partido (componente firma)
 `Boleto` da el próximo partido como una entrada. Es un cartel sólido: marino claro, borde oro al 25 %, radio de 0.75rem, sombra de panel y esquinas en L desde 768 px. Monta 2rem sobre el filete de la portada. Desde 768 px se reparte en tres columnas (talón, campo y hora); por debajo se apila.
 - **Talón:** el día en la voz de marcador, en crema, entre el día de la semana y el mes en la voz de placa. La perforación lo separa del campo.
@@ -450,7 +462,7 @@ Columna "Síguenos": Instagram y Facebook como círculos de 44 px con borde oro 
 En todo el sitio (reglas sobre `html`), el lienzo es marino y `color-scheme: dark` oscurece selectores, barras y controles nativos. La barra de desplazamiento lleva el pulgar celeste, mezclado al 45 % con marino, sobre un carril marino. La selección de texto es oro con texto marino. El cursor de texto y `accent-color` son celestes. El foco es un anillo celeste de 2 px con 3 px de separación. Los enlaces subrayados separan el subrayado 4 px.
 
 ### Movimiento reducido
-Con `prefers-reduced-motion: reduce` se apagan el parallax, el zoom del hero y de la portada del perfil, las entradas (`.aparecer` y las del perfil de equipo, que dejan todo visible), el rebote del balón y de su sombra, la marquesina, el pulso de los esqueletos y, en el cromo, la elevación, el zoom del retrato y el brillo de lámina. El carrusel de torneos y el de figuras arrancan en pausa (el botón permite reanudarlos), las figuras cambian sin girar y el balón no gira.
+Con `prefers-reduced-motion: reduce` se apagan el parallax, el zoom del hero y de la portada del perfil, las entradas (`.aparecer`, las del perfil de equipo y las del podio, que dejan todo visible), el rebote del balón y de su sombra, la marquesina, el pulso de los esqueletos y, en el cromo, la elevación, el zoom del retrato y el brillo de lámina. El carrusel de torneos y el de figuras arrancan en pausa (el botón permite reanudarlos), las figuras cambian sin girar y el balón no gira.
 
 ## Do's and Don'ts
 

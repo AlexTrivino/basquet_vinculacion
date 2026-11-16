@@ -12895,6 +12895,65 @@
    "success": true
   }
  },
+ "GET /api/torneos/podios · anónimo": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "podios": [
+     {
+      "categoria": {
+       "genero_categoria": "masculino",
+       "id_categoria": 4,
+       "nombre_categoria": "Juvenil"
+      },
+      "puestos": [
+       {
+        "PC": 40,
+        "PF": 45,
+        "PG": 1,
+        "PJ": 1,
+        "PP": 0,
+        "equipo": {
+         "id_equipo": 1,
+         "nombre_equipo": "SAN JOSÉ",
+         "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/1/logo/sanjose.png"
+        },
+        "lugar": 1,
+        "partido": null,
+        "sellos": [
+         "invicto",
+         "mas_puntos"
+        ]
+       },
+       {
+        "PC": 45,
+        "PF": 40,
+        "PG": 0,
+        "PJ": 1,
+        "PP": 1,
+        "equipo": {
+         "id_equipo": 2,
+         "nombre_equipo": "FAE",
+         "url_logo": "https://supabase.test/storage/v1/object/public/archivos/equipos/2/logo/fae.png"
+        },
+        "lugar": 2,
+        "partido": null,
+        "sellos": []
+       }
+      ]
+     }
+    ],
+    "torneo": {
+     "estado": "finalizado",
+     "fecha_fin": "2025-11-30",
+     "fecha_inicio": "2025-09-01",
+     "id_torneo": 3,
+     "nombre": "INTERCOLEGIAL 2025"
+    }
+   },
+   "success": true
+  }
+ },
  "GET /api/torneos?anio=2025 · anónimo": {
   "codigo": 200,
   "cuerpo": {

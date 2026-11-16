@@ -190,6 +190,26 @@ class RepositorioPartidos:
         """Ids de los jugadores con una sanción activa en el partido."""
         return {s.id_jugador for s in FilaSancion.query.filter_by(id_partido=id_partido, estado='activa').all()}
 
+    def partidos_finalizados(self, id_torneo, id_categoria):
+        """Los finalizados de la categoría en todo el torneo (fase de grupos y llaves), como tuplas para ``calcular_tabla``."""
+        return [(p.id_equipo_local, p.id_equipo_visitante, p.marcador_local, p.marcador_visitante, p.estado)
+                for p in FilaPartido.query.filter(
+                    FilaPartido.id_torneo == id_torneo, FilaPartido.id_categoria == id_categoria,
+                    FilaPartido.estado.in_(ESTADOS_FINALES),
+                ).all()]
+
+    def torneos_recientes(self):
+        """Los torneos vigentes (la regla es del módulo de torneos), del que termina último al primero."""
+        filas = Torneo.query.order_by(desc(Torneo.fecha_fin), desc(Torneo.id_torneo)).all()
+        return [{'id_torneo': t.id_torneo, 'nombre': t.nombre, 'estado': t.estado,
+                 'fecha_inicio': t.fecha_inicio.isoformat(), 'fecha_fin': t.fecha_fin.isoformat()}
+                for t in filas if torneos.vigente(t.estado)]
+
+    def categorias_del_torneo(self, id_torneo):
+        """(Categoria, nombre, género) de cada categoría del torneo, en el orden en que se crearon."""
+        filas = FilaCategoria.query.filter_by(id_torneo=id_torneo).order_by(FilaCategoria.id_categoria).all()
+        return [(Categoria(f.id_categoria, f.id_torneo, f.formato), f.nombre_categoria, f.genero_categoria) for f in filas]
+
     def nombre_del_torneo(self, id_torneo):
         """Nombre del torneo, o None si no existe o no está vigente (la regla es del módulo de torneos)."""
         fila = db.session.get(Torneo, id_torneo)

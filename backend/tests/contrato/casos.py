@@ -111,6 +111,7 @@ BASE = [
     G('/api/torneos/1/fase-final?id_categoria=2'),
     G('/api/torneos/2/fase-final?id_categoria=3'),
     G('/api/torneos/1/fase-final', nota='sin categoría'),
+    G('/api/torneos/podios'),  # desde la fase 13: la portada
     G('/api/torneos/1/recorrido?id_categoria=1'),
     G('/api/torneos/1/recorrido?id_categoria=2'),
     G('/api/torneos/1/recorrido?id_categoria=3', nota='categoría de otro torneo'),

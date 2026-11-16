@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Home from './Home';
 import { getTorneos } from '@/shared/api/catalogo';
-import { getPartidos } from '@/modules/partidos';
+import { getPartidos, getPodios } from '@/modules/partidos';
 import { getEquipos } from '@/modules/equipos';
 import { getPatrocinadores } from '@/modules/auspicios';
 import { getEstadisticasPublicas, getFigurasPortada } from '@/modules/estadisticas';
@@ -57,6 +57,7 @@ describe('Home (página de inicio)', () => {
     Element.prototype.scrollIntoView = vi.fn(); // jsdom no lo implementa
     vi.mocked(getEstadisticasPublicas).mockResolvedValue({ success: true, message: '', data: { puntos_totales: 15230 } } as never);
     vi.mocked(getFigurasPortada).mockResolvedValue({ success: true, message: '', data: [figura] } as never);
+    vi.mocked(getPodios).mockResolvedValue({ success: true, message: '', data: { torneo: null, podios: [] } } as never);
     vi.mocked(getTorneos).mockResolvedValue({ success: true, message: '', data: torneos, pagination: { page: 1, per_page: 50, total: 2, pages: 1 } } as never);
     vi.mocked(getEquipos).mockResolvedValue({ success: true, message: '', data: [], pagination: { page: 1, per_page: 1, total: 7, pages: 7 } } as never);
     vi.mocked(getPatrocinadores).mockResolvedValue([{ id_patrocinador: 1, nombre_patrocinador: 'Nike Ecuador', url_logo_patrocinador: '/n.png' }] as never);
@@ -77,7 +78,7 @@ describe('Home (página de inicio)', () => {
 
     expect(await screen.findByRole('heading', { name: /Figuras del torneo/i })).toBeInTheDocument();
     const orden = [...container.querySelectorAll('main > section[id], main > footer[id]')].map((el) => el.id);
-    expect(orden).toEqual(['inicio', 'auspiciantes', 'conocenos', 'partidos', 'figuras', 'unete', 'contacto']);
+    expect(orden).toEqual(['inicio', 'auspiciantes', 'conocenos', 'partidos', 'podio', 'figuras', 'unete', 'contacto']);
     // Sin teléfonos en pantalla: solo redes sociales en el footer
     expect(screen.queryByText(/\+593/)).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Instagram/ })).toHaveAttribute('href', 'https://www.instagram.com/baloncestomanta');

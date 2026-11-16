@@ -148,8 +148,21 @@
 .cromo:nth-child(even) { --giro: 2.5deg; }
 .cromo:nth-child(3n) { --giro: -1.5deg; }
 
+/* Portada, podio: los escalones salen del piso (3.º, 2.º y 1.º) y los medallones caen sobre ellos, una sola vez.
+   El estado oculto solo existe mientras JS espera la llegada a la sección (data-podio="pendiente"). */
+@keyframes escalon-sube {
+  from { transform: translateY(100%); }
+}
+@keyframes medallon-cae {
+  from { opacity: 0; transform: translateY(-2.5rem); }
+}
+[data-podio="pendiente"] .podio-entra { opacity: 0; }
+[data-podio="visto"] .escalon { animation: escalon-sube 0.9s cubic-bezier(0.32, 0.72, 0, 1) var(--retraso, 0ms) both; }
+[data-podio="visto"] .medallon-cae { animation: medallon-cae 0.7s cubic-bezier(0.32, 0.72, 0, 1) calc(var(--retraso, 0ms) + 450ms) both; }
+
 @media (prefers-reduced-motion: reduce) {
   [data-revelar] { opacity: 1 !important; animation: none !important; }
+  [data-podio] .podio-entra { opacity: 1 !important; animation: none !important; }
   .cta-boton,
   [data-visible] .cta-boton { opacity: 1; animation: none; }
   .cifra-brillo,

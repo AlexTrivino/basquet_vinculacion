@@ -92,3 +92,38 @@ export async function postEstadisticasBulk(data: any): Promise<ApiResponse<any>>
   const response = await axiosInstance.post('/estadisticas/bulk', data);
   return response.data;
 }
+
+// ── Podio de la portada: el del torneo más reciente que ya tenga alguno (pública) ──
+export interface EquipoDelPodio {
+  id_equipo: number;
+  nombre_equipo: string;
+  url_logo: string | null;
+}
+
+export interface PuestoDelPodio {
+  lugar: 1 | 2 | 3;
+  equipo: EquipoDelPodio;
+  PJ: number;
+  PG: number;
+  PP: number;
+  PF: number;
+  PC: number;
+  sellos: ('invicto' | 'mas_puntos')[];
+  // El partido que definió el puesto (final, tercer puesto o repechaje); null si salió de la tabla
+  partido: { ronda: string; fecha: string | null; propio: number; rival: number; wo: boolean; equipo_rival: EquipoDelPodio } | null;
+}
+
+export interface PodioDeCategoria {
+  categoria: { id_categoria: number; nombre_categoria: string; genero_categoria: string };
+  puestos: PuestoDelPodio[];
+}
+
+export interface PodiosDePortada {
+  torneo: { id_torneo: number; nombre: string; estado: string; fecha_inicio: string; fecha_fin: string } | null;
+  podios: PodioDeCategoria[];
+}
+
+export async function getPodios(): Promise<ApiResponse<PodiosDePortada>> {
+  const response = await axiosInstance.get('/torneos/podios');
+  return response.data;
+}

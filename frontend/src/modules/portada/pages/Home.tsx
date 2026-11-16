@@ -8,6 +8,7 @@ import { SeccionConocenos } from '../components/SeccionConocenos';
 import { Esquinas } from '@/shared/ui/Esquinas';
 import { SeccionPartidos } from '../components/SeccionPartidos';
 import { SeccionFiguras } from '../components/SeccionFiguras';
+import { SeccionPodio } from '../components/SeccionPodio';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -62,6 +63,8 @@ export default function Home() {
       <SeccionConocenos />
 
       <SeccionPartidos />
+
+      <SeccionPodio />
 
       <SeccionFiguras />
 

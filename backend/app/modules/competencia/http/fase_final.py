@@ -28,6 +28,12 @@ def tabla_de_posiciones(id_torneo):
     return api_response(data=posiciones, message=f'Tabla de posiciones del torneo "{nombre}".')
 
 
+@competencia_bp.route('/podios', methods=['GET'])
+def podios_route():
+    """Los podios del torneo más reciente que ya tenga alguno, para la portada (pública)."""
+    return api_response(data=casos.podios_de_portada(RepositorioPartidos()))
+
+
 @competencia_bp.route('/<int:id_torneo>/fase-final', methods=['GET'])
 def fase_final_route(id_torneo):
     """Estado del cuadro de llaves de una categoría: formato, grupos y cada llave con su partido."""

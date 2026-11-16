@@ -4,7 +4,7 @@ Reciben repositorio (RepositorioPartidos) y, los que escriben, unidad (confirmar
 Las categorías son ``llaves.Categoria``.
 """
 from app.modules.competencia.application import partidos
-from app.modules.competencia.domain import llaves, posiciones
+from app.modules.competencia.domain import llaves, podio, posiciones
 from app.shared.domain.errores import Conflicto, NoEncontrado, ReglaDeNegocio
 
 
@@ -56,6 +56,30 @@ def estado(categoria, repositorio):
         repositorio.equipos(list(grupos)) if con_formato and grupos else {},
         repositorio.inactivos(),
     )
+
+
+def podios_de_portada(repositorio):
+    """Los podios del torneo más reciente que ya tenga alguno (del que termina último al primero, sea en curso,
+    programado o finalizado): cada categoría con su podio definido. Sin torneo y sin podios si ninguno tiene uno."""
+    # ponytail: recorre los torneos hasta el primero con podio; con muchos torneos sin finales, una consulta propia
+    for torneo in repositorio.torneos_recientes():
+        podios = []
+        for categoria, nombre, genero in repositorio.categorias_del_torneo(torneo['id_torneo']):
+            id_torneo, id_categoria = torneo['id_torneo'], categoria.id_categoria
+            sin_llaves = not categoria.formato
+            puestos = podio.podio(
+                {'formato': None, 'llaves': []} if sin_llaves else estado(categoria, repositorio),
+                repositorio.partidos_finalizados(id_torneo, id_categoria),
+                tabla_de_posiciones(id_torneo, id_categoria, repositorio) if sin_llaves and torneo['estado'] == 'finalizado' else None,
+            )
+            if puestos:
+                podios.append({
+                    'categoria': {'id_categoria': id_categoria, 'nombre_categoria': nombre, 'genero_categoria': genero},
+                    'puestos': puestos,
+                })
+        if podios:
+            return {'torneo': torneo, 'podios': podios}
+    return {'torneo': None, 'podios': []}
 
 
 def recorrido(categoria, repositorio):
