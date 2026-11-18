@@ -21,12 +21,13 @@ export const boton =
 // Quien lo usa pone las llamadas al servidor (`subir`, `ajustar`, `quitar`, que fallan con el error de axios y salen
 // como aviso), lo que se refresca al terminar y el borrador del encuadre (`encuadre`: el que se está ajustando y
 // todavía no se guarda, o null con el editor cerrado), que el flyer de arriba muestra en vivo.
-export function ControlesDeFoto({ foto, etiquetaArchivo, estado, descripcionQuitar, aspecto, encuadre, alEncuadre, subir, ajustar, quitar, refrescar }: {
+export function ControlesDeFoto({ foto, etiquetaArchivo, estado, descripcionQuitar, aspecto, limpia, encuadre, alEncuadre, subir, ajustar, quitar, refrescar }: {
   foto: FotoDelPodio | null;
   etiquetaArchivo: string; // nombre accesible del selector de archivos
   estado: string; // qué foto lleva el flyer ahora
   descripcionQuitar: string; // lo que dice la confirmación de quitarla
   aspecto: number; // ancho / alto del marco de la foto en el flyer
+  limpia?: boolean; // la foto no se desvanece en el flyer: nada la pisa
   encuadre: Encuadre | null;
   alEncuadre: (e: Encuadre | null) => void;
   subir: (archivo: File) => Promise<unknown>;
@@ -109,6 +110,7 @@ export function ControlesDeFoto({ foto, etiquetaArchivo, estado, descripcionQuit
           foto={foto}
           encuadre={encuadre}
           aspecto={aspecto}
+          limpia={limpia}
           guardando={ajustarFoto.isPending}
           alCambiar={alEncuadre}
           alGuardar={() => ajustarFoto.mutate(encuadre)}

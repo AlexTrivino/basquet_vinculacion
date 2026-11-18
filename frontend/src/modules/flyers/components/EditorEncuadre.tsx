@@ -37,12 +37,14 @@ const FLECHAS: Record<string, readonly [number, number] | undefined> = {
 const boton = 'inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors duration-150 active:scale-[0.98] disabled:opacity-50';
 
 // Editor de recorte: el marco tiene la proporción del héroe del flyer y se ve igual que en él (con los
-// desvanecidos), así que lo que queda dentro es lo que sale. Arrastrar, flechas del teclado y zoom; el flyer de
-// arriba se actualiza mientras tanto porque el encuadre vive en quien lo usa.
-export function EditorEncuadre({ foto, encuadre, aspecto, guardando, alCambiar, alGuardar, alCancelar }: {
+// desvanecidos, salvo en los premios, donde la foto va entera), así que lo que queda dentro es lo que sale.
+// Arrastrar, flechas del teclado y zoom; el flyer de arriba se actualiza mientras tanto porque el encuadre vive en
+// quien lo usa.
+export function EditorEncuadre({ foto, encuadre, aspecto, limpia, guardando, alCambiar, alGuardar, alCancelar }: {
   foto: { url: string; ancho: number; alto: number };
   encuadre: Encuadre;
   aspecto: number; // ancho / alto del marco de la foto en el flyer
+  limpia?: boolean; // la foto no se desvanece en el flyer: nada la pisa
   guardando?: boolean;
   alCambiar: (e: Encuadre) => void;
   alGuardar: () => void;
@@ -90,11 +92,11 @@ export function EditorEncuadre({ foto, encuadre, aspecto, guardando, alCambiar, 
         className="relative w-full cursor-grab touch-none select-none overflow-hidden rounded-lg bg-marino-claro ring-1 ring-oro/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-celeste active:cursor-grabbing"
         style={{ aspectRatio: aspecto }}
       >
-        <FotoHeroe url={foto.url} {...encuadre} />
+        <FotoHeroe url={foto.url} limpia={limpia} {...encuadre} />
       </div>
       <p id={`${id}-ayuda`} className="text-xs leading-relaxed text-slate-400">
-        Arrastra la foto (o usa las flechas del teclado; con Mayús van de a 5) para elegir qué parte se ve. Lo que se
-        desvanece arriba y abajo queda bajo el título y el nombre.
+        Arrastra la foto (o usa las flechas del teclado; con Mayús van de a 5) para elegir qué parte se ve.
+        {!limpia && ' Lo que se desvanece arriba y abajo queda bajo el título y el nombre.'}
       </p>
       <div>
         <label htmlFor={`${id}-zoom`} className="mb-1 flex justify-between text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">

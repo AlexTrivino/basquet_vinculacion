@@ -8,6 +8,7 @@ import {
 } from '../api/flyers.api';
 import { CENTRADO } from '../foto';
 import { AccionesPremio, type BorradorPremio } from './AccionesPremio';
+import { aspectoDelPremio } from './FlyerPremio';
 
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn() } }));
 vi.mock('../api/flyers.api', async (original) => ({
@@ -208,6 +209,7 @@ describe('AccionesPremio: la foto del premio', () => {
     montar('defensa', premio({ mvp: null, defensa: guardado(3, FOTO) }), CARLOS, alBorrador);
     fireEvent.click(screen.getByRole('button', { name: 'Ajustar recorte' }));
     expect(editor()).toBeInTheDocument();
+    expect(editor()).toHaveStyle({ aspectRatio: String(aspectoDelPremio('historia')) }); // el marco del flyer del premio, no el del podio
     expect(alBorrador).toHaveBeenCalledWith({ tipo: 'defensa', id_categoria: 9, id_jugador: 3, encuadre: { foco_x: 30, foco_y: 70, zoom: 1.5 } });
 
     fireEvent.keyDown(editor() as HTMLElement, { key: 'ArrowRight' });

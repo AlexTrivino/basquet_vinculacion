@@ -9,7 +9,7 @@ import {
 import { etiquetaCandidato, PREMIOS } from '../textosPremio';
 import { ControlesDeFoto, mensaje } from './ControlesDeFoto';
 import type { Formato } from './Flyer';
-import { aspectoDeLaFoto } from './FlyerPodio';
+import { aspectoDelPremio } from './FlyerPremio';
 import { Selector } from './Selector';
 
 // El encuadre del premio que se está ajustando y todavía no se guarda: el flyer lo muestra en vivo. Lleva al jugador
@@ -89,7 +89,8 @@ export function AccionesPremio({ idTorneo, tipo, premio, figura, formato, borrad
               : 'Sin foto: el flyer lleva la silueta del jugador con su dorsal.'
         }
         descripcionQuitar={`Se borra la foto del premio de ${jugador.nombre} y el flyer vuelve a llevar la de su ficha.`}
-        aspecto={aspectoDeLaFoto(formato)}
+        aspecto={aspectoDelPremio(formato)}
+        limpia
         encuadre={editando?.encuadre ?? null}
         alEncuadre={(encuadre) => alBorrador(encuadre && { tipo, id_categoria: idCategoria, id_jugador: jugador.id_jugador, encuadre })}
         subir={async (archivo) => {

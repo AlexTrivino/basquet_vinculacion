@@ -200,16 +200,17 @@ export function ListaPartidos({ partidos, conFigura }: { partidos: ResultadoFlye
 }
 
 // ── Una figura: el jugador es el héroe y el título le pisa la base ──
-export function HeroeFigura({ figura, formato }: { figura: FiguraFlyer; formato: Formato }) {
-  const alto = FORMATOS[formato].heroe;
+// `alto` y `limpia` son de los premios de la final, donde nada pisa al héroe: ocupa el alto que se le da y la foto ni se
+// desvanece ni lleva el dorsal encima (la silueta sí lo lleva detrás)
+export function HeroeFigura({ figura, formato, alto = FORMATOS[formato].heroe, limpia }: { figura: FiguraFlyer; formato: Formato; alto?: number; limpia?: boolean }) {
   const { url_foto: foto, numero_camiseta: dorsal } = figura.jugador;
   return (
     <div className="relative mx-auto" style={{ height: alto, width: Math.round(alto * 0.75) }}>
       {foto ? (
         // La foto se desvanece hacia abajo: el título la pisa sin un borde recto
-        <div className="relative h-full overflow-hidden rounded-[28px] ring-1 ring-oro/35 [mask-image:linear-gradient(to_bottom,#000_55%,transparent_96%)]">
+        <div className={`relative h-full overflow-hidden rounded-[28px] ring-1 ring-oro/35 ${limpia ? '' : '[mask-image:linear-gradient(to_bottom,#000_55%,transparent_96%)]'}`}>
           <FotoJugador url={foto} className="h-full w-full object-cover object-[center_20%]" />
-          {dorsal != null && (
+          {dorsal != null && !limpia && (
             <span className="absolute left-[22px] top-[14px] font-display text-[120px] font-bold leading-none text-transparent [-webkit-text-stroke:2px_var(--color-oro)]">
               {dorsal}
             </span>

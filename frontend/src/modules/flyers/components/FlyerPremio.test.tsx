@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { FiguraFlyer, FinalDeCategoria, PremiosDeCategoria, TipoPremio } from '../api/flyers.api';
-import { FlyerPremio } from './FlyerPremio';
+import { aspectoDelPremio, FlyerPremio } from './FlyerPremio';
+import { PREMIOS } from '../textosPremio';
 
 const TORNEO = { id_torneo: 5, nombre: 'CAMPEONATO NACIONAL INTERCOLEGIAL EXALUMNOS - SEDE MANTA', estado: 'finalizado', fecha_inicio: '2026-10-31', fecha_fin: '2026-11-02' };
 const CATEGORIA: PremiosDeCategoria['categoria'] = { id_categoria: 9, nombre_categoria: 'INFANTIL +40', genero_categoria: 'masculino' };
@@ -108,10 +109,17 @@ describe('FlyerPremio: el héroe', () => {
     expect(foto.style.transform).toBe('scale(2)');
   });
 
-  it('sin foto del premio usa la de la ficha del jugador, con su dorsal', () => {
+  it('sin foto del premio usa la de la ficha del jugador, entera: sin desvanecer y sin el dorsal encima', () => {
     montar('mvp', figura({ jugador: { id_jugador: 1, nombre: 'Bryan Chávez', url_foto: '/fotos/ficha.jpg', numero_camiseta: 23 } }));
-    expect(imagen('/fotos/ficha.jpg')).not.toBeNull();
-    expect(screen.getByText('23')).toBeInTheDocument();
+    const ficha = imagen('/fotos/ficha.jpg') as HTMLImageElement;
+    expect(ficha).not.toBeNull();
+    expect(screen.queryByText('23')).not.toBeInTheDocument();
+    expect(ficha.closest('[class*="mask-image"]')).toBeNull();
+  });
+
+  it('la foto del premio tampoco se desvanece: se ve entera dentro de su marco', () => {
+    montar('mvp', figura(), { foto: FOTO });
+    expect((imagen('/fotos/premio.webp') as HTMLImageElement).closest('[class*="mask-image"]')).toBeNull();
   });
 
   it('la foto del premio gana a la de la ficha', () => {
@@ -131,6 +139,51 @@ describe('FlyerPremio: el héroe', () => {
     montar('defensa', figura({ equipo: null }));
     expect(screen.getByText('58 – 55 ante SPELLMAN')).toBeInTheDocument(); // sin equipo conocido se cuenta desde el campeón
     expect(imagen('/escudo-javier.png')).toBeNull();
+  });
+});
+
+// Lo que pidió el admin: que ni el rótulo ni la palabra tapen la foto. Cada pieza tiene su renglón, de arriba abajo.
+describe('FlyerPremio: la foto no se tapa', () => {
+  const arriba = (e: HTMLElement) => parseFloat(e.style.top);
+  const flyerDe = (formato: 'feed' | 'historia', tipo: TipoPremio) =>
+    render(<FlyerPremio formato={formato} tipo={tipo} torneo={TORNEO} categoria={CATEGORIA} final={FINAL} figura={figura()} foto={FOTO} />);
+
+  it.each([['feed', 'mvp'], ['feed', 'defensa'], ['historia', 'mvp'], ['historia', 'defensa']] as const)(
+    'en %s, el %s: rótulo, palabra, foto y nombre van uno bajo otro, sin pisarse',
+    (formato, tipo) => {
+      flyerDe(formato, tipo);
+      const rotulo = screen.getByText(PREMIOS[tipo].encima).parentElement as HTMLElement;
+      const palabra = screen.getByText(PREMIOS[tipo].palabra);
+      const heroe = screen.getByTestId('heroe');
+      const nombre = screen.getByText('BRYAN CHÁVEZ').parentElement as HTMLElement;
+      const encabezado = flyer().querySelector('header') as HTMLElement;
+
+      expect(arriba(encabezado) + parseFloat(encabezado.style.height)).toBeLessThan(arriba(rotulo));
+      expect(arriba(rotulo)).toBeLessThan(arriba(palabra));
+      expect(arriba(palabra) + 0.9 * parseFloat(palabra.style.fontSize)).toBeLessThanOrEqual(arriba(heroe)); // la palabra termina donde empieza la foto
+      expect(arriba(heroe) + parseFloat(heroe.style.height)).toBeLessThanOrEqual(arriba(nombre));
+    }
+  );
+
+  it('el marco de la foto del premio es el que enseña el editor de recorte', () => {
+    expect(aspectoDelPremio('feed')).toBeCloseTo(936 / 452);
+    expect(aspectoDelPremio('historia')).toBeCloseTo(936 / 636);
+  });
+
+  it('el encabezado lleva la categoría con su género y las fechas del campeonato, junto a la copa', () => {
+    flyerDe('feed', 'mvp');
+    const encabezado = flyer().querySelector('header') as HTMLElement;
+    expect(encabezado).toHaveTextContent('Categoría');
+    expect(encabezado).toHaveTextContent('INFANTIL +40 MASCULINO');
+    expect(encabezado).toHaveTextContent('31 OCT – 2 NOV 2026');
+    expect(encabezado.querySelector('img[src="/img/logo-copa-intercolegial.webp"]')).not.toBeNull();
+  });
+
+  it('un género que la categoría ya dice no se repite', () => {
+    const { container } = render(<FlyerPremio formato="feed" tipo="mvp" torneo={TORNEO} categoria={{ ...CATEGORIA, nombre_categoria: 'JUNIOR +50 MASCULINO', genero_categoria: 'masculino' }} final={FINAL} figura={figura()} foto={null} />);
+    const encabezado = container.querySelector('header') as HTMLElement;
+    expect(encabezado).toHaveTextContent('JUNIOR +50 MASCULINO');
+    expect(encabezado).not.toHaveTextContent('MASCULINO MASCULINO');
   });
 });
 

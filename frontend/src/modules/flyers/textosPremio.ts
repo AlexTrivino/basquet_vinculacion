@@ -2,14 +2,14 @@ import { fechaCorta } from '@/modules/partidos';
 import type { FiguraFlyer, FinalDeCategoria, PremiosDeCategoria, TipoPremio } from './api/flyers.api';
 import { cuenta, ENLACE, ETIQUETAS, etiquetaCategoria, numerosDe } from './textos';
 
-// Cada premio de la final: cómo se llama en el estudio, la palabra grande del flyer (con su línea encima, si la lleva),
-// el tope de su tamaño y los números del partido que cuenta. «DEFENSA» es larga y entra a 190 px como las palabras del
-// podio; «MVP» es corta y puede crecer.
+// Cada premio de la final: cómo se llama en el estudio, la palabra grande del flyer con su rótulo encima, el tope de su
+// tamaño y los números del partido que cuenta. Las dos palabras comparten el renglón de arriba de la foto y tienen el
+// mismo tope: «DEFENSA», más larga, entra a 176 px en los 940 que tiene de ancho.
 interface Premio {
   nombre: string;
   descarga: string;
   palabra: string;
-  encima?: string;
+  encima: string;
   tope: number;
   numeros: readonly string[];
   emoji: string;
@@ -18,13 +18,13 @@ interface Premio {
 }
 export const PREMIOS: Record<TipoPremio, Premio> = {
   mvp: {
-    nombre: 'MVP de la final', descarga: 'Descargar MVP', palabra: 'MVP', encima: 'Jugador más valioso', tope: 240,
+    nombre: 'MVP de la final', descarga: 'Descargar MVP', palabra: 'MVP', encima: 'Jugador más valioso', tope: 176,
     numeros: ['puntos', 'triples', 'rebotes', 'asistencias', 'tapones'], emoji: '🏆',
     sinElegir: 'Sin elegir: el flyer lleva al de mejor valoración de la final. Elige a otro si no fue la figura del partido.',
     ayuda: 'El MVP sale del equipo campeón de la final. Elige al jugador (no siempre es el de mejor valoración) y sube su foto: acomódala con «Ajustar recorte», lo que ves es lo que se descarga.',
   },
   defensa: {
-    nombre: 'Mejor defensa de la final', descarga: 'Descargar mejor defensa', palabra: 'DEFENSA', encima: 'Mejor', tope: 190,
+    nombre: 'Mejor defensa de la final', descarga: 'Descargar mejor defensa', palabra: 'DEFENSA', encima: 'Mejor', tope: 176,
     numeros: ['rebotes', 'tapones'], emoji: '🛡️',
     sinElegir: 'Sin elegir: el flyer lleva al de más rebotes y tapones de la final. Elige a otro si no fue el mejor defensa.',
     ayuda: 'El mejor defensa sale de los dos equipos de la final y el flyer lleva sus rebotes y tapones de ese partido. Elige al jugador y sube su foto: acomódala con «Ajustar recorte», lo que ves es lo que se descarga.',

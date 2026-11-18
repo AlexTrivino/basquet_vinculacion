@@ -42,6 +42,15 @@ const conMedidas = (el: HTMLElement) => {
 };
 
 describe('EditorEncuadre', () => {
+  it('con la foto del podio avisa de lo que se desvanece; en los premios, donde nada la pisa, no', () => {
+    const { unmount } = render(<EditorEncuadre foto={FOTO} encuadre={CENTRADO} aspecto={4 / 3} alCambiar={vi.fn()} alGuardar={vi.fn()} alCancelar={vi.fn()} />);
+    expect(screen.getByText(/se desvanece arriba y abajo/)).toBeInTheDocument();
+    unmount();
+    render(<EditorEncuadre foto={FOTO} encuadre={CENTRADO} aspecto={4 / 3} limpia alCambiar={vi.fn()} alGuardar={vi.fn()} alCancelar={vi.fn()} />);
+    expect(screen.queryByText(/desvanece/)).not.toBeInTheDocument();
+    expect(screen.getByText(/elegir qué parte se ve/)).toBeInTheDocument();
+  });
+
   it('muestra la foto con su encuadre y su zoom, y la imagen no es arrastrable como archivo', () => {
     montar({ foco_x: 30, foco_y: 70, zoom: 1.5 });
     const foto = marcoDelEditor().querySelector('img') as HTMLImageElement;
