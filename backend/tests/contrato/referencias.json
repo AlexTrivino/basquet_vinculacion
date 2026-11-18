@@ -380,6 +380,30 @@
    "success": false
   }
  },
+ "DELETE /api/torneos/categorias/1/premios-final/mvp/foto · admin · sin foto": {
+  "codigo": 404,
+  "cuerpo": {
+   "error_code": "NOT_FOUND",
+   "message": "Este premio no tiene foto.",
+   "success": false
+  }
+ },
+ "DELETE /api/torneos/categorias/1/premios-final/mvp/foto · anónimo · sin token": {
+  "codigo": 401,
+  "cuerpo": {
+   "error_code": "MISSING_TOKEN",
+   "message": "Token de acceso no proporcionado. Incluye el header Authorization: Bearer <token>.",
+   "success": false
+  }
+ },
+ "DELETE /api/torneos/categorias/1/premios-final/mvp/foto · del1 · sin permiso": {
+  "codigo": 403,
+  "cuerpo": {
+   "error_code": "FORBIDDEN",
+   "message": "Acceso denegado. Se requiere uno de los siguientes roles para esta operación: 'super_admin'.",
+   "success": false
+  }
+ },
  "DELETE /api/torneos/categorias/3 · admin · con inscripciones": {
   "codigo": 409,
   "cuerpo": {
@@ -12349,6 +12373,38 @@
    "success": true
   }
  },
+ "GET /api/torneos/1/premios-final · admin · sin finales jugadas": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "premios": [],
+    "torneo": {
+     "estado": "en_curso",
+     "fecha_fin": "2026-10-20",
+     "fecha_inicio": "2026-08-01",
+     "id_torneo": 1,
+     "nombre": "INTERCOLEGIAL 2026"
+    }
+   },
+   "success": true
+  }
+ },
+ "GET /api/torneos/1/premios-final · anónimo · sin token": {
+  "codigo": 401,
+  "cuerpo": {
+   "error_code": "MISSING_TOKEN",
+   "message": "Token de acceso no proporcionado. Incluye el header Authorization: Bearer <token>.",
+   "success": false
+  }
+ },
+ "GET /api/torneos/1/premios-final · del1 · sin permiso": {
+  "codigo": 403,
+  "cuerpo": {
+   "error_code": "FORBIDDEN",
+   "message": "Acceso denegado. Se requiere uno de los siguientes roles para esta operación: 'super_admin'.",
+   "success": false
+  }
+ },
  "GET /api/torneos/1/recorrido?id_categoria=1 · anónimo": {
   "codigo": 200,
   "cuerpo": {
@@ -12752,6 +12808,22 @@
    "success": true
   }
  },
+ "GET /api/torneos/3/premios-final · admin · sin formato de llaves": {
+  "codigo": 200,
+  "cuerpo": {
+   "data": {
+    "premios": [],
+    "torneo": {
+     "estado": "finalizado",
+     "fecha_fin": "2025-11-30",
+     "fecha_inicio": "2025-09-01",
+     "id_torneo": 3,
+     "nombre": "INTERCOLEGIAL 2025"
+    }
+   },
+   "success": true
+  }
+ },
  "GET /api/torneos/4 · anónimo · anulado": {
   "codigo": 404,
   "cuerpo": {
@@ -12784,6 +12856,14 @@
    "success": false
   }
  },
+ "GET /api/torneos/4/premios-final · admin · anulado": {
+  "codigo": 404,
+  "cuerpo": {
+   "error_code": "NOT_FOUND",
+   "message": "Torneo no encontrado.",
+   "success": false
+  }
+ },
  "GET /api/torneos/99 · anónimo": {
   "codigo": 404,
   "cuerpo": {
@@ -12801,6 +12881,14 @@
   }
  },
  "GET /api/torneos/99/podios · anónimo": {
+  "codigo": 404,
+  "cuerpo": {
+   "error_code": "NOT_FOUND",
+   "message": "Torneo no encontrado.",
+   "success": false
+  }
+ },
+ "GET /api/torneos/99/premios-final · admin": {
   "codigo": 404,
   "cuerpo": {
    "error_code": "NOT_FOUND",
@@ -16226,6 +16314,30 @@
    "success": false
   }
  },
+ "PATCH /api/torneos/categorias/1/premios-final/mvp/foto · admin · sin foto": {
+  "codigo": 404,
+  "cuerpo": {
+   "error_code": "NOT_FOUND",
+   "message": "Este premio no tiene foto.",
+   "success": false
+  }
+ },
+ "PATCH /api/torneos/categorias/1/premios-final/mvp/foto · anónimo · sin token": {
+  "codigo": 401,
+  "cuerpo": {
+   "error_code": "MISSING_TOKEN",
+   "message": "Token de acceso no proporcionado. Incluye el header Authorization: Bearer <token>.",
+   "success": false
+  }
+ },
+ "PATCH /api/torneos/categorias/1/premios-final/mvp/foto · del1 · sin permiso": {
+  "codigo": 403,
+  "cuerpo": {
+   "error_code": "FORBIDDEN",
+   "message": "Acceso denegado. Se requiere uno de los siguientes roles para esta operación: 'super_admin'.",
+   "success": false
+  }
+ },
  "PATCH /api/torneos/categorias/4/podio/1/foto · admin · equipo sin foto": {
   "codigo": 404,
   "cuerpo": {
@@ -18523,6 +18635,38 @@
    "success": false
   }
  },
+ "POST /api/torneos/categorias/1/premios-final/mvp/foto · admin · la final no se juega": {
+  "codigo": 422,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": "La final de esta categoría todavía no se juega o se definió por W.O.: no hay jugadores que premiar.",
+   "success": false
+  }
+ },
+ "POST /api/torneos/categorias/1/premios-final/mvp/foto · admin · sin archivo": {
+  "codigo": 400,
+  "cuerpo": {
+   "error_code": "BAD_REQUEST",
+   "message": "No se encontró el archivo de la foto (campo \"foto\").",
+   "success": false
+  }
+ },
+ "POST /api/torneos/categorias/1/premios-final/mvp/foto · anónimo · sin token": {
+  "codigo": 401,
+  "cuerpo": {
+   "error_code": "MISSING_TOKEN",
+   "message": "Token de acceso no proporcionado. Incluye el header Authorization: Bearer <token>.",
+   "success": false
+  }
+ },
+ "POST /api/torneos/categorias/1/premios-final/mvp/foto · del1 · sin permiso": {
+  "codigo": 403,
+  "cuerpo": {
+   "error_code": "FORBIDDEN",
+   "message": "Acceso denegado. Se requiere uno de los siguientes roles para esta operación: 'super_admin'.",
+   "success": false
+  }
+ },
  "POST /api/torneos/categorias/4/podio/1/foto · admin": {
   "almacenamiento": [
    "POST archivos/podios/3/4/<uuid>_equipo-1.webp"
@@ -19774,7 +19918,39 @@
    "success": false
   }
  },
+ "PUT /api/torneos/categorias/1/premios-final/mvp · admin · la final no se juega": {
+  "codigo": 422,
+  "cuerpo": {
+   "error_code": "VALIDATION_ERROR",
+   "message": "La final de esta categoría todavía no se juega o se definió por W.O.: no hay jugadores que premiar.",
+   "success": false
+  }
+ },
+ "PUT /api/torneos/categorias/1/premios-final/mvp · anónimo · sin token": {
+  "codigo": 401,
+  "cuerpo": {
+   "error_code": "MISSING_TOKEN",
+   "message": "Token de acceso no proporcionado. Incluye el header Authorization: Bearer <token>.",
+   "success": false
+  }
+ },
+ "PUT /api/torneos/categorias/1/premios-final/mvp · del1 · sin permiso": {
+  "codigo": 403,
+  "cuerpo": {
+   "error_code": "FORBIDDEN",
+   "message": "Acceso denegado. Se requiere uno de los siguientes roles para esta operación: 'super_admin'.",
+   "success": false
+  }
+ },
  "PUT /api/torneos/categorias/99/formato · admin": {
+  "codigo": 404,
+  "cuerpo": {
+   "error_code": "NOT_FOUND",
+   "message": "Categoría no encontrada.",
+   "success": false
+  }
+ },
+ "PUT /api/torneos/categorias/99/premios-final/mvp · admin · categoría inexistente": {
   "codigo": 404,
   "cuerpo": {
    "error_code": "NOT_FOUND",

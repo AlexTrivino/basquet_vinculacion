@@ -64,6 +64,7 @@ def create_app() -> Flask:
     from app.modules.competencia.http.sanciones import sancion_bp
     from app.modules.competencia.http.fase_final import competencia_bp
     from app.modules.competencia.http.fotos_podio import foto_podio_bp
+    from app.modules.competencia.http.premios_final import premios_final_bp
     from app.shared.http.reglas import config_bp
     from app.modules.auspicios.http.rutas import patrocinador_bp
     from app.modules.plantel.http.visor import visor_bp
@@ -74,6 +75,7 @@ def create_app() -> Flask:
     app.register_blueprint(lideres_bp)
     app.register_blueprint(competencia_bp)
     app.register_blueprint(foto_podio_bp)
+    app.register_blueprint(premios_final_bp)
     app.register_blueprint(categoria_bp)
     app.register_blueprint(equipo_bp)
     app.register_blueprint(inscripcion_bp)

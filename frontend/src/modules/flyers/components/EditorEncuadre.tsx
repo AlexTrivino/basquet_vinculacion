@@ -94,7 +94,7 @@ export function EditorEncuadre({ foto, encuadre, aspecto, guardando, alCambiar, 
       </div>
       <p id={`${id}-ayuda`} className="text-xs leading-relaxed text-slate-400">
         Arrastra la foto (o usa las flechas del teclado; con Mayús van de a 5) para elegir qué parte se ve. Lo que se
-        desvanece arriba y abajo queda bajo el título y el nombre del equipo.
+        desvanece arriba y abajo queda bajo el título y el nombre.
       </p>
       <div>
         <label htmlFor={`${id}-zoom`} className="mb-1 flex justify-between text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">

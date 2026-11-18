@@ -119,7 +119,7 @@ backend/
 ├── migrations/               # Migraciones Alembic
 └── app/
     ├── __init__.py            # Fábrica Flask (create_app)
-    ├── shared/                # Lo común: errores de dominio, los 15 modelos, db, storage y utilidades HTTP
+    ├── shared/                # Lo común: errores de dominio, los 16 modelos, db, storage y utilidades HTTP
     └── modules/               # Módulos con domain/, application/, infrastructure/ y http/
 ```
 

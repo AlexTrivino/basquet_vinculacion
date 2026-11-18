@@ -2,7 +2,7 @@
 
 Las consultas son las que hacían partido_service, sancion_service, standings y llaves_service.
 """
-from sqlalchemy import desc, or_
+from sqlalchemy import and_, desc, or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
@@ -18,8 +18,10 @@ from app.shared.infrastructure.modelos.equipo import Equipo
 from app.shared.infrastructure.modelos.estadistica import Estadistica
 from app.shared.infrastructure.modelos.foto_podio import FotoPodio
 from app.shared.infrastructure.modelos.inscripcion import Inscripcion
+from app.shared.infrastructure.modelos.jugador import Jugador
 from app.shared.infrastructure.modelos.partido import Partido as FilaPartido
 from app.shared.infrastructure.modelos.plantilla import Plantilla
+from app.shared.infrastructure.modelos.premio_final import PremioFinal
 from app.shared.infrastructure.modelos.sancion import Sancion as FilaSancion
 from app.shared.infrastructure.modelos.torneo import Torneo
 from app.shared.infrastructure.paginacion import paginar
@@ -64,6 +66,11 @@ def _fase_de_grupos(id_torneo, id_categoria):
     if id_categoria is not None:
         query = query.filter(FilaPartido.id_categoria == id_categoria)
     return query
+
+
+def _sin_foto(premio):
+    premio.url_foto = premio.ancho = premio.alto = None
+    premio.foco_x, premio.foco_y, premio.zoom = 50, 50, 1
 
 
 def _torneo(fila):
@@ -271,6 +278,73 @@ class RepositorioPartidos:
             return None
         url = fila.url_foto
         db.session.delete(fila)
+        return url
+
+    # ── Premios de la final (fase 15) ─────────────────────────────────
+
+    def jugadores_del_partido(self, id_partido, id_torneo, ids_equipos):
+        """Los jugadores con estadísticas cargadas en el partido, con sus números, su foto y su equipo y dorsal: los de su
+        plantilla del torneo en uno de ``ids_equipos`` (los dos del partido)."""
+        filas = db.session.execute(
+            db.select(
+                Estadistica.id_jugador, Jugador.nombre, Jugador.url_foto, Plantilla.id_equipo, Plantilla.numero_camiseta,
+                Estadistica.puntos_anotados, Estadistica.rebotes, Estadistica.asistencias, Estadistica.tapones,
+                Estadistica.triples_anotados, Estadistica.tiros_libres_anotados,
+            )
+            .select_from(Estadistica)
+            .join(Jugador, Jugador.id_jugador == Estadistica.id_jugador)
+            .join(Plantilla, and_(Plantilla.id_jugador == Estadistica.id_jugador, Plantilla.id_torneo == id_torneo,
+                                  Plantilla.id_equipo.in_(ids_equipos)))
+            .where(Estadistica.id_partido == id_partido)
+            .order_by(Plantilla.id_plantilla)
+        ).all()
+        jugadores = {}
+        for f in filas:  # quien está en dos categorías del mismo equipo aparece una vez
+            jugadores.setdefault(f.id_jugador, {
+                'id_jugador': f.id_jugador, 'nombre': f.nombre, 'url_foto': f.url_foto, 'id_equipo': f.id_equipo, 'dorsal': f.numero_camiseta,
+                'puntos': f.puntos_anotados, 'rebotes': f.rebotes, 'asistencias': f.asistencias, 'tapones': f.tapones,
+                'triples': f.triples_anotados, 'tiros_libres': f.tiros_libres_anotados,
+            })
+        return list(jugadores.values())
+
+    def premios_final(self, id_categoria):
+        """{tipo: premio como dict} de los premios de la categoría."""
+        return {f.tipo: f.to_dict() for f in PremioFinal.query.filter_by(id_categoria=id_categoria).all()}
+
+    def elegir_premiado(self, id_categoria, tipo, id_jugador):
+        """Crea el premio o le cambia el jugador. La foto era del anterior: al cambiar, el premio queda sin foto (y con el
+        encuadre a 50 / 50 / 1). Devuelve la URL del archivo de esa foto para borrarlo, o None."""
+        fila = PremioFinal.query.filter_by(id_categoria=id_categoria, tipo=tipo).first()
+        if fila is None:
+            db.session.add(PremioFinal(id_categoria=id_categoria, tipo=tipo, id_jugador=id_jugador))
+            return None
+        if fila.id_jugador == id_jugador:
+            return None
+        anterior = fila.url_foto
+        fila.id_jugador = id_jugador
+        _sin_foto(fila)
+        return anterior
+
+    def guardar_foto_premio(self, id_categoria, tipo, url, ancho, alto):
+        """Pone la foto del premio o reemplaza la que tenía (con el encuadre vuelto a 50 / 50 / 1). Devuelve la URL de la
+        foto anterior, o None si no había."""
+        fila = PremioFinal.query.filter_by(id_categoria=id_categoria, tipo=tipo).one()
+        anterior = fila.url_foto
+        fila.url_foto, fila.ancho, fila.alto = url, ancho, alto
+        fila.foco_x, fila.foco_y, fila.zoom = 50, 50, 1
+        return anterior
+
+    def ajustar_foto_premio(self, id_categoria, tipo, foco_x, foco_y, zoom):
+        fila = PremioFinal.query.filter_by(id_categoria=id_categoria, tipo=tipo).one()
+        fila.foco_x, fila.foco_y, fila.zoom = foco_x, foco_y, zoom
+
+    def borrar_foto_premio(self, id_categoria, tipo):
+        """Deja el premio sin foto (sigue con su jugador) y devuelve la URL de su archivo, o None si no tenía."""
+        fila = PremioFinal.query.filter_by(id_categoria=id_categoria, tipo=tipo).first()
+        if fila is None or fila.url_foto is None:
+            return None
+        url = fila.url_foto
+        _sin_foto(fila)
         return url
 
 

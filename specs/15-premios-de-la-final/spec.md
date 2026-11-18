@@ -32,10 +32,10 @@ Hoy el Estudio de flyers no tiene ninguno de los dos y la base no guarda quién 
 
 ## Criterios de aceptación
 
-- [ ] La migración crea `premios_final` solo si no existe (la tabla puede haberse creado a mano con la query de producción) y, en PostgreSQL, le habilita RLS. La query de producción se prueba dos veces seguidas en un PostgreSQL local.
-- [ ] Los candidatos salen del partido de la final: el MVP solo del campeón, el mejor defensa de los dos finalistas, ordenados como se dijo, y las categorías sin final jugada (o por W.O.) no aparecen.
-- [ ] Solo un candidato se puede elegir: un jugador de otro equipo, de otra categoría o sin estadísticas en la final se rechaza con su mensaje y su prueba. Cambiar de jugador borra la foto del anterior (la fila y el archivo del bucket).
-- [ ] Cada rechazo de la foto tiene su mensaje y su prueba (los mismos de la fase 14, más «elige primero al jugador»), y un delegado no puede elegir, subir, ajustar ni quitar.
-- [ ] El flyer de cada premio se ve bien en estados y redes con y sin foto del premio, con nombres largos y con números en 0; los textos no bajan de 20 px y las zonas seguras de estados (250 px arriba y abajo) quedan libres.
-- [ ] El Estudio elige al jugador, sube la foto, ajusta el recorte, la quita y descarga los PNG; el texto para Instagram cuenta lo mismo que el flyer.
-- [ ] Casos de contrato de las rutas nuevas; `pytest`, `npm test`, build y prueba de humo en verde.
+- [x] La migración crea `premios_final` solo si no existe (la tabla puede haberse creado a mano con la query de producción) y, en PostgreSQL, le habilita RLS. La query de producción se prueba dos veces seguidas en un PostgreSQL local.
+- [x] Los candidatos salen del partido de la final: el MVP solo del campeón, el mejor defensa de los dos finalistas, ordenados como se dijo, y las categorías sin final jugada (o por W.O.) no aparecen.
+- [x] Solo un candidato se puede elegir: un jugador de otro equipo, de otra categoría o sin estadísticas en la final se rechaza con su mensaje y su prueba. Cambiar de jugador borra la foto del anterior (la fila y el archivo del bucket).
+- [x] Cada rechazo de la foto tiene su mensaje y su prueba (los mismos de la fase 14, más «elige primero al jugador»), y un delegado no puede elegir, subir, ajustar ni quitar.
+- [x] El flyer de cada premio se ve bien en estados y redes con y sin foto del premio, con nombres largos y con números en 0; los textos no bajan de 20 px y las zonas seguras de estados (250 px arriba y abajo) quedan libres.
+- [x] El Estudio elige al jugador, sube la foto, ajusta el recorte, la quita y descarga los PNG; el texto para Instagram cuenta lo mismo que el flyer.
+- [x] Casos de contrato de las rutas nuevas; `pytest`, `npm test`, build y prueba de humo en verde.

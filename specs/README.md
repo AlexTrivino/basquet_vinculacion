@@ -26,3 +26,4 @@ Los cambios de arquitectura se hacen con Spec-Driven Development: primero la esp
 | 12 · Portada: figuras del torneo | [12-figuras-portada](12-figuras-portada/spec.md) | terminada |
 | 13 · Portada: el podio del torneo | [13-podio-portada](13-podio-portada/spec.md) | terminada |
 | 14 · La foto del ganador en el flyer del podio | [14-foto-podio-flyer](14-foto-podio-flyer/spec.md) | terminada |
+| 15 · Los premios de la final: MVP y mejor defensa | [15-premios-de-la-final](15-premios-de-la-final/spec.md) | terminada |

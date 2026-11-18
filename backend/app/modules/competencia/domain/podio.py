@@ -85,6 +85,22 @@ def _de_llaves(llaves):
     return [(lugar, _ficha(equipo), _partido(llave, equipo['id_equipo'])) for lugar, equipo, llave in puestos]
 
 
+def final_de(llaves):
+    """La final jugada de la categoría: ``{id_partido, ronda, fecha, campeon, vice}`` con cada equipo y su marcador.
+    None si no hay llave ``F`` jugada o se definió por W.O.: sin un partido de verdad no hay estadísticas ni a quién premiar."""
+    llave = next((l for l in llaves if l['codigo'] == 'F' and l['estado'] == 'finalizado'), None)
+    if llave is None or llave['partido']['estado'] == 'finalizado_wo':
+        return None
+    p = llave['partido']
+    marcador = {p['id_equipo_local']: p['marcador_local'], p['id_equipo_visitante']: p['marcador_visitante']}
+    campeon, vice = _lados(llave)
+    return {
+        'id_partido': p['id_partido'], 'ronda': llave['ronda'], 'fecha': p['fecha'],
+        'campeon': {**_ficha(campeon), 'marcador': marcador[campeon['id_equipo']]},
+        'vice': {**_ficha(vice), 'marcador': marcador[vice['id_equipo']]},
+    }
+
+
 def podio(estado, partidos, tabla=None):
     """Los puestos del podio de una categoría, del 1 al 3 (lista vacía si todavía no hay podio).
 

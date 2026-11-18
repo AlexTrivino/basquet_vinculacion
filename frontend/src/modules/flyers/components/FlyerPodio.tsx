@@ -1,4 +1,4 @@
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, useMemo, type ReactNode } from 'react';
 import { Shield } from 'lucide-react';
 import type { PodioDeCategoria, PodiosDelTorneo, PuestoDelPodio } from '@/modules/partidos';
 import type { Encuadre } from '../api/flyers.api';
@@ -11,6 +11,7 @@ import { EscudoFlyer, FondoFlyer, type Formato } from './Flyer';
 // copa, la franja con la categoría y las fechas, el héroe (la foto o el escudo), la palabra del puesto, el equipo, el
 // dato del puesto, los cuatro números y el pie. En estados, los 250 px de arriba y de abajo quedan libres (barra y
 // caja de respuesta). `base` es donde apoya la palabra del puesto, que pisa la parte baja del héroe.
+// Los flyers de los premios de la final (MVP y mejor defensa) usan este mismo armazón.
 const MEDIDAS = {
   historia: { alto: 1920, cab: 250, cabAlto: 290, titulo: 520, copa: 410, banda: 558, foto: 632, fotoAlto: 760, base: 1250, equipo: 1268, gancho: 1356, stats: 1448, pie: 1592 },
   feed: { alto: 1350, cab: 56, cabAlto: 224, titulo: 410, copa: 320, banda: 296, foto: 370, fotoAlto: 610, base: 868, equipo: 886, gancho: 974, stats: 1064, pie: 1208 },
@@ -52,45 +53,51 @@ function EscudoHeroe({ url, k }: { url: string | null; k: number }) {
   );
 }
 
-interface Props {
+interface MarcoProps {
   formato: Formato;
-  torneo: PodiosDelTorneo['torneo'];
-  categoria: PodioDeCategoria['categoria'];
-  puesto: PuestoDelPodio;
-  encuadre?: Encuadre; // el que se está ajustando: va en lugar del guardado
+  torneo: { nombre: string; fecha_inicio: string; fecha_fin: string };
+  categoria: { nombre_categoria: string; genero_categoria: string };
+  etiqueta: string; // lo que lee un lector de pantalla
+  heroe: ReactNode; // llena el marco del héroe: 1080 px de ancho por `fotoAlto`
+  // La palabra grande que pisa la base del héroe (hasta `tope` px de alto, lo que le deje su ancho) y, si lleva, su línea de arriba
+  palabra: { texto: string; encima?: string; tope?: number };
+  // El nombre bajo la palabra. Con `escudo` (aunque sea null, el genérico) lleva el medallón al lado
+  nombre: { texto: string; escudo?: string | null };
+  gancho: readonly [string, string]; // etiqueta en oro y, debajo, el dato
+  numeros: readonly (readonly [string, number])[]; // de 0 a 5 (de 1 a 2 salen más grandes); sin ninguno no hay franja
 }
 
-// El flyer de un puesto del podio. Héroe: la foto del podio, si no la del equipo y, si no hay ninguna, el escudo.
-export const FlyerPodio = forwardRef<HTMLDivElement, Props>(function FlyerPodio({ formato, torneo, categoria, puesto, encuadre }, ref) {
+// El armazón del flyer del podio y de los premios de la final: encabezado con el campeonato y la copa, franja con
+// la categoría y las fechas, héroe, palabra, nombre, dato, franja de números y pie.
+export const MarcoPodio = forwardRef<HTMLDivElement, MarcoProps>(function MarcoPodio(
+  { formato, torneo, categoria, etiqueta, heroe, palabra, nombre, gancho: [rotulo, dato], numeros },
+  ref
+) {
   const m = MEDIDAS[formato];
   const fuenteLista = useFuente();
-  const url = puesto.foto?.url ?? puesto.url_foto_equipo;
-  const marco = encuadre ?? (puesto.foto ? encuadreDe(puesto.foto) : CENTRADO);
-  const lugar = LUGARES[puesto.lugar].toUpperCase();
-  const [etiqueta, dato] = ganchoDelPuesto(puesto);
-  const equipo = puesto.equipo.nombre_equipo;
+  const conEscudo = nombre.escudo !== undefined;
 
-  // El texto llena su caja: cada línea del campeonato, la palabra del puesto (hasta 190 px), el equipo y el dato
+  // El texto llena su caja: cada línea del campeonato, la palabra (hasta su tope), el nombre y el dato
   const tamanos = useMemo(() => {
     const lineas = lineasDelTorneo(torneo.nombre).map((l) => l.toUpperCase());
     return {
       lineas: lineas.map((l) => [l, tamanoParaAncho(l, m.titulo, 999)] as const),
-      lugar: tamanoParaAncho(lugar, 940, 190),
-      equipo: tamanoParaAncho(equipo, url ? 830 : 936, 52),
+      palabra: tamanoParaAncho(palabra.texto, 940, palabra.tope ?? 190),
+      nombre: tamanoParaAncho(nombre.texto, conEscudo ? 830 : 936, 52),
       dato: tamanoParaAncho(dato, 936, 38),
     };
     // fuenteLista está en las dependencias para medir otra vez cuando baja Cinzel
-  }, [fuenteLista, torneo.nombre, m.titulo, lugar, equipo, dato, url]);
+  }, [fuenteLista, torneo.nombre, m.titulo, palabra.texto, palabra.tope, nombre.texto, conEscudo, dato]);
 
   const generoYaDicho = categoria.nombre_categoria.toLowerCase().includes(categoria.genero_categoria.toLowerCase());
-  const numeros = [['Ganados', puesto.PG], ['Perdidos', puesto.PP], ['Pts. a favor', puesto.PF], ['Pts. en contra', puesto.PC]] as const;
-  const k = m.fotoAlto / 760;
+  const arribaDeLaPalabra = m.base - 0.9 * tamanos.palabra;
+  const grandes = numeros.length <= 2;
 
   return (
     <div
       ref={ref}
       role="img"
-      aria-label={`${LUGARES[puesto.lugar]} de ${categoria.nombre_categoria}: ${equipo}`}
+      aria-label={etiqueta}
       style={{ width: 1080, height: m.alto }}
       className="relative isolate overflow-hidden bg-marino font-sans tabular-nums text-slate-100"
     >
@@ -119,35 +126,55 @@ export const FlyerPodio = forwardRef<HTMLDivElement, Props>(function FlyerPodio(
       </div>
 
       <div className="absolute inset-x-0" style={{ top: m.foto, height: m.fotoAlto }}>
-        {url ? <FotoHeroe url={url} {...marco} /> : <EscudoHeroe url={puesto.equipo.url_logo} k={k} />}
+        {heroe}
       </div>
 
+      {palabra.encima && (
+        // Un rótulo con fondo: suelto, el texto dorado se perdería entre las caras y las camisetas de una foto. El
+        // espacio que deja el tracking a la derecha se compensa a la izquierda para que el texto quede centrado.
+        <div className="absolute inset-x-0 flex justify-center" style={{ top: arribaDeLaPalabra - 50 }}>
+          <span
+            className="rounded-full border-[1.5px] border-oro/70 bg-marino/85 py-[9px] pr-[30px] text-[26px] font-semibold uppercase leading-[1.25] tracking-[0.3em] text-oro"
+            style={{ paddingLeft: 'calc(30px + 0.3em)' }}
+          >
+            {palabra.encima}
+          </span>
+        </div>
+      )}
       <p
         className="absolute inset-x-0 text-center font-display font-bold leading-[0.9] text-crema [text-shadow:0_6px_30px_rgb(8_18_38/0.95),0_2px_0_rgb(8_18_38/0.7)]"
-        style={{ top: m.base - 0.9 * tamanos.lugar, fontSize: tamanos.lugar }}
+        style={{ top: arribaDeLaPalabra, fontSize: tamanos.palabra }}
       >
-        {lugar}
+        {palabra.texto}
       </p>
 
-      <div className="absolute inset-x-0 flex items-center justify-center gap-[22px] font-display font-bold leading-[1.25] text-crema" style={{ top: m.equipo, fontSize: tamanos.equipo }}>
-        {url && <EscudoFlyer url={puesto.equipo.url_logo} className="h-[84px] w-[84px]" />}
-        <span className="whitespace-nowrap">{equipo}</span>
+      <div className="absolute inset-x-0 flex items-center justify-center gap-[22px] font-display font-bold leading-[1.25] text-crema" style={{ top: m.equipo, fontSize: tamanos.nombre }}>
+        {conEscudo && <EscudoFlyer url={nombre.escudo ?? null} className="h-[84px] w-[84px]" />}
+        <span className="whitespace-nowrap">{nombre.texto}</span>
       </div>
 
       <div className="absolute inset-x-0 flex flex-col items-center gap-[8px]" style={{ top: m.gancho }}>
-        <span className="text-[22px] font-semibold uppercase leading-[1.2] tracking-[0.24em] text-oro">{etiqueta}</span>
+        <span className="text-[22px] font-semibold uppercase leading-[1.2] tracking-[0.24em] text-oro">{rotulo}</span>
         <span className="whitespace-nowrap font-display font-bold leading-[1.25] text-crema" style={{ fontSize: tamanos.dato }}>{dato}</span>
       </div>
 
-      <dl className="absolute grid grid-cols-4 border-y border-crema/15" style={{ left: 72, right: 72, top: m.stats, height: 126 }}>
-        {numeros.map(([etiquetaNumero, valor], i) => (
-          <div key={etiquetaNumero} className="relative flex flex-col items-center justify-center gap-[4px]">
-            {i > 0 && <span className="absolute inset-y-[26px] left-0 w-px bg-crema/15" />}
-            <dt className="whitespace-nowrap text-[20px] font-semibold uppercase leading-[1.2] tracking-[0.18em] text-oro">{etiquetaNumero}</dt>
-            <dd className="font-display text-[62px] font-bold leading-none text-crema">{valor}</dd>
-          </div>
-        ))}
-      </dl>
+      {numeros.length > 0 && (
+        <dl
+          className="absolute grid border-y border-crema/15"
+          style={{ left: 72, right: 72, top: m.stats, height: 126, gridTemplateColumns: `repeat(${numeros.length}, minmax(0, 1fr))` }}
+        >
+          {numeros.map(([etiquetaNumero, valor], i) => (
+            <div key={etiquetaNumero} className="relative flex flex-col items-center justify-center gap-[4px]">
+              {i > 0 && <span className="absolute inset-y-[26px] left-0 w-px bg-crema/15" />}
+              {/* Con cinco columnas, «ASISTENCIAS» no cabe con el tracking de las demás */}
+              <dt className={`whitespace-nowrap text-[20px] font-semibold uppercase leading-[1.2] text-oro ${numeros.length > 4 ? 'tracking-[0.1em]' : 'tracking-[0.18em]'}`}>
+                {etiquetaNumero}
+              </dt>
+              <dd className="font-display font-bold leading-none text-crema" style={{ fontSize: grandes ? 80 : 62 }}>{valor}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
 
       <footer className="absolute flex items-end justify-between gap-[40px] border-t border-crema/15 pt-[14px]" style={{ left: 72, right: 72, top: m.pie, height: 78 }}>
         <p className="line-clamp-2 max-w-[560px] font-display text-[22px] font-semibold leading-[1.3] text-crema/85">{pieDelTorneo(torneo.nombre)}</p>
@@ -157,5 +184,35 @@ export const FlyerPodio = forwardRef<HTMLDivElement, Props>(function FlyerPodio(
         </div>
       </footer>
     </div>
+  );
+});
+
+interface Props {
+  formato: Formato;
+  torneo: PodiosDelTorneo['torneo'];
+  categoria: PodioDeCategoria['categoria'];
+  puesto: PuestoDelPodio;
+  encuadre?: Encuadre; // el que se está ajustando: va en lugar del guardado
+}
+
+// El flyer de un puesto del podio. Héroe: la foto del podio, si no la del equipo y, si no hay ninguna, el escudo.
+export const FlyerPodio = forwardRef<HTMLDivElement, Props>(function FlyerPodio({ formato, torneo, categoria, puesto, encuadre }, ref) {
+  const url = puesto.foto?.url ?? puesto.url_foto_equipo;
+  const marco = encuadre ?? (puesto.foto ? encuadreDe(puesto.foto) : CENTRADO);
+  const equipo = puesto.equipo.nombre_equipo;
+
+  return (
+    <MarcoPodio
+      ref={ref}
+      formato={formato}
+      torneo={torneo}
+      categoria={categoria}
+      etiqueta={`${LUGARES[puesto.lugar]} de ${categoria.nombre_categoria}: ${equipo}`}
+      heroe={url ? <FotoHeroe url={url} {...marco} /> : <EscudoHeroe url={puesto.equipo.url_logo} k={MEDIDAS[formato].fotoAlto / 760} />}
+      palabra={{ texto: LUGARES[puesto.lugar].toUpperCase() }}
+      nombre={{ texto: equipo, escudo: url ? puesto.equipo.url_logo : undefined }}
+      gancho={ganchoDelPuesto(puesto)}
+      numeros={[['Ganados', puesto.PG], ['Perdidos', puesto.PP], ['Pts. a favor', puesto.PF], ['Pts. en contra', puesto.PC]]}
+    />
   );
 });

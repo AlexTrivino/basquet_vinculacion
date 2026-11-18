@@ -77,3 +77,66 @@ export async function quitarFotoPodio(idCategoria: number, idEquipo: number): Pr
   const response = await axiosInstance.delete(rutaFoto(idCategoria, idEquipo));
   return response.data;
 }
+
+// ── Premios de la final: el MVP y el mejor defensa de cada categoría (solo super_admin) ──
+export type TipoPremio = 'mvp' | 'defensa';
+
+// Lo que el admin guardó de un premio: el jugador elegido y, si la subió, la foto del premiado con su encuadre
+export interface PremioGuardado {
+  id_jugador: number;
+  foto: FotoDelPodio | null;
+}
+
+export interface FinalDeCategoria {
+  id_partido: number;
+  ronda: string;
+  fecha: string | null;
+  campeon: EquipoFlyer & { marcador: number };
+  vice: EquipoFlyer & { marcador: number };
+}
+
+export interface PremiosDeCategoria {
+  categoria: { id_categoria: number; nombre_categoria: string; genero_categoria: string };
+  final: FinalDeCategoria;
+  // Los jugadores con estadísticas en la final, de mejor a peor: el primero es el que el sistema sugiere
+  candidatos: Record<TipoPremio, FiguraFlyer[]>;
+  premios: Record<TipoPremio, PremioGuardado | null>;
+}
+
+export interface PremiosDelTorneo {
+  torneo: { id_torneo: number; nombre: string; estado: string; fecha_inicio: string; fecha_fin: string };
+  premios: PremiosDeCategoria[];
+}
+
+export async function getPremiosFinal(idTorneo: number): Promise<ApiResponse<PremiosDelTorneo>> {
+  const response = await axiosInstance.get(`/torneos/${idTorneo}/premios-final`);
+  return response.data;
+}
+
+// Clave de los premios del torneo en React Query: al elegir jugador o subir, ajustar o quitar la foto se invalida
+export const clavePremios = (idTorneo: number) => ['flyers', 'premios', idTorneo] as const;
+
+const rutaPremio = (idCategoria: number, tipo: TipoPremio) => `/torneos/categorias/${idCategoria}/premios-final/${tipo}`;
+
+// Elegir otro jugador borra la foto del anterior: era suya
+export async function elegirPremiado(idCategoria: number, tipo: TipoPremio, idJugador: number): Promise<ApiResponse<PremioGuardado>> {
+  const response = await axiosInstance.put(rutaPremio(idCategoria, tipo), { id_jugador: idJugador });
+  return response.data;
+}
+
+export async function subirFotoPremio(idCategoria: number, tipo: TipoPremio, foto: File): Promise<ApiResponse<PremioGuardado>> {
+  const datos = new FormData();
+  datos.append('foto', foto);
+  const response = await axiosInstance.post(`${rutaPremio(idCategoria, tipo)}/foto`, datos);
+  return response.data;
+}
+
+export async function ajustarFotoPremio(idCategoria: number, tipo: TipoPremio, { foco_x, foco_y, zoom }: Encuadre): Promise<ApiResponse<PremioGuardado>> {
+  const response = await axiosInstance.patch(`${rutaPremio(idCategoria, tipo)}/foto`, { foco_x, foco_y, zoom });
+  return response.data;
+}
+
+export async function quitarFotoPremio(idCategoria: number, tipo: TipoPremio): Promise<ApiResponse<PremioGuardado>> {
+  const response = await axiosInstance.delete(`${rutaPremio(idCategoria, tipo)}/foto`);
+  return response.data;
+}

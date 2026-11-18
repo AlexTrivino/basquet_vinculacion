@@ -19,3 +19,4 @@ from app.shared.infrastructure.modelos.documento_jugador import DocumentoJugador
 from app.shared.infrastructure.modelos.patrocinador import Patrocinador  # noqa: F401
 from app.shared.infrastructure.modelos.patrocinador_torneo import PatrocinadorTorneo  # noqa: F401
 from app.shared.infrastructure.modelos.foto_podio import FotoPodio  # noqa: F401
+from app.shared.infrastructure.modelos.premio_final import PremioFinal  # noqa: F401
